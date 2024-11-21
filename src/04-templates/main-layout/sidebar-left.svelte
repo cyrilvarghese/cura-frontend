@@ -12,11 +12,11 @@
 	import Trash2 from "lucide-svelte/icons/trash-2";
 	import { Feather, Stethoscope, Microscope } from "lucide-svelte";
 
-	import NavFavorites from "$lib/components/nav-favorites.svelte";
-	import NavMain from "$lib/components/nav-main.svelte";
-	import NavSecondary from "$lib/components/nav-secondary.svelte";
-	import NavWorkspaces from "$lib/components/nav-workspaces.svelte";
-	import TeamSwitcher from "$lib/components/team-switcher.svelte";
+	import NavFavorites from "./nav-favorites.svelte";
+	import NavMain from "./nav-main.svelte";
+	import NavSecondary from "./nav-secondary.svelte";
+	import NavWorkspaces from "./nav-workspaces.svelte";
+	import TeamSwitcher from "./team-switcher.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
 
@@ -121,12 +121,7 @@
 						name: "Eczema (Atopic Dermatitis)",
 						url: "#",
 						emoji: "📋",
-					},
-					{
-						name: "Medication",
-						url: "#",
-						emoji: "📋",
-					},
+					} 
 				],
 			},
 			{

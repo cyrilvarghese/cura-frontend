@@ -1,10 +1,13 @@
 <script lang="ts">
-	import SidebarLeft from "$lib/components/sidebar-left.svelte";
-	import SidebarRight from "$lib/components/sidebar-right.svelte";
+	import SidebarLeft from "./sidebar-left.svelte";
+	import SidebarRight from "./sidebar-right.svelte";
 	import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
 	import { Separator } from "$lib/components/ui/separator/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-    import { Slash } from "lucide-svelte";
+	import { Slash } from "lucide-svelte";
+	import { Route, Router } from "svelte-routing";
+	import HomePage from "../../05-pages/home/home-page.svelte";
+	import CasePlayer from "../../05-pages/cases/case-player.svelte"; // Importing the CasePlayer component
 </script>
 
 <Sidebar.Provider>
@@ -37,14 +40,23 @@
 				</Breadcrumb.Root>
 			</div>
 		</header>
-		<div class="flex flex-1 flex-col gap-4 p-4">
-			<div
-				class="bg-muted/50 mx-auto h-24 w-full max-w-3xl rounded-xl"
-			></div>
-			<div
-				class="bg-muted/50 mx-auto h-[100vh] w-full max-w-3xl rounded-xl"
-			></div>
-		</div>
+		<main>
+			<Router url="">
+				<Route path="/">
+					<HomePage />
+				</Route>
+					
+				<Route path="cases/:id" let:params>
+					<CasePlayer id={params.id} message={undefined} />
+				</Route>
+
+				<!-- <Route path="posts/:id" let:params>
+					<AddPost id={params.id} />
+				</Route>
+				<Route path="files" component={FileList} />
+				<Route path="settings" component={SettingsPage} />
+				<Route path="calendar" component={CalendarPage} />  -->
+			</Router>
+		</main>
 	</Sidebar.Inset>
-	<SidebarRight />
 </Sidebar.Provider>

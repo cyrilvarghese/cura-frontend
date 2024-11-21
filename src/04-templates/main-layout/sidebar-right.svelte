@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Calendars from "$lib/components/calendars.svelte";
 	import DatePicker from "$lib/components/date-picker.svelte";
-	import NavUser from "$lib/components/nav-user.svelte";
+	import NavUser from "./nav-user.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import Plus from "lucide-svelte/icons/plus";
 	import type { ComponentProps } from "svelte";

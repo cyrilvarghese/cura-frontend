@@ -1,10 +1,11 @@
 <script lang="ts">
   import "./app.css";
-  import SidebarPage from "$lib/components/sidebar-page.svelte";
+  // Correcting the import path for SidebarPage
+  import MainLayout from "./04-templates/main-layout/index.svelte"; 
 </script>
 
 <main>
-  <SidebarPage />
+  <MainLayout />
 </main>
 
 <style>
