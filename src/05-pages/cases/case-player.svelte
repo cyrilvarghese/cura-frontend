@@ -1,5 +1,4 @@
 <script lang="ts">
-    import * as Resizable from "$lib/components/ui/resizable/index.js";
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ChatInput from "../../03-organisms/chat/chat-input.svelte";
     import Message from "../../03-organisms/chat/message.svelte";
@@ -7,7 +6,6 @@
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
     import ArrowRight from "lucide-svelte/icons/arrow-right";
-    import LoadingMessage from "$lib/components/LoadingMessage.svelte";
     import { onMount } from 'svelte';
 
     $: messages = $apiStore.messages;

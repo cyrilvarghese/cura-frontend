@@ -1,0 +1,67 @@
+{
+    "messages": [
+        {
+            "id": "1",
+            "sender": "assistant",
+            "type": "image",
+            "step": "case-presentation",
+            "imageUrl": "https://cdn.midjourney.com/6703f338-5798-4ef4-bc15-865900f67df2/0_3.png",
+            "title": "I have rashes all over my hands and it itches a lot",
+            "content": "Patient presenting with rashes and joint pain.",
+            "timestamp": "2024-02-20T10:00:00"
+        },
+        {
+            "id": "2",
+            "sender": "patient",
+            "step": "case-presentation",
+            "content": "Doctor, I have rashes and my joints are aching.",
+            "timestamp": "2024-02-20T10:01:00"
+        },
+        {
+            "id": "3",
+            "sender": "student",
+            "step": "history-taking",
+            "content": "When did the rash first appear?",
+            "timestamp": "2024-02-20T10:05:00"
+        },
+        {
+            "id": "4",
+            "sender": "patient",
+            "step": "history-taking",
+            "content": "It started about two weeks ago. It hasn't gone away.",
+            "imageUrl": "https://example.com/rash_photo.jpg",
+            "caption": "Photo of rash taken at initial presentation.",
+            "timestamp": "2024-02-20T10:06:00"
+        },
+        {
+            "id": "5",
+            "sender": "Medical Assistant",
+            "step": "physical-examinations",
+            "content": "Here are the vital signs: Heart rate: 80/min, Blood pressure: 118/76 mm Hg, Temperature: 37.2°C. No abnormalities noted.",
+            "timestamp": "2024-02-20T10:10:00"
+        },
+        {
+            "id": "6",
+            "sender": "Medical Assistant",
+            "step": "physical-examinations",
+            "content": "Skin examination findings: Red, raised patches on the forearms and legs, some fading with bruising. Slight tenderness but no pain.",
+            "imageUrl": "https://example.com/skin_exam_photo.jpg",
+            "caption": "Skin findings during physical examination.",
+            "timestamp": "2024-02-20T10:11:00"
+        },
+        {
+            "id": "7",
+            "sender": "Medical Assistant",
+            "step": "relevant-information",
+            "content": "Based on the history and examination findings, select the details you think are relevant to the diagnosis.",
+            "timestamp": "2024-02-20T10:15:00"
+        },
+        {
+            "id": "8",
+            "sender": "student",
+            "step": "relevant-information",
+            "content": "Relevant: Rash lasting over 24 hours, resolving with bruising. Morning joint pain in wrists and knees. No new exposures.",
+            "timestamp": "2024-02-20T10:16:00"
+        }
+    ]
+}

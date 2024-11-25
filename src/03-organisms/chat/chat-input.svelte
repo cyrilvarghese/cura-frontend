@@ -1,9 +1,14 @@
 <script lang="ts">
-    import Paperclip from "lucide-svelte/icons/paperclip";
-    import Mic from "lucide-svelte/icons/mic";
     import { Button } from "$lib/components/ui/button/index.js";
     import { Textarea } from "$lib/components/ui/textarea/index.js";
     import { sendMessage } from "$lib/stores/api";
+    import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+    import { examinationStore } from "$lib/stores/examination";
+    import { laboratoryStore } from "$lib/stores/laboratory";
+    import type { ExaminationName } from "$lib/stores/examination-data";
+    import type { DiagnosticTestName } from "$lib/stores/diagnostic-test-data";
 
     let textValue = "";
     let isLoading = false;
@@ -12,8 +17,13 @@
         if (textValue.trim() && !isLoading) {
             isLoading = true;
             try {
-                await sendMessage(textValue.trim());
-                textValue = ""; // Clear the input after sending
+                await sendMessage(
+                    textValue.trim(),
+                    "student",
+                    "patient_history",
+                    "text",
+                );
+                textValue = "";
             } catch (error) {
                 console.error("Failed to send message:", error);
             } finally {
@@ -23,9 +33,53 @@
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter' && event.ctrlKey) {
+        if (event.key === "Enter" && event.ctrlKey) {
             event.preventDefault();
             handleSend();
+        }
+    }
+
+    async function handleLabTest(testName: DiagnosticTestName) {
+        const result = await laboratoryStore.orderTest(testName);
+       
+        if (result) {
+            const message = {
+                id: crypto.randomUUID(),
+                sender: "assistant",
+                content: {
+                    testName: result.testName,
+                    purpose: result.purpose,
+                    status: result.status,
+                    results: result.results,
+                    interpretation:
+                        result.interpretation || "Results are being analyzed.",
+                    timestamp: result.timestamp,
+                },
+                timestamp: new Date(),
+                type: "test-result",
+            };
+            await sendMessage(message.content, "assistant", "examination", "test-result");
+        }
+        debugger;
+        console.log(result);
+    }
+
+    async function handlePhysicalExam(examName: ExaminationName) {
+        const result = await examinationStore.performPhysicalExam(examName);
+        if (result) {
+            const message = {
+                id: crypto.randomUUID(),
+                sender: "assistant",
+                content: {
+                    name: result.name,
+                    purpose: result.purpose,
+                    findings: result.findings,
+                    timestamp: result.timestamp,
+                },
+                timestamp: new Date(),
+                type: "examination",
+            };
+            await sendMessage(message.content, "assistant", "examination", "examination");
         }
     }
 </script>
@@ -39,22 +93,207 @@
         onkeydown={handleKeyDown}
     />
     <div class="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2">
-        <Button
-            variant="ghost"
-            size="icon"
-            class="h-8 w-8 p-0"
-            disabled={isLoading}
-        >
-            <Paperclip class="h-5 w-5" />
-        </Button>
-        <Button
-            variant="ghost"
-            size="icon"
-            class="h-8 w-8 p-0"
-            disabled={isLoading}
-        >
-            <Mic class="h-5 w-5" />
-        </Button>
+        <Tooltip.Provider>
+            <Tooltip.Root>
+                <Tooltip.Trigger>
+                    <DropdownMenu.Root>
+                        <DropdownMenu.Trigger>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                class="h-8 w-8 p-0"
+                                disabled={isLoading}
+                            >
+                                <TestTubeDiagonal class="h-5 w-5" />
+                            </Button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Content class="w-72">
+                            <DropdownMenu.Label
+                                >Laboratory Tests</DropdownMenu.Label
+                            >
+                            <DropdownMenu.Separator />
+                            <DropdownMenu.Group>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest(
+                                            "Complete Blood Count and ESR",
+                                        )}
+                                >
+                                    Complete Blood Count and ESR
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() => handleLabTest("ANA Test")}
+                                >
+                                    ANA Test
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest("Complement Levels")}
+                                >
+                                    Complement Levels
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() => handleLabTest("Skin Biopsy")}
+                                >
+                                    Skin Biopsy
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest("Rheumatoid Factor")}
+                                >
+                                    Rheumatoid Factor
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest("Anti-dsDNA and Anti-Sm")}
+                                >
+                                    Anti-dsDNA and Anti-Sm
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest("Allergy Panel")}
+                                >
+                                    Allergy Panel
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                    onclick={() =>
+                                        handleLabTest("Chest Imaging")}
+                                >
+                                    Chest Imaging
+                                </DropdownMenu.Item>
+                            </DropdownMenu.Group>
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    <p>Add tests</p>
+                </Tooltip.Content>
+            </Tooltip.Root>
+
+            <Tooltip.Root>
+                <Tooltip.Trigger>
+                    <div>
+                        <DropdownMenu.Root>
+                            <DropdownMenu.Trigger>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    class="h-8 w-8 p-0"
+                                    disabled={isLoading}
+                                >
+                                    <ScanEye class="h-5 w-5" />
+                                </Button>
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Content class="w-72">
+                                <DropdownMenu.Label
+                                    >Physical Examination</DropdownMenu.Label
+                                >
+                                <DropdownMenu.Separator />
+                                <DropdownMenu.Group>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Skin Examination",
+                                            )}
+                                    >
+                                        Skin Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Musculoskeletal Examination",
+                                            )}
+                                    >
+                                        Musculoskeletal Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam("Vitals Check")}
+                                    >
+                                        Vitals Check
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Lymph Node Examination",
+                                            )}
+                                    >
+                                        Lymph Node Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Abdominal Examination",
+                                            )}
+                                    >
+                                        Abdominal Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Neurological Examination",
+                                            )}
+                                    >
+                                        Neurological Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Respiratory Examination",
+                                            )}
+                                    >
+                                        Ophthalmologic Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Cardiovascular Examination",
+                                            )}
+                                    >
+                                        Cardiovascular Examination</DropdownMenu.Item
+                                    >
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Oral Examination",
+                                            )}
+                                    >
+                                        Oral Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Hair and Scalp Examination",
+                                            )}
+                                    >
+                                        Hair and Scalp Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Spinal Examination",
+                                            )}
+                                    >
+                                        Spinal Examination
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                        onclick={() =>
+                                            handlePhysicalExam(
+                                                "Peripheral Vascular Examination",
+                                            )}
+                                    >
+                                        Peripheral Vascular Examination
+                                    </DropdownMenu.Item>
+                                </DropdownMenu.Group>
+                            </DropdownMenu.Content>
+                        </DropdownMenu.Root>
+                    </div>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    <p>Physical examination</p>
+                </Tooltip.Content>
+            </Tooltip.Root>
+        </Tooltip.Provider>
     </div>
     <Button
         class="absolute right-2 top-1/2 -translate-y-1/2"
