@@ -10,10 +10,10 @@
 <Dialog.Root bind:open>
     <Dialog.Content class="sm:max-w-[800px]">
         <Dialog.Header>
-            <Dialog.Title>Submit Final Diagnosis</Dialog.Title>
+            <Dialog.Title>Submit Inital Diagnosis</Dialog.Title>
             <Dialog.Description>
-                Are you sure you want to submit your final diagnosis for Case #123?
-                This action cannot be undone.
+                <p class="font-semibold">This is your initial diagnosis for Case #123, which you can change later.</p>
+                <p>Please arrange your primary diagnosis at the top, followed by your differential diagnoses in the order of likelihood.</p>
             </Dialog.Description>
         </Dialog.Header>
 
