@@ -60,7 +60,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             id: crypto.randomUUID(),
             sender: role as 'student' | 'assistant' | 'patient',
             step: step as 'patient_history' | 'examination' | 'diagnosis' | 'treatment',
-            type: type,
+            type: type as 'text' | 'image' | 'test-result' | 'examination',
             content: content,
             timestamp: new Date()
         };

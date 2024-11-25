@@ -12,10 +12,10 @@ export interface TestResult {
 export interface Message {
     id: string;
     sender: string;
-    content: string | TestResult;
+    content: string | TestResult | ExaminationResult;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination';
     imageUrl?: string;
     title?: string;
 }

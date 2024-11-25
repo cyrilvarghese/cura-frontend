@@ -6,32 +6,49 @@
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
     import ArrowRight from "lucide-svelte/icons/arrow-right";
-    import { onMount } from 'svelte';
+    import CheckCircle from "lucide-svelte/icons/check-circle";
+    import { onMount } from "svelte";
+    import * as Dialog from "$lib/components/ui/dialog";
+    import DiagnosisDialog from "../../03-organisms/dialogs/diagnosis-dialog.svelte";
 
-    $: messages = $apiStore.messages;
-    $: error = $apiStore.error;
-    
+    const messages = $derived($apiStore.messages);
+    const error = $derived($apiStore.error);
+
+    let diagnosisDialogOpen = $state(false);
+
     function scrollToLatest() {
         requestAnimationFrame(() => {
-            const lastMessage = document.querySelector('#messages-container > div:last-child');
+            const lastMessage = document.querySelector(
+                "#messages-container > div:last-child",
+            );
             if (lastMessage) {
-                console.log('Scrolling last message into view');
-                lastMessage.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'end'
+                console.log("Scrolling last message into view");
+                lastMessage.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
                 });
             }
         });
     }
 
-    onMount(scrollToLatest);
-    
-    $: if (messages?.length) {
+    $effect(() => {
+        if (messages?.length) {
+            scrollToLatest();
+        }
+    });
+
+    $effect(() => {
         scrollToLatest();
+    });
+
+    function handleDiagnosisSubmit() {
+        diagnosisDialogOpen = true;
     }
 
-    function handleNext() {
-        console.log("Next clicked");
+    function handleFinalSubmit() {
+        // TODO: Implement final diagnosis submission logic
+        console.log("Final diagnosis submitted");
+        diagnosisDialogOpen = false;
     }
 </script>
 
@@ -57,10 +74,10 @@
                     <Button
                         variant="outline"
                         class="gap-2"
-                        onclick={handleNext}
+                        onclick={handleDiagnosisSubmit}
                     >
-                        Next
-                        <ArrowRight class="h-4 w-4" />
+                        Submit diagnosis
+                        <CheckCircle class="h-4 w-4" />
                     </Button>
                 </div>
 
@@ -74,10 +91,7 @@
 
                 <!-- Chat Messages -->
                 <ScrollArea class="flex-1 p-4">
-                    <div 
-                        id="messages-container"
-                        class="messages space-y-4"
-                    >
+                    <div id="messages-container" class="messages space-y-4">
                         {#each messages as message}
                             <div class="message-wrapper">
                                 <Message {message} />
@@ -96,4 +110,9 @@
             </div>
         </div>
     </div>
+
+    <DiagnosisDialog 
+        bind:open={diagnosisDialogOpen} 
+        onSubmit={handleFinalSubmit} 
+    />
 </div>
