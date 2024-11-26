@@ -50,7 +50,7 @@
             <img
                 src={imageUrl}
                 alt={altText}
-                class="w-full h-auto object-contain"
+                class="w-full max-h-[500px] h-auto object-cover"
             />
         </div>
 

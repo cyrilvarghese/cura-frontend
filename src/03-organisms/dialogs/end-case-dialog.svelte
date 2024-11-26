@@ -16,10 +16,12 @@
         </Dialog.Header>
 
         <Dialog.Footer>
-            <Button variant="outline" on:click={() => (open = false)}>
-                Cancel
-            </Button>
-            <Button variant="destructive" on:click={onSubmit}>
+            <Dialog.Close>
+                <Button variant="outline"  
+                    >Cancel</Button
+                >
+            </Dialog.Close>
+            <Button variant="destructive" onclick={onSubmit}>
                 End Case
             </Button>
         </Dialog.Footer>

@@ -25,7 +25,7 @@
                     id="diagnosis"
                     class="min-h-[100px] w-full rounded-md border p-2" 
                     placeholder="Enter your final diagnosis..."
-                />
+                ></textarea>
             </div>
             <div class="space-y-2">
                 <label for="rationale" class="text-sm font-medium">Clinical Rationale</label>
@@ -33,20 +33,19 @@
                     id="rationale"
                     class="min-h-[100px] w-full rounded-md border p-2" 
                     placeholder="Explain your diagnostic reasoning..."
-                />
+                ></textarea>
             </div>
         </div>
 
         <Dialog.Footer>
-            <Button 
-                variant={"outline" satisfies ButtonVariants}
-                on:click={() => (open = false)}
-            >
-                Cancel
-            </Button>
+            <Dialog.Close>
+                <Button variant="outline"  
+                    >Cancel</Button
+                >
+            </Dialog.Close>
             <Button 
                 variant={"default" satisfies ButtonVariants}
-                on:click={onSubmit}
+                onclick={onSubmit}
             >
                 Submit Final Diagnosis
             </Button>

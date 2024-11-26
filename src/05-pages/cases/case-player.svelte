@@ -24,6 +24,9 @@
     let finalDiagnosisDialogOpen = $state(false);
     let endCaseDialogOpen = $state(false);
 
+    // Single state to track current step
+    let currentStep = $state('relevant-info'); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+
     function scrollToLatest() {
         requestAnimationFrame(() => {
             const lastMessage = document.querySelector(
@@ -52,16 +55,19 @@
     function handleRelevantInfoSubmit() {
         console.log("Relevant info submitted");
         relevantInfoDialogOpen = false;
+        currentStep = 'diagnosis';
     }
 
     function handleDiagnosisSubmit() {
         console.log("Initial diagnosis submitted");
         diagnosisDialogOpen = false;
+        currentStep = 'final-diagnosis';
     }
 
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
+        currentStep = 'end-case';
     }
 
     function handleEndCase() {
@@ -78,7 +84,7 @@
             <div class="bg-muted/50 rounded-xl w-[70%] h-full flex flex-col">
                 <!-- Title Section with Action Buttons -->
                 <div
-                    class="p-4 border-b border-gray-300 flex justify-between items-center"
+                    class="p-4 border-b border-gray-300 flex justify-between items-end"
                 >
                     <div>
                         <h2 class="text-2xl font-semibold text-gray-800">
@@ -90,39 +96,43 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        <Button
-                            variant="outline"
-                            class="gap-2"
-                            onclick={() => (relevantInfoDialogOpen = true)}
-                        >
-                            Submit Relevant Info
-                            <InfoIcon class="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                            variant="outline"
-                            class="gap-2"
-                            onclick={() => (diagnosisDialogOpen = true)}
-                        >
-                            Submit Diagnosis
-                            <Stethoscope class="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            class="gap-2"
-                            onclick={() => (finalDiagnosisDialogOpen = true)}
-                        >
-                            Final Diagnosis
-                            <CheckCircle2 class="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            class="gap-2"
-                            onclick={() => (endCaseDialogOpen = true)}
-                        >
-                            End Case
-                            <XCircle class="h-4 w-4" />
-                        </Button>
+                        {#if currentStep === 'relevant-info'}
+                            <Button
+                                variant="outline"
+                                class="gap-2"
+                                onclick={() => (relevantInfoDialogOpen = true)}
+                            >
+                                Submit Relevant Info
+                                <InfoIcon class="h-4 w-4" />
+                            </Button>
+                        {:else if currentStep === 'diagnosis'}
+                            <Button
+                                variant="outline"
+                                class="gap-2"
+                                onclick={() => (diagnosisDialogOpen = true)}
+                            >
+                                Submit Diagnosis
+                                <Stethoscope class="h-4 w-4" />
+                            </Button>
+                        {:else if currentStep === 'final-diagnosis'}
+                            <Button
+                                variant="outline"
+                                class="gap-2"
+                                onclick={() => (finalDiagnosisDialogOpen = true)}
+                            >
+                                Final Diagnosis
+                                <CheckCircle2 class="h-4 w-4" />
+                            </Button>
+                        {:else if currentStep === 'end-case'}
+                            <Button
+                                variant="destructive"
+                                class="gap-2"
+                                onclick={() => (endCaseDialogOpen = true)}
+                            >
+                                End Case
+                                <XCircle class="h-4 w-4" />
+                            </Button>
+                        {/if}
                     </div>
                 </div>
 
