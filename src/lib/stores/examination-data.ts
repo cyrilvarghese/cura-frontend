@@ -1,64 +1,132 @@
+import type { ExaminationData } from '$lib/types';
 import { writable } from 'svelte/store';
 
-export interface ExaminationData {
-    purpose: string;
-    findings: string;
+export interface TabularData {
+    headers: string[];
+    rows: (string | number)[][];
 }
+
+export interface ImageData {
+    url: string;
+    caption?: string;
+    altText: string;
+}
+
 
 export const examinationData = {
     "Skin Examination": {
         purpose: "Assess rash characteristics",
-        findings: "Red, raised patches on the forearms and legs; some have bruising as they fade. Slight tenderness but no pain."
+        findings: {
+            type: "mixed" as const,
+            content: [
+                {
+                    type: "text" as const,
+                    content: "Red, raised patches on the forearms and legs; some have bruising as they fade. Slight tenderness but no pain."
+                },
+                {
+                    type: "image" as const,
+                    content: {
+                        url: "https://www.pcds.org.uk/imager/gallery/clinical/urticarial-vasculitis/13305/urt_vascul_33_fee391183f15cb4d62773032fe0be92d.jpg",
+                        altText: "Red raised patches on forearm",
+                        caption: "Rash distribution on right forearm"
+                    }
+                }
+            ]
+        }
     },
     "Musculoskeletal Examination": {
         purpose: "Check for joint-related symptoms",
-        findings: "Mild tenderness in the wrists and knees, stiffness especially in the morning, no noticeable swelling or warmth, full range of motion preserved."
+        findings: {
+            type: "text",
+            content: "Mild tenderness in the wrists and knees, stiffness especially in the morning, no noticeable swelling or warmth, full range of motion preserved."
+        }
     },
     "Vitals Check": {
         purpose: "Evaluate general health",
-        findings: "Temperature: 37.2°C (98.9°F), Pulse: 80/min, Blood Pressure: 118/76 mm Hg, Normal height, weight, and BMI."
+        findings: {
+            type: "table",
+            content: {
+                headers: ["Measurement", "Value", "Unit", "Reference Range"],
+                rows: [
+                    ["Temperature", 37.2, "°C", "36.5-37.5"],
+                    ["Pulse", 80, "bpm", "60-100"],
+                    ["Blood Pressure", "118/76", "mm Hg", "90/60-120/80"],
+                    ["BMI", 22.4, "kg/m²", "18.5-24.9"]
+                ]
+            }
+        }
     },
     "Lymph Node Examination": {
         purpose: "Check for lymphadenopathy",
-        findings: "No enlarged lymph nodes detected."
+        findings: {
+            type: "text",
+            content: "No enlarged lymph nodes detected."
+        }
     },
     "Abdominal Examination": {
         purpose: "Check for organomegaly or tenderness",
-        findings: "Soft and non-tender abdomen, no palpable masses or organ enlargement."
+        findings: {
+            type: "text",
+            content: "Soft and non-tender abdomen, no palpable masses or organ enlargement."
+        }
     },
     "Neurological Examination": {
         purpose: "Assess for neurological deficits",
-        findings: "Normal reflexes, tone, and power; no sensory deficits."
+        findings: {
+            type: "text",
+            content: "Normal reflexes, tone, and power; no sensory deficits."
+        }
     },
     "Respiratory Examination": {
         purpose: "Evaluate lung function",
-        findings: "Clear lung fields bilaterally, no adventitious sounds."
+        findings: {
+            type: "text",
+            content: "Clear lung fields bilaterally, no adventitious sounds."
+        }
     },
     "Ophthalmologic Examination": {
         purpose: "Look for ocular involvement",
-        findings: "Sclera white, conjunctiva clear, no evidence of uveitis or episcleritis."
+        findings: {
+            type: "text",
+            content: "Sclera white, conjunctiva clear, no evidence of uveitis or episcleritis."
+        }
     },
     "Cardiovascular Examination": {
         purpose: "Detect cardiovascular abnormalities",
-        findings: "Normal heart sounds, no murmurs or rubs."
+        findings: {
+            type: "text",
+            content: "Normal heart sounds, no murmurs or rubs."
+        }
     },
     "Oral Examination": {
         purpose: "Inspect for oral ulcers or mucosal changes",
-        findings: "No abnormalities detected, oral mucosa normal."
+        findings: {
+            type: "text",
+            content: "No abnormalities detected, oral mucosa normal."
+        }
     },
     "Hair and Scalp Examination": {
         purpose: "Check for hair thinning or scalp issues",
-        findings: "Scalp normal, no hair loss or abnormalities."
+        findings: {
+            type: "text",
+            content: "Scalp normal, no hair loss or abnormalities."
+        }
     },
     "Spinal Examination": {
         purpose: "Assess spinal tenderness or deformities",
-        findings: "No abnormalities, full range of motion."
+        findings: {
+            type: "text",
+            content: "No abnormalities, full range of motion."
+        }
     },
     "Peripheral Vascular Examination": {
         purpose: "Evaluate pulses and skin changes",
-        findings: "Normal peripheral pulses, no edema or cyanosis."
+        findings: {
+            type: "text",
+            content: "Normal peripheral pulses, no edema or cyanosis."
+        }
     }
-} as const;
+} satisfies Record<string, ExaminationData>;
 
 export type ExaminationName = keyof typeof examinationData;
 

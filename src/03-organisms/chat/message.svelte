@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Message, TestResult } from "$lib/types";
+    import type { ExaminationResult, Message, TestResult } from "$lib/types";
     import { statusColors } from "$lib/types";
     import { Avatar } from "$lib/components/ui/avatar";
     import * as Card from "$lib/components/ui/card";
@@ -9,6 +9,7 @@
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
     import TestResultCard from "./test-result-card.svelte";
     import ExaminationCard from "./examination-card.svelte";
+    import DiagnosisCard from "./diagnosis-card.svelte";
 
     export let message: Message;
 
@@ -29,12 +30,30 @@
     }
 
     $: isStudent = message.sender === "student";
+
+    function parseDiagnosisMessage(content: string) {
+        try {
+            const primaryMatch = content.match(/Primary Diagnosis: (.*?)\n/);
+            const justificationMatch = content.match(/Justification: (.*?)\n/);
+            const differentialMatch = content.match(/Differential Diagnoses: (.*?)$/);
+
+            return {
+                primaryDiagnosis: {
+                    text: primaryMatch?.[1] || "",
+                    justification: justificationMatch?.[1] || ""
+                },
+                differentialDiagnoses: differentialMatch?.[1].split(',').map(d => d.trim()) || []
+            };
+        } catch (error) {
+            console.error('Error parsing diagnosis message:', error);
+            return null;
+        }
+    }
 </script>
 
 <div
     class="flex items-start gap-3 {isStudent ? 'justify-end' : 'justify-start'}"
 >   
-    {@debug message}
     {#if !isStudent}
         <Avatar class="h-8 w-8 mt-1">
             <div
@@ -48,6 +67,15 @@
     <div class="max-w-[80%]">
         {#if message.type === "loading"}
             <LoadingMessage />
+        {:else if message.type === "diagnosis"}
+            {@const diagnosisData = parseDiagnosisMessage(message.content as string)}
+            {#if diagnosisData}
+                <DiagnosisCard diagnosis={diagnosisData} />
+            {:else}
+                <div class="bg-card rounded-lg p-4 shadow-sm border">
+                    <p class="text-sm">{message.content}</p>
+                </div>
+            {/if}
         {:else if message.type === "image"}
             <div class="bg-card rounded-lg overflow-hidden shadow-sm border">
                 <img
@@ -70,9 +98,9 @@
                 </div>
             </div>
         {:else if message.type === "test-result" && typeof message.content !== "string"}
-            <TestResultCard result={message.content} />
+            <TestResultCard result={message.content as TestResult} />
         {:else if message.type === "examination" && typeof message.content !== "string"}
-            <ExaminationCard result={message.content} />
+            <ExaminationCard result={message.content as ExaminationResult} />
         {:else}
             <div
                 class="bg-card rounded-lg p-4 shadow-sm border {isStudent

@@ -3,21 +3,38 @@
     import { Badge } from "$lib/components/ui/badge";
     import TestTube from "lucide-svelte/icons/test-tube";
     import { getRelativeTime } from "$lib/utils/time";
-
-    export let result: {
-        testName: string;
-        purpose: string;
-        status: "completed" | "pending" | "failed";
-        results: string;
-        interpretation: string;
-        timestamp: Date;
-    };
+    import type { TestResultContent } from "$lib/stores/diagnostic-test-data";
+    import TestResultsTable from "./test-results-table.svelte";
+    import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
+    import type { TestResult } from '$lib/types';
+    
+    export let result: TestResult;
+   
 
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
         pending: "bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20",
         failed: "bg-red-500/10 text-red-700 hover:bg-red-500/20",
     };
+
+    function renderResult(
+        result: TestResultContent,
+    ): string | TestResultContent {
+        switch (result.type) {
+            case "text":
+                return result.content;
+            case "table":
+                return result;
+            case "image":
+                return result;
+            case "mixed":
+                return result;
+            default:
+                return "Unsupported result type";
+        }
+    }
+
+    const resultContent = renderResult(result.results);
 </script>
 
 <Card.Root
@@ -38,8 +55,52 @@
     <Card.Content class="grid gap-4">
         <div class="space-y-2 bg-amber-50/50 p-3 rounded-md">
             <h4 class="font-medium leading-none text-amber-900">Results</h4>
-            <p class="text-sm text-muted-foreground">{result.results}</p>
+            {#if typeof resultContent === "string"}
+                <p class="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {resultContent}
+                </p>
+            {:else if resultContent.type === "table"}
+                <TestResultsTable data={resultContent.content} />
+            {:else if resultContent.type === "image"}
+                <MedicalImageViewer
+                    imageUrl={resultContent.content.url}
+                    altText={resultContent.content.altText}
+                    caption={resultContent.content.caption}
+                    subtitle={getRelativeTime(result.timestamp)}
+                />
+            {:else if resultContent.type === "mixed"}
+                <div class="space-y-4">
+                    {#each resultContent.content as item}
+                        {#if item.type === "text"}
+                            <p
+                                class="text-sm text-muted-foreground whitespace-pre-wrap"
+                            >
+                                {item.content}
+                            </p>
+                        {:else if item.type === "table"}
+                            <TestResultsTable data={item.content} />
+                        {:else if item.type === "image"}
+                            <MedicalImageViewer
+                                imageUrl={item.content.url}
+                                altText={item.content.altText}
+                                caption={item.content.caption}
+                                subtitle={getRelativeTime(result.timestamp)}
+                            />
+                        {/if}
+                    {/each}
+                </div>
+            {/if}
         </div>
+        {#if result.interpretation}
+            <div class="space-y-2">
+                <h4 class="font-medium leading-none text-amber-900">
+                    Interpretation
+                </h4>
+                <p class="text-sm text-muted-foreground">
+                    {result.interpretation}
+                </p>
+            </div>
+        {/if}
     </Card.Content>
     <Card.Footer>
         <p class="text-sm text-muted-foreground">

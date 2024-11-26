@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
-import { examinationData, type ExaminationName } from './examination-data';
-import type { ExaminationState, ExaminationResult } from '$lib/types';
-
+import { examinationData, type ExaminationName  } from './examination-data';
+import type { ExaminationState, ExaminationResult, FindingContent } from '$lib/types';
 
 function createExaminationStore() {
     const { subscribe, update } = writable<ExaminationState>({
@@ -19,9 +18,12 @@ function createExaminationStore() {
             
             const examData = examinationData[examName];
             
+            // Ensure findings is in the correct format
+            const findings = typeof examData.findings === 'string' 
+                ? { type: 'text' as const, content: examData.findings }
+                : { ...examData.findings } as FindingContent;
+            
             const result: ExaminationResult = {
-                id: crypto.randomUUID(),
-                type: 'physical',
                 name: examName,
                 purpose: examData.purpose,
                 findings: examData.findings,

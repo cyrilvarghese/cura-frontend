@@ -3,17 +3,34 @@
     import { Badge } from "$lib/components/ui/badge";
     import Stethoscope from "lucide-svelte/icons/stethoscope";
     import { getRelativeTime } from "$lib/utils/time";
+    import ImageCard from '$lib/components/image-card.svelte';
+    import FindingsTable from "./findings-table.svelte";
+    import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
+    import type { ExaminationResult, FindingContent } from "$lib/types";
 
-    export let result: {
-        name: string;
-        purpose: string;
-        findings: string;
-        timestamp: Date;
-    };
+    export let result: ExaminationResult;
+      
+
+    function renderFinding(finding: FindingContent): string | FindingContent {
+        switch (finding.type) {
+            case 'text':
+                return finding.content;
+            case 'table':
+                return finding;
+            case 'image':
+                return finding;
+            case 'mixed':
+                return finding;
+            default:
+                return 'Unsupported finding type';
+        }
+    }
+
+    const findingContent = renderFinding(result.findings as FindingContent);
 </script>
 
 <Card.Root
-    class="w-full max-w-2xl border-l-4 border-l-blue-500/50 rounded-none rounded-r-md "
+    class="w-full max-w-2xl border-l-4 border-l-blue-500/50 rounded-none rounded-r-md"
 >
     <Card.Header>
         <div class="flex items-center justify-between">
@@ -33,9 +50,39 @@
     <Card.Content>
         <div class="space-y-2 bg-blue-50/50 p-3 rounded-md">
             <h4 class="font-medium leading-none text-blue-700">Findings</h4>
-            <p class="text-sm text-muted-foreground whitespace-pre-wrap">
-                {result.findings}
-            </p>
+            {#if typeof findingContent === 'string'}
+                <p class="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {findingContent}
+                </p>
+            {:else if findingContent.type === 'table'}
+                <FindingsTable data={findingContent.content} />
+            {:else if findingContent.type === 'image'}
+                <MedicalImageViewer
+                    imageUrl={findingContent.content.url}
+                    altText={findingContent.content.altText}
+                    caption={findingContent.content.caption}
+                    subtitle={getRelativeTime(result.timestamp)}
+                />
+            {:else if findingContent.type === 'mixed'}
+                <div class="space-y-4">
+                    {#each findingContent.content as item}
+                        {#if item.type === 'text'}
+                            <p class="text-sm text-muted-foreground whitespace-pre-wrap">
+                                {item.content}
+                            </p>
+                        {:else if item.type === 'table'}
+                            <FindingsTable data={item.content} />
+                        {:else if item.type === 'image'}
+                            <MedicalImageViewer
+                                imageUrl={item.content.url}
+                                altText={item.content.altText}
+                                caption={item.content.caption}
+                                subtitle={getRelativeTime(result.timestamp)}
+                            />
+                        {/if}
+                    {/each}
+                </div>
+            {/if}
         </div>
     </Card.Content>
     <Card.Footer>
