@@ -27,7 +27,7 @@ export const examinationData = {
                     type: "image" as const,
                     content: {
                         url: "https://www.pcds.org.uk/imager/gallery/clinical/urticarial-vasculitis/13305/urt_vascul_33_fee391183f15cb4d62773032fe0be92d.jpg",
-                        altText: "Red raised patches on forearm",
+                        altText: "Red, raised patches on the forearms and legs; some have bruising as they fade. Slight tenderness but no pain.",
                         caption: "Rash distribution on right forearm"
                     }
                 }

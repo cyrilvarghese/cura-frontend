@@ -35,7 +35,14 @@
     <Dialog.Content class="max-w-4xl">
         <Dialog.Header>
             {#if caption}
-                <Dialog.Description>{caption}</Dialog.Description>
+                <Dialog.Title>{caption}</Dialog.Title>
+                <Dialog.Description
+                    >{#if subtitle}
+                        <p class="text-sm text-muted-foreground">
+                            {subtitle}
+                        </p>
+                    {/if}</Dialog.Description
+                >
             {/if}
         </Dialog.Header>
 
@@ -47,12 +54,7 @@
             />
         </div>
 
-        <Dialog.Footer class="flex justify-between items-center">
-            {#if subtitle}
-                <p class="text-sm text-muted-foreground">
-                    {subtitle}
-                </p>
-            {/if}
+        <Dialog.Footer class="flex justify-start items-start">
             <Dialog.Close>
                 <Button variant="outline">Close</Button>
             </Dialog.Close>

@@ -80,7 +80,7 @@ export const diagnosticTestData: Record<string, Omit<TestResult, 'timestamp'>> =
                 {
                     type: 'image',
                     content: {
-                        url: '/images/biopsy-result.jpg',
+                        url: 'https://www.dermatologyadvisor.com/wp-content/uploads/sites/20/2019/03/ch1147.fig2_.jpg',
                         caption: 'Histopathology showing leukocytoclastic vasculitis',
                         altText: 'Microscopic image of skin biopsy showing vasculitis'
                     }

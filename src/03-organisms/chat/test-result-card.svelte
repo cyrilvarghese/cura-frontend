@@ -91,7 +91,7 @@
                 </div>
             {/if}
         </div>
-        {#if result.interpretation}
+        <!-- {#if result.interpretation}
             <div class="space-y-2">
                 <h4 class="font-medium leading-none text-amber-900">
                     Interpretation
@@ -100,7 +100,7 @@
                     {result.interpretation}
                 </p>
             </div>
-        {/if}
+        {/if} -->
     </Card.Content>
     <Card.Footer>
         <p class="text-sm text-muted-foreground">

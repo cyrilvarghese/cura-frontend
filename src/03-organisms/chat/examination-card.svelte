@@ -61,7 +61,7 @@
                     imageUrl={findingContent.content.url}
                     altText={findingContent.content.altText}
                     caption={findingContent.content.caption}
-                    subtitle={getRelativeTime(result.timestamp)}
+                    subtitle={findingContent.content.altText}
                 />
             {:else if findingContent.type === 'mixed'}
                 <div class="space-y-4">
@@ -77,7 +77,7 @@
                                 imageUrl={item.content.url}
                                 altText={item.content.altText}
                                 caption={item.content.caption}
-                                subtitle={getRelativeTime(result.timestamp)}
+                                subtitle={item.content.altText}
                             />
                         {/if}
                     {/each}

@@ -5,16 +5,24 @@
     import { apiStore } from "$lib/stores/api";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
-    import ArrowRight from "lucide-svelte/icons/arrow-right";
-    import CheckCircle from "lucide-svelte/icons/check-circle";
+    import InfoIcon from "lucide-svelte/icons/info";
+    import Stethoscope from "lucide-svelte/icons/stethoscope";
+    import CheckCircle2 from "lucide-svelte/icons/check-circle-2";
+    import XCircle from "lucide-svelte/icons/x-circle";
     import { onMount } from "svelte";
     import * as Dialog from "$lib/components/ui/dialog";
     import DiagnosisDialog from "../../03-organisms/dialogs/diagnosis-dialog.svelte";
+    import RelevantInfoDialog from "../../03-organisms/dialogs/relevant-info-dialog.svelte";
+    import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
+    import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
 
     const messages = $derived($apiStore.messages);
     const error = $derived($apiStore.error);
 
+    let relevantInfoDialogOpen = $state(false);
     let diagnosisDialogOpen = $state(false);
+    let finalDiagnosisDialogOpen = $state(false);
+    let endCaseDialogOpen = $state(false);
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -41,14 +49,24 @@
         scrollToLatest();
     });
 
-    function handleDiagnosisSubmit() {
-        diagnosisDialogOpen = true;
+    function handleRelevantInfoSubmit() {
+        console.log("Relevant info submitted");
+        relevantInfoDialogOpen = false;
     }
 
-    function handleFinalSubmit() {
-        // TODO: Implement final diagnosis submission logic
-        console.log("Final diagnosis submitted");
+    function handleDiagnosisSubmit() {
+        console.log("Initial diagnosis submitted");
         diagnosisDialogOpen = false;
+    }
+
+    function handleFinalDiagnosisSubmit() {
+        console.log("Final diagnosis submitted");
+        finalDiagnosisDialogOpen = false;
+    }
+
+    function handleEndCase() {
+        console.log("Case ended");
+        endCaseDialogOpen = false;
     }
 </script>
 
@@ -58,7 +76,7 @@
     >
         <div class="flex gap-4 w-full h-full">
             <div class="bg-muted/50 rounded-xl w-[70%] h-full flex flex-col">
-                <!-- Title Section with Next Button -->
+                <!-- Title Section with Action Buttons -->
                 <div
                     class="p-4 border-b border-gray-300 flex justify-between items-center"
                 >
@@ -71,14 +89,41 @@
                             Fatigue
                         </p>
                     </div>
-                    <Button
-                        variant="outline"
-                        class="gap-2"
-                        onclick={handleDiagnosisSubmit}
-                    >
-                        Submit diagnosis
-                        <CheckCircle class="h-4 w-4" />
-                    </Button>
+                    <div class="flex gap-2">
+                        <Button
+                            variant="outline"
+                            class="gap-2"
+                            onclick={() => (relevantInfoDialogOpen = true)}
+                        >
+                            Submit Relevant Info
+                            <InfoIcon class="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            class="gap-2"
+                            onclick={() => (diagnosisDialogOpen = true)}
+                        >
+                            Submit Diagnosis
+                            <Stethoscope class="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            class="gap-2"
+                            onclick={() => (finalDiagnosisDialogOpen = true)}
+                        >
+                            Final Diagnosis
+                            <CheckCircle2 class="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            class="gap-2"
+                            onclick={() => (endCaseDialogOpen = true)}
+                        >
+                            End Case
+                            <XCircle class="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
 
                 {#if error}
@@ -111,8 +156,20 @@
         </div>
     </div>
 
-    <DiagnosisDialog 
-        bind:open={diagnosisDialogOpen} 
-        onSubmit={handleFinalSubmit} 
+    <RelevantInfoDialog
+        bind:open={relevantInfoDialogOpen}
+        onSubmit={handleRelevantInfoSubmit}
     />
+
+    <DiagnosisDialog
+        bind:open={diagnosisDialogOpen}
+        onSubmit={handleDiagnosisSubmit}
+    />
+
+    <FinalDiagnosisDialog
+        bind:open={finalDiagnosisDialogOpen}
+        onSubmit={handleFinalDiagnosisSubmit}
+    />
+
+    <EndCaseDialog bind:open={endCaseDialogOpen} onSubmit={handleEndCase} />
 </div>
