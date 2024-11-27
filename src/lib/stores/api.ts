@@ -53,7 +53,7 @@ const initialState: ApiState = {
 
 export const apiStore = writable<ApiState>(initialState);
 
-export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' = 'text') {
+export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' = 'text') {
     debugger;
     apiStore.update(state => {
         const newMessage: Message = {

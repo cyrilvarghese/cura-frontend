@@ -64,10 +64,20 @@
     $: isValid = diagnoses.some(
         (d) => d.status === "primary" && d.justification?.trim(),
     );
+
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter' && event.ctrlKey && isValid && !isSubmitting) {
+            event.preventDefault();
+            handleSubmit(false);
+        }
+    }
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content class="sm:max-w-[800px]">
+    <Dialog.Content 
+        class="sm:max-w-[800px]"
+        onkeydown={handleKeyDown}
+    >
         <Dialog.Header>
             <Dialog.Title>Submit Initial Diagnosis</Dialog.Title>
             <Dialog.Description>

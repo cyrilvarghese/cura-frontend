@@ -4,10 +4,22 @@
 
     export let open = false;
     export let onSubmit: () => void;
+
+    let isSubmitting = false;
+
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter' && event.ctrlKey && !isSubmitting) {
+            event.preventDefault();
+            onSubmit();
+        }
+    }
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Content 
+        class="sm:max-w-[425px]"
+        onkeydown={handleKeyDown}
+    >
         <Dialog.Header>
             <Dialog.Title>End Case</Dialog.Title>
             <Dialog.Description>

@@ -21,7 +21,7 @@ export interface Message {
     content: string | TestResult | ExaminationResult;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis';
     imageUrl?: string;
     title?: string;
 }

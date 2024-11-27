@@ -7,9 +7,10 @@
     import User from "lucide-svelte/icons/user";
     import Bot from "lucide-svelte/icons/bot";
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
-    import TestResultCard from "./test-result-card.svelte";
-    import ExaminationCard from "./examination-card.svelte";
-    import DiagnosisCard from "./diagnosis-card.svelte";
+    import TestResultCard from "./chat-cards/test-result-card.svelte";
+    import ExaminationCard from "./chat-cards/examination-card.svelte";
+    import DiagnosisCard from "./chat-cards/diagnosis-card.svelte";
+    import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
 
     export let message: Message;
 
@@ -31,22 +32,40 @@
 
     $: isStudent = message.sender === "student";
 
-    function parseDiagnosisMessage(content: string) {
+    function parseDiagnosisMessage(content: string, type: "initial" | "final" = "initial") {
         try {
-            const primaryMatch = content.match(/Primary Diagnosis: (.*?)\n/);
+            const diagnosisMatch = content.match(/(Primary|Final) Diagnosis: (.*?)\n/);
             const justificationMatch = content.match(/Justification: (.*?)\n/);
             const differentialMatch = content.match(/Differential Diagnoses: (.*?)$/);
 
             return {
                 primaryDiagnosis: {
-                    text: primaryMatch?.[1] || "",
+                    text: diagnosisMatch?.[2] || "",
                     justification: justificationMatch?.[1] || ""
                 },
-                differentialDiagnoses: differentialMatch?.[1].split(',').map(d => d.trim()) || []
+                differentialDiagnoses: type === "initial" 
+                    ? (differentialMatch?.[1].split(',').map(d => d.trim()) || [])
+                    : []
             };
         } catch (error) {
             console.error('Error parsing diagnosis message:', error);
             return null;
+        }
+    }
+
+    function parseRelevantInfo(content: string): string[] {
+        try {
+            // If content is already an array, return it
+            if (Array.isArray(content)) return content;
+            
+            // If content is a string, split by newlines or commas
+            return content
+                .split(/[,\n]/)
+                .map(point => point.trim())
+                .filter(point => point.length > 0);
+        } catch (error) {
+            console.error('Error parsing relevant info:', error);
+            return [];
         }
     }
 </script>
@@ -67,15 +86,20 @@
     <div class="max-w-[80%]">
         {#if message.type === "loading"}
             <LoadingMessage />
-        {:else if message.type === "diagnosis"}
-            {@const diagnosisData = parseDiagnosisMessage(message.content as string)}
+        {:else if message.type === "diagnosis" || message.type === "final-diagnosis"}
+            {@const diagnosisType = message.type === "final-diagnosis" ? "final" : "initial"}
+            {@const diagnosisData = parseDiagnosisMessage(message.content as string, diagnosisType)}
             {#if diagnosisData}
-                <DiagnosisCard diagnosis={diagnosisData} />
+                {@debug diagnosisData}
+                <DiagnosisCard diagnosis={diagnosisData} type={diagnosisType} />
             {:else}
                 <div class="bg-card rounded-lg p-4 shadow-sm border">
                     <p class="text-sm">{message.content}</p>
                 </div>
             {/if}
+        {:else if message.type === "relevant-info"}
+            {@const relevantInfo = parseRelevantInfo(message.content as string)}
+            <RelevantInfoCard {relevantInfo} />
         {:else if message.type === "image"}
             <div class="bg-card rounded-lg overflow-hidden shadow-sm border">
                 <img

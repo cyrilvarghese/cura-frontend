@@ -120,7 +120,7 @@
                                 class="gap-2"
                                 onclick={() => (finalDiagnosisDialogOpen = true)}
                             >
-                                Final Diagnosis
+                                Submit Final Diagnosis
                                 <CheckCircle2 class="h-4 w-4" />
                             </Button>
                         {:else if currentStep === 'end-case'}
