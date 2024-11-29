@@ -15,8 +15,8 @@
     <Card.Header>
         <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-                <ClipboardList class="h-5 w-5 text-blue-900/70" />
-                <Card.Title class="text-blue-900">Relevant Information</Card.Title>
+                <ClipboardList class="h-5 w-5 text-gray-900/70" />
+                <Card.Title class="text-gray-600">Positive Clinical Findings</Card.Title>
             </div>
         </div>
     </Card.Header>

@@ -1,6 +1,6 @@
 import type { ExaminationResult, Message, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
- 
+import { patientApi } from '$lib/services/patientApi';
 
 interface ApiState {
     messages: Message[];
@@ -54,13 +54,14 @@ const initialState: ApiState = {
 export const apiStore = writable<ApiState>(initialState);
 
 export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' = 'text') {
+    // Immediately display the user's message in the UI
     debugger;
     apiStore.update(state => {
         const newMessage: Message = {
             id: crypto.randomUUID(),
-            sender: role as 'student' | 'assistant' | 'patient',
-            step: step as 'patient_history' | 'examination' | 'diagnosis' | 'treatment',
-            type: type as 'text' | 'image' | 'test-result' | 'examination',
+            sender: role,
+            step: step,
+            type: type,
             content: content,
             timestamp: new Date()
         };
@@ -71,6 +72,52 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
         };
     });
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    switch (step) {
+        case 'patient_history':
+            // Handle real API interactions for patient history questions
+            if (role === 'student') {
+                try {
+                    // Make API call to get patient's response
+                    const response = await patientApi.askPatient(content as string);
+                    
+                    // Update store with patient's response from API
+                    apiStore.update(state => ({
+                        ...state,
+                        messages: [...state.messages, {
+                            id: response.id,
+                            sender: response.sender.toLowerCase(),
+                            step: response.step,
+                            type: response.type,
+                            content: response.content,
+                            timestamp: new Date(response.timestamp)
+                        }]
+                    }));
+                } catch (error) {
+                    // Handle any API errors and update error state
+                    apiStore.update(state => ({
+                        ...state,
+                        error: error instanceof Error ? error.message : 'Unknown error occurred'
+                    }));
+                }
+            }
+            break;
+
+        default: // All other steps (examination, diagnosis, treatment)
+            // Add artificial delay to simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Update store with simulated response for non-patient-history steps
+            apiStore.update(state => ({
+                ...state,
+                messages: [...state.messages, {
+                    id: crypto.randomUUID(),
+                    sender: 'assistant',
+                    step: step,
+                    type: type,
+                    content: content,
+                    timestamp: new Date()
+                }]
+            }));
+            break;
+    }
 } 

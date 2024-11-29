@@ -13,9 +13,19 @@
         differentialDiagnoses?: string[];
     };
 
-    $: cardStyles = "border-l-blue-900/50 bg-white";
-    $: iconColor = "text-blue-900/70";
-    $: justificationTextColor = "text-gray-900";
+    // Define styles based on the diagnosis type
+    $: cardStyles = type === "final" 
+        ? "border-l-red-500 bg-white" 
+        : "border-l-blue-900/50 bg-white";
+    $: iconColor = type === "final" 
+        ? "text-red-500" 
+        : "text-blue-900/70";
+    $: justificationTextColor = type === "final" 
+        ? "text-gray-900" 
+        : "text-gray-900";
+    $: justificationBgColor = type === "final" 
+        ? "bg-red-50/50" 
+        : "bg-blue-50/50";
 </script>
 
 <Card.Root
@@ -23,21 +33,23 @@
 >
     <Card.Header class="pb-4">
         <div class="space-y-2">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center">
                 {#if type === "initial"}
                     <Stethoscope class="h-5 w-5 {iconColor}" />
                 {:else}
                     <CheckCircle class="h-5 w-5 {iconColor}" />
                 {/if}
-                <Card.Title class="text-gray-800">
-                    <div class=" px-3 py-1.5 rounded-md">
+                <Card.Title class="text-blue-900">
+                    <div class="px-2 py-1.5 rounded-md">
                         {diagnosis.primaryDiagnosis.text}
                     </div>
                 </Card.Title>
             </div>
             <Badge 
                 variant="outline" 
-                class="bg-blue-50/50 text-blue-800 hover:bg-blue-50/80 border-blue-200"
+                class={type === "final" 
+                    ? "bg-red-50/50 text-red-800 hover:bg-red-50/80 border-red-200" 
+                    : "bg-blue-50/50 text-blue-800 hover:bg-blue-50/80 border-blue-200"}
             >
                 {type === "initial" ? "Initial Diagnosis" : "Final Diagnosis"}
             </Badge>
@@ -47,7 +59,7 @@
     <Card.Content class="grid gap-4">
         <div class="space-y-4">
             <div class="space-y-2">
-                <div class="bg-blue-50/50 px-3 py-2 rounded-md">
+                <div class="{justificationBgColor} px-3 py-2 rounded-md">
                     <p class="text-md font-normal {justificationTextColor} leading-relaxed">
                         {diagnosis.primaryDiagnosis.justification}
                     </p>
