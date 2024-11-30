@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
-import { examinationData, type ExaminationName  } from './examination-data';
-import type { ExaminationState, ExaminationResult, FindingContent } from '$lib/types';
+import type { ExaminationState, ExaminationResult, FindingContent, ExaminationName } from '$lib/types';
+import { examinationService } from '$lib/services/examinationService';
 
 function createExaminationStore() {
     const { subscribe, update } = writable<ExaminationState>({
@@ -11,22 +11,25 @@ function createExaminationStore() {
 
     async function performPhysicalExam(examName: ExaminationName) {
         update(state => ({ ...state, isLoading: true, error: null }));
-        
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            const examData = examinationData[examName];
-            
+            // Get data from examination service
+            const examData = await examinationService.getExaminationData(examName);
+
+
+            if (!examData) {
+                throw new Error(`Examination data not found for ${examName}`);
+            }
+
             // Ensure findings is in the correct format
-            const findings = typeof examData.findings === 'string' 
+            const findings = typeof examData.findings === 'string'
                 ? { type: 'text' as const, content: examData.findings }
                 : { ...examData.findings } as FindingContent;
-            
+
             const result: ExaminationResult = {
                 name: examName,
                 purpose: examData.purpose,
-                findings: examData.findings,
+                findings,  // Use the properly formatted findings
                 timestamp: new Date(),
                 status: 'completed'
             };

@@ -1,6 +1,6 @@
 export type TestStatus = 'completed' | 'pending' | 'failed';
 
-export type TestResultContent = 
+export type TestResultContent =
     | { type: 'text'; content: string }
     | { type: 'table'; content: TabularData }
     | { type: 'image'; content: ImageData }
@@ -38,16 +38,41 @@ export interface ExaminationState {
     isLoading: boolean;
     error: string | null;
 }
+// Extract exam names from examination-data.json
+export type ExaminationName =
+    | 'Skin Examination'
+    | 'Musculoskeletal Examination'
+    | 'Vitals Check'
+    | 'Lymph Node Examination'
+    | 'Abdominal Examination'
+    | 'Neurological Examination'
+    | 'Respiratory Examination'
+    | 'Ophthalmologic Examination'
+    | 'Cardiovascular Examination'
+    | 'Oral Examination'
+    | 'Hair and Scalp Examination'
+    | 'Spinal Examination'
+    | 'Peripheral Vascular Examination';
+    
+export type DiagnosticTestName =
+    | 'Complete Blood Count and ESR'
+    | 'ANA Test'
+    | 'Complement Levels'
+    | 'Skin Biopsy'
+    | 'Rheumatoid Factor'
+    | 'Anti-dsDNA and Anti-Sm'
+    | 'Allergy Panel'
+    | 'Chest Imaging';
 
-export interface ExaminationData {
-    purpose: string;
-    findings: {
-        type: 'text' | 'table' | 'image' | 'mixed';
-        content: string | TabularData | ImageData | readonly FindingContent[];
-    };
-}
+// export interface ExaminationDataType {
+//     purpose: string;
+//     findings: {
+//         type: 'text' | 'table' | 'image' | 'mixed';
+//         content: string | TabularData | ImageData | readonly FindingContent[];
+//     };
+// }
 
-export type FindingContent = 
+export type FindingContent =
     | { readonly type: 'text'; readonly content: string }
     | { readonly type: 'table'; readonly content: TabularData }
     | { readonly type: 'image'; readonly content: ImageData }

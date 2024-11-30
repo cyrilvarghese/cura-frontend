@@ -5,15 +5,17 @@
     import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
-    import { examinationStore } from "$lib/stores/examination";
-    import { laboratoryStore } from "$lib/stores/laboratory";
-    import type { ExaminationName } from "$lib/stores/examination-data";
-    import type { DiagnosticTestName } from "$lib/stores/diagnostic-test-data";
+    import { examinationStore } from "$lib/stores/examination-store";
+    import { laboratoryStore } from "$lib/stores/lab-test-store";
+    import type { ExaminationName } from "$lib/types";
+    import type { DiagnosticTestName } from "$lib/types";
+    import type { ExaminationResult } from "$lib/types";
 
     let textValue = "";
     let isLoading = false;
 
     async function handleSend() {
+        //add the message to UI and then send it to the API
         if (textValue.trim() && !isLoading) {
             isLoading = true;
             try {
@@ -40,8 +42,9 @@
     }
 
     async function handleLabTest(testName: DiagnosticTestName) {
+        //get the result from the store which calls the API and then add it to the UI
         const result = await laboratoryStore.orderTest(testName);
-       
+
         if (result) {
             const message = {
                 id: crypto.randomUUID(),
@@ -79,7 +82,7 @@
                 timestamp: new Date(),
                 type: "examination",
             };
-            await sendMessage(message.content, "assistant", "examination", "examination");
+            await sendMessage(message.content as ExaminationResult, "assistant", "examination", "examination");
         }
     }
 </script>

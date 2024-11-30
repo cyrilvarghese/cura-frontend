@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
-import { diagnosticTestData, type DiagnosticTestName } from './diagnostic-test-data';
+import type { DiagnosticTestName } from '$lib/types';
 import type { TestResult } from '$lib/types';
+import { labTestService } from '$lib/services/labTestService';
 
 interface LabState {
     results: TestResult[];
@@ -33,9 +34,7 @@ function createLabStore() {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            const testData = diagnosticTestData[testName];
+            const testData = await labTestService.getLabTestData(testName);
 
             const result: TestResult = {
                 testName,
@@ -43,7 +42,7 @@ function createLabStore() {
                 results: testData.results,
                 interpretation: testData.interpretation,
                 timestamp: new Date(),
-                status: testData.status
+                status: 'pending'
             };
 
             update(state => ({
@@ -52,7 +51,7 @@ function createLabStore() {
                 isLoading: false
             }));
 
-            // Simulate test completion
+            // Simulate test completion after 5 seconds
             setTimeout(() => {
                 update(state => {
                     const updatedResults = state.results.map(r => {
@@ -72,9 +71,10 @@ function createLabStore() {
 
             return result;
         } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to order laboratory test';
             update(state => ({
                 ...state,
-                error: 'Failed to order laboratory test',
+                error: errorMessage,
                 isLoading: false
             }));
             return null;

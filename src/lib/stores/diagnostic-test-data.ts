@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { TestResult, TestStatus } from '$lib/types';
+import type { TestResult } from '$lib/types';
 
 export const diagnosticTestData: Record<string, Omit<TestResult, 'timestamp'>> = {
     "Complete Blood Count and ESR": {

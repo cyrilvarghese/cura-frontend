@@ -1,6 +1,7 @@
 import type { ExaminationResult, Message, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientApi';
+import { examinationService } from '$lib/services/examinationService';
 
 interface ApiState {
     messages: Message[];
@@ -54,23 +55,7 @@ const initialState: ApiState = {
 export const apiStore = writable<ApiState>(initialState);
 
 export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' = 'text') {
-    // Immediately display the user's message in the UI
-    debugger;
-    apiStore.update(state => {
-        const newMessage: Message = {
-            id: crypto.randomUUID(),
-            sender: role,
-            step: step,
-            type: type,
-            content: content,
-            timestamp: new Date()
-        };
-        
-        return {
-            ...state,
-            messages: [...state.messages, newMessage]
-        };
-    });
+
 
     switch (step) {
         case 'patient_history':
@@ -79,7 +64,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                 try {
                     // Make API call to get patient's response
                     const response = await patientApi.askPatient(content as string);
-                    
+
                     // Update store with patient's response from API
                     apiStore.update(state => ({
                         ...state,
@@ -102,10 +87,12 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             }
             break;
 
+
+
         default: // All other steps (examination, diagnosis, treatment)
             // Add artificial delay to simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
-            
+
             // Update store with simulated response for non-patient-history steps
             apiStore.update(state => ({
                 ...state,
