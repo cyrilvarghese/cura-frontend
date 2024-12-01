@@ -1,7 +1,6 @@
 import type { ExaminationResult, Message, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientApi';
-import { examinationService } from '$lib/services/examinationService';
 
 interface ApiState {
     messages: Message[];
@@ -54,7 +53,27 @@ const initialState: ApiState = {
 
 export const apiStore = writable<ApiState>(initialState);
 
+interface StudentMessage {
+    content: string;
+    step: string;
+    timestamp: Date;
+}
+
+// Create a store for student messages only
+export const studentMessageHistory = writable<StudentMessage[]>([]);
+ 
+
 export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' = 'text') {
+    
+ 
+    // Only store messages from students before the switch
+    if (role === 'student') {
+        studentMessageHistory.update(messages => [...messages, {
+            content: content as string,
+            step,
+            timestamp: new Date()
+        }]);
+    }
 
 
     switch (step) {

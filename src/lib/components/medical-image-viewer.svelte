@@ -46,11 +46,13 @@
             {/if}
         </Dialog.Header>
 
-        <div class="relative w-full overflow-hidden rounded-lg">
+        <div
+            class="relative w-full overflow-auto h-fit max-h-[calc(90vh-150px)] rounded-lg"
+        >
             <img
                 src={imageUrl}
                 alt={altText}
-                class="w-full max-h-[500px] h-auto object-cover"
+                class="w-full h-auto object-cover"
             />
         </div>
 

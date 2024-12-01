@@ -9,13 +9,16 @@
     import Stethoscope from "lucide-svelte/icons/stethoscope";
     import CheckCircle2 from "lucide-svelte/icons/check-circle-2";
     import XCircle from "lucide-svelte/icons/x-circle";
-    import { onMount } from "svelte";
-    import * as Dialog from "$lib/components/ui/dialog";
     import DiagnosisDialog from "../../03-organisms/dialogs/diagnosis-dialog.svelte";
     import RelevantInfoDialog from "../../03-organisms/dialogs/relevant-info-dialog.svelte";
     import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
+    import { studentMessageHistory } from "$lib/stores/api";
 
+    // Subscribe to changes if needed
+    studentMessageHistory.subscribe((studentMessages) => {
+        console.log(studentMessages);
+    });
     const messages = $derived($apiStore.messages);
     const error = $derived($apiStore.error);
 
@@ -25,7 +28,7 @@
     let endCaseDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state('relevant-info'); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -55,19 +58,19 @@
     function handleRelevantInfoSubmit() {
         console.log("Relevant info submitted");
         relevantInfoDialogOpen = false;
-        currentStep = 'diagnosis';
+        currentStep = "diagnosis";
     }
 
     function handleDiagnosisSubmit() {
         console.log("Initial diagnosis submitted");
         diagnosisDialogOpen = false;
-        currentStep = 'final-diagnosis';
+        currentStep = "final-diagnosis";
     }
 
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
-        currentStep = 'end-case';
+        currentStep = "end-case";
     }
 
     function handleEndCase() {
@@ -96,7 +99,7 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        {#if currentStep === 'relevant-info'}
+                        {#if currentStep === "relevant-info"}
                             <Button
                                 variant="outline"
                                 class="gap-2"
@@ -105,7 +108,7 @@
                                 Submit Relevant Info
                                 <InfoIcon class="h-4 w-4" />
                             </Button>
-                        {:else if currentStep === 'diagnosis'}
+                        {:else if currentStep === "diagnosis"}
                             <Button
                                 variant="outline"
                                 class="gap-2"
@@ -114,16 +117,17 @@
                                 Submit Diagnosis
                                 <Stethoscope class="h-4 w-4" />
                             </Button>
-                        {:else if currentStep === 'final-diagnosis'}
+                        {:else if currentStep === "final-diagnosis"}
                             <Button
                                 variant="outline"
                                 class="gap-2"
-                                onclick={() => (finalDiagnosisDialogOpen = true)}
+                                onclick={() =>
+                                    (finalDiagnosisDialogOpen = true)}
                             >
                                 Submit Final Diagnosis
                                 <CheckCircle2 class="h-4 w-4" />
                             </Button>
-                        {:else if currentStep === 'end-case'}
+                        {:else if currentStep === "end-case"}
                             <Button
                                 variant="destructive"
                                 class="gap-2"

@@ -42,7 +42,7 @@ function createLabStore() {
                 results: testData.results,
                 interpretation: testData.interpretation,
                 timestamp: new Date(),
-                status: 'pending'
+                status: testData.status
             };
 
             update(state => ({
