@@ -138,3 +138,19 @@ export interface FeedbackState {
     isLoading: boolean;
     error: string | null;
 }
+
+export interface ApiResponse {
+    response: string;
+    thread_id: string;
+}
+
+export interface PatientResponse {
+    id: string;
+    sender: string;
+    content: string;
+    step: string;
+    timestamp: string;
+    type: string;
+    imageUrl: string;
+    title: string;
+}
