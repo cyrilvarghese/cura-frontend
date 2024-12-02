@@ -136,7 +136,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                 ...state,
                 messages: [...state.messages, {
                     id: crypto.randomUUID(),
-                    sender: 'assistant',
+                    sender: role,
                     step: step,
                     type: type,
                     content: content,

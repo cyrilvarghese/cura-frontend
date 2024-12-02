@@ -1,9 +1,6 @@
 <script lang="ts">
     import type { ExaminationResult, Message, TestResult } from "$lib/types";
-    import { statusColors } from "$lib/types";
     import { Avatar } from "$lib/components/ui/avatar";
-    import * as Card from "$lib/components/ui/card";
-    import { Badge } from "$lib/components/ui/badge";
     import User from "lucide-svelte/icons/user";
     import Bot from "lucide-svelte/icons/bot";
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
@@ -73,6 +70,7 @@
 <div
     class="flex items-start gap-3 {isStudent ? 'justify-end' : 'justify-start'}"
 >   
+    {@debug isStudent}
     {#if !isStudent}
         <Avatar class="h-8 w-8 mt-1">
             <div

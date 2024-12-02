@@ -99,13 +99,13 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        {#if currentStep === "relevant-info1"}
+                        {#if currentStep === "relevant-info"}
                             <Button
                                 variant="outline"
                                 class="gap-2"
                                 onclick={() => (relevantInfoDialogOpen = true)}
                             >
-                                Submit Relevant Info
+                                Submit Positive Clinical Findings
                                 <InfoIcon class="h-4 w-4" />
                             </Button>
                         {:else if currentStep === "diagnosis"}
@@ -117,7 +117,7 @@
                                 Submit Diagnosis
                                 <Stethoscope class="h-4 w-4" />
                             </Button>
-                        {:else if currentStep === "relevant-info"}
+                        {:else if currentStep === "final-diagnosis"}
                             <Button
                                 variant="outline"
                                 class="gap-2"

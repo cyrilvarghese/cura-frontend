@@ -72,7 +72,7 @@
         onkeydown={handleKeyDown}
     >
         <Dialog.Header>
-            <Dialog.Title>Relevant Information</Dialog.Title>
+            <Dialog.Title>Positive Clinical Findings</Dialog.Title>
             <Dialog.Description>
                 Add key points you've gathered from this case which are relevant to the case.
             </Dialog.Description>
