@@ -99,7 +99,7 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        {#if currentStep === "relevant-info"}
+                        {#if currentStep === "relevant-info1"}
                             <Button
                                 variant="outline"
                                 class="gap-2"
@@ -117,7 +117,7 @@
                                 Submit Diagnosis
                                 <Stethoscope class="h-4 w-4" />
                             </Button>
-                        {:else if currentStep === "final-diagnosis"}
+                        {:else if currentStep === "relevant-info"}
                             <Button
                                 variant="outline"
                                 class="gap-2"

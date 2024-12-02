@@ -1,6 +1,6 @@
 import type { ExaminationResult, Message, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
-import { patientApi } from '$lib/services/patientApi';
+import { patientApi } from '$lib/services/patientService';
 
 interface ApiState {
     messages: Message[];
@@ -61,23 +61,42 @@ interface StudentMessage {
 
 // Create a store for student messages only
 export const studentMessageHistory = writable<StudentMessage[]>([]);
- 
 
-export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' = 'text') {
-    
- 
+
+export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
+
+
     // Only store messages from students before the switch
-    if (role === 'student') {
-        studentMessageHistory.update(messages => [...messages, {
-            content: content as string,
-            step,
-            timestamp: new Date()
-        }]);
-    }
+    let messageContent = typeof content === 'object' && content !== null
+        ? ('testName' in content
+            ? `Test: ${content.testName} `
+            : 'name' in content
+                ? `Examination: ${content.name} `
+                : String(content))
+        : String(content);
+
+    studentMessageHistory.update(messages => [...messages, {
+        content: messageContent,
+        step,
+        timestamp: new Date()
+    }]);
+
 
 
     switch (step) {
         case 'patient_history':
+            // Add the incoming message to the messages array
+            apiStore.update(state => ({
+                ...state,
+                messages: [...state.messages, {
+                    id: crypto.randomUUID(),
+                    sender: role,
+                    step: step,
+                    type: type,
+                    content: messageContent,
+                    timestamp: new Date()
+                }]
+            }));
             // Handle real API interactions for patient history questions
             if (role === 'student') {
                 try {

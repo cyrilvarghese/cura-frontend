@@ -21,16 +21,25 @@ export interface Message {
     content: string | TestResult | ExaminationResult;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback';
     imageUrl?: string;
     title?: string;
 }
+
+export interface StudentMessage {
+    content: string;
+    step: string;
+    timestamp: Date;
+    type?: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis';
+}
+
 export interface ExaminationResult {
     name: string;
     purpose: string;
     findings: string | FindingContent;
     timestamp: Date;
     status: TestStatus;
+    interpretation: string;
 }
 
 export interface ExaminationState {
@@ -53,7 +62,7 @@ export type ExaminationName =
     | 'Hair and Scalp Examination'
     | 'Spinal Examination'
     | 'Peripheral Vascular Examination';
-    
+
 export type DiagnosticTestName =
     | 'Complete Blood Count and ESR'
     | 'ANA Test'
@@ -102,4 +111,30 @@ export const MessageSender = {
     ASSISTANT: 'assistant'
 } as const;
 
-export type MessageSenderType = typeof MessageSender[keyof typeof MessageSender]; 
+export type MessageSenderType = typeof MessageSender[keyof typeof MessageSender];
+
+export interface Diagnosis {
+    primaryDiagnosis: string;
+    justification: string;
+    studentMessageHistory: StudentMessage[];
+    timestamp?: Date;
+    status?: 'initial' | 'final';
+    differentialDiagnoses?: string[];
+}
+
+export interface FeedbackResponse {
+    score: number;
+    correctDiagnosis: string;
+    feedback: string;
+    explanations: string[];
+    recommendations: string[];
+} 
+export interface FeedbackState {
+    feedback: string | null;
+    score: number | null;
+    correctDiagnosis: string | null;
+    explanations: string[];
+    recommendations: string[];
+    isLoading: boolean;
+    error: string | null;
+}

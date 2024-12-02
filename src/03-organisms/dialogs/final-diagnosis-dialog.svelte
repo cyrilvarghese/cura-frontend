@@ -1,11 +1,13 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { sendMessage } from "$lib/stores/api";
+    import { sendMessage, studentMessageHistory } from "$lib/stores/api";
+    import { feedbackStore } from "$lib/stores/feedback-store";
     import Loader2 from "lucide-svelte/icons/loader-2";
 
     export let open = false;
-    export let onSubmit: (diagnosis: {
+    // svelte-ignore export_let_unused
+        export let onSubmit: (diagnosis: {
         primaryDiagnosis: {
             text: string;
             justification: string;
@@ -13,21 +15,45 @@
     }) => void;
 
     let finalDiagnosis = "";
-    let clinicalRationale = "";
+    let justification = "";
     let isSubmitting = false;
 
     async function handleSubmit() {
         isSubmitting = true;
         try {
-            const messageContent = `Primary Diagnosis: ${finalDiagnosis}\nJustification: ${clinicalRationale}\nDifferential Diagnoses: `;
+            const messageContent = `Primary Diagnosis: ${finalDiagnosis}\nJustification: ${justification}\nDifferential Diagnoses: `;
 
+            // Send message to chat
             await sendMessage(
                 messageContent,
                 "student",
                 "final-diagnosis",
                 "final-diagnosis"
             );
+            
+            console.log($studentMessageHistory);
+            console.log(finalDiagnosis);
+            console.log(justification);
+            debugger
+            // Get feedback
+            // const feedbackResponse = await feedbackStore.getFeedback({
+            //     primaryDiagnosis: finalDiagnosis,
+            //     justification: justification,
+            //     studentMessageHistory: $studentMessageHistory
+            // });
+
+            // // Log feedback response as step 4
+            // await sendMessage(
+            //     `Feedback:\nScore: ${feedbackResponse.score}%\nCorrect Diagnosis: ${feedbackResponse.correctDiagnosis}\n\n${feedbackResponse.feedback}\n\nExplanations:\n${feedbackResponse.explanations.join('\n')}\n\nRecommendations:\n${feedbackResponse.recommendations.join('\n')}`,
+            //     "assistant",
+            //     "feedback",
+            //     "feedback"
+            // );
+
+            // Close dialog
             open = false;
+        } catch (error) {
+            console.error('Error submitting diagnosis:', error);
         } finally {
             isSubmitting = false;
         }
@@ -40,7 +66,7 @@
         }
     }
 
-    $: isValid = finalDiagnosis.trim() && clinicalRationale.trim();
+    $: isValid = finalDiagnosis.trim() && justification.trim();
 </script>
 
 <Dialog.Root bind:open>
@@ -67,11 +93,11 @@
             </div>
             <div class="space-y-2">
                 <label for="rationale" class="text-sm font-medium"
-                    >Clinical Rationale</label
+                    >Justification</label
                 >
                 <textarea
                     id="rationale"
-                    bind:value={clinicalRationale}
+                    bind:value={justification}
                     class="min-h-[100px] w-full rounded-md border p-2"
                     placeholder="Explain your diagnostic reasoning..."
                 ></textarea>

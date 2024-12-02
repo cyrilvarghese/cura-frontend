@@ -13,9 +13,9 @@
 
     let textValue = "";
     let isLoading = false;
+    let textareaRef: null | HTMLTextAreaElement = null;
 
     async function handleSend() {
-        //add the message to UI and then send it to the API
         if (textValue.trim() && !isLoading) {
             isLoading = true;
             try {
@@ -26,6 +26,9 @@
                     "text",
                 );
                 textValue = "";
+                if (textareaRef) {
+                    setTimeout(() => textareaRef?.focus(), 0);
+                }
             } catch (error) {
                 console.error("Failed to send message:", error);
             } finally {
@@ -89,6 +92,7 @@
 
 <div class="relative flex-1">
     <Textarea
+        bind:ref={textareaRef}
         bind:value={textValue}
         class="flex-1 pl-24 pt-7 pr-12"
         placeholder="Type your message... (Ctrl+Enter to send)"
