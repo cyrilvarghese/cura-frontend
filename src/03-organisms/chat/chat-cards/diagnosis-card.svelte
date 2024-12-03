@@ -64,6 +64,17 @@
                         {diagnosis.primaryDiagnosis.justification}
                     </p>
                 </div>
+                
+                {#if type === "initial" && diagnosis.differentialDiagnoses?.length}
+                    <div class="mt-4">
+                        <h4 class="text-sm font-semibold mb-2">Differential Diagnoses:</h4>
+                        <ul class="list-disc list-inside space-y-1">
+                            {#each diagnosis.differentialDiagnoses as differential}
+                                <li class="text-sm text-gray-700">{differential}</li>
+                            {/each}
+                        </ul>
+                    </div>
+                {/if}
             </div>
         </div>
     </Card.Content>

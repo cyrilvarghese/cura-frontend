@@ -36,19 +36,15 @@
             console.log(justification);
             debugger
             // Get feedback
-            // const feedbackResponse = await feedbackStore.getFeedback({
-            //     primaryDiagnosis: finalDiagnosis,
-            //     justification: justification,
-            //     studentMessageHistory: $studentMessageHistory
-            // });
-
-            // // Log feedback response as step 4
-            // await sendMessage(
-            //     `Feedback:\nScore: ${feedbackResponse.score}%\nCorrect Diagnosis: ${feedbackResponse.correctDiagnosis}\n\n${feedbackResponse.feedback}\n\nExplanations:\n${feedbackResponse.explanations.join('\n')}\n\nRecommendations:\n${feedbackResponse.recommendations.join('\n')}`,
-            //     "assistant",
-            //     "feedback",
-            //     "feedback"
-            // );
+            const feedbackResponse = await feedbackStore.getFeedback($studentMessageHistory);
+            debugger
+            // Log feedback response as step 4
+            await sendMessage(
+                `Feedback:\nScore: ${feedbackResponse.score}%\nCorrect Diagnosis: ${feedbackResponse.correctDiagnosis}\n\n${feedbackResponse.feedback}\n\nExplanations:\n${feedbackResponse.explanations.join('\n')}\n\nRecommendations:\n${feedbackResponse.recommendations.join('\n')}`,
+                "assistant",
+                "feedback",
+                "feedback"
+            );
 
             // Close dialog
             open = false;

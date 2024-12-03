@@ -30,7 +30,7 @@ export interface StudentMessage {
     content: string;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis';
+    type?: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback';
 }
 
 export interface ExaminationResult {
@@ -113,15 +113,7 @@ export const MessageSender = {
 
 export type MessageSenderType = typeof MessageSender[keyof typeof MessageSender];
 
-export interface Diagnosis {
-    primaryDiagnosis: string;
-    justification: string;
-    studentMessageHistory: StudentMessage[];
-    timestamp?: Date;
-    status?: 'initial' | 'final';
-    differentialDiagnoses?: string[];
-}
-
+ 
 export interface FeedbackResponse {
     score: number;
     correctDiagnosis: string;

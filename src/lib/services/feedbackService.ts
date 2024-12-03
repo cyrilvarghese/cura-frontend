@@ -1,25 +1,18 @@
-interface FeedbackResponse {
-    feedback: string;
-    score: number;
-    correctDiagnosis: string;
-    explanations: string[];
-    recommendations: string[];
-}
+import type { FeedbackResponse, FeedbackState, StudentMessage } from "$lib/types";
 
+ 
+ 
 export class FeedbackService {
     private baseUrl = 'http://127.0.0.1:8000'; // adjust based on your API endpoint
 
-    async getFeedback(diagnosis: {
-        primaryDiagnosis: string;
-        justification: string;
-    }): Promise<FeedbackResponse> {
+    async getFeedback(studentMessageHistory:StudentMessage[]): Promise<FeedbackResponse> {
         try {
             const response = await fetch(`${this.baseUrl}/get-feedback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(diagnosis)
+                body: JSON.stringify(studentMessageHistory)
             });
 
             if (!response.ok) {

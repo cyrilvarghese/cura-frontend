@@ -1,4 +1,4 @@
-import type { ExaminationResult, Message, TestResult } from '$lib/types';
+import type { ExaminationResult, Message, StudentMessage, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
 
@@ -18,46 +18,14 @@ const initialState: ApiState = {
             title: '" I have rashes all over my hands and it itches a lot "',
             content: 'Patient presenting with rashes and joint pain.',
             timestamp: new Date('2024-02-20T10:00:00')
-        },
-        {
-            id: '2',
-            sender: 'patient',
-            step: 'patient_history',
-            content: "Doctor, I have rashes and my joints are aching.",
-            timestamp: new Date('2024-02-20T10:01:00')
-        },
-        {
-            id: '3',
-            sender: 'student',
-            step: 'patient_history',
-            content: "I understand. When did the rashes and joint pain start?",
-            timestamp: new Date('2024-02-20T10:02:00')
-        },
-        {
-            id: '4',
-            sender: 'patient',
-            step: 'patient_history',
-            content: "It started about two hours ago. At first, I thought it was just anxiety, but the pain is getting worse.",
-            timestamp: new Date('2024-02-20T10:03:00')
-        },
-        {
-            id: '5',
-            sender: 'student',
-            step: 'patient_history',
-            content: "Thank you for sharing that. Do you feel any pain radiating to other areas, like your arm, jaw, or back?",
-            timestamp: new Date('2024-02-20T10:04:00')
-        }
+        }   
     ],
     error: null
 };
 
 export const apiStore = writable<ApiState>(initialState);
 
-interface StudentMessage {
-    content: string;
-    step: string;
-    timestamp: Date;
-}
+ 
 
 // Create a store for student messages only
 export const studentMessageHistory = writable<StudentMessage[]>([]);
@@ -78,7 +46,8 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
     studentMessageHistory.update(messages => [...messages, {
         content: messageContent,
         step,
-        timestamp: new Date()
+        timestamp: new Date(),
+        type: type
     }]);
 
 

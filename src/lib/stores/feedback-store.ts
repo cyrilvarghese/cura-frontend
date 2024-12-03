@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
-import type { Diagnosis, FeedbackState } from '$lib/types/index';
+import type { FeedbackState, StudentMessage } from '$lib/types/index';
 
 
 
@@ -17,11 +17,11 @@ const initialState: FeedbackState = {
 function createFeedbackStore() {
     const { subscribe, update, set } = writable<FeedbackState>(initialState);
 
-    async function getFeedback(diagnosis: Diagnosis) {
+    async function getFeedback(studentMessageHistory: StudentMessage[]) {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            const response = await feedbackService.getFeedback(diagnosis);
+            const response = await feedbackService.getFeedback(studentMessageHistory);
 
             update(state => ({
                 ...state,
