@@ -31,16 +31,12 @@
                 "final-diagnosis"
             );
             
-            console.log($studentMessageHistory);
-            console.log(finalDiagnosis);
-            console.log(justification);
-            debugger
             // Get feedback
             const feedbackResponse = await feedbackStore.getFeedback($studentMessageHistory);
-            debugger
-            // Log feedback response as step 4
+            
+            // Send feedback directly
             await sendMessage(
-                `Feedback:\nScore: ${feedbackResponse.score}%\nCorrect Diagnosis: ${feedbackResponse.correctDiagnosis}\n\n${feedbackResponse.feedback}\n\nExplanations:\n${feedbackResponse.explanations.join('\n')}\n\nRecommendations:\n${feedbackResponse.recommendations.join('\n')}`,
+                feedbackResponse,  // Send the feedback response object directly
                 "assistant",
                 "feedback",
                 "feedback"

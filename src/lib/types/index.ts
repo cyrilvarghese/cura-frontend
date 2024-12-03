@@ -18,7 +18,7 @@ export interface TestResult {
 export interface Message {
     id: string;
     sender: string;
-    content: string | TestResult | ExaminationResult;
+    content: string | TestResult | ExaminationResult | FeedbackResponse;
     step: string;
     timestamp: Date;
     type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback';
@@ -113,20 +113,39 @@ export const MessageSender = {
 
 export type MessageSenderType = typeof MessageSender[keyof typeof MessageSender];
 
- 
-export interface FeedbackResponse {
+export interface Annotation {
+    action: string;
+    step: string;
+    relevance?: 'relevant' | 'neutral' | 'irrelevant';
+    correctness?: 'correct' | 'incorrect';
+    justification: string;
+}
+
+export interface FeedbackCategory {
     score: number;
-    correctDiagnosis: string;
-    feedback: string;
-    explanations: string[];
-    recommendations: string[];
-} 
+    comments: string;
+}
+
+export interface DetailedFeedback {
+    history_taking: FeedbackCategory;
+    examinations_performed: FeedbackCategory;
+    tests_ordered: FeedbackCategory;
+    diagnostic_reasoning: FeedbackCategory;
+    synthesis_organization: FeedbackCategory;
+}
+
+export interface FeedbackResponse {
+    annotations: Annotation[];
+    feedback: DetailedFeedback;
+    total_score: number;
+    suggestions: string;
+}
+
 export interface FeedbackState {
-    feedback: string | null;
-    score: number | null;
-    correctDiagnosis: string | null;
-    explanations: string[];
-    recommendations: string[];
+    annotations: Annotation[] | null;
+    feedback: DetailedFeedback | null;
+    total_score: number | null;
+    suggestions: string | null;
     isLoading: boolean;
     error: string | null;
 }

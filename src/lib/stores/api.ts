@@ -1,4 +1,4 @@
-import type { ExaminationResult, Message, StudentMessage, TestResult } from '$lib/types';
+import type { ExaminationResult, FeedbackResponse, Message, StudentMessage, TestResult } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
 
@@ -31,9 +31,9 @@ export const apiStore = writable<ApiState>(initialState);
 export const studentMessageHistory = writable<StudentMessage[]>([]);
 
 
-export async function sendMessage(content: string | TestResult | ExaminationResult, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
+export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
 
-
+    debugger
     // Only store messages from students before the switch
     let messageContent = typeof content === 'object' && content !== null
         ? ('testName' in content
@@ -99,7 +99,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
         default: // All other steps (examination, diagnosis, treatment)
             // Add artificial delay to simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
-
+            debugger
             // Update store with simulated response for non-patient-history steps
             apiStore.update(state => ({
                 ...state,

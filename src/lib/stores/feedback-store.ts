@@ -5,11 +5,10 @@ import type { FeedbackState, StudentMessage } from '$lib/types/index';
 
 
 const initialState: FeedbackState = {
+    annotations: null,
     feedback: null,
-    score: null,
-    correctDiagnosis: null,
-    explanations: [],
-    recommendations: [],
+    total_score: null,
+    suggestions: null,
     isLoading: false,
     error: null
 };
@@ -25,11 +24,10 @@ function createFeedbackStore() {
 
             update(state => ({
                 ...state,
+                annotations: response.annotations,
                 feedback: response.feedback,
-                score: response.score,
-                correctDiagnosis: response.correctDiagnosis,
-                explanations: response.explanations,
-                recommendations: response.recommendations,
+                total_score: response.total_score,
+                suggestions: response.suggestions,
                 isLoading: false
             }));
 

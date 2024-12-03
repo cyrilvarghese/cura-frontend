@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { ExaminationResult, Message, TestResult } from "$lib/types";
+    import type { ExaminationResult, Message, TestResult, FeedbackResponse } from "$lib/types";
     import { Avatar } from "$lib/components/ui/avatar";
     import User from "lucide-svelte/icons/user";
     import Bot from "lucide-svelte/icons/bot";
@@ -8,6 +8,7 @@
     import ExaminationCard from "./chat-cards/examination-card.svelte";
     import DiagnosisCard from "./chat-cards/diagnosis-card.svelte";
     import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
+    import FeedbackCard from "./chat-cards/feedback-card.svelte";
 
     export let message: Message;
 
@@ -70,7 +71,6 @@
 <div
     class="flex items-start gap-3 {isStudent ? 'justify-end' : 'justify-start'}"
 >   
-    {@debug isStudent}
     {#if !isStudent}
         <Avatar class="h-8 w-8 mt-1">
             <div
@@ -88,7 +88,6 @@
             {@const diagnosisType = message.type === "final-diagnosis" ? "final" : "initial"}
             {@const diagnosisData = parseDiagnosisMessage(message.content as string, diagnosisType)}
             {#if diagnosisData}
-                {@debug diagnosisData}
                 <DiagnosisCard diagnosis={diagnosisData} type={diagnosisType} />
             {:else}
                 <div class="bg-card rounded-lg p-4 shadow-sm border">
@@ -123,6 +122,9 @@
             <TestResultCard result={message.content as TestResult} />
         {:else if message.type === "examination" && typeof message.content !== "string"}
             <ExaminationCard result={message.content as ExaminationResult} />
+        {:else if message.type === "feedback"}
+            {@debug message}
+            <FeedbackCard feedback={message.content as FeedbackResponse} />
         {:else}
             <div
                 class="bg-card rounded-lg p-4 shadow-sm border {isStudent
