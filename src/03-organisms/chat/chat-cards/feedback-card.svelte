@@ -1,8 +1,48 @@
 <script lang="ts">
     import type { FeedbackResponse } from "$lib/types";
+    import Star from "lucide-svelte/icons/star";
+    import StarHalf from "lucide-svelte/icons/star-half";
+    import StarOff from "lucide-svelte/icons/star-off";
+    import * as HoverCard from "$lib/components/ui/hover-card";
 
     export let feedback: FeedbackResponse;
     import { onMount } from "svelte";
+
+    // Scoring color configuration
+    const scoreColors = {
+        high: 'text-green-400',
+        medium: 'text-yellow-400',
+        low: 'text-red-400',
+        empty: 'text-gray-200'
+    } as const;
+
+    function getScoreColor(score: number) {
+        if (score >= 7) return scoreColors.high;
+        if (score >= 5) return scoreColors.medium;
+        return scoreColors.low;
+    }
+
+    function getStars(score: number) {
+        const stars = [];
+        const fullStars = Math.floor(score / 2);
+        const hasHalfStar = score % 2 >= 1;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        
+        // Add full stars
+        for (let i = 0; i < fullStars; i++) {
+            stars.push('full');
+        }
+        // Add half star if needed
+        if (hasHalfStar) {
+            stars.push('half');
+        }
+        // Add empty stars
+        for (let i = 0; i < emptyStars; i++) {
+            stars.push('empty');
+        }
+        
+        return stars;
+    }
 
     onMount(() => {
         console.log("Feedback received:", feedback);
@@ -45,14 +85,21 @@
     <!-- Overall Score -->
     <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold">Case Feedback</h3>
-        <div
-            class="text-xl font-bold {feedback.total_score >= 7
-                ? 'text-green-500'
-                : feedback.total_score >= 5
-                  ? 'text-yellow-500'
-                  : 'text-red-500'}"
-        >
-            {feedback.total_score.toFixed(1)}/10
+        <div class="flex items-center gap-2">
+            <div class="text-lg font-bold {getScoreColor(feedback.total_score)}">
+                {feedback.total_score.toFixed(1)}/10
+            </div>
+            <div class="flex gap-0.5">
+                {#each getStars(feedback.total_score) as starType}
+                    {#if starType === 'full'}
+                        <Star class="w-4 h-4 fill-current {getScoreColor(feedback.total_score)}" />
+                    {:else if starType === 'half'}
+                        <StarHalf class="w-4 h-4 fill-current {getScoreColor(feedback.total_score)}" />
+                    {:else}
+                        <StarOff class="w-4 h-4 {scoreColors.empty}" />
+                    {/if}
+                {/each}
+            </div>
         </div>
     </div>
 
@@ -63,15 +110,26 @@
             <div class="border-t pt-2">
                 <div class="flex items-center justify-between">
                     <h4 class="font-medium">{category.label}</h4>
-                    <span
-                        class="font-semibold {categoryFeedback.score >= 7
-                            ? 'text-green-500'
-                            : categoryFeedback.score >= 5
-                              ? 'text-yellow-500'
-                              : 'text-red-500'}"
-                    >
-                        {categoryFeedback.score}/10
-                    </span>
+                    <HoverCard.Root>
+                        <HoverCard.Trigger>
+                            <div class="flex gap-0.5">
+                                {#each getStars(categoryFeedback.score) as starType}
+                                    {#if starType === 'full'}
+                                        <Star class="w-3.5 h-3.5 fill-current {getScoreColor(categoryFeedback.score)}" />
+                                    {:else if starType === 'half'}
+                                        <StarHalf class="w-3.5 h-3.5 fill-current {getScoreColor(categoryFeedback.score)}" />
+                                    {:else}
+                                        <StarOff class="w-3.5 h-3.5 {scoreColors.empty}" />
+                                    {/if}
+                                {/each}
+                            </div>
+                        </HoverCard.Trigger>
+                        <HoverCard.Content class="p-2">
+                            <div class="text-sm font-medium">
+                                Score: {categoryFeedback.score}/10
+                            </div>
+                        </HoverCard.Content>
+                    </HoverCard.Root>
                 </div>
                 <p class="text-sm text-muted-foreground mt-1">
                     {categoryFeedback.comments}
