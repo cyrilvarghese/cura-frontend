@@ -18,14 +18,14 @@ const initialState: ApiState = {
             title: '" I have rashes all over my hands and it itches a lot "',
             content: 'Patient presenting with rashes and joint pain.',
             timestamp: new Date('2024-02-20T10:00:00')
-        }   
+        }
     ],
     error: null
 };
 
 export const apiStore = writable<ApiState>(initialState);
 
- 
+
 
 // Create a store for student messages only
 export const studentMessageHistory = writable<StudentMessage[]>([]);
@@ -43,14 +43,15 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                 : String(content))
         : String(content);
 
-    studentMessageHistory.update(messages => [...messages, {
-        content: messageContent,
-        step,
-        timestamp: new Date(),
-        type: type
-    }]);
-
-
+    if (step !== 'feedback') {
+        studentMessageHistory.update(messages => [...messages, {
+            content: messageContent,
+            step,
+            timestamp: new Date(),
+            type: type
+        },
+        ]);
+    }
 
     switch (step) {
         case 'patient_history':

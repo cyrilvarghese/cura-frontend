@@ -7,7 +7,7 @@
 
     export let open = false;
     // svelte-ignore export_let_unused
-        export let onSubmit: (diagnosis: {
+    export let onSubmit: (diagnosis: {
         primaryDiagnosis: {
             text: string;
             justification: string;
@@ -28,31 +28,33 @@
                 messageContent,
                 "student",
                 "final-diagnosis",
-                "final-diagnosis"
+                "final-diagnosis",
             );
-            
+
             // Get feedback
-            const feedbackResponse = await feedbackStore.getFeedback($studentMessageHistory);
-            
+            const feedbackResponse = await feedbackStore.getFeedback(
+                $studentMessageHistory,
+            );
+
             // Send feedback directly
             await sendMessage(
-                feedbackResponse,  // Send the feedback response object directly
+                feedbackResponse, // Send the feedback response object directly
                 "assistant",
                 "feedback",
-                "feedback"
+                "feedback",
             );
 
             // Close dialog
             open = false;
         } catch (error) {
-            console.error('Error submitting diagnosis:', error);
+            console.error("Error submitting diagnosis:", error);
         } finally {
             isSubmitting = false;
         }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter' && event.ctrlKey && !isSubmitting) {
+        if (event.key === "Enter" && event.ctrlKey && !isSubmitting) {
             event.preventDefault();
             handleSubmit();
         }
@@ -98,10 +100,11 @@
 
         <Dialog.Footer>
             <Dialog.Close>
-                <Button variant="outline" disabled={isSubmitting}>Cancel</Button>
+                <Button variant="outline" disabled={isSubmitting}>Cancel</Button
+                >
             </Dialog.Close>
-            <Button 
-                variant="default" 
+            <Button
+                variant="default"
                 onclick={handleSubmit}
                 disabled={!isValid || isSubmitting}
             >
