@@ -1,4 +1,4 @@
-import type { ExaminationResult, FeedbackResponse, Message, StudentMessage, TestResult } from '$lib/types';
+import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
 
@@ -31,9 +31,57 @@ export const apiStore = writable<ApiState>(initialState);
 export const studentMessageHistory = writable<StudentMessage[]>([]);
 
 
+
+
+function isFindingContent(finding: any): finding is FindingContent {
+    return finding
+        && typeof finding === 'object'
+        && 'type' in finding
+        && 'content' in finding;
+}
+
+
+
+// Add this type guard function for TestResult
+function isTestResultContent(result: any): result is TestResultContent {
+    return result
+        && typeof result === 'object'
+        && 'type' in result
+        && 'content' in result
+        && (result.type === 'text' 
+            || result.type === 'table' 
+            || result.type === 'image' 
+            || result.type === 'mixed');
+}
+ 
+
+
+// Update the store type
+export const patientFile = writable<PatientFileItem[]>([]);
+
+// Update the update function
+function updatePatientFile(content: TestResult | ExaminationResult, type: 'examination' | 'test-result') {
+    if (type === 'examination') {
+        const examContent = content as ExaminationResult;
+        if (isFindingContent(examContent.findings) && examContent.findings.type === 'mixed') {
+            patientFile.update(files => [...files, {
+                name: examContent.name,
+                result: examContent.findings
+            }]);
+        }
+    } else if (type === 'test-result') {
+        const testContent = content as TestResult;
+        if (isTestResultContent(testContent.results) && testContent.results.type === 'mixed') {
+            patientFile.update(files => [...files, {
+                name: testContent.testName,
+                result: testContent.results
+            }]);
+        }
+    }
+}
+
 export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
 
-    debugger
     // Only store messages from students before the switch
     let messageContent = typeof content === 'object' && content !== null
         ? ('testName' in content
@@ -42,7 +90,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                 ? `Examination: ${content.name} `
                 : String(content))
         : String(content);
-
+    // Store all student messages in the history except for feedback
     if (step !== 'feedback') {
         studentMessageHistory.update(messages => [...messages, {
             content: messageContent,
@@ -102,6 +150,18 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             await new Promise(resolve => setTimeout(resolve, 1000));
             debugger
             // Update store with simulated response for non-patient-history steps
+            // types: text, image, test-result, examination, diagnosis, relevant-info, final-diagnosis, feedback
+            let resultContent: TestResult | ExaminationResult;
+
+            switch (type) {
+                case 'examination':
+                case 'test-result':
+                    updatePatientFile(content as (TestResult | ExaminationResult), type);
+                    break;
+                default:
+                    console.warn("Unknown type:", type);
+                    break;
+            }
             apiStore.update(state => ({
                 ...state,
                 messages: [...state.messages, {

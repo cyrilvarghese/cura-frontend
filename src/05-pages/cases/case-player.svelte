@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            <div class="bg-muted/50 rounded-xl w-[30%] h-full">
+            <div class="bg-muted/10 rounded-xl w-[30%] h-full">
                 <CaseSidebar />
             </div>
         </div>

@@ -36,7 +36,7 @@ export interface StudentMessage {
 export interface ExaminationResult {
     name: string;
     purpose: string;
-    findings: string | FindingContent;
+    findings:FindingContent;
     timestamp: Date;
     status: TestStatus;
     interpretation: string;
@@ -73,13 +73,7 @@ export type DiagnosticTestName =
     | 'Allergy Panel'
     | 'Chest Imaging';
 
-// export interface ExaminationDataType {
-//     purpose: string;
-//     findings: {
-//         type: 'text' | 'table' | 'image' | 'mixed';
-//         content: string | TabularData | ImageData | readonly FindingContent[];
-//     };
-// }
+
 
 export type FindingContent =
     | { readonly type: 'text'; readonly content: string }
@@ -91,6 +85,12 @@ export interface TabularData {
     headers: string[];
     rows: (string | number)[][];
 }
+// Define the PatientFileItem interface
+export interface PatientFileItem {
+    name: string;
+    result: FindingContent | TestResultContent;
+}
+
 
 export interface ImageData {
     url: string;
