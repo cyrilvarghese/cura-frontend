@@ -80,7 +80,7 @@
 <div class="flex-col w-full p-4 h-full">
     <h2 class="text-lg font-semibold pb-8">Patient File</h2>
     <ScrollArea
-        class="w-96 h-[calc(100%-100px)] rounded-md "
+        class="w-full h-[calc(100%-100px)] rounded-md "
         orientation="vertical"
     >
         <div id="patient-files-container">
