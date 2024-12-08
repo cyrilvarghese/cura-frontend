@@ -17,7 +17,15 @@ const initialState: ApiState = {
             imageUrl: 'https://cdn.midjourney.com/6703f338-5798-4ef4-bc15-865900f67df2/0_3.png',
             title: '" I have rashes all over my hands and it itches a lot "',
             content: 'Patient presenting with rashes and joint pain.',
-            timestamp: new Date('2024-02-20T10:00:00')
+            timestamp: new Date() // Current date and time
+        },
+        {
+            id: '2',
+            sender: 'assistant',
+            type: 'text',
+            step: 'patient_history',
+            content: 'You may ask the patient any questions you have.',
+            timestamp: new Date() // Current date and time
         }
     ],
     error: null

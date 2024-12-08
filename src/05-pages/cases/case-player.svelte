@@ -14,7 +14,7 @@
     import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
     import { studentMessageHistory } from "$lib/stores/api";
-
+    const { id } = $props();
     // Subscribe to changes if needed
     studentMessageHistory.subscribe((studentMessages) => {
         console.log(studentMessages);

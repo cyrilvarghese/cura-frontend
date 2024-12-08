@@ -9,6 +9,7 @@
     import DiagnosisCard from "./chat-cards/diagnosis-card.svelte";
     import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
+    import { onMount, onDestroy } from 'svelte';
 
     export let message: Message;
 
@@ -66,6 +67,23 @@
             return [];
         }
     }
+
+    let relativeTimeString: string;
+    let intervalId: ReturnType<typeof setInterval>;
+
+    onMount(() => {
+        // Update immediately
+        relativeTimeString = getRelativeTime(message.timestamp);
+        
+        // Then update every minute
+        intervalId = setInterval(() => {
+            relativeTimeString = getRelativeTime(message.timestamp);
+        }, 60000); // Update every minute
+    });
+
+    onDestroy(() => {
+        if (intervalId) clearInterval(intervalId);
+    });
 </script>
 
 <div

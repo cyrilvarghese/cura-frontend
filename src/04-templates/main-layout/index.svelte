@@ -33,7 +33,7 @@
 						<Breadcrumb.Separator />
 						<Breadcrumb.Item>
 							<Breadcrumb.Link href="/cases"
-								>Urticarial Vasculitis</Breadcrumb.Link
+								>Case id - 123</Breadcrumb.Link
 							>
 						</Breadcrumb.Item>
 					</Breadcrumb.List>
@@ -43,11 +43,11 @@
 		<main>
 			<Router url="">
 				<Route path="/">
-					<HomePage />
+					<CasePlayer id=1  />
 				</Route>
 					
 				<Route path="cases/:id" let:params>
-					<CasePlayer id={params.id} message={undefined} />
+					<CasePlayer id={params.id}  />
 				</Route>
 
 				<!-- <Route path="posts/:id" let:params>
