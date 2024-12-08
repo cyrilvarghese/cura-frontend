@@ -77,6 +77,33 @@
         console.log("Case ended");
         endCaseDialogOpen = false;
     }
+
+    const stepButtons = {
+        "relevant-info": {
+            label: "Submit Positive Clinical Findings",
+            icon: InfoIcon,
+            action: () => (relevantInfoDialogOpen = true),
+            variant: "outline" as const,
+        },
+        diagnosis: {
+            label: "Submit Diagnosis",
+            icon: Stethoscope,
+            action: () => (diagnosisDialogOpen = true),
+            variant: "outline" as const,
+        },
+        "final-diagnosis": {
+            label: "Submit Final Diagnosis",
+            icon: CheckCircle2,
+            action: () => (finalDiagnosisDialogOpen = true),
+            variant: "outline" as const,
+        },
+        "end-case": {
+            label: "End Case",
+            icon: XCircle,
+            action: () => (endCaseDialogOpen = true),
+            variant: "destructive" as const,
+        },
+    };
 </script>
 
 <div>
@@ -99,42 +126,18 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        {#if currentStep === "relevant-info"}
+                        {#if stepButtons[currentStep as keyof typeof stepButtons]}
+                            {@const button =
+                                stepButtons[
+                                    currentStep as keyof typeof stepButtons
+                                ]}
                             <Button
-                                variant="outline"
+                                variant={button.variant || "outline"}
                                 class="gap-2"
-                                onclick={() => (relevantInfoDialogOpen = true)}
+                                onclick={button.action}
                             >
-                                Submit Positive Clinical Findings
-                                <InfoIcon class="h-4 w-4" />
-                            </Button>
-                        {:else if currentStep === "diagnosis"}
-                            <Button
-                                variant="outline"
-                                class="gap-2"
-                                onclick={() => (diagnosisDialogOpen = true)}
-                            >
-                                Submit Diagnosis
-                                <Stethoscope class="h-4 w-4" />
-                            </Button>
-                        {:else if currentStep === "final-diagnosis"}
-                            <Button
-                                variant="outline"
-                                class="gap-2"
-                                onclick={() =>
-                                    (finalDiagnosisDialogOpen = true)}
-                            >
-                                Submit Final Diagnosis
-                                <CheckCircle2 class="h-4 w-4" />
-                            </Button>
-                        {:else if currentStep === "end-case"}
-                            <Button
-                                variant="destructive"
-                                class="gap-2"
-                                onclick={() => (endCaseDialogOpen = true)}
-                            >
-                                End Case
-                                <XCircle class="h-4 w-4" />
+                                {button.label}
+                                <button.icon class="h-4 w-4" />
                             </Button>
                         {/if}
                     </div>

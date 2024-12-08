@@ -7,9 +7,10 @@
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     import { examinationStore } from "$lib/stores/examination-store";
     import { laboratoryStore } from "$lib/stores/lab-test-store";
-    import type { ExaminationName } from "$lib/types";
+    import type { ExaminationName, Message } from "$lib/types";
     import type { DiagnosticTestName } from "$lib/types";
     import type { ExaminationResult } from "$lib/types";
+    import { apiStore } from "$lib/stores/api";
 
     let textValue = "";
     let isLoading = false;
@@ -19,6 +20,16 @@
         if (textValue.trim() && !isLoading) {
             isLoading = true;
             try {
+                const loadingMessage: Message = {
+                    id: crypto.randomUUID(),
+                    sender: "assistant",
+                    content: "",
+                    timestamp: new Date(),
+                    type: "loading",
+                    step: "patient_history"
+                };
+                $apiStore.messages = [...$apiStore.messages, loadingMessage];
+                
                 await sendMessage(
                     textValue.trim(),
                     "student",

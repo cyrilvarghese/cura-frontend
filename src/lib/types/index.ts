@@ -165,3 +165,9 @@ export interface PatientResponse {
     imageUrl: string;
     title: string;
 }
+
+export interface StreamingChunk {
+    content: string;
+    thread_id?: string;
+    // Add other properties as needed
+}

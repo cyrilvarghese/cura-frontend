@@ -1,7 +1,8 @@
 import type { DiagnosticTestName, Message, TestResult } from '$lib/types';
+import { API_BASE_URL } from '$lib/config/api';
 
 export class LabTestService {
-    private baseUrl = 'http://127.0.0.1:8000'; // for future API integration
+    private baseUrl = API_BASE_URL;
 
     async getLabTestData(testName: DiagnosticTestName): Promise<TestResult> {
         // Load from local JSON

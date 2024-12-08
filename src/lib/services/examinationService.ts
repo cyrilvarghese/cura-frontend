@@ -1,8 +1,9 @@
 import type { ExaminationName, ExaminationResult, Message } from '$lib/types';
+import { API_BASE_URL } from '$lib/config/api';
 
 
 export class ExaminationService {
-    private baseUrl = 'http://127.0.0.1:8000'; // for future API integration
+    private baseUrl = API_BASE_URL;
 
     async getExaminationData(examName: ExaminationName): Promise<ExaminationResult> {
         const data = await import('$lib/data/examination-data.json');

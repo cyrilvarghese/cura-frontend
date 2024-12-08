@@ -43,9 +43,9 @@
 		<main>
 			<Router url="">
 				<Route path="/">
-					<CasePlayer id=1  />
+					<CasePlayer id={1}  />
 				</Route>
-					
+
 				<Route path="cases/:id" let:params>
 					<CasePlayer id={params.id}  />
 				</Route>

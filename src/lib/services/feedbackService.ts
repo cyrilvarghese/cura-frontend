@@ -1,9 +1,8 @@
 import type { FeedbackResponse, FeedbackState, StudentMessage } from "$lib/types";
+import { API_BASE_URL } from '$lib/config/api';
 
- 
- 
 export class FeedbackService {
-    private baseUrl = 'http://127.0.0.1:8000'; // adjust based on your API endpoint
+    private baseUrl = API_BASE_URL;
 
     async getFeedback(studentMessageHistory:StudentMessage[]): Promise<FeedbackResponse> {
         try {

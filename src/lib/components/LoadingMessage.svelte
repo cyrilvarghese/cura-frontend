@@ -1,11 +1,12 @@
 <script lang="ts">
-    import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+    let dots = $state(".");
+    
+    // Animate the dots
+    setInterval(() => {
+        dots = dots.length >= 3 ? "." : dots + ".";
+    }, 500);
 </script>
 
-<div class="flex items-center space-x-4">
-    <Skeleton class="size-12 rounded-full" />
-    <div class="space-y-2">
-        <Skeleton class="h-4 w-[50px]" />
-        <Skeleton class="h-4 w-[30px]" />
-    </div>
+<div class="bg-card rounded-lg p-4 shadow-sm border">
+    <p class="text-sm text-muted-foreground">Patient is thinking{dots}</p>
 </div>

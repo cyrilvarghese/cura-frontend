@@ -1,5 +1,10 @@
 <script lang="ts">
-    import type { ExaminationResult, Message, TestResult, FeedbackResponse } from "$lib/types";
+    import type {
+        ExaminationResult,
+        Message,
+        TestResult,
+        FeedbackResponse,
+    } from "$lib/types";
     import { Avatar } from "$lib/components/ui/avatar";
     import User from "lucide-svelte/icons/user";
     import Bot from "lucide-svelte/icons/bot";
@@ -9,9 +14,9 @@
     import DiagnosisCard from "./chat-cards/diagnosis-card.svelte";
     import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount, onDestroy } from "svelte";
 
-    export let message: Message;
+    const { message } = $props<{ message: Message }>();
 
     function getRelativeTime(date: Date): string {
         const now = new Date();
@@ -29,25 +34,35 @@
         return `${diffInDays} days ago`;
     }
 
-    $: isStudent = message.sender === "student";
+    const isStudent = $derived(message.sender === "student");
 
-    function parseDiagnosisMessage(content: string, type: "initial" | "final" = "initial") {
+    function parseDiagnosisMessage(
+        content: string,
+        type: "initial" | "final" = "initial",
+    ) {
         try {
-            const diagnosisMatch = content.match(/(Primary|Final) Diagnosis: (.*?)\n/);
+            const diagnosisMatch = content.match(
+                /(Primary|Final) Diagnosis: (.*?)\n/,
+            );
             const justificationMatch = content.match(/Justification: (.*?)\n/);
-            const differentialMatch = content.match(/Differential Diagnoses: (.*?)$/);
+            const differentialMatch = content.match(
+                /Differential Diagnoses: (.*?)$/,
+            );
 
             return {
                 primaryDiagnosis: {
                     text: diagnosisMatch?.[2] || "",
-                    justification: justificationMatch?.[1] || ""
+                    justification: justificationMatch?.[1] || "",
                 },
-                differentialDiagnoses: type === "initial" 
-                    ? (differentialMatch?.[1].split(',').map(d => d.trim()) || [])
-                    : []
+                differentialDiagnoses:
+                    type === "initial"
+                        ? differentialMatch?.[1]
+                              .split(",")
+                              .map((d) => d.trim()) || []
+                        : [],
             };
         } catch (error) {
-            console.error('Error parsing diagnosis message:', error);
+            console.error("Error parsing diagnosis message:", error);
             return null;
         }
     }
@@ -56,14 +71,14 @@
         try {
             // If content is already an array, return it
             if (Array.isArray(content)) return content;
-            
+
             // If content is a string, split by newlines or commas
             return content
                 .split(/[,\n]/)
-                .map(point => point.trim())
-                .filter(point => point.length > 0);
+                .map((point) => point.trim())
+                .filter((point) => point.length > 0);
         } catch (error) {
-            console.error('Error parsing relevant info:', error);
+            console.error("Error parsing relevant info:", error);
             return [];
         }
     }
@@ -74,7 +89,7 @@
     onMount(() => {
         // Update immediately
         relativeTimeString = getRelativeTime(message.timestamp);
-        
+
         // Then update every minute
         intervalId = setInterval(() => {
             relativeTimeString = getRelativeTime(message.timestamp);
@@ -84,84 +99,136 @@
     onDestroy(() => {
         if (intervalId) clearInterval(intervalId);
     });
+
+    type MessageComponentProps = {
+        diagnosis?: {
+            primaryDiagnosis: { text: string; justification: string };
+            differentialDiagnoses?: string[];
+        };
+        type?: "initial" | "final";
+        relevantInfo?: string[];
+        result?: TestResult | ExaminationResult;
+        feedback?: FeedbackResponse;
+    };
+
+    const messageTypeComponents = {
+        loading: () => LoadingMessage,
+        diagnosis: (msg: Message) => {
+            const diagnosisData = parseDiagnosisMessage(msg.content as string, "initial");
+            return diagnosisData ? DiagnosisCard : null;
+        },
+        "final-diagnosis": (msg: Message) => {
+            const diagnosisData = parseDiagnosisMessage(msg.content as string, "final");
+            return diagnosisData ? DiagnosisCard : null;
+        },
+        "relevant-info": () => RelevantInfoCard,
+        "test-result": () => TestResultCard,
+        examination: () => ExaminationCard,
+        feedback: () => FeedbackCard,
+    } as const;
+
+    function getComponentProps(msg: Message) {
+        switch(msg.type) {
+            case "diagnosis":
+            case "final-diagnosis": {
+                const diagnosisType = msg.type === "final-diagnosis" ? "final" : "initial";
+                const diagnosisData = parseDiagnosisMessage(msg.content as string, diagnosisType);
+                if (!diagnosisData) return null;
+                return {
+                    diagnosis: diagnosisData,
+                    type: diagnosisType
+                };
+            }
+            case "relevant-info":
+                return {
+                    relevantInfo: parseRelevantInfo(msg.content as string)
+                };
+            case "test-result":
+                return {
+                    result: msg.content as TestResult
+                };
+            case "examination":
+                return {
+                    result: msg.content as ExaminationResult
+                };
+            case "feedback":
+                return {
+                    feedback: msg.content as FeedbackResponse
+                };
+            default:
+                return {};
+        }
+    }
 </script>
 
 <div
     class="flex items-start gap-3 {isStudent ? 'justify-end' : 'justify-start'}"
->   
-    {#if !isStudent}
-        <Avatar class="h-8 w-8 mt-1">
-            <div
-                class="rounded-full bg-secondary w-full h-full flex items-center justify-center"
-            >
-                <Bot class="h-4 w-4" />
-            </div>
-        </Avatar>
-    {/if}
-
-    <div class="max-w-[80%]">
-        {#if message.type === "loading"}
-            <LoadingMessage />
-        {:else if message.type === "diagnosis" || message.type === "final-diagnosis"}
-            {@const diagnosisType = message.type === "final-diagnosis" ? "final" : "initial"}
-            {@const diagnosisData = parseDiagnosisMessage(message.content as string, diagnosisType)}
-            {#if diagnosisData}
-                <DiagnosisCard diagnosis={diagnosisData} type={diagnosisType} />
-            {:else}
-                <div class="bg-card rounded-lg p-4 shadow-sm border">
-                    <p class="text-sm">{message.content}</p>
+>
+    {#if message.content || message.type === "loading" || message.type === "image"}
+        {#if !isStudent}
+            <Avatar class="h-8 w-8 mt-1">
+                <div
+                    class="rounded-full bg-secondary w-full h-full flex items-center justify-center"
+                >
+                    <Bot class="h-4 w-4" />
                 </div>
-            {/if}
-        {:else if message.type === "relevant-info"}
-            {@const relevantInfo = parseRelevantInfo(message.content as string)}
-            <RelevantInfoCard {relevantInfo} />
-        {:else if message.type === "image"}
-            <div class="bg-card rounded-lg overflow-hidden shadow-sm border">
-                <img
-                    src={message.imageUrl}
-                    alt={message.title}
-                    class="w-full h-64 object-cover"
-                />
-                <div class="p-4">
-                    <h3 class="font-medium text-lg mb-1">{message.title}</h3>
-                    {#if message.content}
-                        <p class="text-sm text-muted-foreground">
-                            {message.content}
-                        </p>
-                    {/if}
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="text-xs text-muted-foreground"
+            </Avatar>
+        {/if}
+
+        <div class="max-w-[80%]">
+            {#if message.type === "image"}
+                <div
+                    class="bg-card rounded-lg overflow-hidden shadow-sm border"
+                >
+                    <img
+                        src={message.imageUrl}
+                        alt={message.title}
+                        class="w-full h-64 object-cover"
+                    />
+                    <div class="p-4">
+                        <h3 class="font-medium text-lg mb-1">
+                            {message.title}
+                        </h3>
+                        {#if message.content}
+                            <p class="text-sm text-muted-foreground">
+                                {message.content}
+                            </p>
+                        {/if}
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-xs text-muted-foreground"
+                                >{getRelativeTime(message.timestamp)}</span
+                            >
+                        </div>
+                    </div>
+                </div>
+            {:else if message.type in messageTypeComponents}
+                {@const MessageComponent = messageTypeComponents[message.type as keyof typeof messageTypeComponents](message)}
+                {#if MessageComponent}
+                    {#key message.type}
+                        <!-- @ts-ignore  fix the type error -->
+                        <MessageComponent {...getComponentProps(message) as any} />
+                    {/key}
+                {/if}
+            {:else}
+                <div
+                    class="bg-card rounded-lg p-4 shadow-sm border {isStudent
+                        ? ' bg-primary/70 text-primary-foreground'
+                        : ''}"
+                >
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-medium">@{message.sender}</span>
+                        <span
+                            class="text-xs {isStudent
+                                ? 'text-primary-foreground/70'
+                                : 'text-muted-foreground'}"
                             >{getRelativeTime(message.timestamp)}</span
                         >
                     </div>
+                    <p class="text-sm">{message.content}</p>
                 </div>
-            </div>
-        {:else if message.type === "test-result" && typeof message.content !== "string"}
-            <TestResultCard result={message.content as TestResult} />
-        {:else if message.type === "examination" && typeof message.content !== "string"}
-            <ExaminationCard result={message.content as ExaminationResult} />
-        {:else if message.type === "feedback"}
-            {@debug message}
-            <FeedbackCard feedback={message.content as FeedbackResponse} />
-        {:else}
-            <div
-                class="bg-card rounded-lg p-4 shadow-sm border {isStudent
-                    ? ' bg-primary/70 text-primary-foreground'
-                    : ''}"
-            >
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="font-medium">@{message.sender}</span>
-                    <span
-                        class="text-xs {isStudent
-                            ? 'text-primary-foreground/70'
-                            : 'text-muted-foreground'}"
-                        >{getRelativeTime(message.timestamp)}</span
-                    >
-                </div>
-                <p class="text-sm">{message.content}</p>
-            </div>
-        {/if}
-    </div>
+            {/if}
+        </div>
+    {/if}
 
     {#if isStudent}
         <Avatar class="h-8 w-8 mt-1">
@@ -173,3 +240,7 @@
         </Avatar>
     {/if}
 </div>
+
+<style>
+    /* Component styles */
+</style>

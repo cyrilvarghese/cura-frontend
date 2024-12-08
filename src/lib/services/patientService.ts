@@ -1,8 +1,9 @@
 import type { ApiResponse, Message, PatientResponse } from '$lib/types';
 import { threadStore } from '$lib/stores/thread-store';
+import { API_BASE_URL } from '$lib/config/api';
 
 export class PatientApiService {
-    private baseUrl = 'http://127.0.0.1:8000';
+    private baseUrl = API_BASE_URL;
 
     async askPatient(query: string): Promise<Message> {
         // Get the current thread_id from the store
