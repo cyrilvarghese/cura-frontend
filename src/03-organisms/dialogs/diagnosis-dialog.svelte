@@ -4,7 +4,7 @@
     import CheckCircle from "lucide-svelte/icons/check-circle";
     import Loader2 from "lucide-svelte/icons/loader-2";
     import DiagnosisList from "$lib/components/DiagnosisList.svelte";
-    import { sendMessage } from "$lib/stores/api";
+    import { sendMessage } from "$lib/stores/api-store";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
     export let open = false;

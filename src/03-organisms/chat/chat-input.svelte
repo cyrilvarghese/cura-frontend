@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button } from "$lib/components/ui/button/index.js";
     import { Textarea } from "$lib/components/ui/textarea/index.js";
-    import { sendMessage } from "$lib/stores/api";
+    import { sendMessage } from "$lib/stores/api-store";
     import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
@@ -10,12 +10,11 @@
     import type { ExaminationName, Message } from "$lib/types";
     import type { DiagnosticTestName } from "$lib/types";
     import type { ExaminationResult } from "$lib/types";
-    import { apiStore } from "$lib/stores/api";
+    import { apiStore } from "$lib/stores/api-store";
 
     let textValue = "";
     let isLoading = false;
     let textareaRef: null | HTMLTextAreaElement = null;
-
     async function handleSend() {
         if (textValue.trim() && !isLoading) {
             isLoading = true;

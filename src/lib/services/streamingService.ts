@@ -2,7 +2,7 @@ import { writable, type Writable } from 'svelte/store';
 import type { ApiResponse, Message, PatientResponse, StreamingChunk } from '$lib/types';
 import { threadStore } from '$lib/stores/thread-store';
 import { API_BASE_URL } from '$lib/config/api';
-import { apiStore } from '$lib/stores/api';
+import { apiStore } from '$lib/stores/api-store';
 
 interface StreamingOptions {
     onChunk?: (chunk: string) => void;

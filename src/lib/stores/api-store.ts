@@ -1,7 +1,6 @@
 import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
-
 interface ApiState {
     messages: Message[];
     error: string | null;
@@ -90,7 +89,7 @@ function updatePatientFile(content: TestResult | ExaminationResult, type: 'exami
 
 export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
 
-    // Only store messages from students before the switch
+    
     let messageContent = typeof content === 'object' && content !== null
         ? ('testName' in content
             ? `Test: ${content.testName} `
@@ -98,6 +97,8 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                 ? `Examination: ${content.name} `
                 : String(content))
         : String(content);
+
+
     // Store all student messages in the history except for feedback
     if (step !== 'feedback') {
         studentMessageHistory.update(messages => [...messages, {

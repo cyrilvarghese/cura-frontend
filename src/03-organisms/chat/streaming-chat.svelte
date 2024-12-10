@@ -1,6 +1,6 @@
 <script lang="ts">
     import { streamingService } from '$lib/services/streamingService';
-    import { apiStore } from '$lib/stores/api';
+    import { apiStore } from '$lib/stores/api-store';
     import { onDestroy } from 'svelte';
     import type { Message } from '$lib/types';
 

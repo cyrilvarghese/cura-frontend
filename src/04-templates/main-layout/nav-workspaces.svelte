@@ -2,14 +2,10 @@
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
 	import Ellipsis from "lucide-svelte/icons/ellipsis";
 	import Plus from "lucide-svelte/icons/plus";
-	import ArrowUpRight from "lucide-svelte/icons/arrow-up-right";
-	import Link from "lucide-svelte/icons/link";
-	import Trash2 from "lucide-svelte/icons/trash-2";
-
+	
 	import * as Collapsible from "$lib/components/ui/collapsible/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-    import { useSidebar } from "$lib/components/ui/sidebar/index.js";
+	import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
 	const sidebar = useSidebar();
 

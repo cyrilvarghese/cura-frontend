@@ -1,17 +1,21 @@
 import type { ApiResponse, Message, PatientResponse } from '$lib/types';
 import { threadStore } from '$lib/stores/thread-store';
 import { API_BASE_URL } from '$lib/config/api';
+import { currentCaseStore } from '$lib/stores/case-store';
 
 export class PatientApiService {
     private baseUrl = API_BASE_URL;
-
+    
     async askPatient(query: string): Promise<Message> {
-        // Get the current thread_id from the store
+        // Get the current thread_id,case_id from the store
         let currentThreadId: string | null = null;
+        let currentCaseId: number | null = null;
         threadStore.subscribe(value => currentThreadId = value)();
+        currentCaseStore.subscribe(value => currentCaseId = value)();
 
+        debugger;
         const response = await fetch(
-            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}`,
+            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${currentCaseId ? `&case_id=${currentCaseId}` : ''}`,
             {
                 method: 'GET',
                 headers: {

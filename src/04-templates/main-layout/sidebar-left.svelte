@@ -114,7 +114,7 @@
 				pages: [
 					{
 						name: "Urticarial Vasculitis",
-						url: "/cases/urticarial-vasculitis",
+						url: "/cases/1",
 						emoji: "📋",
 					},
 					{

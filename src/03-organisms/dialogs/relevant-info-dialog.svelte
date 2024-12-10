@@ -3,7 +3,7 @@
     import { Button } from "$lib/components/ui/button";
     import { Plus, X } from "lucide-svelte";
     import Loader2 from "lucide-svelte/icons/loader-2";
-    import { sendMessage } from "$lib/stores/api";
+    import { sendMessage } from "$lib/stores/api-store";
 
     export let open = false;
     export let onSubmit: () => void;

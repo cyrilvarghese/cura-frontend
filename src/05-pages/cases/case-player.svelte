@@ -2,7 +2,7 @@
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ChatInput from "../../03-organisms/chat/chat-input.svelte";
     import Message from "../../03-organisms/chat/message.svelte";
-    import { apiStore } from "$lib/stores/api";
+    import { apiStore } from "$lib/stores/api-store";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
     import InfoIcon from "lucide-svelte/icons/info";
@@ -13,8 +13,11 @@
     import RelevantInfoDialog from "../../03-organisms/dialogs/relevant-info-dialog.svelte";
     import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
-    import { studentMessageHistory } from "$lib/stores/api";
-    const { id } = $props();
+    import { studentMessageHistory } from "$lib/stores/api-store";
+    import * as Breadcrumb from "$lib/components/ui/breadcrumb";
+    import { currentCaseStore } from '$lib/stores/case-store';
+    const { id } = $props();// current case id
+
     // Subscribe to changes if needed
     studentMessageHistory.subscribe((studentMessages) => {
         console.log(studentMessages);
@@ -44,7 +47,9 @@
             }
         });
     }
-
+    $effect(() => {
+        currentCaseStore.set(id);
+    });
     $effect(() => {
         if (messages?.length) {
             scrollToLatest();
@@ -110,6 +115,27 @@
     <div
         class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh-56px)]"
     >
+        <div class="pl-[64px]">
+            <Breadcrumb.Root>
+                <Breadcrumb.List>
+                    <Breadcrumb.Item>
+                        <Breadcrumb.Link href="/">Cases</Breadcrumb.Link>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Separator />
+                    <Breadcrumb.Item>
+                        <Breadcrumb.Link href="/cases"
+                            >Diagnosis</Breadcrumb.Link
+                        >
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Separator />
+                    <Breadcrumb.Item>
+                        <Breadcrumb.Link href="/cases"
+                            >Case {id}</Breadcrumb.Link
+                        >
+                    </Breadcrumb.Item>
+                </Breadcrumb.List>
+            </Breadcrumb.Root>
+        </div>
         <div class="flex gap-4 w-full h-full">
             <div class="bg-muted/50 rounded-xl w-[70%] h-full flex flex-col">
                 <!-- Title Section with Action Buttons -->
@@ -121,7 +147,7 @@
                             Patient Consultation
                         </h2>
                         <p class="text-sm text-gray-500">
-                            Case #123 - Persistent Rash with Joint Pain and
+                            Persistent Rash with Joint Pain and
                             Fatigue
                         </p>
                     </div>
@@ -163,7 +189,7 @@
                 </ScrollArea>
 
                 <div class="p-4 border-t">
-                    <ChatInput />
+                    <ChatInput {id} />
                 </div>
             </div>
 
