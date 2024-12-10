@@ -14,6 +14,17 @@ export interface TestResult {
     interpretation: string;
     timestamp: Date;
 }
+export interface UploadResponse {
+    patient_prompt: string;
+} 
+
+
+export interface FormattedPersonaResponse {
+    id: string;
+    content: string;
+    timestamp: string;
+    type: 'ai';
+}
 
 export interface Message {
     id: string;

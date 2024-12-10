@@ -6,6 +6,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { Route, Router } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte"; // Importing the CasePlayer component
+	import FileUploader from "$lib/components/ui/file-uploader/file-uploader.svelte";
 </script>
 
 <Sidebar.Provider>
@@ -17,17 +18,23 @@
 			<div class="flex flex-1 items-center gap-2 px-3">
 				<Sidebar.Trigger />
 				<Separator orientation="vertical" class="mr-2 h-4" />
-			
 			</div>
 		</header>
 		<main>
 			<Router url="">
 				<Route path="/">
-					<CasePlayer id={1}  />
+					<div
+						class="container py-10 pt-20 flex flex-col items-start justify-start"
+					>
+						<h1 class="text-3xl font-bold tracking-tight mb-8">
+							Create Patient Persona
+						</h1>
+						<FileUploader class="" />
+					</div>
 				</Route>
 
 				<Route path="cases/:id" let:params>
-					<CasePlayer id={params.id}  />
+					<CasePlayer id={params.id} />
 				</Route>
 
 				<!-- <Route path="posts/:id" let:params>
