@@ -1,43 +1,41 @@
 <script lang="ts">
-    import { uploadService } from '$lib/services/uploadService';
-    import { Button } from '$lib/components/ui/button';
-    import { Progress } from '$lib/components/ui/progress';
-    import { Alert, AlertDescription } from '$lib/components/ui/alert';
-    import { cn } from '$lib/utils';
-    import { marked } from 'marked';
-    import LoadingMessage from '$lib/components/LoadingMessage.svelte';
-    
+    import { uploadService } from "$lib/services/uploadService";
+    import { Alert, AlertDescription } from "$lib/components/ui/alert";
+    import { cn } from "$lib/utils";
+    import { marked } from "marked";
+    import LoadingMessage from "$lib/components/LoadingMessage.svelte";
+
     interface FormattedResponse {
         id: string;
         content: string;
         timestamp: string;
-        type: 'ai';
+        type: "ai";
     }
-    
+
     let { class: className } = $props();
-    
+
     const uploadState = $state({
         loading: false,
         error: null as string | null,
         progress: 0,
-        response: null as FormattedResponse | null
+        response: null as FormattedResponse | null,
     });
 
-    let caseId = '';
+    let caseId = $state("");
 
     async function handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
 
         if (!caseId.trim()) {
-            uploadState.error = 'Please enter a Case ID';
+            uploadState.error = "Please enter a Case ID";
             return;
         }
 
         const file = input.files[0];
-        
-        if (!file.type.includes('pdf')) {
-            uploadState.error = 'Please upload a PDF file only';
+
+        if (!file.type.includes("pdf")) {
+            uploadState.error = "Please upload a PDF file only";
             return;
         }
 
@@ -47,22 +45,26 @@
         uploadState.progress = 0;
 
         try {
-            const response = await uploadService.uploadFile(file, caseId.trim());
+            const response = await uploadService.uploadFile(
+                file,
+                caseId.trim(),
+            );
             uploadState.response = response;
-            caseId = ''; // Reset case ID after successful upload
-            (event.target as HTMLInputElement).value = '';
+            caseId = ""; // Direct assignment works with $state variables
+            (event.target as HTMLInputElement).value = "";
         } catch (error) {
-            uploadState.error = error instanceof Error ? error.message : 'Upload failed';
+            uploadState.error =
+                error instanceof Error ? error.message : "Upload failed";
         } finally {
             uploadState.loading = false;
         }
     }
 </script>
 
-<div class={cn('space-y-4', className)}>
+<div class={cn("space-y-4 w-full overflow-auto", className)}>
     <div class="grid w-full items-center pb-4 gap-1.5">
-        <label 
-            for="case-id" 
+        <label
+            for="case-id"
             class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
             Case ID
@@ -78,13 +80,13 @@
     </div>
 
     <div class="grid w-full items-center gap-1.5">
-        <label 
-            for="file-upload" 
+        <label
+            for="file-upload"
             class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
             Upload Patient Case Document (PDF only)
         </label>
-        
+
         <input
             id="file-upload"
             type="file"
@@ -93,10 +95,8 @@
             disabled={uploadState.loading}
             accept=".pdf"
         />
-        
-        <p class="text-xs text-muted-foreground mt-1">
-            Accepted format: PDF
-        </p>
+
+        <p class="text-xs text-muted-foreground mt-1">Accepted format: PDF</p>
     </div>
 
     {#if uploadState.loading}
@@ -114,21 +114,17 @@
     {/if}
 
     {#if uploadState.response}
-        <div class="rounded-lg border bg-card text-card-foreground shadow-sm p-4 w-full">
+        <div
+            class="rounded-lg border overflow-auto bg-card text-card-foreground shadow-sm p-4 w-full"
+        >
             <div class="flex justify-between items-start mb-2">
-                <h3 class="font-semibold leading-none tracking-tight">
-                    Patient Persona Created
-                </h3>
                 <time class="text-xs text-muted-foreground">
                     {new Date(uploadState.response.timestamp).toLocaleString()}
                 </time>
             </div>
-            <div 
-                class="prose prose-sm dark:prose-invert max-w-none"
-            >
+            <div class="prose prose-sm dark:prose-invert max-w-none">
                 {@html marked(uploadState.response.content)}
             </div>
-             
         </div>
     {/if}
 </div>
@@ -150,4 +146,4 @@
         list-style-type: decimal;
         padding-left: 1.5em;
     }
-</style> 
+</style>

@@ -113,7 +113,7 @@
 
 <div>
     <div
-        class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh-56px)]"
+        class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh-6px)]"
     >
         <div class="pl-[64px]">
             <Breadcrumb.Root>

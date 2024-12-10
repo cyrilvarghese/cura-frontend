@@ -6,7 +6,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { Route, Router } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte"; // Importing the CasePlayer component
-	import FileUploader from "$lib/components/ui/file-uploader/file-uploader.svelte";
+	import FileUploader from "../../02-molecules/file-uploader/file-uploader.svelte";
 </script>
 
 <Sidebar.Provider>
@@ -26,10 +26,10 @@
 					<div
 						class="container py-10 pt-20 flex flex-col items-start justify-start"
 					>
-						<h1 class="text-3xl font-bold tracking-tight mb-8">
+						<h1 class="text-xl font-bold tracking-tight mb-8">
 							Create Patient Persona
 						</h1>
-						<FileUploader class="" />
+						<FileUploader class="border border-gray-200 rounded-md p-4" />
 					</div>
 				</Route>
 
