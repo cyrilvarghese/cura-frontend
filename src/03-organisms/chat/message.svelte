@@ -100,16 +100,16 @@
         if (intervalId) clearInterval(intervalId);
     });
 
-    type MessageComponentProps = {
-        diagnosis?: {
-            primaryDiagnosis: { text: string; justification: string };
-            differentialDiagnoses?: string[];
-        };
-        type?: "initial" | "final";
-        relevantInfo?: string[];
-        result?: TestResult | ExaminationResult;
-        feedback?: FeedbackResponse;
-    };
+    // type MessageComponentProps = {
+    //     diagnosis?: {
+    //         primaryDiagnosis: { text: string; justification: string };
+    //         differentialDiagnoses?: string[];
+    //     };
+    //     type?: "initial" | "final";
+    //     relevantInfo?: string[];
+    //     result?: TestResult | ExaminationResult;
+    //     feedback?: FeedbackResponse;
+    // };
 
     const messageTypeComponents = {
         loading: () => LoadingMessage,

@@ -112,7 +112,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
 
     switch (step) {
         case 'patient_history':
-            // Add the incoming message to the messages array
+            // First add the student's message
             apiStore.update(state => ({
                 ...state,
                 messages: [...state.messages, {
@@ -122,30 +122,43 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
                     type: type,
                     content: messageContent,
                     timestamp: new Date()
+                },
+                // Add loading message immediately after student's message
+                {
+                    id: crypto.randomUUID(),
+                    sender: 'assistant',
+                    content: '',
+                    timestamp: new Date(),
+                    type: 'loading',
+                    step: 'patient_history'
                 }]
             }));
+
             // Handle real API interactions for patient history questions
             if (role === 'student') {
                 try {
                     // Make API call to get patient's response
                     const response = await patientApi.askPatient(content as string);
 
-                    // Update store with patient's response from API
+                    // Remove loading message and update store with patient's response from API
                     apiStore.update(state => ({
                         ...state,
-                        messages: [...state.messages, {
-                            id: response.id,
-                            sender: response.sender.toLowerCase(),
-                            step: response.step,
-                            type: response.type,
-                            content: response.content,
-                            timestamp: new Date(response.timestamp)
-                        }]
+                        messages: state.messages
+                            .filter(msg => msg.type !== 'loading')
+                            .concat({
+                                id: response.id,
+                                sender: response.sender.toLowerCase(),
+                                step: response.step,
+                                type: response.type,
+                                content: response.content,
+                                timestamp: new Date(response.timestamp)
+                            })
                     }));
                 } catch (error) {
                     // Handle any API errors and update error state
                     apiStore.update(state => ({
                         ...state,
+                        messages: state.messages.filter(msg => msg.type !== 'loading'),
                         error: error instanceof Error ? error.message : 'Unknown error occurred'
                     }));
                 }

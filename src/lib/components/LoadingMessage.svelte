@@ -1,6 +1,6 @@
 <script lang="ts">
     let dots = $state(".");
-    
+
     // Animate the dots
     setInterval(() => {
         dots = dots.length >= 3 ? "." : dots + ".";

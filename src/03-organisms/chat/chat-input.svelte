@@ -19,15 +19,7 @@
         if (textValue.trim() && !isLoading) {
             isLoading = true;
             try {
-                const loadingMessage: Message = {
-                    id: crypto.randomUUID(),
-                    sender: "assistant",
-                    content: "",
-                    timestamp: new Date(),
-                    type: "loading",
-                    step: "patient_history"
-                };
-                $apiStore.messages = [...$apiStore.messages, loadingMessage];
+                
                 
                 await sendMessage(
                     textValue.trim(),
@@ -36,6 +28,7 @@
                     "text",
                 );
                 textValue = "";
+                
                 if (textareaRef) {
                     setTimeout(() => textareaRef?.focus(), 0);
                 }
