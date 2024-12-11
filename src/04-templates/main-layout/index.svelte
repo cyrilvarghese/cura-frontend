@@ -1,12 +1,10 @@
 <script lang="ts">
 	import SidebarLeft from "./sidebar-left.svelte";
-	import SidebarRight from "./sidebar-right.svelte";
-	import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
 	import { Separator } from "$lib/components/ui/separator/index.js";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { Route, Router } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte"; // Importing the CasePlayer component
-	import FileUploader from "../../02-molecules/file-uploader/file-uploader.svelte";
+	import CaseCreatorWrapper from "../../05-pages/cases/case-creator-wrapper.svelte";
 </script>
 
 <Sidebar.Provider>
@@ -23,14 +21,7 @@
 		<main>
 			<Router url="">
 				<Route path="/">
-					<div
-						class="container py-10 pt-20 flex flex-col items-start justify-start"
-					>
-						<h1 class="text-xl font-bold tracking-tight mb-8">
-							Create Patient Persona
-						</h1>
-						<FileUploader class="border border-gray-200 rounded-md p-4" />
-					</div>
+					<CaseCreatorWrapper />
 				</Route>
 
 				<Route path="cases/:id" let:params>
