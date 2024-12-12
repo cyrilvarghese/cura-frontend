@@ -42,9 +42,8 @@
                     >Patient Persona</Tabs.Trigger
                 >
                 <Tabs.Trigger value="physical-exams"
-                    >Physical Exams</Tabs.Trigger
+                    >Physical Examination & Lab Tests</Tabs.Trigger
                 >
-                <Tabs.Trigger value="lab-results">Lab Results</Tabs.Trigger>
                 <Tabs.Trigger value="case-summary"
                     >Case Summary For Feedback</Tabs.Trigger
                 >
@@ -85,7 +84,7 @@
 
                 <Tabs.Content value="physical-exams">
                     {#if uploadState.generating}
-                        <LoadingMessage message="Getting physical exams" />
+                        <LoadingMessage message="Generating physical examinations and lab tests" />
                     {:else if uploadState.error}
                         <Alert variant="destructive">
                             <AlertDescription>
@@ -101,11 +100,7 @@
                     {/if}
                 </Tabs.Content>
 
-                <Tabs.Content value="lab-results">
-                    <div class="text-center text-muted-foreground py-8">
-                        <p>Lab results will be available after analysis</p>
-                    </div>
-                </Tabs.Content>
+                 
 
                 <Tabs.Content value="case-summary">
                     <div class="text-center text-muted-foreground py-8">

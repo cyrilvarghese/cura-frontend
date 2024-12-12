@@ -12,7 +12,7 @@
 <div class="space-y-6">
 
     <section>
-        <h3 class="text-xl pb-4 pt-4 font-semibold">Physical Examimations</h3>
+        <h3 class="text-xl pb-4 pt-4 font-semibold">Physical Examinations</h3>
         {#each Object.entries(testData.physical_exam) as [examName, examDetails]}
             <ExaminationCard
                 result={{
