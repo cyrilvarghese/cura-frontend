@@ -23,12 +23,13 @@
     let caseId = $state("");
     let uploadState = $state(initialValue);
     let uploadedFile = $state<File | null>(null);
+    let currentTab = $state<"patient-persona"|"physical-exams"|"lab-results"|"case-summary">("patient-persona");
 
  
 
     // Subscribe to the caseStore
     const unsubscribe = caseStore.subscribe(state => {
-        debugger
+       
         uploadState = state;
     });
 
@@ -49,6 +50,7 @@
 
     async function handleGeneratePersona() {
         if (!uploadedFile || !caseId.trim()) return;
+        $:currentTab = "patient-persona";
 
         uploadState.generating = true;
         uploadState.error = null;
@@ -67,11 +69,15 @@
     }
 
     async function handleGeneratePhysicalExam() {
+        debugger
+        $:currentTab = "physical-exams";
+        
         console.log("Generating Physical Exam");
         if (!uploadedFile || !caseId.trim()) return;
 
         try {
             await generatePhysicalExam(uploadedFile, caseId);
+           
         } catch (error) {
             console.error("Error generating physical exam:", error);
         }
@@ -127,5 +133,5 @@
         </div>
     </div>
 
-    <CaseData {uploadState} />
+    <CaseData {uploadState} {currentTab} />
 </div>

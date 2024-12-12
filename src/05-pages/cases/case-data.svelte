@@ -6,7 +6,21 @@
     import { marked } from "marked";
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
     import type { CaseStoreState } from "$lib/stores/caseStore";
-    export let uploadState: CaseStoreState;
+    import TestDataDisplay from "./TestDataDisplay.svelte";
+
+    // Use $props() to declare props in runes mode
+    const { uploadState, currentTab } = $props<{ 
+        uploadState: CaseStoreState; 
+        currentTab: 'patient-persona'|'physical-exams'|'lab-results'|'case-summary'; 
+    }>();
+
+    $effect(() => {
+        console.log("uploadState", uploadState);
+        console.log("currentTab", currentTab);
+    });
+    
+    
+
     // Ensure synchronous markdown conversion
     function syncMarked(content: string): string {
         return marked.parse(content) as string;
@@ -14,7 +28,7 @@
 </script>
 
 <Card.Root class="flex-1">
-    {@debug uploadState}
+    
     <Card.Header>
         <Card.Title class="text-lg font-semibold">Case Data</Card.Title>
         <Card.Description
@@ -22,8 +36,8 @@
         >
     </Card.Header>
     <Card.Content>
-        <Tabs.Root value="patient-persona" class="w-full">
-            <Tabs.List class="border-b">
+        <Tabs.Root value={currentTab} class="w-full">
+            <Tabs.List class="border-b w-full flex justify-start gap-8">
                 <Tabs.Trigger value="patient-persona"
                     >Patient Persona</Tabs.Trigger
                 >
@@ -69,10 +83,22 @@
                     {/if}
                 </Tabs.Content>
 
-                <Tabs.Content value="medical-history">
-                    <div class="text-center text-muted-foreground py-8">
-                        <p>Medical history will be available after analysis</p>
-                    </div>
+                <Tabs.Content value="physical-exams">
+                    {#if uploadState.generating}
+                        <LoadingMessage message="Getting physical exams" />
+                    {:else if uploadState.error}
+                        <Alert variant="destructive">
+                            <AlertDescription>
+                                {uploadState.error}
+                            </AlertDescription>
+                        </Alert>
+                    {:else if uploadState.testData}
+                        <TestDataDisplay testData={uploadState.testData} />
+                    {:else}
+                        <div class="text-center text-muted-foreground py-8">
+                            <p>Physical exams are not available yet</p>
+                        </div>
+                    {/if}
                 </Tabs.Content>
 
                 <Tabs.Content value="lab-results">
@@ -87,11 +113,7 @@
                     </div>
                 </Tabs.Content>
 
-                <Tabs.Content value="physical-exams">
-                    <div class="text-center text-muted-foreground py-8">
-                        <p>Physical exams will be available after analysis</p>
-                    </div>
-                </Tabs.Content>
+                 
             </div>
         </Tabs.Root>
     </Card.Content>

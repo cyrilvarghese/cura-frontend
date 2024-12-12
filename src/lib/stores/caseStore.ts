@@ -59,8 +59,15 @@ export async function generatePhysicalExam(uploadedFile: File, caseId: string) {
     caseStore.update(state => ({ ...state, generating: true, error: null }));
 
     try {
-        await testDataService.createExamTestData(caseId, uploadedFile);
-        caseStore.update(state => ({ ...state, generating: false }));
+        const response = await testDataService.createExamTestData(caseId, uploadedFile);
+        caseStore.update(state => ({
+            ...state,
+            testData: {
+                physical_exam: response.content.physical_exam,
+                lab_test: response.content.lab_test
+            },
+            generating: false
+        }));
     } catch (error) {
         caseStore.update(state => ({
             ...state,

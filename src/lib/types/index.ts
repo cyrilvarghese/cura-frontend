@@ -12,7 +12,7 @@ export interface TestResult {
     status: TestStatus;
     results: TestResultContent;
     interpretation: string;
-    timestamp: Date;
+    timestamp: Date|null;
 }
 export interface UploadResponse {
     patient_prompt: string;
@@ -48,7 +48,7 @@ export interface ExaminationResult {
     name: string;
     purpose: string;
     findings:FindingContent;
-    timestamp: Date;
+    timestamp: Date|null;
     status: TestStatus;
     interpretation: string;
 }
