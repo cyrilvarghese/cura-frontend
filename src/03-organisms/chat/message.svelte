@@ -88,6 +88,7 @@
 
     onMount(() => {
         // Update immediately
+        console.log("message-----", message);
         relativeTimeString = getRelativeTime(message.timestamp);
 
         // Then update every minute
@@ -178,12 +179,12 @@
         <div class="max-w-[80%]">
             {#if message.type === "image"}
                 <div
-                    class="bg-card rounded-lg overflow-hidden shadow-sm border"
+                    class="bg-card w-[260px] rounded-lg overflow-hidden shadow-sm border"
                 >
                     <img
                         src={message.imageUrl}
                         alt={message.title}
-                        class="w-full h-64 object-cover"
+                        class="w-full h-64 object-contain"
                     />
                     <div class="p-4">
                         <h3 class="font-medium text-lg mb-1">

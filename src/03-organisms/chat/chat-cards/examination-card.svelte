@@ -87,7 +87,7 @@
     </Card.Content>
     <Card.Footer>
         <p class="text-sm text-muted-foreground">
-            {getRelativeTime(result.timestamp)}
+            {getRelativeTime(result.timestamp ?? new Date())}
         </p>
     </Card.Footer>
 </Card.Root>

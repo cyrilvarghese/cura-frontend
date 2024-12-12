@@ -95,17 +95,17 @@
 		favorites: [
 			{
 				name: "Rash with Joint Pain and Fatigue",
-				url: "#",
+				url: "/cases/1",
 				emoji: "📄",
 			},
 			{
 				name: "Small, Red-Purple spots On The Legs",
-				url: "#",
+				url: "/cases/2",
 				emoji: "📄",
 			},
 			{
-				name: "Headache and Vision Changes in a Young Adult",
-				url: "#",
+				name: "Painful, Non-Healing Ulcers On lower legs",
+				url: "/cases/3",
 				emoji: "📄",
 			},
 		],

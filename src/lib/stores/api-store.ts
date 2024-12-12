@@ -1,13 +1,18 @@
 import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
+import { currentCaseStore } from '$lib/stores/case-store';
+ 
+import cover2 from '../../assets/cover2.webp'
+import cover3 from '../../assets/cover3.webp'
 interface ApiState {
     messages: Message[];
     error: string | null;
 }
 
-const initialState: ApiState = {
-    messages: [
+// Service to get cover messages
+function getCoverMessages(): Message[] {
+    return [
         {
             id: '1',
             sender: 'assistant',
@@ -21,18 +26,68 @@ const initialState: ApiState = {
         {
             id: '2',
             sender: 'assistant',
-            type: 'text',
+            type: 'image',
             step: 'patient_history',
-            content: 'You may ask the patient any questions you have.',
+            imageUrl: cover2,
+            title: '" I have these painful rahes on my legs "',
+            content: 'Patient reporting headache and dizziness.',
+            timestamp: new Date() // Current date and time
+        },
+        {
+            id: '3',
+            sender: 'assistant',
+            type: 'image',
+            step: 'patient_history',
+            imageUrl: cover3,
+            title: '" I have some painful ulcers on my feet "',
+            content: 'Patient experiencing sore throat and persistent cough.',
             timestamp: new Date() // Current date and time
         }
-    ],
+    ];
+}
+
+// Function to get the first message based on currentCaseId
+function getFirstMessage(currentCaseId: number | null): Message {
+    debugger
+
+    // Assuming coverMessages is defined somewhere in your code
+    if (currentCaseId !== null && currentCaseId > 0 && currentCaseId - 1 < getCoverMessages().length) {
+        return getCoverMessages()[currentCaseId - 1];
+    }
+    return { // Fallback message
+        id: '0',
+        sender: 'assistant',
+        type: 'text',
+        step: 'patient_history',
+        content: 'No message available.',
+        timestamp: new Date() // Current date and time
+    };
+}
+
+// Initialize the store with the cover messages
+const initialState: ApiState = {
+    messages: getCoverMessages(), // Set initial messages from the service
     error: null
 };
 
 export const apiStore = writable<ApiState>(initialState);
 
+// Subscribe to currentCaseStore to dynamically update messages
+currentCaseStore.subscribe(value => {
+    console.log("currentCaseId", value);
+    debugger
+    if (value !== null) {
+        const currentCaseId = parseInt(value.toString());
 
+        // Update the apiStore with the first message based on the currentCaseId
+        apiStore.update(state => ({
+            ...state,
+            messages: [
+                getFirstMessage(currentCaseId),
+            ]
+        }));
+    }
+});
 
 // Create a store for student messages only
 export const studentMessageHistory = writable<StudentMessage[]>([]);
@@ -55,12 +110,12 @@ function isTestResultContent(result: any): result is TestResultContent {
         && typeof result === 'object'
         && 'type' in result
         && 'content' in result
-        && (result.type === 'text' 
-            || result.type === 'table' 
-            || result.type === 'image' 
+        && (result.type === 'text'
+            || result.type === 'table'
+            || result.type === 'image'
             || result.type === 'mixed');
 }
- 
+
 
 
 // Update the store type
@@ -89,7 +144,7 @@ function updatePatientFile(content: TestResult | ExaminationResult, type: 'exami
 
 export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
 
-    
+
     let messageContent = typeof content === 'object' && content !== null
         ? ('testName' in content
             ? `Test: ${content.testName} `
