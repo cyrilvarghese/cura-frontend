@@ -1,10 +1,10 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { FormattedPersonaResponse } from '$lib/types';
 
-export class FileUploadService {
+export class PatientPersonaService {
     private baseUrl = API_BASE_URL;
     
-    async uploadFile(file: File, caseId: string): Promise<FormattedPersonaResponse> {
+        async createPatientPersona(file: File, caseId: string): Promise<FormattedPersonaResponse> {
         const formData = new FormData();
         formData.append('pdf_file', file);
         formData.append('case_id', caseId);
@@ -25,4 +25,4 @@ export class FileUploadService {
     }
 }
 
-export const uploadService = new FileUploadService(); 
+export const patientPersonaService = new PatientPersonaService(); 

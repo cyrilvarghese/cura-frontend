@@ -5,15 +5,16 @@
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
     import { marked } from "marked";
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
-    let { uploadState } = $props();
-
+    import type { CaseStoreState } from "$lib/stores/caseStore";
+    export let uploadState: CaseStoreState;
     // Ensure synchronous markdown conversion
     function syncMarked(content: string): string {
-        return marked.parse(content);
-    }
+        return marked.parse(content) as string;
+    } 
 </script>
 
 <Card.Root class="flex-1">
+    {@debug uploadState}
     <Card.Header>
         <Card.Title class="text-lg font-semibold">Case Data</Card.Title>
         <Card.Description
@@ -45,19 +46,19 @@
                                 {uploadState.error}
                             </AlertDescription>
                         </Alert>
-                    {:else if uploadState.response}
+                    {:else if uploadState.persona}
                         <div class="rounded-lg">
                             <time
                                 class="text-xs text-muted-foreground mb-2 block"
                             >
                                 {new Date(
-                                    uploadState.response.timestamp,
+                                    uploadState.persona.timestamp,
                                 ).toLocaleString()}
                             </time>
 
                             <MarkdownContent
                                 content={syncMarked(
-                                    uploadState.response.content,
+                                    uploadState.persona.content,
                                 )}
                             />
                         </div>

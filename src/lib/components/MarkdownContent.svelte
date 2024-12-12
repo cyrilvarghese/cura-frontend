@@ -47,7 +47,7 @@
 
         /* Code */
         :global(code) {
-            @apply bg-gray-100 rounded px-1 py-0.5 text-sm font-mono;
+            @apply bg-gray-100 rounded px-1 py-0.5 text-sm font-mono max-w-full ;
         }
         :global(pre) {
             @apply bg-gray-50 p-4 rounded-lg overflow-x-auto mb-4;
@@ -68,5 +68,10 @@
         :global(td) {
             @apply border p-2;
         }
+        :global(pre) {
+            @apply max-w-[780px];
+        }
+       
+
     }
 </style> 
