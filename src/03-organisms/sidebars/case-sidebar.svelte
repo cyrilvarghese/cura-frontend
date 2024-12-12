@@ -13,13 +13,7 @@
     };
 
     const initialFiles: PatientFiles[] = [
-        {
-            name: "Initial Assessment",
-            caption:
-                "The patient presenting at the clinic, showing visible concern about her rash.",
-            url: "https://cdn.midjourney.com/6703f338-5798-4ef4-bc15-865900f67df2/0_3.png",
-            aspect: "16/9",
-        },
+ 
     ];
 
     function convertImageDataToPatientFile(
@@ -78,7 +72,7 @@
 </script>
 
 <div class="flex-col w-full p-4 h-full">
-    <h2 class="text-lg font-semibold pb-8">Patient File</h2>
+    <h2 class="text-lg font-semibold pb-8 p border-b border-gray-200">Patient File</h2>
     <ScrollArea
         class="w-full h-[calc(100%-100px)] rounded-md "
         orientation="vertical"
