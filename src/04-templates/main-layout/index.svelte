@@ -23,6 +23,9 @@
 				<Route path="/">
 					<CaseCreatorWrapper />
 				</Route>
+				<Route path="/tools/case-data-creator">
+					<CaseCreatorWrapper />
+				</Route>
 
 				<Route path="cases/:id" let:params>
 					<CasePlayer id={params.id} />

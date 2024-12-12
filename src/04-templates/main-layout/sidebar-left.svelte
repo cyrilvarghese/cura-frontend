@@ -10,7 +10,7 @@
 	import Settings2 from "lucide-svelte/icons/settings-2";
 	import Sparkles from "lucide-svelte/icons/sparkles";
 	import Trash2 from "lucide-svelte/icons/trash-2";
-	import { Feather, Stethoscope, Microscope } from "lucide-svelte";
+	import { Feather, Stethoscope, Microscope, Wrench } from "lucide-svelte";
 
 	import NavFavorites from "./nav-favorites.svelte";
 	import NavMain from "./nav-main.svelte";
@@ -41,27 +41,29 @@
 		],
 		navMain: [
 			{
-				title: "Search",
-				url: "#",
-				icon: Search,
-			},
-			{
-				title: "Ask AI",
-				url: "#",
-				icon: Sparkles,
-			},
-			{
 				title: "Home",
 				url: "#",
 				icon: House,
 				isActive: true,
 			},
 			{
-				title: "Inbox",
+				title: "Search",
 				url: "#",
-				icon: Inbox,
-				badge: "10",
+				icon: Search,
 			},
+			
+			{
+				title: "Tools",
+				url: "/tools/case-data-creator",
+				icon: Wrench,
+				badge: "10",
+			}
+			,
+			{
+				title: "Ask AI",
+				url: "#",
+				icon: Sparkles,
+			}
 		],
 		navSecondary: [
 			{
@@ -92,12 +94,12 @@
 		],
 		favorites: [
 			{
-				name: "Shortness of Breath in a Middle-Aged Woman",
+				name: "Rash with Joint Pain and Fatigue",
 				url: "#",
 				emoji: "📄",
 			},
 			{
-				name: "Abdominal Pain in an Elderly Man",
+				name: "Small, Red-Purple spots On The Legs",
 				url: "#",
 				emoji: "📄",
 			},

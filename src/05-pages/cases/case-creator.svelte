@@ -38,7 +38,8 @@
         uploadState.error = null;
 
         try {
-            const response: FormattedPersonaResponse = await uploadService.uploadFile(uploadedFile, caseId);
+            const response: FormattedPersonaResponse =
+                await uploadService.uploadFile(uploadedFile, caseId);
             uploadState.response = {
                 id: response.id,
                 content: response.content,
@@ -46,7 +47,8 @@
                 type: "ai",
             };
         } catch (error) {
-            uploadState.error = error instanceof Error ? error.message : "Generation failed";
+            uploadState.error =
+                error instanceof Error ? error.message : "Generation failed";
         } finally {
             uploadState.generating = false;
         }
@@ -54,29 +56,38 @@
 </script>
 
 <div class="flex flex-row items-start justify-start gap-4">
-    <div class="flex flex-col gap-4 w-full">
+    <div>
         <FileUploader
             {caseId}
             {uploadState}
             onFileUpload={handleFileUpload}
             onCaseIdChange={handleCaseIdChange}
         />
-        
-        {#if uploadState.fileUploaded}
-            <div class="flex justify-start w-[200px]">
-                <Button
-                    onclick={handleGeneratePersona}
-                    disabled={uploadState.generating}
-                >
-                    {#if uploadState.generating}
-                        Generating...
-                    {:else}
-                        Generate Persona
-                    {/if}
-                </Button>
-            </div>
-        {/if}
+
+        <div class="flex flex-col justify-start   mt-4">
+          
+            <Button
+                
+                onclick={handleGeneratePersona}
+                disabled={uploadState.generating ||
+                    !caseId.trim() ||
+                    !uploadedFile}
+            >
+                {#if uploadState.generating}
+                    Generating...
+                {:else}
+                    Generate Persona
+                {/if}
+            </Button>
+            {#if 
+                !caseId.trim() ||
+                !uploadedFile}
+                <p class="text-xs mt-1 text-red-500">
+                    Please fill in all fields and upload a PDF file
+                </p>
+            {/if}
+        </div>
     </div>
-    
+
     <CaseData {uploadState} />
 </div>

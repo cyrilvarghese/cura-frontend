@@ -2,10 +2,10 @@
     import * as Card from "$lib/components/ui/card";
     import { Button } from "$lib/components/ui/button";
     import { Upload } from "lucide-svelte";
-    import { cn } from "$lib/utils";
- 
 
     let { caseId, uploadState, onFileUpload, onCaseIdChange } = $props();
+
+    let uploadedFileName: string | null = $state(null);
 
     function handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
@@ -17,28 +17,31 @@
             return;
         }
 
+        uploadedFileName = file.name;
+
         onFileUpload(file);
     }
 
     function triggerFileUpload() {
-        const input = document.getElementById('file-upload-input') as HTMLInputElement;
+        const input = document.getElementById(
+            "file-upload-input",
+        ) as HTMLInputElement;
         input.click();
     }
 </script>
 
 <div class="flex w-full gap-4">
-    <Card.Root class="w-full max-w-md p-4 shadow-md rounded-lg bg-white">
+    <Card.Root class="max-w-md shadow-md rounded-lg bg-white w-[300px]">
         <Card.Header>
-            <Card.Title class="text-lg font-semibold"
+            <Card.Title class="text-lg o font-semibold"
                 >Upload Patient Case Document</Card.Title
             >
         </Card.Header>
         <Card.Content>
             <div class="space-y-8">
                 <div class="grid w-full items-center gap-1.5">
-                    <label
-                        for="case-id"
-                        class="text-sm leading-none">Case ID</label
+                    <label for="case-id" class="text-sm leading-none"
+                        >Case ID</label
                     >
                     <input
                         id="case-id"
@@ -52,10 +55,8 @@
                 </div>
 
                 <div class="grid w-full items-center gap-1.5">
-                    <label
-                        for="file-upload"
-                        class="text-sm leading-none"
-                        >Upload Patient Case Document (PDF only)</label
+                    <label for="file-upload" class="text-sm leading-none"
+                        >Patient Case Document</label
                     >
                     <input
                         id="file-upload-input"
@@ -65,13 +66,24 @@
                         disabled={uploadState.loading || uploadState.generating}
                         accept=".pdf"
                     />
-                    <Button  onclick={triggerFileUpload} variant="secondary" disabled={uploadState.loading || uploadState.generating}>
+                    <Button
+                        class="hover:bg-gray-300"
+                        onclick={triggerFileUpload}
+                        variant="secondary"
+                        disabled={uploadState.loading || uploadState.generating}
+                    >
                         <Upload class="mr-2" />
                         Upload PDF
                     </Button>
-                    <p class="text-xs text-muted-foreground mt-1">
-                        Accepted format: PDF
-                    </p>
+                    {#if uploadedFileName}
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Uploaded: {uploadedFileName}
+                        </p>
+                    {:else}
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Accepted format: PDF
+                        </p>
+                    {/if}
                 </div>
             </div>
         </Card.Content>
