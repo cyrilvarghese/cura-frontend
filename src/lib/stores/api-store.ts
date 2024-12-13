@@ -48,7 +48,6 @@ function getCoverMessages(): Message[] {
 
 // Function to get the first message based on currentCaseId
 function getFirstMessage(currentCaseId: number | null): Message {
-    debugger
 
     // Assuming coverMessages is defined somewhere in your code
     if (currentCaseId !== null && currentCaseId > 0 && currentCaseId - 1 < getCoverMessages().length) {
@@ -74,8 +73,6 @@ export const apiStore = writable<ApiState>(initialState);
 
 // Subscribe to currentCaseStore to dynamically update messages
 currentCaseStore.subscribe(value => {
-    console.log("currentCaseId", value);
-    debugger
     if (value !== null) {
         const currentCaseId = parseInt(value.toString());
 
@@ -225,7 +222,6 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
         default: // All other steps (examination, diagnosis, treatment)
             // Add artificial delay to simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000));
-            debugger
             // Update store with simulated response for non-patient-history steps
             // types: text, image, test-result, examination, diagnosis, relevant-info, final-diagnosis, feedback
             let resultContent: TestResult | ExaminationResult;

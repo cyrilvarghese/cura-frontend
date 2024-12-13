@@ -1,5 +1,4 @@
 import { API_BASE_URL } from '$lib/config/api';
-import type sticker from 'lucide-svelte/icons/sticker';
 
 export class TestDataService {
     private baseUrl = API_BASE_URL;
@@ -20,6 +19,11 @@ export class TestDataService {
         
 
         return response.json(); // Return the response data
+    }
+
+    async getExamTestData(caseId: string): Promise<any> {
+        const response = await fetch(`${this.baseUrl}/cases/${caseId}`);
+        return response.json();
     }
 }
 

@@ -12,8 +12,8 @@
         if (!input.files || input.files.length === 0) return;
 
         const file = input.files[0];
-        if (!file.type.includes("pdf")) {
-            alert("Please upload a PDF file only");
+        if (!file.type.includes("pdf") && !file.type.includes("markdown") && !file.name.endsWith(".md")) {
+            alert("Please upload a PDF or Markdown file only");
             return;
         }
 
@@ -33,16 +33,12 @@
 <div class="flex w-full gap-4">
     <Card.Root class="max-w-md shadow-md rounded-lg bg-white w-[300px]">
         <Card.Header>
-            <Card.Title class="text-lg o font-semibold"
-                >Upload Patient Case Document</Card.Title
-            >
+            <Card.Title class="text-lg font-semibold">Upload Patient Case Document</Card.Title>
         </Card.Header>
         <Card.Content>
             <div class="space-y-8">
                 <div class="grid w-full items-center gap-1.5">
-                    <label for="case-id" class="text-sm leading-none"
-                        >Case ID</label
-                    >
+                    <label for="case-id" class="text-sm leading-none">Case ID</label>
                     <input
                         id="case-id"
                         type="text"
@@ -55,16 +51,14 @@
                 </div>
 
                 <div class="grid w-full items-center gap-1.5">
-                    <label for="file-upload" class="text-sm leading-none"
-                        >Patient Case Document</label
-                    >
+                    <label for="file-upload" class="text-sm leading-none">Patient Case Document</label>
                     <input
                         id="file-upload-input"
                         type="file"
                         class="hidden"
                         onchange={handleFileUpload}
                         disabled={uploadState.loading || uploadState.generating}
-                        accept=".pdf"
+                        accept=".pdf,.md"
                     />
                     <Button
                         class="hover:bg-gray-300"
@@ -73,7 +67,7 @@
                         disabled={uploadState.loading || uploadState.generating}
                     >
                         <Upload class="mr-2" />
-                        Upload PDF
+                        Upload PDF or Markdown
                     </Button>
                     {#if uploadedFileName}
                         <p class="text-xs text-muted-foreground mt-1">
@@ -81,7 +75,7 @@
                         </p>
                     {:else}
                         <p class="text-xs text-muted-foreground mt-1">
-                            Accepted format: PDF
+                            Accepted formats: PDF, Markdown
                         </p>
                     {/if}
                 </div>

@@ -69,7 +69,6 @@
     }
 
     async function handleGeneratePhysicalExam() {
-        debugger
         $:currentTab = "physical-exams";
         
         console.log("Generating Physical Exam");

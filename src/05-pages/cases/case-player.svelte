@@ -16,6 +16,8 @@
     import { studentMessageHistory } from "$lib/stores/api-store";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb";
     import { currentCaseStore } from '$lib/stores/case-store';
+    import { fetchCaseData } from "$lib/stores/caseDataStore";
+    import { onDestroy } from "svelte";
     const { id } = $props();// current case id
 
     // Subscribe to changes if needed
@@ -47,6 +49,16 @@
             }
         });
     }
+    const unsubscribe = currentCaseStore.subscribe((caseId) => {
+        if (caseId !== null) {
+            fetchCaseData(caseId.toString());
+        }
+    });
+
+    // Cleanup function to unsubscribe when the component is destroyed
+    onDestroy(() => {
+        unsubscribe();
+    });
     $effect(() => {
         currentCaseStore.set(id);
     });
@@ -109,6 +121,8 @@
             variant: "destructive" as const,
         },
     };
+
+    
 </script>
 
 <div>

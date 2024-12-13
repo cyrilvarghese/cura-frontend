@@ -69,12 +69,13 @@
             };
             await sendMessage(message.content, "assistant", "examination", "test-result");
         }
-        debugger;
         console.log(result);
     }
 
     async function handlePhysicalExam(examName: ExaminationName) {
         const result = await examinationStore.performPhysicalExam(examName);
+        console.log(result);
+        debugger;
         if (result) {
             const message = {
                 id: crypto.randomUUID(),

@@ -2,8 +2,7 @@
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import { patientFile } from "$lib/stores/api-store";
     import type { ImageData, PatientFileItem } from "$lib/types";
-    import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
-
+    
     //local state
     type PatientFiles = {
         name: string;
@@ -71,8 +70,8 @@
     });
 </script>
 
-<div class="flex-col w-full p-4 h-full">
-    <h2 class="text-lg font-semibold pb-8 p border-b border-gray-200">Patient File</h2>
+<div class="flex-col w-full p-6 h-full">
+    <h2 class="text-lg font-semibold pb-8 border-b border-gray-200">Patient File</h2>
     <ScrollArea
         class="w-full h-[calc(100%-100px)] rounded-md "
         orientation="vertical"

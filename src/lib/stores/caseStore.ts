@@ -34,7 +34,6 @@ export async function generatePersona(uploadedFile: File, caseId: string) {
 
     try {
         const response = await patientPersonaService.createPatientPersona(uploadedFile, caseId);
-        debugger
         caseStore.update(state => ({
             ...state,
             persona: {

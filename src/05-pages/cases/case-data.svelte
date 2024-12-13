@@ -7,18 +7,14 @@
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
     import type { CaseStoreState } from "$lib/stores/caseStore";
     import TestDataDisplay from "./TestDataDisplay.svelte";
+    import ExaminationEditor from "./ExaminationEditor.svelte";
 
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{ 
         uploadState: CaseStoreState; 
         currentTab: 'patient-persona'|'physical-exams'|'lab-results'|'case-summary'; 
     }>();
-
-    $effect(() => {
-        console.log("uploadState", uploadState);
-        console.log("currentTab", currentTab);
-    });
-    
+ 
     
 
     // Ensure synchronous markdown conversion
@@ -46,6 +42,9 @@
                 >
                 <Tabs.Trigger value="case-summary"
                     >Case Summary For Feedback</Tabs.Trigger
+                >
+                <Tabs.Trigger value="examination-editor"
+                    >Cover Image Card</Tabs.Trigger
                 >
             </Tabs.List>
 
@@ -105,6 +104,12 @@
                 <Tabs.Content value="case-summary">
                     <div class="text-center text-muted-foreground py-8">
                         <p>Case summary will be available after analysis</p>
+                    </div>
+                </Tabs.Content>
+
+                <Tabs.Content value="examination-editor">
+                    <div class="text-center text-muted-foreground py-8">
+                        <p>No cover image card generated yet</p>
                     </div>
                 </Tabs.Content>
 

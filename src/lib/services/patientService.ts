@@ -13,7 +13,6 @@ export class PatientApiService {
         threadStore.subscribe(value => currentThreadId = value)();
         currentCaseStore.subscribe(value => currentCaseId = value)();
 
-        debugger;
         const response = await fetch(
             `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${currentCaseId ? `&case_id=${currentCaseId}` : ''}`,
             {
