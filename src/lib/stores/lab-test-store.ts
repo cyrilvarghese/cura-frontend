@@ -1,7 +1,7 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { DiagnosticTestName } from '$lib/types';
 import type { TestResult } from '$lib/types';
-import { labTestService } from '$lib/services/labTestService';
+import { caseDataStore } from './caseDataStore';
 
 interface LabState {
     results: TestResult[];
@@ -32,9 +32,18 @@ function createLabStore() {
 
     async function orderTest(testName: DiagnosticTestName) {
         update(state => ({ ...state, isLoading: true, error: null }));
-
+        
         try {
-            const testData = await labTestService.getLabTestData(testName);
+            // Get data from caseDataStore instead of lab test service
+            const caseData = get(caseDataStore);
+            if (!caseData) {
+                throw new Error('Case data not loaded');
+            }
+
+            const testData = caseData.labTestReports[testName];
+            if (!testData) {
+                throw new Error(`Lab test data not found for ${testName}`);
+            }
 
             const result: TestResult = {
                 testName,
@@ -42,7 +51,7 @@ function createLabStore() {
                 results: testData.results,
                 interpretation: testData.interpretation,
                 timestamp: new Date(),
-                status: testData.status
+                status: 'completed' as const
             };
 
             update(state => ({
@@ -50,24 +59,6 @@ function createLabStore() {
                 results: [...state.results, result],
                 isLoading: false
             }));
-
-            // Simulate test completion after 5 seconds
-            setTimeout(() => {
-                update(state => {
-                    const updatedResults = state.results.map(r => {
-                        if (r.testName === result.testName) {
-                            return {
-                                ...r,
-                                status: 'completed' as const,
-                                results: testData.results,
-                                interpretation: testData.interpretation
-                            };
-                        }
-                        return r;
-                    });
-                    return { ...state, results: updatedResults };
-                });
-            }, 5000);
 
             return result;
         } catch (error) {

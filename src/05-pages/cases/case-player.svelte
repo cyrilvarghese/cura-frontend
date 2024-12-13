@@ -18,6 +18,7 @@
     import { currentCaseStore } from '$lib/stores/case-store';
     import { fetchCaseData } from "$lib/stores/caseDataStore";
     import { onDestroy } from "svelte";
+    import LabTestsDropdown from '../../03-organisms/lab-tests/LabTestsDropdown.svelte';
     const { id } = $props();// current case id
 
     // Subscribe to changes if needed
