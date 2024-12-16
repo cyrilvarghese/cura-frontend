@@ -190,6 +190,6 @@ export interface CoverImageResponse {
     quote: string;
     prompt: string;
     image_url: string;
-    timestamp: string;
-    type: 'ai';
+    timestamp?: string;
+    type?: 'ai';
 }
