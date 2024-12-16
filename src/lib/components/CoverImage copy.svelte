@@ -9,7 +9,6 @@
     import RefreshCw from "lucide-svelte/icons/refresh-cw";
     import cover2 from "../../assets/cover2.webp";
     import cover3 from "../../assets/cover3.webp";
-    import { timeLog } from "console";
 
     const coverImageService = new CoverImageService();
     const coverImageData = writable<{
@@ -25,18 +24,18 @@
         isLoading.set(false);
         try {
             isLoading.set(true);
-            const response =
-                await coverImageService.createCoverImage($lastCaseIdStore);
-            coverImageData.set(response);
-            currentPrompt = response.prompt;
-            // coverImageData.set({
-            //     image_url: cover2,
-            //     prompt: "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.",
-            //     title: "Test Title",
-            //     quote: "Test Quote",
-            // });
-            // currentPrompt =
-            //     "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.";
+            // const response =
+            //     await coverImageService.createCoverImage($lastCaseIdStore);
+            // coverImageData.set(response);
+            // curretPrompt = response.prompt;
+            coverImageData.set({
+                image_url: cover2,
+                prompt: "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.",
+                title: "Test Title",
+                quote: "Test Quote",
+            });
+            currentPrompt =
+                "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.";
         } catch (error) {
             console.error("Error generating cover image:", error);
         } finally {
@@ -49,19 +48,17 @@
             return generateCoverImage();
         try {
             isLoading.set(true);
-            const response = await coverImageService.generateWithPrompt(
-                $lastCaseIdStore,
-                currentPrompt,
-                title,
-                quote
-            );
-            coverImageData.set(response);
-            // coverImageData.set({
-            //     image_url: cover2,
-            //     prompt: currentPrompt,
-            //     title: "Test Title",
-            //     quote: "Test Quote",
-            // });
+            // const response = await coverImageService.generateWithPrompt(
+            //     $lastCaseIdStore,
+            //     currentPrompt,
+            // );
+            // coverImageData.set(response);
+            coverImageData.set({
+                image_url: cover2,
+                prompt: currentPrompt,
+                title: "Test Title",
+                quote: "Test Quote",
+            });
         } catch (error) {
             console.error("Error generating cover image with prompt:", error);
         } finally {
@@ -71,7 +68,6 @@
 
     onMount(() => {
         if (!$coverImageData) {
-            isLoading.set(false);
             generateCoverImage();
         }
     });
@@ -88,7 +84,16 @@
                     src={$coverImageData.image_url}
                     alt="Generated cover"
                 />
-            
+                <Button
+                    variant="outline"
+                    onclick={generateCoverImage}
+                    disabled={$isLoading}
+                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm hover:bg-white"
+                >
+                    <RefreshCw
+                        class="h-4 w-4  {$isLoading ? 'animate-spin' : ''}"
+                    />
+                </Button>
             </div>
 
             <!-- Text Overlay (Green Box) -->

@@ -26,8 +26,9 @@ export class CoverImageService {
         return await response.json();
     }
 
-    async generateWithPrompt(caseId: string, prompt: string): Promise<CoverImagePromptResponse> {
+    async generateWithPrompt(caseId: string, prompt: string, title: string, quote: string): Promise<CoverImagePromptResponse> {
         try {
+            
             const response = await fetch(`${this.baseUrl}/cover_image/create?case_id=${caseId}`, {
                 method: 'POST',
                 headers: {
@@ -35,7 +36,9 @@ export class CoverImageService {
                 },
                 body: JSON.stringify({
                     caseId,
-                    prompt
+                    prompt,
+                    title,
+                    quote
                 })
             });
 

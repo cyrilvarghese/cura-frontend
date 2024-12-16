@@ -10,7 +10,7 @@
     import ExaminationEditor from "./ExaminationEditor.svelte";
     import CoverImage from "$lib/components/CoverImage.svelte";
     import { onMount } from "svelte";
-
+    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -37,7 +37,7 @@
 
 <Card.Root class="flex-1">
     <Card.Header>
-        <Card.Title class="text-lg font-semibold">Case Data</Card.Title>
+        <Card.Title class="text-lg font-semibold">Data for case {$lastCaseIdStore}</Card.Title>
         <Card.Description
             >Upload and analyze patient case documents</Card.Description
         >
@@ -68,7 +68,6 @@
                         </Alert>
                     {:else if uploadState.persona}
                         {@debug uploadState}
-
                         <CoverImage />
 
                         <div class="rounded-lg pt-4">
