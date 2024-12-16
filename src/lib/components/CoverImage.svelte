@@ -9,7 +9,7 @@
     import RefreshCw from "lucide-svelte/icons/refresh-cw";
     import cover2 from "../../assets/cover2.webp";
     import cover3 from "../../assets/cover3.webp";
-    import { timeLog } from "console";
+    
 
     const coverImageService = new CoverImageService();
     const coverImageData = writable<{
@@ -45,15 +45,15 @@
     }
 
     async function generateWithPrompt() {
-        if (!currentPrompt.trim() || !$lastCaseIdStore)
+        if (!currentPrompt.trim() || !$lastCaseIdStore || !$coverImageData)
             return generateCoverImage();
         try {
             isLoading.set(true);
             const response = await coverImageService.generateWithPrompt(
                 $lastCaseIdStore,
                 currentPrompt,
-                title,
-                quote
+                $coverImageData.title ?? "",
+                $coverImageData.quote ?? ""
             );
             coverImageData.set(response);
             // coverImageData.set({
