@@ -5,7 +5,11 @@
     import LoadingMessage from "./LoadingMessage.svelte";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     import { Button } from "$lib/components/ui/button";
-    import RefreshCw from "lucide-svelte/icons/refresh-cw"; // Import refresh icon
+    import { Textarea } from "$lib/components/ui/textarea";
+    import RefreshCw from "lucide-svelte/icons/refresh-cw";
+import cover2 from '../../assets/cover2.webp'
+import cover3 from '../../assets/cover3.webp'
+
 
     const coverImageService = new CoverImageService();
     const coverImageData = writable<{
@@ -13,15 +17,36 @@
         prompt: string;
     } | null>(null);
     const isLoading = writable(true);
+    let currentPrompt: string = "";
 
     async function generateCoverImage() {
+        isLoading.set(false);
         try {
             isLoading.set(true);
             const response =
                 await coverImageService.createCoverImage($lastCaseIdStore);
             coverImageData.set(response);
+            currentPrompt = response.prompt;
         } catch (error) {
             console.error("Error generating cover image:", error);
+        } finally {
+            isLoading.set(false);
+        }
+    }
+
+    async function generateWithPrompt() {
+
+        
+        if (!currentPrompt.trim() || !$lastCaseIdStore) return generateCoverImage();
+        try {
+            isLoading.set(true);
+            const response = await coverImageService.generateWithPrompt(
+                $lastCaseIdStore,
+                currentPrompt,
+            );
+            coverImageData.set(response);
+        } catch (error) {
+            console.error("Error generating cover image with prompt:", error);
         } finally {
             isLoading.set(false);
         }
@@ -32,31 +57,58 @@
     });
 </script>
 
-<div class="w-full bg-white rounded-lg p-4 pl-0  mb-4">
-    {#if $isLoading}
+<div class="w-full bg-white rounded-lg shadow-sm">
+    {#if $isLoading && !$coverImageData}
         <LoadingMessage message="Generating cover image" />
     {:else if $coverImageData}
-        <div class="flex flex-row p-4 gap-4 w-full">
+        <div class="relative">
             <img
-                class="w-[400px] h-auto rounded-lg"
+                class="w-[400px] h-auto object-cover rounded-lg"
                 src={$coverImageData.image_url}
-                alt={$coverImageData.prompt || "Cover Image"}
+                alt="Generated cover"
+                
             />
-            <p class=" w-[300px] text-sm text-muted-foreground ">
-                {$coverImageData.prompt}
-            </p>
+
+            <!-- Text Overlay (Green Box) -->
+            <div 
+                class="absolute top-0 left-[400px] w-[300px] bg-white/90 backdrop-blur-sm rounded-lg p-4 pt-0 shadow-sm"
+            >
+                <h3 class="text-lg text-muted-foreground font-medium mb-2">Image Description (pro   )</h3>
+                <Textarea
+                    bind:value={currentPrompt}
+                    class="min-h-[300px] w-[500px] text-sm text-muted-foreground bg-transparent resize-none"
+                />
+            </div>
+
+            <!-- Button Overlay (Red Box) -->
+            <div class="absolute bottom-4 left-4 flex gap-2">
+                <Button
+                    variant="outline"
+                    onclick={generateCoverImage}
+                    disabled={$isLoading}
+                    class="bg-white/90 backdrop-blur-sm hover:bg-white"
+                >
+                    <RefreshCw
+                        class="h-4 w-4 mr-2 {$isLoading ? 'animate-spin' : ''}"
+                    />
+                    Random
+                </Button>
+                <Button
+                    variant="outline"
+                    onclick={generateWithPrompt}
+                    disabled={$isLoading || !currentPrompt.trim()}
+                    class="bg-white/90 backdrop-blur-sm hover:bg-white"
+                >
+                    <RefreshCw
+                        class="h-4 w-4 mr-2 {$isLoading ? 'animate-spin' : ''}"
+                    />
+                    With Prompt
+                </Button>
+            </div>
         </div>
-        <Button
-            variant="outline"
-            onclick={() => generateCoverImage()}
-            class="w-fit"
-        >
-            <RefreshCw class="m-4 h-4 w-4" />
-            Generate Again
-        </Button>
     {:else}
         <div class="text-center text-muted-foreground py-8">
-            <p>No cover image card generated yet</p>
+            <p>No cover image generated yet</p>
         </div>
     {/if}
 </div>

@@ -71,7 +71,7 @@
 
                         <CoverImage />
 
-                        <div class="rounded-lg">
+                        <div class="rounded-lg pt-4">
                             <MarkdownContent
                                 content={syncMarked(
                                     uploadState.persona.content,
