@@ -28,7 +28,7 @@ export class CoverImageService {
 
     async generateWithPrompt(caseId: string, prompt: string): Promise<CoverImagePromptResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/create?case_id=${caseId}`, {
+            const response = await fetch(`${this.baseUrl}/cover_image/create?case_id=${caseId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

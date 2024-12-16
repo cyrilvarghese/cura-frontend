@@ -53,7 +53,9 @@ import cover3 from '../../assets/cover3.webp'
     }
 
     onMount(() => {
-        generateCoverImage();
+        if (!$coverImageData) { 
+            generateCoverImage();
+        }
     });
 </script>
 
@@ -73,7 +75,7 @@ import cover3 from '../../assets/cover3.webp'
             <div 
                 class="absolute top-0 left-[400px] w-[300px] bg-white/90 backdrop-blur-sm rounded-lg p-4 pt-0 shadow-sm"
             >
-                <h3 class="text-lg text-muted-foreground font-medium mb-2">Image Description (pro   )</h3>
+                <h3 class="text-lg text-muted-foreground font-medium mb-2">Image Description (prompt)</h3>
                 <Textarea
                     bind:value={currentPrompt}
                     class="min-h-[300px] w-[500px] text-sm text-muted-foreground bg-transparent resize-none"

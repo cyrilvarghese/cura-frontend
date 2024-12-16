@@ -120,7 +120,7 @@
                     Generate Patient Persona
                 {/if}
             </Button>
-            {#if !uploadState.caseId || !uploadedFile}
+            {#if (!uploadState.caseId || !uploadedFile) && !uploadState.generating}
                 <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
                 </p>
