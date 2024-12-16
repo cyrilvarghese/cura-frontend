@@ -1,10 +1,13 @@
 import { writable } from 'svelte/store';
 import { patientPersonaService } from '$lib/services/patientPersonaService'; // Adjust the import based on your project structure
 import { testDataService } from '$lib/services/testDataService'; // Adjust the import based on your project structure
-import type { FormattedPersonaResponse } from '$lib/types';
+import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
+import { coverImageService } from '$lib/services/coverImageService';
+
 
 // Define the store state interface
 export interface CaseStoreState {
+    caseId: string | null;
     loading: boolean;
     fileUploaded: boolean;
     generating: boolean;
@@ -14,6 +17,7 @@ export interface CaseStoreState {
         physical_exam: any; // Define the structure of physical_exam as needed
         lab_test: any; // Define the structure of lab_test as needed
     } | null; // Allow null if no data is available
+    coverImage: CoverImageResponse | null;
 }
 
 // Create a writable store with initial state
@@ -24,14 +28,17 @@ const initialState: CaseStoreState = {
     error: null,
     persona: null,
     testData: null,
+    coverImage: null,
+    caseId: null,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
+export const lastCaseIdStore = writable<string | null>(null);
 
 // Function to generate a persona
 export async function generatePersona(uploadedFile: File, caseId: string) {
     caseStore.update(state => ({ ...state, generating: true, error: null }));
-
+    lastCaseIdStore.set(caseId);
     try {
         const response = await patientPersonaService.createPatientPersona(uploadedFile, caseId);
         caseStore.update(state => ({
@@ -71,6 +78,32 @@ export async function generatePhysicalExam(uploadedFile: File, caseId: string) {
         caseStore.update(state => ({
             ...state,
             error: error instanceof Error ? error.message : "Generation failed",
+            generating: false,
+        }));
+    }
+}
+
+export async function generateCoverImage(caseId: string) {
+    caseStore.update(state => ({ ...state, generating: true, error: null }));
+
+    try {
+        const response = await coverImageService.createCoverImage(caseId);
+        caseStore.update(state => ({
+            ...state,
+            coverImage: {
+                image_url: response.image_url,
+                timestamp: new Date().toISOString(),
+                type: "ai",
+                prompt: response.prompt,
+                title: response.title,
+                quote: response.quote,
+            },
+            generating: false,
+        }));
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Cover image generation failed",
             generating: false,
         }));
     }

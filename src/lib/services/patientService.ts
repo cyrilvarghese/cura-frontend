@@ -1,7 +1,7 @@
 import type { ApiResponse, Message, PatientResponse } from '$lib/types';
-import { threadStore } from '$lib/stores/thread-store';
+import { threadStore } from '$lib/stores/threadStore';
 import { API_BASE_URL } from '$lib/config/api';
-import { currentCaseStore } from '$lib/stores/case-store';
+import { currentCaseId } from '$lib/stores/casePlayerStore';
 
 export class PatientApiService {
     private baseUrl = API_BASE_URL;
@@ -9,9 +9,9 @@ export class PatientApiService {
     async askPatient(query: string): Promise<Message> {
         // Get the current thread_id,case_id from the store
         let currentThreadId: string | null = null;
-        let currentCaseId: number | null = null;
+        
         threadStore.subscribe(value => currentThreadId = value)();
-        currentCaseStore.subscribe(value => currentCaseId = value)();
+        
 
         const response = await fetch(
             `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${currentCaseId ? `&case_id=${currentCaseId}` : ''}`,

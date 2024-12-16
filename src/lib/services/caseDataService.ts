@@ -1,10 +1,7 @@
 import { API_BASE_URL } from '$lib/config/api';
+import type { CaseData } from '$lib/stores/casePlayerStore';
 
-export interface CaseData {
-    physicalExamReports: any; // Replace 'any' with the appropriate type if known
-    labTestReports: any; // Replace 'any' with the appropriate type if known
-    coverMessage: string; // Assuming coverMessage is a string
-}
+
 
 export class CaseDataService {
     private baseUrl = API_BASE_URL;
@@ -13,7 +10,7 @@ export class CaseDataService {
         this.baseUrl = baseUrl;
     }
 
- 
+
 
     async getCaseData(caseId: string): Promise<CaseData> {
         const response = await fetch(`${this.baseUrl}/cases/${caseId}`);

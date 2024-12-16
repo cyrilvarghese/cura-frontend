@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { caseDataStore } from '$lib/stores/caseDataStore';
+    import { caseDataStore } from '$lib/stores/casePlayerStore';
     import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
     import { Button } from '$lib/components/ui/button';
     import ScanEye from 'lucide-svelte/icons/scan-eye';

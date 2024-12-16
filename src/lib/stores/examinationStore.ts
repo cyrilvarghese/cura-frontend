@@ -1,6 +1,6 @@
 import { writable, get } from 'svelte/store';
 import type { ExaminationState, ExaminationResult, FindingContent, ExaminationName } from '$lib/types';
-import { caseDataStore } from './caseDataStore';
+import { caseDataStore } from './casePlayerStore';
 
 function createExaminationStore() {
     const { subscribe, update } = writable<ExaminationState>({

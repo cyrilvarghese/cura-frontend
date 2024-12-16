@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
-    import { patientFile } from "$lib/stores/api-store";
+    import { patientFile } from "$lib/stores/apiStore";
     import type { ImageData, PatientFileItem } from "$lib/types";
     
     //local state

@@ -2,7 +2,7 @@
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ChatInput from "../../03-organisms/chat/chat-input.svelte";
     import Message from "../../03-organisms/chat/message.svelte";
-    import { apiStore } from "$lib/stores/api-store";
+    import { apiStore } from "$lib/stores/apiStore";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
     import { Button } from "$lib/components/ui/button";
     import InfoIcon from "lucide-svelte/icons/info";
@@ -13,10 +13,10 @@
     import RelevantInfoDialog from "../../03-organisms/dialogs/relevant-info-dialog.svelte";
     import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
-    import { studentMessageHistory } from "$lib/stores/api-store";
+    import { studentMessageHistory } from "$lib/stores/apiStore";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb";
-    import { currentCaseStore } from '$lib/stores/case-store';
-    import { fetchCaseData } from "$lib/stores/caseDataStore";
+    import { currentCaseId } from '$lib/stores/casePlayerStore';
+    import { fetchCaseData } from "$lib/stores/casePlayerStore";
     import { onDestroy } from "svelte";
     import LabTestsDropdown from '../../03-organisms/lab-tests/LabTestsDropdown.svelte';
     const { id } = $props();// current case id
@@ -50,7 +50,7 @@
             }
         });
     }
-    const unsubscribe = currentCaseStore.subscribe((caseId) => {
+    const unsubscribe = currentCaseId.subscribe((caseId: number | null) => {
         if (caseId !== null) {
             fetchCaseData(caseId.toString());
         }
@@ -61,7 +61,7 @@
         unsubscribe();
     });
     $effect(() => {
-        currentCaseStore.set(id);
+        currentCaseId.set(id);
     });
     $effect(() => {
         if (messages?.length) {

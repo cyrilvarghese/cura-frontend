@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store';
-import { CaseDataService, type CaseData } from '$lib/services/caseDataService';
+import { CaseDataService } from '$lib/services/caseDataService';
 import { API_BASE_URL } from '$lib/config/api';
 import type { DiagnosticTestName, ExaminationName } from '$lib/types';
-
+export const currentCaseId = writable<string | null>(null); 
 // Update the CaseData interface to be more specific about labTestReports
 export interface CaseData {
     physicalExamReports: Record<ExaminationName, {

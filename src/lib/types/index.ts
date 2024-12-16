@@ -1,3 +1,5 @@
+import type bug from "lucide-svelte/icons/bug";
+
 export type TestStatus = 'completed' | 'pending' | 'failed';
 
 export type TestResultContent =
@@ -181,4 +183,13 @@ export interface StreamingChunk {
     content: string;
     thread_id?: string;
     // Add other properties as needed
+}
+
+export interface CoverImageResponse {
+    title: string;
+    quote: string;
+    prompt: string;
+    image_url: string;
+    timestamp: string;
+    type: 'ai';
 }

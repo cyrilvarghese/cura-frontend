@@ -5,26 +5,37 @@
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
     import { marked } from "marked";
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
-    import type { CaseStoreState } from "$lib/stores/caseStore";
+    import type { CaseStoreState } from "$lib/stores/caseCreatorStore";
     import TestDataDisplay from "./TestDataDisplay.svelte";
     import ExaminationEditor from "./ExaminationEditor.svelte";
+    import CoverImage from "$lib/components/CoverImage.svelte";
+    import { onMount } from "svelte";
 
     // Use $props() to declare props in runes mode
-    const { uploadState, currentTab } = $props<{ 
-        uploadState: CaseStoreState; 
-        currentTab: 'patient-persona'|'physical-exams'|'lab-results'|'case-summary'; 
+    const { uploadState, currentTab } = $props<{
+        uploadState: CaseStoreState;
+        currentTab:
+            | "patient-persona"
+            | "physical-exams"
+            | "lab-results"
+            | "case-summary"
+            | "cover-image"
+            | "examination-editor";
     }>();
- 
-    
-
+    onMount(() => {
+        console.log(uploadState.caseId);
+    });
+    $effect(() => {
+        console.log("caseId changed:", uploadState.caseId);
+        // Add any additional logic for caseId changes
+    });
     // Ensure synchronous markdown conversion
     function syncMarked(content: string): string {
         return marked.parse(content) as string;
-    } 
+    }
 </script>
 
 <Card.Root class="flex-1">
-    
     <Card.Header>
         <Card.Title class="text-lg font-semibold">Case Data</Card.Title>
         <Card.Description
@@ -43,9 +54,6 @@
                 <Tabs.Trigger value="case-summary"
                     >Case Summary For Feedback</Tabs.Trigger
                 >
-                <Tabs.Trigger value="examination-editor"
-                    >Cover Image Card</Tabs.Trigger
-                >
             </Tabs.List>
 
             <div class="mt-4 h-[calc(100vh-354px)] overflow-y-auto">
@@ -59,15 +67,11 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.persona}
-                        <div class="rounded-lg">
-                            <time
-                                class="text-xs text-muted-foreground mb-2 block"
-                            >
-                                {new Date(
-                                    uploadState.persona.timestamp,
-                                ).toLocaleString()}
-                            </time>
+                        {@debug uploadState}
 
+                        <CoverImage />
+
+                        <div class="rounded-lg">
                             <MarkdownContent
                                 content={syncMarked(
                                     uploadState.persona.content,
@@ -83,7 +87,9 @@
 
                 <Tabs.Content value="physical-exams">
                     {#if uploadState.generating}
-                        <LoadingMessage message="Generating physical examinations and lab tests" />
+                        <LoadingMessage
+                            message="Generating physical examinations and lab tests"
+                        />
                     {:else if uploadState.error}
                         <Alert variant="destructive">
                             <AlertDescription>
@@ -99,21 +105,11 @@
                     {/if}
                 </Tabs.Content>
 
-                 
-
                 <Tabs.Content value="case-summary">
                     <div class="text-center text-muted-foreground py-8">
                         <p>Case summary will be available after analysis</p>
                     </div>
                 </Tabs.Content>
-
-                <Tabs.Content value="examination-editor">
-                    <div class="text-center text-muted-foreground py-8">
-                        <p>No cover image card generated yet</p>
-                    </div>
-                </Tabs.Content>
-
-                 
             </div>
         </Tabs.Root>
     </Card.Content>

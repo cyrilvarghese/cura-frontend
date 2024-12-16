@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import type { DiagnosticTestName } from '$lib/types';
 import type { TestResult } from '$lib/types';
-import { caseDataStore } from './caseDataStore';
+import { caseDataStore } from './casePlayerStore';
 
 interface LabState {
     results: TestResult[];
@@ -32,7 +32,7 @@ function createLabStore() {
 
     async function orderTest(testName: DiagnosticTestName) {
         update(state => ({ ...state, isLoading: true, error: null }));
-        
+
         try {
             // Get data from caseDataStore instead of lab test service
             const caseData = get(caseDataStore);

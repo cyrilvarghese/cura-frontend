@@ -1,7 +1,7 @@
 import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
 import { writable } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
-import { currentCaseStore } from '$lib/stores/case-store';
+import { currentCaseId } from '$lib/stores/casePlayerStore';
  
 import cover2 from '../../assets/cover2.webp'
 import cover3 from '../../assets/cover3.webp'
@@ -72,7 +72,7 @@ const initialState: ApiState = {
 export const apiStore = writable<ApiState>(initialState);
 
 // Subscribe to currentCaseStore to dynamically update messages
-currentCaseStore.subscribe(value => {
+currentCaseId.subscribe(value => {
     if (value !== null) {
         const currentCaseId = parseInt(value.toString());
 

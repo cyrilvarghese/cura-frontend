@@ -1,8 +1,8 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { sendMessage, studentMessageHistory } from "$lib/stores/api-store";
-    import { feedbackStore } from "$lib/stores/feedback-store";
+    import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
+    import { feedbackStore } from "$lib/stores/feedbackStore";
     import Loader2 from "lucide-svelte/icons/loader-2";
 
     export let open = false;
