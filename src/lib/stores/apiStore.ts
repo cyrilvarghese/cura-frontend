@@ -1,87 +1,80 @@
 import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
-import { currentCaseId } from '$lib/stores/casePlayerStore';
- 
-import cover2 from '../../assets/cover2.webp'
-import cover3 from '../../assets/cover3.webp'
+import { caseDataStore } from '$lib/stores/casePlayerStore';
+import { API_BASE_URL } from '$lib/config/api';
+
+import type { CaseData } from './casePlayerStore';
 interface ApiState {
     messages: Message[];
     error: string | null;
 }
 
-// Service to get cover messages
-function getCoverMessages(): Message[] {
-    return [
-        {
-            id: '1',
-            sender: 'assistant',
-            type: 'image',
-            step: 'patient_history',
-            imageUrl: 'https://cdn.midjourney.com/6703f338-5798-4ef4-bc15-865900f67df2/0_3.png',
-            title: '" I have rashes all over my hands and it itches a lot "',
-            content: 'Patient presenting with rashes and joint pain.',
-            timestamp: new Date() // Current date and time
-        },
-        {
-            id: '2',
-            sender: 'assistant',
-            type: 'image',
-            step: 'patient_history',
-            imageUrl: cover2,
-            title: '" I have these painful rahes on my legs "',
-            content: 'Patient reporting headache and dizziness.',
-            timestamp: new Date() // Current date and time
-        },
-        {
-            id: '3',
-            sender: 'assistant',
-            type: 'image',
-            step: 'patient_history',
-            imageUrl: cover3,
-            title: '" I have some painful ulcers on my feet "',
-            content: 'Patient experiencing sore throat and persistent cough.',
-            timestamp: new Date() // Current date and time
-        }
-    ];
+
+
+// Function to get the first message based on caseDataStore
+function getFirstMessage(): Message {
+    const defaultMessage: Message = {
+        id: '1',
+        sender: 'assistant',
+        type: 'image',
+        step: 'patient_history',
+        imageUrl: 'https://cdn.midjourney.com/6703f338-5798-4ef4-bc15-865900f67df2/0_3.png',
+        title: '" I have rashes all over my hands and it itches a lot "',
+        content: 'Patient presenting with rashes and joint pain.',
+        timestamp: new Date()
+    };
+
+    // Get cover message from caseDataStore
+    const caseData = get(caseDataStore);
+    if (caseData?.coverMessage) {
+        return {
+            ...defaultMessage,
+            content: caseData.coverMessage.content || defaultMessage.content,
+            imageUrl: caseData.coverMessage.imageUrl || defaultMessage.imageUrl,
+            title: caseData.coverMessage.title || defaultMessage.title
+        };
+    }
+
+    return defaultMessage;
 }
 
-// Function to get the first message based on currentCaseId
-function getFirstMessage(currentCaseId: number | null): Message {
+// Function to get cover messages array
+function getCoverMessages(): Message[] {
+    return [getFirstMessage()];
+}
 
-    // Assuming coverMessages is defined somewhere in your code
-    if (currentCaseId !== null && currentCaseId > 0 && currentCaseId - 1 < getCoverMessages().length) {
-        return getCoverMessages()[currentCaseId - 1];
-    }
-    return { // Fallback message
-        id: '0',
+function getMessageFromCover(coverMessage: any): Message {
+    return {
+        id: '1',
         sender: 'assistant',
-        type: 'text',
+        type: 'image',
         step: 'patient_history',
-        content: 'No message available.',
-        timestamp: new Date() // Current date and time
+        imageUrl: API_BASE_URL + coverMessage.image_url,
+        title: coverMessage.title,
+        content: coverMessage.quote,
+        timestamp: new Date()
     };
 }
 
 // Initialize the store with the cover messages
 const initialState: ApiState = {
-    messages: getCoverMessages(), // Set initial messages from the service
+    messages:[],
     error: null
 };
 
+// Create the store
 export const apiStore = writable<ApiState>(initialState);
 
-// Subscribe to currentCaseStore to dynamically update messages
-currentCaseId.subscribe(value => {
-    if (value !== null) {
-        const currentCaseId = parseInt(value.toString());
-
-        // Update the apiStore with the first message based on the currentCaseId
+// Subscribe to caseDataStore changes
+caseDataStore.subscribe((caseData: CaseData | null) => {
+    debugger
+    if (caseData?.coverMessage) {
         apiStore.update(state => ({
             ...state,
-            messages: [
-                getFirstMessage(currentCaseId),
-            ]
+            messages:
+                [getMessageFromCover(caseData.coverMessage)]
+
         }));
     }
 });

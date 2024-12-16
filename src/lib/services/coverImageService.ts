@@ -1,6 +1,10 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { CoverImageResponse } from '$lib/types/index';
- 
+
+interface CoverImagePromptResponse {
+    image_url: string;
+    prompt: string;
+}
 
 export class CoverImageService {
     private baseUrl = API_BASE_URL;
@@ -48,6 +52,7 @@ export class CoverImageService {
                 prompt: data.prompt,
                 title: data.title,
                 quote: data.quote,
+                timestamp: data.timestamp,
             };
         } catch (error) {
             console.error('Error in generateWithPrompt:', error);

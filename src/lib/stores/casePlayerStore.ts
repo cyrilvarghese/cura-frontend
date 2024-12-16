@@ -1,8 +1,10 @@
 import { writable } from 'svelte/store';
-import { CaseDataService } from '$lib/services/caseDataService';
-import { API_BASE_URL } from '$lib/config/api';
+import { CaseDataService, type CaseListItem } from '$lib/services/caseDataService';
 import type { DiagnosticTestName, ExaminationName } from '$lib/types';
-export const currentCaseId = writable<string | null>(null); 
+
+// Current case ID store
+export const currentCaseId = writable<string | null>(null);
+
 // Update the CaseData interface to be more specific about labTestReports
 export interface CaseData {
     physicalExamReports: Record<ExaminationName, {
@@ -15,12 +17,16 @@ export interface CaseData {
         results: any;
         interpretation: string;
     }>;
-    coverMessage: string;
+    coverMessage: any;
 }
 
-const caseDataService = new CaseDataService(API_BASE_URL);
+const caseDataService = new CaseDataService();
 export const caseDataStore = writable<CaseData | null>(null);
 
+// Add a new store for the cases list
+export const casesListStore = writable<CaseListItem[]>([]);
+
+// Existing fetch case data function
 export const fetchCaseData = async (caseId: string) => {
     try {
         const caseData = await caseDataService.getCaseData(caseId);
@@ -29,4 +35,16 @@ export const fetchCaseData = async (caseId: string) => {
         console.error('Error fetching case data:', error);
         caseDataStore.set(null);
     }
-}; 
+};
+
+// New function to fetch all cases
+export const fetchCases = async () => {
+    try {
+        const cases = await caseDataService.getAllCases();
+        casesListStore.set(cases);
+    } catch (error) {
+        console.error('Error fetching cases:', error);
+        casesListStore.set([]);
+    }
+};
+

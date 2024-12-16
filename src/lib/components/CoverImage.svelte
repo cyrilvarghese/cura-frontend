@@ -9,6 +9,7 @@
     import RefreshCw from "lucide-svelte/icons/refresh-cw";
     import cover2 from "../../assets/cover2.webp";
     import cover3 from "../../assets/cover3.webp";
+    import { API_BASE_URL } from "$lib/config/api";
     
 
     const coverImageService = new CoverImageService();
@@ -19,6 +20,7 @@
         quote?: string | null;
     } | null>(null);
     const isLoading = writable(true);
+    const isError = writable(false);
     let currentPrompt: string = "";
 
     async function generateCoverImage() {
@@ -27,7 +29,12 @@
             isLoading.set(true);
             const response =
                 await coverImageService.createCoverImage($lastCaseIdStore);
-            coverImageData.set(response);
+            coverImageData.set({
+                image_url: API_BASE_URL + response.image_url,
+                prompt: response.prompt,
+                title: response.title,
+                quote: response.quote,
+            });
             currentPrompt = response.prompt;
             // coverImageData.set({
             //     image_url: cover2,
@@ -39,6 +46,7 @@
             //     "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.";
         } catch (error) {
             console.error("Error generating cover image:", error);
+            isError.set(true);
         } finally {
             isLoading.set(false);
         }
@@ -65,6 +73,7 @@
             // });
         } catch (error) {
             console.error("Error generating cover image with prompt:", error);
+            isError.set(true);
         } finally {
             isLoading.set(false);
         }
@@ -129,7 +138,12 @@
         </div>
     {:else}
         <div class="text-center text-muted-foreground py-8">
-            <p>No cover image generated yet</p>
+            {#if $isError}
+                <p>Error generating cover image</p>
+                <Button class="bg-red-500 text-white mt-4" onclick={generateCoverImage}>Retry</Button>
+            {:else}
+                <p>No cover image generated yet</p>
+            {/if}
         </div>
     {/if}
 </div>
