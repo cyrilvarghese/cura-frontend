@@ -18,6 +18,7 @@ export interface CaseStoreState {
         lab_test: any; // Define the structure of lab_test as needed
     } | null; // Allow null if no data is available
     coverImage: CoverImageResponse | null;
+    showValidationMessage: boolean;
 }
 
 // Create a writable store with initial state

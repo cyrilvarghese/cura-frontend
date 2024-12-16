@@ -121,7 +121,7 @@
                 {/if}
             </Button>
             {#if !uploadState.caseId || !uploadedFile}
-                <p class="text-xs mt-1 text-red-500">
+                <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
                 </p>
             {/if}
@@ -139,32 +139,13 @@
                     Generate Physical Exam Data
                 {/if}
             </Button>
-            {#if !uploadState.caseId || !uploadedFile}
-                <p class="text-xs mt-1 text-red-500">
-                    Please fill in all fields and upload a PDF file
-                </p>
-            {/if}
-        </div>
-        <div class="flex flex-col justify-start mt-4">
-            <Button
-                onclick={handleGenerateCoverImage}
-                disabled={uploadState.generating ||
-                    !uploadState.caseId ||
-                    !uploadedFile}
-            >
-                {#if uploadState.generating}
-                    Generating...
-                {:else}
-                    Generate Cover Image
-                {/if}
-            </Button>
-            {#if !uploadState.caseId || !uploadedFile}
-                <p class="text-xs mt-1 text-red-500">
+            {#if (!uploadState.caseId || !uploadedFile) && !uploadState.generating}
+                <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
                 </p>
             {/if}
         </div>
     </div>
 
-    <CaseData {uploadState} {currentTab}   />
+    <CaseData {uploadState} {currentTab} />
 </div>

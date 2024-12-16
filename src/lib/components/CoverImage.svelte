@@ -32,11 +32,11 @@
     });
 </script>
 
-<div class="w-full bg-white rounded-lg p-4 mb-4">
+<div class="w-full bg-white rounded-lg p-4 pl-0  mb-4">
     {#if $isLoading}
         <LoadingMessage message="Generating cover image" />
     {:else if $coverImageData}
-        <div class="flex flex-row gap-4 w-full">
+        <div class="flex flex-row p-4 gap-4 w-full">
             <img
                 class="w-[400px] h-auto rounded-lg"
                 src={$coverImageData.image_url}
@@ -51,7 +51,7 @@
             onclick={() => generateCoverImage()}
             class="w-fit"
         >
-            <RefreshCw class="mr-2 h-4 w-4" />
+            <RefreshCw class="m-4 h-4 w-4" />
             Generate Again
         </Button>
     {:else}
