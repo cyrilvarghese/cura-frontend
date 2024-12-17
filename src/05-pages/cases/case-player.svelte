@@ -15,12 +15,14 @@
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
     import { studentMessageHistory } from "$lib/stores/apiStore";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb";
-    import { currentCaseId } from '$lib/stores/casePlayerStore';
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { fetchCaseData } from "$lib/stores/casePlayerStore";
     import { onDestroy } from "svelte";
-    import LabTestsDropdown from '../../03-organisms/lab-tests/LabTestsDropdown.svelte';
-    const { id } = $props();// current case id
-
+    import { writable } from "svelte/store";
+    import LoaderCircle from "lucide-svelte/icons/loader-circle";
+    const { id } = $props(); // current case id
+    // Add loading state store
+    export const isLoading = writable(false);
     // Subscribe to changes if needed
     studentMessageHistory.subscribe((studentMessages) => {
         console.log(studentMessages);
@@ -50,11 +52,24 @@
             }
         });
     }
-    const unsubscribe = currentCaseId.subscribe((caseId: number | null) => {
-        if (caseId !== null) {
-            fetchCaseData(caseId.toString());
-        }
-    });
+    const unsubscribe = currentCaseId.subscribe(
+        async (caseId: string | null) => {
+            if (caseId !== null) {
+                // Set loading state to true
+                isLoading.set(true);
+
+                try {
+                    await fetchCaseData(caseId.toString());
+                     
+                } catch (error) {
+                    console.error("Error loading case:", error);
+                } finally {
+                    // Set loading state to false when done
+                    isLoading.set(false);
+                }
+            }
+        },
+    );
 
     // Cleanup function to unsubscribe when the component is destroyed
     onDestroy(() => {
@@ -122,8 +137,6 @@
             variant: "destructive" as const,
         },
     };
-
-    
 </script>
 
 <div>
@@ -162,8 +175,7 @@
                             Patient Consultation
                         </h2>
                         <p class="text-sm text-gray-500">
-                            Persistent Rash with Joint Pain and
-                            Fatigue
+                            Persistent Rash with Joint Pain and Fatigue
                         </p>
                     </div>
                     <div class="flex gap-2">
@@ -195,11 +207,22 @@
                 <!-- Chat Messages -->
                 <ScrollArea class="flex-1 p-4">
                     <div id="messages-container" class="messages space-y-4">
-                        {#each messages as message}
-                            <div class="message-wrapper">
-                                <Message {message} />
+                        {#if $isLoading}
+                            <div class="flex h-[600px] w-full items-center justify-center">
+                                <div class="flex flex-col items-center gap-2 text-muted-foreground">
+                                    <LoaderCircle 
+                                        class="h-10 w-10 animate-spin text-muted-foreground/70" 
+                                    />
+                                    <p class="text-sm">Loading case data...</p>
+                                </div>
                             </div>
-                        {/each}
+                        {:else}
+                            {#each $apiStore.messages as message}
+                                <div class="message-wrapper">
+                                    <Message {message} />
+                                </div>
+                            {/each}
+                        {/if}
                     </div>
                 </ScrollArea>
 
