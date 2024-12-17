@@ -30,6 +30,7 @@ export const casesListStore = writable<CaseListItem[]>([]);
 export const fetchCaseData = async (caseId: string) => {
     try {
         const caseData = await caseDataService.getCaseData(caseId);
+        debugger;
         caseDataStore.set(caseData);
     } catch (error) {
         console.error('Error fetching case data:', error);

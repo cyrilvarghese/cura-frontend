@@ -177,9 +177,11 @@
                             Patient Consultation
                         </h2>
                         <p class="text-sm text-gray-500">
-                            Persistent Rash with Joint Pain and Fatigue
+                            {#if $apiStore.messages.length > 0}
+                                {$apiStore.messages[0].title}
+                            {/if}
                         </p>
-                    </div>
+                    </div>  
                     <div class="flex gap-2">
                         {#if stepButtons[currentStep as keyof typeof stepButtons]}
                             {@const button =
@@ -245,6 +247,7 @@
     />
 
     <DiagnosisDialog
+    
         bind:open={diagnosisDialogOpen}
         onSubmit={handleDiagnosisSubmit}
     />

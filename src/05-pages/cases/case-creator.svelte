@@ -7,6 +7,7 @@
         generatePersona,
         generatePhysicalExam,
         generateCoverImage,
+        generateDifferentialDiagnosis,
         type CaseStoreState,
     } from "$lib/stores/caseCreatorStore";
     import { onDestroy } from "svelte";
@@ -35,6 +36,7 @@
         | "case-summary"
         | "cover-image"
         | "examination-editor"
+        | "differential-diagnosis"
     >("patient-persona");
 
     // Subscribe to the caseStore
@@ -96,6 +98,16 @@
             console.error("Error generating cover image:", error);
         }
     }
+
+    async function handleGenerateDifferentialDiagnosis() {
+        $: currentTab = "differential-diagnosis";
+        if (!uploadedFile || !uploadState.caseId) return;
+        try {
+            await generateDifferentialDiagnosis(uploadedFile, uploadState.caseId);
+        } catch (error) {
+            console.error("Error generating differential diagnosis:", error);
+        }
+    }
 </script>
 
 <div class="flex flex-row items-start justify-start gap-4">
@@ -137,6 +149,25 @@
                     Generating...
                 {:else}
                     Generate Physical Exam Data
+                {/if}
+            </Button>
+            {#if (!uploadState.caseId || !uploadedFile) && !uploadState.generating}
+                <p class="text-xs mt-1 text-muted-foreground">
+                    Please fill in all fields and upload a PDF file
+                </p>
+            {/if}
+        </div>
+        <div class="flex flex-col justify-start mt-4">
+            <Button
+                onclick={handleGenerateDifferentialDiagnosis}
+                disabled={uploadState.generating ||
+                    !uploadState.caseId ||
+                    !uploadedFile}
+            >
+                {#if uploadState.generating}
+                    Generating...
+                {:else}
+                    Generate Differential Diagnosis
                 {/if}
             </Button>
             {#if (!uploadState.caseId || !uploadedFile) && !uploadState.generating}

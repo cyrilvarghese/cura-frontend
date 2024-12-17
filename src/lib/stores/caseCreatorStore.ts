@@ -3,6 +3,8 @@ import { patientPersonaService } from '$lib/services/patientPersonaService'; // 
 import { testDataService } from '$lib/services/testDataService'; // Adjust the import based on your project structure
 import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
 import { coverImageService } from '$lib/services/coverImageService';
+import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
+
 
 
 // Define the store state interface
@@ -18,6 +20,7 @@ export interface CaseStoreState {
         lab_test: any; // Define the structure of lab_test as needed
     } | null; // Allow null if no data is available
     coverImage: CoverImageResponse | null;
+    differentialDiagnosis: any | null;
 }
 
 // Create a writable store with initial state
@@ -29,6 +32,7 @@ const initialState: CaseStoreState = {
     persona: null,
     testData: null,
     coverImage: null,
+    differentialDiagnosis: null,
     caseId: null,
 };
 
@@ -107,4 +111,24 @@ export async function generateCoverImage(caseId: string) {
             generating: false,
         }));
     }
-} 
+}
+
+export async function generateDifferentialDiagnosis(uploadedFile: File, caseId: string) {
+    caseStore.update(state => ({ ...state, generating: true, error: null }));
+
+    try {
+        const response = await differentialDiagnosisService.createDifferentialDiagnosis(caseId, uploadedFile);
+        caseStore.update(state => ({
+            ...state,
+            differentialDiagnosis: response.content,
+            generating: false,
+        }));
+    } catch (error) {
+        caseStore.update(state =>
+        ({
+            ...state,
+            error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
+            generating: false
+        }));
+    }
+}

@@ -20,7 +20,8 @@
             | "lab-results"
             | "case-summary"
             | "cover-image"
-            | "examination-editor";
+            | "examination-editor"
+            | "differential-diagnosis";
     }>();
     onMount(() => {
         console.log(uploadState.caseId);
@@ -37,7 +38,9 @@
 
 <Card.Root class="flex-1">
     <Card.Header>
-        <Card.Title class="text-lg font-semibold">Data for case {$lastCaseIdStore}</Card.Title>
+        <Card.Title class="text-lg font-semibold"
+            >Data for case {$lastCaseIdStore}</Card.Title
+        >
         <Card.Description
             >Upload and analyze patient case documents</Card.Description
         >
@@ -51,8 +54,8 @@
                 <Tabs.Trigger value="physical-exams"
                     >Physical Examination & Lab Tests</Tabs.Trigger
                 >
-                <Tabs.Trigger value="case-summary"
-                    >Case Summary For Feedback</Tabs.Trigger
+                <Tabs.Trigger value="differential-diagnosis"
+                    >Differential Diagnosis</Tabs.Trigger
                 >
             </Tabs.List>
 
@@ -104,10 +107,35 @@
                     {/if}
                 </Tabs.Content>
 
-                <Tabs.Content value="case-summary">
-                    <div class="text-center text-muted-foreground py-8">
-                        <p>Case summary will be available after analysis</p>
-                    </div>
+                <Tabs.Content value="differential-diagnosis">
+                    {#if uploadState.generating}
+                        <LoadingMessage
+                            message="Generating differential diagnosis"
+                        />
+                    {:else if uploadState.error}
+                        <Alert variant="destructive">
+                            <AlertDescription>
+                                {uploadState.error}
+                            </AlertDescription>
+                        </Alert>
+                    {:else if uploadState.differentialDiagnosis}
+                        <div class="rounded-lg pt-4">
+                            <ul class="space-y-2">
+                                {#each uploadState.differentialDiagnosis as diagnosis, index}
+                                    <li class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3">
+                                            {index + 1}
+                                        </span>
+                                        <span class="text-gray-700 dark:text-gray-200">{diagnosis}</span>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    {:else}
+                        <div class="text-center text-muted-foreground py-8">
+                            <p>Differential diagnosis is not available yet</p>
+                        </div>
+                    {/if}
                 </Tabs.Content>
             </div>
         </Tabs.Root>

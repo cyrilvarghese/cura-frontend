@@ -186,18 +186,15 @@
                         alt={message.title}
                         class="w-full h-64 object-contain"
                     />
-                    <div class="p-4">
-                        <h3 class="font-medium text-lg mb-1">
-                            {message.title}
+                    <div class="p-4"> 
+                        <h3 class="font-medium text-md mb-1">
+                            "{message.content}"
+                           
                         </h3>
-                        {#if message.content}
-                            <p class="text-sm text-muted-foreground">
-                                {message.content}
-                            </p>
-                        {/if}
+                        
                         <div class="flex items-center gap-2 mt-2">
-                            <span class="text-xs text-muted-foreground"
-                                >{getRelativeTime(message.timestamp)}</span
+                            <span class="text-sm text-muted-foreground"
+                                >You may ask the patient questions about their condition</span
                             >
                         </div>
                     </div>

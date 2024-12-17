@@ -1,10 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { CoverImageResponse } from '$lib/types/index';
 
-interface CoverImagePromptResponse {
-    image_url: string;
-    prompt: string;
-}
 
 export class CoverImageService {
     private baseUrl = API_BASE_URL;
