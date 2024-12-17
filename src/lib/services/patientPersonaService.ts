@@ -6,7 +6,7 @@ export class PatientPersonaService {
     
         async createPatientPersona(file: File, caseId: string): Promise<FormattedPersonaResponse> {
         const formData = new FormData();
-        formData.append('pdf_file', file);
+        formData.append('file', file);
         formData.append('case_id', caseId);
 
         const response = await fetch(

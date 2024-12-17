@@ -5,16 +5,17 @@ import { currentCaseId } from '$lib/stores/casePlayerStore';
 
 export class PatientApiService {
     private baseUrl = API_BASE_URL;
-    
+
     async askPatient(query: string): Promise<Message> {
         // Get the current thread_id,case_id from the store
         let currentThreadId: string | null = null;
-        
+        let caseId: string | null = null;
+        debugger;
         threadStore.subscribe(value => currentThreadId = value)();
-        
+        currentCaseId.subscribe(value => caseId = value)();
 
         const response = await fetch(
-            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${currentCaseId ? `&case_id=${currentCaseId}` : ''}`,
+            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${caseId ? `&case_id=${caseId}` : ''}`,
             {
                 method: 'GET',
                 headers: {

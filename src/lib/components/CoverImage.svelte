@@ -63,7 +63,6 @@
                 $coverImageData.title ?? "",
                 $coverImageData.quote ?? ""
             );
-            debugger;
             coverImageData.set(response);
             // coverImageData.set({
             //     image_url: cover2,

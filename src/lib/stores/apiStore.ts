@@ -68,7 +68,6 @@ export const apiStore = writable<ApiState>(initialState);
 
 // Subscribe to caseDataStore changes
 caseDataStore.subscribe((caseData: CaseData | null) => {
-    debugger
     if (caseData?.coverMessage) {
         apiStore.update(state => ({
             ...state,
@@ -183,6 +182,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             if (role === 'student') {
                 try {
                     // Make API call to get patient's response
+                    debugger;
                     const response = await patientApi.askPatient(content as string);
 
                     // Remove loading message and update store with patient's response from API

@@ -11,7 +11,6 @@ function createExaminationStore() {
 
     async function performPhysicalExam(examName: ExaminationName) {
         update(state => ({ ...state, isLoading: true, error: null }));
-        debugger;
         try {
             // Get data from caseDataStore instead of examination service
             const caseData = get(caseDataStore);
