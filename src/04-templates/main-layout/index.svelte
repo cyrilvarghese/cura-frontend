@@ -5,10 +5,15 @@
 	import { Route, Router } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte"; // Importing the CasePlayer component
 	import CaseCreatorWrapper from "../../05-pages/cases/case-creator-wrapper.svelte";
+	import { fetchCases } from "$lib/stores/casePlayerStore";
+	import { onMount } from "svelte";
+	onMount(() => {
+		fetchCases();
+	});
 </script>
 
 <Sidebar.Provider>
-	<SidebarLeft />
+	<SidebarLeft   />
 	<Sidebar.Inset>
 		<header
 			class="absolute bg-background top-0 flex h-14 shrink-0 items-center gap-2"

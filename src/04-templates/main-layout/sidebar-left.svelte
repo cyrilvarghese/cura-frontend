@@ -19,9 +19,9 @@
 	import TeamSwitcher from "./team-switcher.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
+	import { casesListStore } from "$lib/stores/casePlayerStore";
 
-	// This is sample data.
-	const data = {
+	const data = $state({
 		teams: [
 			{
 				name: "Dermatology",
@@ -30,8 +30,8 @@
 			},
 			{
 				name: "Internal Medicine",
-				logo: Stethoscope,
-				plan: "Startup",
+					logo: Stethoscope,
+					plan: "Startup",
 			},
 			{
 				name: "Microbiology",
@@ -51,19 +51,18 @@
 				url: "/",
 				icon: Search,
 			},
-			
+
 			{
 				title: "Tools",
 				url: "/tools/case-data-creator",
 				icon: Wrench,
 				badge: "10",
-			}
-			,
+			},
 			{
 				title: "Ask AI",
 				url: "#",
 				icon: Sparkles,
-			}
+			},
 		],
 		navSecondary: [
 			{
@@ -123,7 +122,7 @@
 						name: "Eczema (Atopic Dermatitis)",
 						url: "#",
 						emoji: "📋",
-					} 
+					},
 				],
 			},
 			{
@@ -227,12 +226,20 @@
 				],
 			},
 		],
-	};
+	});
 
 	let {
 		ref = $bindable(null),
 		...restProps
 	}: ComponentProps<typeof Sidebar.Root> = $props();
+
+	casesListStore.subscribe((cases) => {
+		data.favorites = cases.map((c) => ({
+			name: c.title,
+			url: `/cases/${c.case_id}`,
+			emoji: "📄",
+		}));
+	});
 </script>
 
 <Sidebar.Root class="border-r-0" {...restProps}>
