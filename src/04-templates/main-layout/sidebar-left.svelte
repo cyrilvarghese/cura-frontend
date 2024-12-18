@@ -42,13 +42,13 @@
 		navMain: [
 			{
 				title: "Home",
-				url: "#",
+				url: "/",
 				icon: House,
 				isActive: true,
 			},
 			{
 				title: "Search",
-				url: "#",
+				url: "/",
 				icon: Search,
 			},
 			
