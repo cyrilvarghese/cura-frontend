@@ -10,7 +10,6 @@ export class PatientApiService {
         // Get the current thread_id,case_id from the store
         let currentThreadId: string | null = null;
         let caseId: string | null = null;
-        debugger;
         threadStore.subscribe(value => currentThreadId = value)();
         currentCaseId.subscribe(value => caseId = value)();
 

@@ -63,7 +63,12 @@
                 $coverImageData.title ?? "",
                 $coverImageData.quote ?? ""
             );
-            coverImageData.set(response);
+            coverImageData.set({
+                image_url: API_BASE_URL + response.image_url,
+                prompt: response.prompt,
+                title: response.title,
+                quote: response.quote,
+            });
             // coverImageData.set({
             //     image_url: cover2,
             //     prompt: currentPrompt,

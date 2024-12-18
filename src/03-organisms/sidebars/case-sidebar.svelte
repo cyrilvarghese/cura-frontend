@@ -55,7 +55,7 @@
                 return [
                     convertImageDataToPatientFile(
                         file.name,
-                        file.result.content,
+                        file.result.content as ImageData,
                     ),
                 ];
             }

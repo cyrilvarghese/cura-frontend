@@ -15,7 +15,6 @@
     // Subscribe to caseDataStore changes using $ syntax
     $effect(() => {
         console.log("caseDataStore changed");
-        debugger;
         console.log($caseDataStore);
         if ($caseDataStore?.coverMessage?.differentials) {
             diagnoses = $caseDataStore.coverMessage.differentials.map(

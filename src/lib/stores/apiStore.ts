@@ -122,7 +122,7 @@ function updatePatientFile(content: TestResult | ExaminationResult, type: 'exami
         }
     } else if (type === 'test-result') {
         const testContent = content as TestResult;
-        if (isTestResultContent(testContent.results) && testContent.results.type === 'mixed') {
+        if (isTestResultContent(testContent.results) && (testContent.results.type === 'mixed' || testContent.results.type === 'image')) {
             patientFile.update(files => [...files, {
                 name: testContent.testName,
                 result: testContent.results
@@ -182,7 +182,6 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             if (role === 'student') {
                 try {
                     // Make API call to get patient's response
-                    debugger;
                     const response = await patientApi.askPatient(content as string);
 
                     // Remove loading message and update store with patient's response from API

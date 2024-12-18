@@ -76,7 +76,6 @@
         unsubscribe();
     });
     $effect(() => {
-        debugger;
         console.log("Setting current case id to", id);
         currentCaseId.set(id);
     });
