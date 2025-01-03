@@ -3,14 +3,16 @@
     import { Badge } from "$lib/components/ui/badge";
     import TestTube from "lucide-svelte/icons/test-tube";
     import { getRelativeTime } from "$lib/utils/time";
-    import type { TestResultContent } from "$lib/stores/diagnostic-test-data";
     import TestResultsTable from "./test-results-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
-    import type { TestResult } from '$lib/types';
+    import type { TestResult, TestResultContent } from '$lib/types';
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { get } from "svelte/store";
     
     export let result: TestResult;
    
-
+    export let caseId: string = get(currentCaseId) ?? "";
+    debugger
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
         pending: "bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20",
@@ -18,7 +20,7 @@
     };
 
     function renderResult(
-        result: TestResultContent,
+        result: TestResultContent
     ): string | TestResultContent {
         switch (result.type) {
             case "text":
@@ -33,6 +35,8 @@
                 return "Unsupported result type";
         }
     }
+    
+    
 
     const resultContent = renderResult(result.results);
 </script>
@@ -62,11 +66,20 @@
             {:else if resultContent.type === "table"}
                 <TestResultsTable data={resultContent.content} />
             {:else if resultContent.type === "image"}
+        
                 <MedicalImageViewer
                     imageUrl={resultContent.content.url}
                     altText={resultContent.content.altText}
                     caption={resultContent.content.caption}
-                    subtitle={getRelativeTime(result.timestamp)}
+                    subtitle={getRelativeTime(result.timestamp ?? new Date())}
+                    caseId={caseId}
+                    testName={result.testName}
+                    testType="lab_test"
+                    onUploadSuccess={(response) => {
+                        // Handle successful upload
+                        console.log('Upload successful:', response);
+                        // Update your UI with the new image URL
+                    }}
                 />
             {:else if resultContent.type === "mixed"}
                 <div class="space-y-4">
@@ -84,7 +97,15 @@
                                 imageUrl={item.content.url}
                                 altText={item.content.altText}
                                 caption={item.content.caption}
-                                subtitle={getRelativeTime(result.timestamp)}
+                                subtitle={getRelativeTime(result.timestamp ?? new Date())}
+                                caseId={caseId}
+                                testName={result.testName}
+                                testType="lab_test"
+                                onUploadSuccess={(response) => {
+                                    // Handle successful upload
+                                    console.log('Upload successful:', response);
+                                    // Update your UI with the new image URL
+                                }}
                             />
                         {/if}
                     {/each}
@@ -104,7 +125,7 @@
     </Card.Content>
     <Card.Footer>
         <p class="text-sm text-muted-foreground">
-            {getRelativeTime(result.timestamp)}
+            {getRelativeTime(result.timestamp ?? new Date())}
         </p>
     </Card.Footer>
 </Card.Root>

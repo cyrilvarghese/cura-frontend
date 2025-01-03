@@ -6,9 +6,10 @@
     import FindingsTable from "./findings-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
     import type { ExaminationResult, FindingContent } from "$lib/types";
-
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { get } from "svelte/store";
     export let result: ExaminationResult;
-
+    export let caseId: string = get(currentCaseId) ?? "";
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":
@@ -56,6 +57,9 @@
                 <FindingsTable data={findingContent.content} />
             {:else if findingContent.type === "image"}
                 <MedicalImageViewer
+                    caseId={caseId}
+                    testName={result.name}
+                    testType="physical_exam"
                     imageUrl={findingContent.content.url}
                     altText={findingContent.content.altText}
                     caption={findingContent.content.caption}
@@ -74,6 +78,9 @@
                             <FindingsTable data={item.content} />
                         {:else if item.type === "image"}
                             <MedicalImageViewer
+                                caseId={caseId}
+                                testName={result.name}
+                                testType="physical_exam"
                                 imageUrl={item.content.url}
                                 altText={item.content.altText}
                                 caption={item.content.caption}

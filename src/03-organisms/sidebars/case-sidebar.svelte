@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
+    import { API_BASE_URL } from "$lib/config/api";
     import { patientFile } from "$lib/stores/apiStore";
     import type { ImageData, PatientFileItem } from "$lib/types";
     
@@ -76,15 +77,15 @@
         class="w-full h-[calc(100%-100px)] rounded-md "
         orientation="vertical"
     >
-        <div id="patient-files-container">
+        <div id="patient-files-container" class="pt-8">
             {#each allFiles as file (file.url)}
-                <h3 class="text-sm font-semibold pb-2">{file.name}</h3>
+                <h3 class="text-sm font-semibold pb-2 text-muted-foreground">{file.name}</h3>
                 <figure class="shrink-0 pb-10">
                     <div
-                        class="overflow-hidden flex justify-center items-center rounded-md"
+                        class="overflow-hidden flex justify-start items-center rounded-md"
                     >
                         <img
-                            src={file.url}
+                            src={API_BASE_URL + file.url}
                             alt={file.caption}
                             class="aspect-[16/9] rounded-md h-fit w-fit object-cover"
                             width={300}
