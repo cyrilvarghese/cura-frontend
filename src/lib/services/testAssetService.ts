@@ -6,13 +6,20 @@ export interface UploadTestAssetResponse {
     test_type: string;
 }
 
+export interface UploadTestAssetFromUrlRequest {
+    case_id: string;
+    test_name: string;
+    test_type: 'physical_exam' | 'lab_test';
+    image_url: string;
+}
+
 export class TestAssetService {
     private baseUrl = API_BASE_URL;
 
     async uploadTestAsset(
-        file: File, 
-        caseId: string, 
-        testName: string, 
+        file: File,
+        caseId: string,
+        testName: string,
         testType: 'physical_exam' | 'lab_test'
     ): Promise<UploadTestAssetResponse> {
         const formData = new FormData();
@@ -31,6 +38,27 @@ export class TestAssetService {
 
         if (!response.ok) {
             throw new Error('Failed to upload test asset');
+        }
+
+        return await response.json();
+    }
+
+    async uploadTestAssetFromUrl(
+        request: UploadTestAssetFromUrlRequest
+    ): Promise<UploadTestAssetResponse> {
+        const response = await fetch(
+            `${this.baseUrl}/test-image/upload-from-url`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(request)
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to upload test asset from URL');
         }
 
         return await response.json();

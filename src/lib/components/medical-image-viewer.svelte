@@ -2,7 +2,10 @@
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
     import { Upload } from "lucide-svelte";
-    import { testAssetService, type UploadTestAssetResponse } from '$lib/services/testAssetService';
+    import {
+        testAssetService,
+        type UploadTestAssetResponse,
+    } from "$lib/services/testAssetService";
     import { API_BASE_URL } from "$lib/config/api";
     const {
         imageUrl: initialImageUrl,
@@ -12,7 +15,8 @@
         caseId,
         testName,
         testType,
-        onUploadSuccess
+        onUploadSuccess,
+        onUploadError,
     } = $props<{
         imageUrl: string;
         altText: string;
@@ -20,8 +24,9 @@
         subtitle?: string;
         caseId: string;
         testName: string;
-        testType: 'physical_exam' | 'lab_test';
+        testType: "physical_exam" | "lab_test";
         onUploadSuccess?: (response: UploadTestAssetResponse) => void;
+        onUploadError?: (error: string) => void;
     }>();
 
     let currentImageUrl = $state(initialImageUrl);
@@ -37,26 +42,54 @@
         try {
             isUploading = true;
             uploadError = null;
-            debugger
-            
+            debugger;
+
             const response = await testAssetService.uploadTestAsset(
                 file,
                 caseId,
                 testName,
-                testType
+                testType,
             );
-            debugger
+            debugger;
             console.log(response);
             onUploadSuccess?.(response);
             currentImageUrl = response.file_path;
             if (currentImageUrl) {
                 imageError = false;
             }
-            debugger
+            debugger;
         } catch (error) {
-            console.error('Upload failed:', error);
-            uploadError = 'Failed to upload image';
-            isUploading = false;    
+            console.error("Upload failed:", error);
+            uploadError = "Failed to upload image";
+            onUploadError?.(error);
+            isUploading = false;
+        } finally {
+            isUploading = false;
+        }
+    }
+
+    async function uploadImageFromUrl(imageUrl: string) {
+        try {
+            isUploading = true;
+            uploadError = null;
+
+            const response = await testAssetService.uploadTestAssetFromUrl({
+                case_id: caseId,
+                test_name: testName,
+                test_type: testType,
+                image_url: imageUrl,
+            });
+
+            currentImageUrl = response.file_path;
+            imageError = false;
+
+            if (onUploadSuccess) {
+                onUploadSuccess(response);
+            }
+        } catch (error) {
+            console.error("URL upload failed:", error);
+            uploadError = "Failed to upload image from URL";
+            onUploadError?.(error);
         } finally {
             isUploading = false;
         }
@@ -80,10 +113,12 @@
             </div>
         </Dialog.Trigger>
     {:else}
-        <div class="w-full h-full min-h-[200px] flex items-center justify-start bg-muted rounded-md">
+        <div
+            class="w-full h-full min-h-[200px] flex items-center justify-start bg-muted rounded-md"
+        >
             <div class="w-full space-y-4 p-4 border rounded-md">
                 <h3 class="text-lg font-medium mb-4">Add Image</h3>
-                
+
                 <!-- File Upload Option -->
                 <div class="space-y-2">
                     <label for="file-upload" class="block text-sm font-medium">
@@ -106,7 +141,7 @@
                             variant="outline"
                             class="gap-2"
                             onclick={() => {
-                                document.getElementById('file-upload')?.click();
+                                document.getElementById("file-upload")?.click();
                             }}
                         >
                             <Upload class="h-4 w-4" />
@@ -130,10 +165,13 @@
                         <Button
                             variant="outline"
                             onclick={() => {
-                                const url = (document.getElementById('image-url') as HTMLInputElement)?.value;
+                                const url = (
+                                    document.getElementById(
+                                        "image-url",
+                                    ) as HTMLInputElement
+                                )?.value;
                                 if (url) {
-                                    console.log('URL entered:', url);
-                                    // Add your URL handling logic here
+                                    uploadImageFromUrl(url);
                                 }
                             }}
                         >
@@ -190,9 +228,7 @@
 
 <!-- Show upload status -->
 {#if isUploading}
-    <div class="text-sm text-muted-foreground">
-        Uploading...
-    </div>
+    <div class="text-sm text-muted-foreground">Uploading...</div>
 {/if}
 
 {#if uploadError}
