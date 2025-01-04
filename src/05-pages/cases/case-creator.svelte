@@ -82,6 +82,13 @@
     }
 
     function handleCaseIdChange(newCaseId: string) {
+        //check if its a number 
+        if (isNaN(Number(newCaseId))) {
+            alert("Case ID must be a number");
+            //reset the case id
+            updateCaseId("");
+            return;
+        }
         updateCaseId(newCaseId);
     }
 
@@ -238,7 +245,7 @@
             </Card.Root>
         </div>
 
-        <div class="flex flex-col justify-start mt-4">
+        <div class="flex flex-col justify-start mt-4 mb-12">
             <Button
                 onclick={handleGenerateAll}
                 disabled={uploadState.generating ||
@@ -251,6 +258,11 @@
                     Generate All Data
                 {/if}
             </Button>
+            {#if (!uploadState.caseId || !uploadState.uploadedFile) && !uploadState.generating}
+                <p class="text-xs mt-1 text-muted-foreground">
+                    Please fill in all fields and upload a PDF file
+                </p>
+            {/if}
         </div>
 
         <div class="flex flex-col justify-start mt-4">
