@@ -30,6 +30,9 @@
         differentialDiagnosis: null,
         uploadedFile: null,
         uploadedFileName: null,
+        isGeneratingPersona: false,
+        isGeneratingPhysicalExam: false,
+        isGeneratingDifferential: false,
     };
 
     let uploadState = $state(initialValue);
@@ -43,11 +46,6 @@
         | "differential-diagnosis"
     >("patient-persona");
     let uploadedFileName: string | null = $state(null);
-
-    // Add these new states to track individual loading states
-    let isGeneratingPersona = $state(false);
-    let isGeneratingPhysicalExam = $state(false);
-    let isGeneratingDifferential = $state(false);
 
     // Subscribe to the caseStore
     const unsubscribe = caseStore.subscribe((state) => {
@@ -93,20 +91,18 @@
         uploadState.error = null;
 
         try {
-            // Update persona loading state
-            isGeneratingPersona = true;
+            // Update store loading states instead of local ones
+            uploadState.isGeneratingPersona = true;
             await handleGeneratePersona();
-            isGeneratingPersona = false;
+            uploadState.isGeneratingPersona = false;
 
-            // Update physical exam loading state
-            isGeneratingPhysicalExam = true;
+            uploadState.isGeneratingPhysicalExam = true;
             await handleGenerateCaseData();
-            isGeneratingPhysicalExam = false;
+            uploadState.isGeneratingPhysicalExam = false;
 
-            // Update differential diagnosis loading state
-            isGeneratingDifferential = true;
+            uploadState.isGeneratingDifferential = true;
             await handleGenerateDifferentialDiagnosis();
-            isGeneratingDifferential = false;
+            uploadState.isGeneratingDifferential = false;
         } catch (error) {
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
@@ -114,15 +110,16 @@
         } finally {
             uploadState.generating = false;
             // Reset all loading states in case of error
-            isGeneratingPersona = false;
-            isGeneratingPhysicalExam = false;
-            isGeneratingDifferential = false;
+            uploadState.isGeneratingPersona = false;
+            uploadState.isGeneratingPhysicalExam = false;
+            uploadState.isGeneratingDifferential = false;
         }
     }
 
     async function handleGeneratePersona() {
         if (!uploadState.uploadedFile || !uploadState.caseId) return;
         currentTab = "patient-persona";
+        uploadState.isGeneratingPersona = true;
 
         try {
             await generatePersona(uploadState.uploadedFile, uploadState.caseId);
@@ -130,12 +127,15 @@
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
             throw error;
+        } finally {
+            uploadState.isGeneratingPersona = false;
         }
     }
 
     async function handleGenerateCaseData() {
-        currentTab = "physical-exams";
         if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        currentTab = "physical-exams";
+        uploadState.isGeneratingPhysicalExam = true;
 
         try {
             await generatePhysicalExam(
@@ -145,12 +145,15 @@
         } catch (error) {
             console.error("Error generating physical exam:", error);
             throw error;
+        } finally {
+            uploadState.isGeneratingPhysicalExam = false;
         }
     }
 
     async function handleGenerateDifferentialDiagnosis() {
-        currentTab = "differential-diagnosis";
         if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        currentTab = "differential-diagnosis";
+        uploadState.isGeneratingDifferential = true;
 
         try {
             await generateDifferentialDiagnosis(
@@ -160,6 +163,8 @@
         } catch (error) {
             console.error("Error generating differential diagnosis:", error);
             throw error;
+        } finally {
+            uploadState.isGeneratingDifferential = false;
         }
     }
 </script>
@@ -255,8 +260,8 @@
                     !uploadState.caseId ||
                     !uploadState.uploadedFile}
             >
-                {#if isGeneratingPersona}
-                    Generating...
+                {#if uploadState.isGeneratingPersona}
+                    Generating Patient Persona...
                 {:else}
                     Generate Patient Persona
                 {/if}
@@ -274,8 +279,8 @@
                     !uploadState.caseId ||
                     !uploadState.uploadedFile}
             >
-                {#if isGeneratingPhysicalExam}
-                    Generating...
+                {#if uploadState.isGeneratingPhysicalExam}
+                    Generating Physical Exam Data...
                 {:else}
                     Generate Physical Exam Data
                 {/if}
@@ -293,8 +298,8 @@
                     !uploadState.caseId ||
                     !uploadState.uploadedFile}
             >
-                {#if isGeneratingDifferential}
-                    Generating...
+                {#if uploadState.isGeneratingDifferential}
+                    Extracting Differential Diagnosis...
                 {:else}
                     Generate Differential Diagnosis
                 {/if}

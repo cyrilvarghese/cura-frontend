@@ -61,7 +61,7 @@
 
             <div class="mt-4 h-[calc(100vh-354px)] overflow-y-auto">
                 <Tabs.Content value="patient-persona">
-                    {#if uploadState.generating}
+                    {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
                     {:else if uploadState.error}
                         <Alert variant="destructive">
@@ -70,9 +70,7 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.persona}
-                        {@debug uploadState}
                         <CoverImage />
-
                         <div class="rounded-lg pt-4">
                             <MarkdownContent
                                 content={syncMarked(
@@ -88,7 +86,7 @@
                 </Tabs.Content>
 
                 <Tabs.Content value="physical-exams">
-                    {#if uploadState.generating}
+                    {#if uploadState.isGeneratingPhysicalExam}
                         <LoadingMessage
                             message="Generating physical examinations and lab tests"
                         />
@@ -108,7 +106,7 @@
                 </Tabs.Content>
 
                 <Tabs.Content value="differential-diagnosis">
-                    {#if uploadState.generating}
+                    {#if uploadState.isGeneratingDifferential}
                         <LoadingMessage
                             message="Generating differential diagnosis"
                         />
@@ -122,11 +120,18 @@
                         <div class="rounded-lg pt-4">
                             <ul class="space-y-2">
                                 {#each uploadState.differentialDiagnosis as diagnosis, index}
-                                    <li class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3">
+                                    <li
+                                        class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3"
+                                        >
                                             {index + 1}
                                         </span>
-                                        <span class="text-gray-700 dark:text-gray-200">{diagnosis}</span>
+                                        <span
+                                            class="text-gray-700 dark:text-gray-200"
+                                            >{diagnosis}</span
+                                        >
                                     </li>
                                 {/each}
                             </ul>

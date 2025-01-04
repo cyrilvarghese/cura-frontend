@@ -23,6 +23,9 @@ export interface CaseStoreState {
     differentialDiagnosis: any | null;
     uploadedFile: File | null;
     uploadedFileName: string | null;
+    isGeneratingPersona: boolean;
+    isGeneratingPhysicalExam: boolean;
+    isGeneratingDifferential: boolean;
 }
 
 // Create a writable store with initial state
@@ -38,6 +41,9 @@ const initialState: CaseStoreState = {
     caseId: null,
     uploadedFile: null,
     uploadedFileName: null,
+    isGeneratingPersona: false,
+    isGeneratingPhysicalExam: false,
+    isGeneratingDifferential: false,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -70,7 +76,7 @@ export function resetStore() {
 
 // Function to generate a persona
 export async function generatePersona(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null }));
+    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPersona: true }));
     lastCaseIdStore.set(caseId);
     try {
         const response = await patientPersonaService.createPatientPersona(uploadedFile, caseId);
@@ -83,19 +89,21 @@ export async function generatePersona(uploadedFile: File, caseId: string) {
                 type: "ai",
             },
             generating: false,
+            isGeneratingPersona: false,
         }));
     } catch (error) {
         caseStore.update(state => ({
             ...state,
             error: error instanceof Error ? error.message : "Generation failed",
             generating: false,
+            isGeneratingPersona: false,
         }));
     }
 }
 
 // Function to generate a physical exam
 export async function generatePhysicalExam(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null }));
+    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPhysicalExam: true }));
 
     try {
         const response = await testDataService.createExamTestData(caseId, uploadedFile);
@@ -105,13 +113,15 @@ export async function generatePhysicalExam(uploadedFile: File, caseId: string) {
                 physical_exam: response.content.physical_exam,
                 lab_test: response.content.lab_test
             },
-            generating: false
+            generating: false,
+            isGeneratingPhysicalExam: false,
         }));
     } catch (error) {
         caseStore.update(state => ({
             ...state,
             error: error instanceof Error ? error.message : "Generation failed",
             generating: false,
+            isGeneratingPhysicalExam: false,
         }));
     }
 }
@@ -143,7 +153,7 @@ export async function generateCoverImage(caseId: string) {
 }
 
 export async function generateDifferentialDiagnosis(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null }));
+    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingDifferential: true }));
 
     try {
         const response = await differentialDiagnosisService.createDifferentialDiagnosis(caseId, uploadedFile);
@@ -151,13 +161,15 @@ export async function generateDifferentialDiagnosis(uploadedFile: File, caseId: 
             ...state,
             differentialDiagnosis: response.content,
             generating: false,
+            isGeneratingDifferential: false,
         }));
     } catch (error) {
         caseStore.update(state =>
         ({
             ...state,
             error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
-            generating: false
+            generating: false,
+            isGeneratingDifferential: false,
         }));
     }
 }
