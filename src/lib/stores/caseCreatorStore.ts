@@ -21,6 +21,8 @@ export interface CaseStoreState {
     } | null; // Allow null if no data is available
     coverImage: CoverImageResponse | null;
     differentialDiagnosis: any | null;
+    uploadedFile: File | null;
+    uploadedFileName: string | null;
 }
 
 // Create a writable store with initial state
@@ -34,10 +36,37 @@ const initialState: CaseStoreState = {
     coverImage: null,
     differentialDiagnosis: null,
     caseId: null,
+    uploadedFile: null,
+    uploadedFileName: null,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
 export const lastCaseIdStore = writable<string | null>(null);
+
+// Function to update case ID
+export function updateCaseId(caseId: string) {
+    caseStore.update(state => ({
+        ...state,
+        caseId
+    }));
+    lastCaseIdStore.set(caseId);
+}
+
+// Function to update uploaded file
+export function updateUploadedFile(file: File) {
+    caseStore.update(state => ({
+        ...state,
+        uploadedFile: file,
+        uploadedFileName: file.name,
+        fileUploaded: true
+    }));
+}
+
+// Function to reset store
+export function resetStore() {
+    caseStore.set(initialState);
+    lastCaseIdStore.set(null);
+}
 
 // Function to generate a persona
 export async function generatePersona(uploadedFile: File, caseId: string) {
