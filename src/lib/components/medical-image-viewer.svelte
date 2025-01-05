@@ -9,7 +9,8 @@
     import { API_BASE_URL } from "$lib/config/api";
     import { searchMedicalImages } from "$lib/stores/caseCreatorStore";
     import type { ImageSearchResponse } from "$lib/services/imageSearchService";
-
+    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
+    import { get } from "svelte/store";
     const {
         imageUrl: initialImageUrl,
         altText,
@@ -72,7 +73,6 @@
             isUploading = true;
             uploadError = null;
             debugger;
-
             const response = await testAssetService.uploadTestAsset(
                 file,
                 caseId,
@@ -101,6 +101,7 @@
         try {
             isUploading = true;
             uploadError = null;
+            const caseId = get(lastCaseIdStore) ?? "";
 
             const response = await testAssetService.uploadTestAssetFromUrl({
                 case_id: caseId,

@@ -8,10 +8,11 @@
     import type { TestResult, TestResultContent } from '$lib/types';
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
+    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     
     export let result: TestResult;
    
-    export let caseId: string = get(currentCaseId) ?? "";
+    export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     debugger
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
