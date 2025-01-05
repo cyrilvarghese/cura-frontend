@@ -69,7 +69,7 @@
         
                 <MedicalImageViewer
                     imageUrl={resultContent.content.url}
-                    altText={resultContent.content.altText}
+                    altText=""
                     caption={resultContent.content.caption}
                     subtitle={getRelativeTime(result.timestamp ?? new Date())}
                     caseId={caseId}
