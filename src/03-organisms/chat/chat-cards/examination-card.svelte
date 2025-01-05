@@ -8,8 +8,9 @@
     import type { ExaminationResult, FindingContent } from "$lib/types";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
+    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     export let result: ExaminationResult;
-    export let caseId: string = get(currentCaseId) ?? "";
+    export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":

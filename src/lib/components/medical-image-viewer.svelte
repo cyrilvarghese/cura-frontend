@@ -101,8 +101,7 @@
         try {
             isUploading = true;
             uploadError = null;
-            const caseId = get(lastCaseIdStore) ?? "";
-
+            
             const response = await testAssetService.uploadTestAssetFromUrl({
                 case_id: caseId,
                 test_name: testName,
@@ -132,7 +131,7 @@
             <div class="group space-y-1.5">
                 <div class="relative overflow-hidden rounded-md">
                     <div class="relative w-full h-full">
-                        <!-- sometimes the image url is 
+                        <!-- sometimes the image url is     
                          not a full url(when the image is 
                          from the actual server and not 
                          from the our server, so we need to
