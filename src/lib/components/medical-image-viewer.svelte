@@ -50,7 +50,7 @@
             isSearching = true;
             searchError = null;
             const results = await searchMedicalImages(searchQuery);
-            searchResults = results;
+            searchResults = results ?? null;
         } catch (error) {
             searchError =
                 error instanceof Error ? error.message : "Search failed";

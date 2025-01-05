@@ -194,11 +194,6 @@ export async function searchMedicalImages(query: string) {
         return response;
     } catch (error) {
         console.error('Image search failed:', error);
-        caseStore.update(state => ({
-            ...state,
-            error: error instanceof Error ? error.message : "Image search failed",
-            isSearchingImages: false,
-        }));
-        throw error;
+      
     }
 }
