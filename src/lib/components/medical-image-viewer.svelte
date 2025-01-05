@@ -1,12 +1,15 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { Upload } from "lucide-svelte";
+    import { Upload, Search } from "lucide-svelte";
     import {
         testAssetService,
         type UploadTestAssetResponse,
     } from "$lib/services/testAssetService";
     import { API_BASE_URL } from "$lib/config/api";
+    import { searchMedicalImages } from "$lib/stores/caseCreatorStore";
+    import type { ImageSearchResponse } from "$lib/services/imageSearchService";
+
     const {
         imageUrl: initialImageUrl,
         altText,
@@ -33,6 +36,32 @@
     let imageError = $state(false);
     let isUploading = $state(false);
     let uploadError = $state<string | null>(null);
+    let searchDialogOpen = $state(false);
+    let searchQuery = $state("");
+    let searchResults = $state<ImageSearchResponse | null>(null);
+    let isSearching = $state(false);
+    let searchError = $state<string | null>(null);
+
+    async function handleSearch() {
+        if (!searchQuery.trim()) return;
+
+        try {
+            isSearching = true;
+            searchError = null;
+            const results = await searchMedicalImages(searchQuery);
+            searchResults = results;
+        } catch (error) {
+            searchError =
+                error instanceof Error ? error.message : "Search failed";
+        } finally {
+            isSearching = false;
+        }
+    }
+
+    async function selectAndUploadImage(imageUrl: string) {
+        searchDialogOpen = false;
+        await uploadImageFromUrl(imageUrl);
+    }
 
     function handleImageError() {
         imageError = true;
@@ -102,8 +131,17 @@
             <div class="group space-y-1.5">
                 <div class="relative overflow-hidden rounded-md">
                     <div class="relative w-full h-full">
+                        <!-- sometimes the image url is 
+                         not a full url(when the image is 
+                         from the actual server and not 
+                         from the our server, so we need to
+                          add the base url -->
+                          {@debug currentImageUrl}
                         <img
-                            src={API_BASE_URL + currentImageUrl}
+                            src={currentImageUrl.startsWith("http") ||
+                            currentImageUrl.startsWith("www")
+                                ? currentImageUrl
+                                : API_BASE_URL + currentImageUrl}
                             alt={altText}
                             class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-[1.02] cursor-zoom-in"
                             onerror={handleImageError}
@@ -179,6 +217,18 @@
                         </Button>
                     </div>
                 </div>
+
+                <!-- Search Images Button -->
+                <div class="space-y-2">
+                    <Button
+                        variant="outline"
+                        class="gap-2 w-full"
+                        onclick={() => (searchDialogOpen = true)}
+                    >
+                        <Search class="h-4 w-4" />
+                        Search Medical Images
+                    </Button>
+                </div>
             </div>
         </div>
     {/if}
@@ -212,7 +262,10 @@
             class="relative w-full overflow-auto h-fit max-h-[calc(90vh-150px)] rounded-lg"
         >
             <img
-                src={API_BASE_URL + currentImageUrl}
+                src={currentImageUrl.startsWith("http") ||
+                currentImageUrl.startsWith("www")
+                    ? currentImageUrl
+                    : API_BASE_URL + currentImageUrl}
                 alt={altText}
                 class="w-full h-auto object-cover"
             />
@@ -221,6 +274,79 @@
         <Dialog.Footer class="flex justify-start items-start">
             <Dialog.Close>
                 <Button variant="outline">Close</Button>
+            </Dialog.Close>
+        </Dialog.Footer>
+    </Dialog.Content>
+</Dialog.Root>
+
+<!-- Image Search Dialog -->
+<Dialog.Root bind:open={searchDialogOpen}>
+    <Dialog.Content class="sm:max-w-[800px]">
+        <Dialog.Header>
+            <Dialog.Title>Search Medical Images</Dialog.Title>
+            <Dialog.Description>
+                Search for relevant medical images to add to your case.
+            </Dialog.Description>
+        </Dialog.Header>
+
+        <div class="grid gap-4 py-4">
+            <div class="flex gap-2">
+                <input
+                    type="text"
+                    placeholder="Enter search terms..."
+                    class="flex-1 px-3 py-2 border rounded-md"
+                    bind:value={searchQuery}
+                    onkeydown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <Button
+                    variant="default"
+                    onclick={handleSearch}
+                    disabled={isSearching}
+                >
+                    {#if isSearching}
+                        <span class="animate-spin mr-2">⌛</span>
+                    {/if}
+                    Search
+                </Button>
+            </div>
+
+            {#if searchError}
+                <p class="text-sm text-destructive">{searchError}</p>
+            {/if}
+
+            {#if searchResults}
+                <div
+                    class="grid grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto"
+                >
+                    {#each searchResults.images as image}
+                        <div class="border rounded-md p-2 space-y-2">
+                            <img
+                                src={image.url}
+                                alt={image.title}
+                                class="w-full h-48 object-cover rounded-md"
+                            />
+                            <p class="text-sm font-medium truncate">
+                                {image.title}
+                            </p>
+                            <p class="text-xs text-muted-foreground truncate">
+                                Source: {image.source}
+                            </p>
+                            <Button
+                                variant="outline"
+                                class="w-full"
+                                onclick={() => selectAndUploadImage(image.url)}
+                            >
+                                Select Image
+                            </Button>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+
+        <Dialog.Footer>
+            <Dialog.Close>
+                <Button variant="outline">Cancel</Button>
             </Dialog.Close>
         </Dialog.Footer>
     </Dialog.Content>

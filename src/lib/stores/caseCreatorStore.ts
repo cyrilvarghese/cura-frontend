@@ -4,6 +4,7 @@ import { testDataService } from '$lib/services/testDataService'; // Adjust the i
 import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
+import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
 
 
 
@@ -26,6 +27,8 @@ export interface CaseStoreState {
     isGeneratingPersona: boolean;
     isGeneratingPhysicalExam: boolean;
     isGeneratingDifferential: boolean;
+    searchedImages: ImageSearchResponse | null;
+    isSearchingImages: boolean;
 }
 
 // Create a writable store with initial state
@@ -44,6 +47,8 @@ const initialState: CaseStoreState = {
     isGeneratingPersona: false,
     isGeneratingPhysicalExam: false,
     isGeneratingDifferential: false,
+    searchedImages: null,
+    isSearchingImages: false,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -171,5 +176,29 @@ export async function generateDifferentialDiagnosis(uploadedFile: File, caseId: 
             generating: false,
             isGeneratingDifferential: false,
         }));
+    }
+}
+
+// Function to search medical images
+export async function searchMedicalImages(query: string) {
+    caseStore.update(state => ({ ...state, isSearchingImages: true, error: null }));
+
+    try {
+        const response = await imageSearchService.searchMedicalImages(query);
+        console.log('Image search results:', response);
+        caseStore.update(state => ({
+            ...state,
+            searchedImages: response,
+            isSearchingImages: false,
+        }));
+        return response;
+    } catch (error) {
+        console.error('Image search failed:', error);
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Image search failed",
+            isSearchingImages: false,
+        }));
+        throw error;
     }
 }
