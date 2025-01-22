@@ -142,7 +142,7 @@
 
 <div>
     <div
-        class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh-36px)]"
+        class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh)]"
     >
         <div class="pl-[64px]">
             <Breadcrumb.Root>
@@ -209,9 +209,9 @@
 
                 <!-- Chat Messages -->
                 <ScrollArea class="flex-1 p-4">
-                    <div id="messages-container" class="messages space-y-4">
+                    <div id="messages-container" class="messages space-y-4 max-h-[calc(100vh-3  00px)]">
                         {#if $isLoading}
-                            <div class="flex h-[600px] w-full items-center justify-center">
+                            <div class="flex h-[600px] max w-full items-center justify-center">
                                 <div class="flex flex-col items-center gap-2 text-muted-foreground">
                                     <LoaderCircle 
                                         class="h-10 w-10 animate-spin text-muted-foreground/70" 

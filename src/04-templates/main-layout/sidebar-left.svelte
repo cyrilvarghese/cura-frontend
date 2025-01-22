@@ -30,8 +30,8 @@
 			},
 			{
 				name: "Internal Medicine",
-					logo: Stethoscope,
-					plan: "Startup",
+				logo: Stethoscope,
+				plan: "Startup",
 			},
 			{
 				name: "Microbiology",
