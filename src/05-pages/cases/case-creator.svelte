@@ -82,7 +82,7 @@
     }
 
     function handleCaseIdChange(newCaseId: string) {
-        //check if its a number 
+        //check if its a number
         if (isNaN(Number(newCaseId))) {
             alert("Case ID must be a number");
             //reset the case id

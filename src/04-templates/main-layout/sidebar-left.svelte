@@ -20,6 +20,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
 	import { casesListStore } from "$lib/stores/casePlayerStore";
+	import { currentTeam } from "$lib/stores/teamStore";
 
 	const data = $state({
 		teams: [
@@ -233,12 +234,27 @@
 		...restProps
 	}: ComponentProps<typeof Sidebar.Root> = $props();
 
-	casesListStore.subscribe((cases) => {
-		data.favorites = cases.map((c) => ({
-			name: c.title,
-			url: `/cases/${c.case_id}`,
-			emoji: "📄",
-		}));
+	$effect(() => {
+		casesListStore.subscribe((cases) => {
+			const filteredCases = 
+				$currentTeam?.name === "Dermatology"
+					? cases.filter((c) => {
+						const id = Number(c.case_id);
+						return id >= 1 && id <= 5;
+					})
+					: $currentTeam?.name === "Internal Medicine"
+					? cases.filter((c) => {
+						const id = Number(c.case_id);
+						return id >= 6 && id <= 10;
+					})
+					: cases;
+
+			data.favorites = filteredCases.map((c) => ({
+				name: c.title,
+				url: `/cases/${c.case_id}`,
+				emoji: "📄",
+			}));
+		});
 	});
 </script>
 

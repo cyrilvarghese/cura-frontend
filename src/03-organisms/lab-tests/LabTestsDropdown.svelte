@@ -29,11 +29,12 @@
         {#snippet child({ props })}
             <Button
                 variant="ghost"
-                size="icon"
-                class="h-8 w-8 p-0"
+                size="default"
+                
                 {...props}
             >
                 <TestTubeDiagonal class="h-5 w-5" />
+                <p>Lab Tests</p>
             </Button>
         {/snippet}
     </DropdownMenu.Trigger>

@@ -165,7 +165,7 @@
                 </Breadcrumb.List>
             </Breadcrumb.Root>
         </div>
-        <div class="flex gap-4 w-full h-full">
+        <div class="flex gap-4 w-full h-full h-[calc(100vh-64px)]">
             <div class="bg-muted/50 rounded-xl w-[70%] h-full flex flex-col">
                 <!-- Title Section with Action Buttons -->
                 <div

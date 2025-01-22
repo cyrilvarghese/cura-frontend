@@ -12,7 +12,7 @@
     import type { ExaminationResult } from "$lib/types";
     import { apiStore } from "$lib/stores/apiStore";
     import LabTestsDropdown from "../lab-tests/LabTestsDropdown.svelte";
-    import PhysicalExamDropdown from '../physical-exam/PhysicalExamDropdown.svelte';
+    import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
 
     let textValue = "";
     let isLoading = false;
@@ -107,7 +107,7 @@
     <Textarea
         bind:ref={textareaRef}
         bind:value={textValue}
-        class="flex-1 pl-24 pt-7 pr-12"
+        class="flex-1 pl-[320px] pt-8 pr-12"
         placeholder="Type your message... (Ctrl+Enter to send)"
         disabled={isLoading}
         onkeydown={handleKeyDown}
@@ -116,23 +116,22 @@
         <Tooltip.Provider>
             <Tooltip.Root>
                 <Tooltip.Trigger>
+                    <PhysicalExamDropdown onExamination={handlePhysicalExam} />
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    <p>Perform Physical Examination</p>
+                </Tooltip.Content>
+            </Tooltip.Root>
+            <p class="text-gray-500 pt-2">|</p>
+            <Tooltip.Root>
+                <Tooltip.Trigger>
                     <LabTestsDropdown onOrderTest={handleLabTest} />
                 </Tooltip.Trigger>
                 <Tooltip.Content>
-                    <p>Add tests</p>
+                    <p>Order Lab Tests</p>
                 </Tooltip.Content>
             </Tooltip.Root>
-
-            <Tooltip.Root>
-                <Tooltip.Trigger>
-                    <PhysicalExamDropdown 
-                        onExamination={handlePhysicalExam}
-                    />
-                </Tooltip.Trigger>
-                <Tooltip.Content>
-                    <p>Physical examination</p>
-                </Tooltip.Content>
-            </Tooltip.Root>
+            <p class="text-gray-500 pt-2">|</p>
         </Tooltip.Provider>
     </div>
     <Button

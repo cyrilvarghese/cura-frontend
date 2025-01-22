@@ -28,11 +28,12 @@
         {#snippet child({ props })}
             <Button
                 variant="ghost"
-                size="icon"
-                class="h-8 w-8 p-0"
+                size="default"
+                 
                 {...props}
             >
                 <ScanEye class="h-5 w-5" />
+                <p>Physical Exam</p>
             </Button>
         {/snippet}
     </DropdownMenu.Trigger>

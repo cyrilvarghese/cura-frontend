@@ -3,6 +3,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import ChevronDown from "lucide-svelte/icons/chevron-down";
 	import Plus from "lucide-svelte/icons/plus";
+	import { currentTeam } from "$lib/stores/teamStore";
 
 	let {
 		teams,
@@ -16,7 +17,18 @@
 		}[];
 	} = $props();
 
-	let activeTeam = $state(teams[0]);
+	// Initialize the store with the first team
+	let activeTeam = $state($currentTeam || teams[0]);
+
+	$effect(() => {
+		currentTeam.set(activeTeam);
+	});
+
+	function handleTeamChange(team: (typeof teams)[0]) {
+		activeTeam = team;
+		currentTeam.set(team);
+		console.log("Team changed:", team);
+	}
 </script>
 
 <Sidebar.Menu>
@@ -30,7 +42,9 @@
 						>
 							<activeTeam.logo class="size-3" />
 						</div>
-						<span class="truncate font-semibold">{activeTeam.name}</span>
+						<span class="truncate font-semibold"
+							>{activeTeam.name}</span
+						>
 						<ChevronDown class="opacity-50" />
 					</Sidebar.MenuButton>
 				{/snippet}
@@ -41,14 +55,23 @@
 				side="bottom"
 				sideOffset={4}
 			>
-				<DropdownMenu.Label class="text-muted-foreground text-xs">Teams</DropdownMenu.Label>
+				<DropdownMenu.Label class="text-muted-foreground text-xs"
+					>Teams</DropdownMenu.Label
+				>
 				{#each teams as team, index (team.name)}
-					<DropdownMenu.Item onSelect={() => (activeTeam = team)} class="gap-2 p-2">
-						<div class="flex size-6 items-center justify-center rounded-sm border">
+					<DropdownMenu.Item
+						onSelect={() => handleTeamChange(team)}
+						class="gap-2 p-2"
+					>
+						<div
+							class="flex size-6 items-center justify-center rounded-sm border"
+						>
 							<team.logo class="size-4 shrink-0" />
 						</div>
 						{team.name}
-						<DropdownMenu.Shortcut>⌘{index + 1}</DropdownMenu.Shortcut>
+						<DropdownMenu.Shortcut
+							>⌘{index + 1}</DropdownMenu.Shortcut
+						>
 					</DropdownMenu.Item>
 				{/each}
 				<DropdownMenu.Separator />
@@ -58,7 +81,9 @@
 					>
 						<Plus class="size-4" />
 					</div>
-					<div class="text-muted-foreground font-medium">Add team</div>
+					<div class="text-muted-foreground font-medium">
+						Add team
+					</div>
 				</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>

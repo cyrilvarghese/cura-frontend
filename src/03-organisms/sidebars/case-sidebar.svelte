@@ -3,7 +3,7 @@
     import { API_BASE_URL } from "$lib/config/api";
     import { patientFile } from "$lib/stores/apiStore";
     import type { ImageData, PatientFileItem } from "$lib/types";
-    
+
     //local state
     type PatientFiles = {
         name: string;
@@ -12,9 +12,7 @@
         aspect: string;
     };
 
-    const initialFiles: PatientFiles[] = [
- 
-    ];
+    const initialFiles: PatientFiles[] = [];
 
     function convertImageDataToPatientFile(
         name: string,
@@ -72,20 +70,27 @@
 </script>
 
 <div class="flex-col w-full p-6 h-full">
-    <h2 class="text-lg font-semibold pb-8 border-b border-gray-200">Patient File</h2>
+    <h2 class="text-lg font-semibold pb-8 border-b border-gray-200">
+        Patient File
+    </h2>
     <ScrollArea
         class="w-full h-[calc(100%-100px)] rounded-md "
         orientation="vertical"
     >
         <div id="patient-files-container" class="pt-8">
             {#each allFiles as file (file.url)}
-                <h3 class="text-sm font-semibold pb-2 text-muted-foreground">{file.name}</h3>
+                <h3 class="text-sm font-semibold pb-2 text-muted-foreground">
+                    {file.name}
+                </h3>
                 <figure class="shrink-0 pb-10">
                     <div
                         class="overflow-hidden flex justify-start items-center rounded-md"
                     >
                         <img
-                            src={API_BASE_URL + file.url}
+                            src={file.url.startsWith("www") ||
+                            file.url.startsWith("http")
+                                ? file.url
+                                : API_BASE_URL + file.url}
                             alt={file.caption}
                             class="aspect-[16/9] rounded-md h-fit w-fit object-cover"
                             width={300}
