@@ -33,7 +33,7 @@
 
             // Get feedback
             const feedbackResponse = await feedbackStore.getFeedback(
-                $studentMessageHistory,
+                $studentMessageHistory
             );
 
             // Send feedback directly

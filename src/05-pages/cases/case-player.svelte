@@ -209,7 +209,7 @@
 
                 <!-- Chat Messages -->
                 <ScrollArea class="flex-1 p-4">
-                    <div id="messages-container" class="messages space-y-4 max-h-[calc(100vh-3  00px)]">
+                    <div id="messages-container" class="messages space-y-4 max-h-[calc(100vh-300px)]">
                         {#if $isLoading}
                             <div class="flex h-[600px] max w-full items-center justify-center">
                                 <div class="flex flex-col items-center gap-2 text-muted-foreground">

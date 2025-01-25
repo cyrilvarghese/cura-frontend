@@ -1,6 +1,7 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
 import type { FeedbackState, StudentMessage } from '$lib/types/index';
+import { currentCaseId } from "$lib/stores/casePlayerStore";
 
 
 
@@ -20,7 +21,7 @@ function createFeedbackStore() {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            const response = await feedbackService.getFeedback(studentMessageHistory);
+            const response = await feedbackService.getFeedback(studentMessageHistory, get(currentCaseId) ?? '');
 
             update(state => ({
                 ...state,

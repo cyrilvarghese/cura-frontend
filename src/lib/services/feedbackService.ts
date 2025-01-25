@@ -4,9 +4,13 @@ import { API_BASE_URL } from '$lib/config/api';
 export class FeedbackService {
     private baseUrl = API_BASE_URL;
 
-    async getFeedback(studentMessageHistory:StudentMessage[]): Promise<FeedbackResponse> {
+    async getFeedback(studentMessageHistory: StudentMessage[], caseId: string): Promise<FeedbackResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/get-feedback`, {
+            const url = caseId
+                ? `${this.baseUrl}/get-feedback?case_id=${encodeURIComponent(caseId)}`
+                : `${this.baseUrl}/get-feedback`;
+
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
