@@ -18,7 +18,7 @@ function createFeedbackStore() {
     const { subscribe, update, set } = writable<FeedbackState>(initialState);
 
     async function getFeedback(studentMessageHistory: StudentMessage[]) {
-        update(state => ({ ...state, isLoading: true, error: null }));
+            update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
             const response = await feedbackService.getFeedback(studentMessageHistory, get(currentCaseId) ?? '');
