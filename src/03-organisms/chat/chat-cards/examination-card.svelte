@@ -49,7 +49,7 @@
     </Card.Header>
     <Card.Content>
         <div class="space-y-2 bg-blue-50/50 p-3 rounded-md">
-            <h4 class="font-medium leading-none text-blue-700">Findings</h4>
+            <!-- <h4 class="font-medium leading-none text-blue-700">Findings</h4> -->
             {#if typeof findingContent === "string"}
                 <p class="text-sm text-muted-foreground whitespace-pre-wrap">
                     {findingContent}
@@ -70,11 +70,11 @@
                 <div class="space-y-4">
                     {#each findingContent.content as item}
                         {#if item.type === "text"}
-                            <p
+                            <!-- <p
                                 class="text-sm text-muted-foreground whitespace-pre-wrap"
                             >
                                 {item.content}
-                            </p>
+                            </p> -->
                         {:else if item.type === "table"}
                             <FindingsTable data={item.content} />
                         {:else if item.type === "image"}
