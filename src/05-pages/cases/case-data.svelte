@@ -7,7 +7,6 @@
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
     import type { CaseStoreState } from "$lib/stores/caseCreatorStore";
     import TestDataDisplay from "./TestDataDisplay.svelte";
-    import ExaminationEditor from "./ExaminationEditor.svelte";
     import CoverImage from "$lib/components/CoverImage.svelte";
     import { onMount } from "svelte";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";

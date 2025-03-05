@@ -23,7 +23,7 @@ export class CaseDataService {
         return {
             physicalExamReports: data.content.physical_exam,
             labTestReports: data.content.lab_test,
-            coverMessage: data.content.case_cover,
+            coverMessage:  data.content.case_cover,
         };
     }
 

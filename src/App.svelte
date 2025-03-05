@@ -1,11 +1,13 @@
 <script lang="ts">
   import "./app.css";
-  // Correcting the import path for SidebarPage
-  import MainLayout from "./04-templates/main-layout/index.svelte"; 
+  import MainLayout from "./04-templates/main-layout/index.svelte";
+
+  // Get the current URL for the router
+  let url = window.location.pathname;
 </script>
 
-<main>
-  <MainLayout />
+<main class="min-h-screen bg-background">
+  <MainLayout {url} />
 </main>
 
 <style>

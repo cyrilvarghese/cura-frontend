@@ -20,6 +20,7 @@
     import { onDestroy } from "svelte";
     import { writable } from "svelte/store";
     import LoaderCircle from "lucide-svelte/icons/loader-circle";
+    import PageLayout from "../../04-templates/page-layout.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -60,7 +61,6 @@
 
                 try {
                     await fetchCaseData(caseId.toString());
-                     
                 } catch (error) {
                     console.error("Error loading case:", error);
                 } finally {
@@ -140,103 +140,85 @@
     };
 </script>
 
-<div>
-    <div
-        class="flex flex-1 flex-col p-4 gap-4 w-[calc(100vw-256px)] h-[calc(100vh)]"
-    >
-        <div class="pl-[64px]">
-            <Breadcrumb.Root>
-                <Breadcrumb.List>
-                    <Breadcrumb.Item>
-                        <Breadcrumb.Link href="/">Cases</Breadcrumb.Link>
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Separator />
-                    <Breadcrumb.Item>
-                        <Breadcrumb.Link href="/cases"
-                            >Diagnosis</Breadcrumb.Link
+<PageLayout
+    breadcrumbs={[
+        { label: "Case Library", href: "/case-library" },
+        { label: `Case ${id}` },
+    ]}
+>
+    <div class="flex gap-4 w-full h-full">
+        <div class="w-[70%] h-full flex flex-col">
+            <!-- Title Section with Action Buttons -->
+            <div
+                class="p-4 pl-0 border-b border-gray-300 flex justify-between items-end"
+            >
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800">
+                        Patient Consultation
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                        {#if $apiStore.messages.length > 0}
+                            {$apiStore.messages[0].title}
+                        {/if}
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    {#if stepButtons[currentStep as keyof typeof stepButtons]}
+                        {@const button =
+                            stepButtons[
+                                currentStep as keyof typeof stepButtons
+                            ]}
+                        <Button
+                            variant={button.variant || "outline"}
+                            class="gap-2"
+                            onclick={button.action}
                         >
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Separator />
-                    <Breadcrumb.Item>
-                        <Breadcrumb.Link href="/cases"
-                            >Case {id}</Breadcrumb.Link
+                            {button.label}
+                            <button.icon class="h-4 w-4" />
+                        </Button>
+                    {/if}
+                </div>
+            </div>
+
+            {#if error}
+                <div class="bg-destructive/10 text-destructive p-2 m-2 rounded">
+                    {error}
+                </div>
+            {/if}
+
+            <!-- Chat Messages -->
+            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-300px)]">
+                <div id="messages-container" class="messages space-y-4">
+                    {#if $isLoading}
+                        <div
+                            class="flex h-[600px] max w-full items-center justify-center"
                         >
-                    </Breadcrumb.Item>
-                </Breadcrumb.List>
-            </Breadcrumb.Root>
-        </div>
-        <div class="flex gap-4 w-full h-full h-[calc(100vh-64px)]">
-            <div class="bg-muted/50 rounded-xl w-[70%] h-full flex flex-col">
-                <!-- Title Section with Action Buttons -->
-                <div
-                    class="p-4 border-b border-gray-300 flex justify-between items-end"
-                >
-                    <div>
-                        <h2 class="text-2xl font-semibold text-gray-800">
-                            Patient Consultation
-                        </h2>
-                        <p class="text-sm text-gray-500">
-                            {#if $apiStore.messages.length > 0}
-                                {$apiStore.messages[0].title}
-                            {/if}
-                        </p>
-                    </div>  
-                    <div class="flex gap-2">
-                        {#if stepButtons[currentStep as keyof typeof stepButtons]}
-                            {@const button =
-                                stepButtons[
-                                    currentStep as keyof typeof stepButtons
-                                ]}
-                            <Button
-                                variant={button.variant || "outline"}
-                                class="gap-2"
-                                onclick={button.action}
+                            <div
+                                class="flex flex-col items-center gap-2 text-muted-foreground"
                             >
-                                {button.label}
-                                <button.icon class="h-4 w-4" />
-                            </Button>
-                        {/if}
-                    </div>
-                </div>
-
-                {#if error}
-                    <div
-                        class="bg-destructive/10 text-destructive p-2 m-2 rounded"
-                    >
-                        {error}
-                    </div>
-                {/if}
-
-                <!-- Chat Messages -->
-                <ScrollArea class="flex-1 p-4">
-                    <div id="messages-container" class="messages space-y-4 max-h-[calc(100vh-300px)]">
-                        {#if $isLoading}
-                            <div class="flex h-[600px] max w-full items-center justify-center">
-                                <div class="flex flex-col items-center gap-2 text-muted-foreground">
-                                    <LoaderCircle 
-                                        class="h-10 w-10 animate-spin text-muted-foreground/70" 
-                                    />
-                                    <p class="text-sm">Loading case data...</p>
-                                </div>
+                                <LoaderCircle
+                                    class="h-10 w-10 animate-spin text-muted-foreground/70"
+                                />
+                                <p class="text-sm">Loading case data...</p>
                             </div>
-                        {:else}
-                            {#each $apiStore.messages as message}
-                                <div class="message-wrapper">
-                                    <Message {message} />
-                                </div>
-                            {/each}
-                        {/if}
-                    </div>
-                </ScrollArea>
-
-                <div class="p-4 border-t">
-                    <ChatInput />
+                        </div>
+                    {:else}
+                        {#each $apiStore.messages as message}
+                            <div class="message-wrapper">
+                                <Message {message} />
+                            </div>
+                        {/each}
+                    {/if}
                 </div>
-            </div>
+            </ScrollArea>
 
-            <div class="bg-muted/10 rounded-xl w-[30%] h-full">
-                <CaseSidebar />
+            <div class=" pl-0 pt-6 border-t">
+                <ChatInput />
             </div>
+        </div>
+
+        <div class="bg-muted/10 rounded-xl w-[30%] h-full">
+            <CaseSidebar />
         </div>
     </div>
 
@@ -246,7 +228,6 @@
     />
 
     <DiagnosisDialog
-    
         bind:open={diagnosisDialogOpen}
         onSubmit={handleDiagnosisSubmit}
     />
@@ -257,4 +238,4 @@
     />
 
     <EndCaseDialog bind:open={endCaseDialogOpen} onSubmit={handleEndCase} />
-</div>
+</PageLayout>

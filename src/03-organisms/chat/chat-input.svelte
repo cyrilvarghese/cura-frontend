@@ -13,6 +13,7 @@
     import { apiStore } from "$lib/stores/apiStore";
     import LabTestsDropdown from "../lab-tests/LabTestsDropdown.svelte";
     import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
+    import { onMount } from "svelte";
 
     let textValue = "";
     let isLoading = false;
@@ -101,15 +102,21 @@
             );
         }
     }
+
+    onMount(() => {
+        if (textareaRef) {
+            textareaRef.focus();
+        }
+    });
 </script>
 
 <div class="relative flex-1">
     <Textarea
         bind:ref={textareaRef}
         bind:value={textValue}
-        class="flex-1 pl-[320px] pt-8 pr-12"
+        class="flex-1 pl-[320px] pt-8 pr-12  focus-visible:ring-black/30"
         placeholder="Type your message... (Ctrl+Enter to send)"
-        disabled={isLoading}
+        disabled={isLoading} 
         onkeydown={handleKeyDown}
     />
     <div class="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2">
