@@ -6,6 +6,7 @@
     import { API_BASE_URL } from "$lib/config/api";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb";
     import PageLayout from "../04-templates/page-layout.svelte";
+    import { Link } from "svelte-routing";
 
     interface Case {
         case_id: number;
@@ -38,7 +39,7 @@
 </script>
 
 <PageLayout
-    title="Case Library"
+     
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Library" }]}
 >
     <h1 class="text-3xl font-bold mb-6">Case Library</h1>
@@ -48,7 +49,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {#each filteredCases as caseItem}
-            <a href={`/case-library/${caseItem.case_id}`} class="group">
+            <Link to={`/case-library/${caseItem.case_id}`} class="group">
                 <div
                     class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
@@ -71,7 +72,7 @@
                         </p>
                     </div>
                 </div>
-            </a>
+            </Link>
         {/each}
     </div>
 </PageLayout>

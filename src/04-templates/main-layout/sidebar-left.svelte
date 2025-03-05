@@ -93,6 +93,11 @@
 				url: "/forum",
 				icon: Users,
 			},
+			{
+				title: "Knowledge Base",
+				url: "/knowledge-base",
+				icon: BookOpen,
+			},
 		],
 		navSecondary: [
 			{

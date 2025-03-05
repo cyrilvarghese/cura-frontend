@@ -38,7 +38,6 @@
 </script>
 
 <PageLayout
-
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Curriculum" }]}
 >
     <div class="flex items-center justify-between mb-6">
@@ -94,9 +93,10 @@
                                     <TableCell>
                                         <div class="flex gap-2 flex-wrap">
                                             {#each item.assessmentMethod as method}
-                                                <span
+                                                <a
+                                                    href={`/case-library/1`}
                                                     class="text-sm text-blue-600 hover:underline cursor-pointer"
-                                                    >{method}</span
+                                                    >{method}</a
                                                 >
                                             {/each}
                                         </div>

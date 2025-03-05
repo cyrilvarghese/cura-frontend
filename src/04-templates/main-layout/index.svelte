@@ -38,11 +38,11 @@
 					<Route path="/tools/case-data-creator">
 						<CaseCreatorWrapper />
 					</Route>
-					<Route path="case-library/:id" let:params>
-						<CasePlayer id={params.id} />
-					</Route>
 					<Route path="/curriculum" component={CurriculumPage} />
 					<Route path="/case-library" component={CaseLibraryPage} />
+					<Route path="/case-library/:id" let:params>
+						<CasePlayer id={params.id} />
+					</Route>
 				</main>
 			</Sidebar.Inset>
 		</div>
