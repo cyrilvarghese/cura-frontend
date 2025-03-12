@@ -5,20 +5,31 @@ export type TopicItem = {
     assessmentMethod: string[];
 };
 
-export type Topic = {
+ 
+
+export interface Document {
+    id: number;
     title: string;
-    items: TopicItem[];
-};
+    type: string;
+    url: string;
+    description?: string;
+    created_at: string;
+}
 
 export interface CurriculumData {
     department: string;
     topics: {
         topic: string;
+        documents: Document[];
         competencies: {
-            number: string;
+            competency_code: string;
             competency: string;
             teaching_methods: string[];
             assessment_methods: string[];
+            assessments: {
+                id: number;
+                title: string;
+            }[];
         }[];
     }[];
 } 

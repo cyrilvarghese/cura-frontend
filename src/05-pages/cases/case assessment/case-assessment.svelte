@@ -1,6 +1,6 @@
 <script lang="ts">
-    import PageLayout from "../../04-templates/page-layout.svelte";
-    import CaseCreator from "./case-creator.svelte";
+    import PageLayout from "../../../04-templates/page-layout.svelte";
+    import CaseAssessmentData from "./case-assessment-data.svelte";
     import {
         uploadedFileStore,
         caseIdStore,
@@ -31,7 +31,7 @@
         </div>
 
         <div class="p-4">
-            <CaseCreator />
+            <CaseAssessmentData />
         </div>
     </div>
 </PageLayout>

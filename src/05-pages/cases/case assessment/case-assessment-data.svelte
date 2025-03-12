@@ -1,5 +1,5 @@
 <script lang="ts">
-    import CaseData from "./case-data.svelte";
+    import CaseData from "../case-data.svelte";
     import { Button } from "$lib/components/ui/button";
     import * as Card from "$lib/components/ui/card";
     import { Upload } from "lucide-svelte";

@@ -6,7 +6,7 @@ import mockCurriculumData from '../data/mock-curriculum.json';
 
 export class CurriculumService {
     private baseUrl = API_BASE_URL;
-    private useMockData = true; // Toggle this for development/production
+    private useMockData = false; // Toggle this for development/production
 
     constructor() {
         this.baseUrl = API_BASE_URL;
@@ -19,6 +19,7 @@ export class CurriculumService {
 
         try {
             const response = await fetch(`${this.baseUrl}/curriculum`);
+
             if (!response.ok) {
                 throw new Error('Failed to fetch curriculum data');
             }

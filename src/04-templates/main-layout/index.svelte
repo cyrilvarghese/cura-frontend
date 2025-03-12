@@ -5,6 +5,7 @@
 	import { Route, Router } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte";
 	import CaseCreatorWrapper from "../../05-pages/cases/case-creator-wrapper.svelte";
+	import CaseAssessment from "../../05-pages/cases/case assessment/case-assessment.svelte";
 	import { fetchCases } from "$lib/stores/casePlayerStore";
 	import { onMount } from "svelte";
 	import CurriculumPage from "../../05-pages/CurriculumPage.svelte";
@@ -39,6 +40,7 @@
 						<CaseCreatorWrapper />
 					</Route>
 					<Route path="/curriculum" component={CurriculumPage} />
+					<Route path="/curriculum/:id/new-case-assessment" component={CaseAssessment} />
 					<Route path="/case-library" component={CaseLibraryPage} />
 					<Route path="/case-library/:id" let:params>
 						<CasePlayer id={params.id} />

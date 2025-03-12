@@ -1,7 +1,6 @@
 <script lang="ts">
     import ImageEditor from "./ImageEditor.svelte";
     import { Input } from "$lib/components/ui/input/index.js";
-    import { Button } from "$lib/components/ui/button/index.js";
     import { Label } from "$lib/components/ui/label";
 
     export let key: string;

@@ -142,8 +142,9 @@
 
 <PageLayout
     breadcrumbs={[
+        { label: "Home", href: "/" },
         { label: "Case Library", href: "/case-library" },
-        { label: `Case ${id}` },
+        { label: `Case ${id}` }
     ]}
 >
     <div class="flex gap-4 w-full h-full">

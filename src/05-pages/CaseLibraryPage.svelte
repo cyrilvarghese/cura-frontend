@@ -4,7 +4,6 @@
     import { onMount } from "svelte";
     import { fetchCases } from "$lib/stores/casePlayerStore";
     import { API_BASE_URL } from "$lib/config/api";
-    import * as Breadcrumb from "$lib/components/ui/breadcrumb";
     import PageLayout from "../04-templates/page-layout.svelte";
     import { Link } from "svelte-routing";
 
@@ -17,6 +16,7 @@
     }
 
     let cases: Case[] = [];
+    let searchQuery = "";
 
     onMount(async () => {
         await fetchCases();
@@ -34,15 +34,33 @@
                     const id = Number(c.case_id);
                     return id >= 6 && id <= 10;
                 })
-              : cases
+              : cases.filter(
+                    (c) =>
+                        c.title
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                        c.quote
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()),
+                )
         : [];
 </script>
 
 <PageLayout
-     
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Library" }]}
 >
-    <h1 class="text-3xl font-bold mb-6">Case Library</h1>
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold">Case Library</h1>
+        <div class="relative">
+            <input
+                type="search"
+                placeholder="Search..."
+                bind:value={searchQuery}
+                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+        </div>
+    </div>
+
     <p class="text-gray-500 mb-8">
         A collection of cases for you to learn from.
     </p>

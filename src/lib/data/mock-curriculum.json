@@ -5,7 +5,7 @@
       "topic": "Acne",
       "competencies": [
         {
-          "number": "DR1.1",
+          "competency_code": "DR1.1",
           "competency": "Recognize a patient with acne vulgaris including the risk factors, etiology and clinical grading",
           "teaching_methods": [
             "LGT",
@@ -21,7 +21,7 @@
           ]
         },
         {
-          "number": "DR1.2",
+          "competency_code": "DR1.2",
           "competency": "Device a management plan of a patient with acne",
           "teaching_methods": [
             "LGT",
@@ -42,7 +42,7 @@
       "topic": "Vitiligo",
       "competencies": [
         {
-          "number": "DR2.1",
+          "competency_code": "DR2.1",
           "competency": "Identify and differentiate vitiligo from other causes of hypo pigmented lesions and present a treatment plan",
           "teaching_methods": [
             "SGT",
@@ -61,7 +61,7 @@
       "topic": "Papulosquamous Disorders",
       "competencies": [
         {
-          "number": "DR3.1",
+          "competency_code": "DR3.1",
           "competency": "Identify and distinguish psoriatic lesions from other causes",
           "teaching_methods": [
             "SGT",
@@ -75,7 +75,7 @@
           ]
         },
         {
-          "number": "DR3.2",
+          "competency_code": "DR3.2",
           "competency": "Demonstrate the Grattage test",
           "teaching_methods": [
             "Bedside teaching",
@@ -88,7 +88,7 @@
           ]
         },
         {
-          "number": "DR3.3",
+          "competency_code": "DR3.3",
           "competency": "Devise a treatment plan for a patient with psoriasis and counsel the patient regarding various treatment options and chronicity of disease",
           "teaching_methods": [
             "SGT",
@@ -107,7 +107,7 @@
       "topic": "Lichen Planus",
       "competencies": [
         {
-          "number": "DR4.1",
+          "competency_code": "DR4.1",
           "competency": "Identify and manage a case of lichen planus",
           "teaching_methods": [
             "SGT",
@@ -126,7 +126,7 @@
       "topic": "Scabies",
       "competencies": [
         {
-          "number": "DR5.1",
+          "competency_code": "DR5.1",
           "competency": "Devise a treatment plan for management of scabies including adverse drug reactions",
           "teaching_methods": [
             "SGT",
@@ -144,7 +144,7 @@
       "topic": "Pediculosis",
       "competencies": [
         {
-          "number": "DR6.1",
+          "competency_code": "DR6.1",
           "competency": "Describe the pathogenesis, diagnostic features and management of pediculosis in adults and children",
           "teaching_methods": [
             "LGT",
@@ -163,7 +163,7 @@
       "topic": "Fungal Infections",
       "competencies": [
         {
-          "number": "DR7.1",
+          "competency_code": "DR7.1",
           "competency": "Demonstrate candida/dermatophytes in fungal scrapings on KOH mount",
           "teaching_methods": [
             "Bedside teaching",
@@ -175,7 +175,7 @@
           ]
         },
         {
-          "number": "DR7.2",
+          "competency_code": "DR7.2",
           "competency": "Manage a case of fungal infections",
           "teaching_methods": [
             "LGT",
@@ -192,7 +192,7 @@
       "topic": "Common Viral Infections",
       "competencies": [
         {
-          "number": "DR8.1",
+          "competency_code": "DR8.1",
           "competency": "Describe the aetiology, microbiology, pathogenesis, clinical presentations and management of common viral infections of the skin in adults and children",
           "teaching_methods": [
             "LGT",
@@ -207,7 +207,7 @@
           ]
         },
         {
-          "number": "DR8.2",
+          "competency_code": "DR8.2",
           "competency": "Identify and distinguish herpes simplex and herpes labialis from other skin lesions",
           "teaching_methods": [
             "SGT",
@@ -221,7 +221,7 @@
           ]
         },
         {
-          "number": "DR8.3",
+          "competency_code": "DR8.3",
           "competency": "Identify and distinguish herpes zoster and varicella from other skin lesions",
           "teaching_methods": [
             "SGT",
@@ -235,7 +235,7 @@
           ]
         },
         {
-          "number": "DR8.4",
+          "competency_code": "DR8.4",
           "competency": "Identify and distinguish viral warts from other skin lesions",
           "teaching_methods": [
             "SGT",
@@ -249,7 +249,7 @@
           ]
         },
         {
-          "number": "DR8.5",
+          "competency_code": "DR8.5",
           "competency": "Identify and distinguish molluscum contagiosum from other skin lesions",
           "teaching_methods": [
             "SGT",
@@ -268,7 +268,7 @@
       "topic": "Leprosy",
       "competencies": [
         {
-          "number": "DR9.1",
+          "competency_code": "DR9.1",
           "competency": "Describe the epidemiology, clinical features and classification of Leprosy",
           "teaching_methods": [
             "LGT",
@@ -282,7 +282,7 @@
           ]
         },
         {
-          "number": "DR9.2",
+          "competency_code": "DR9.2",
           "competency": "Demonstrate an appropriate neurologic examination in Leprosy",
           "teaching_methods": [
             "Bedside teaching",
@@ -294,7 +294,7 @@
           ]
         },
         {
-          "number": "DR9.3",
+          "competency_code": "DR9.3",
           "competency": "Enumerate the indications and observe the performance of a slit-skin smear in patients with leprosy",
           "teaching_methods": [
             "SGT",
@@ -306,7 +306,7 @@
           ]
         },
         {
-          "number": "DR9.4",
+          "competency_code": "DR9.4",
           "competency": "Effectively treat a case of Lepra Reaction",
           "teaching_methods": [
             "LGT",
@@ -320,7 +320,7 @@
           ]
         },
         {
-          "number": "DR9.5",
+          "competency_code": "DR9.5",
           "competency": "Effectively manage a case of Leprosy based on National Guidelines and WHO Guidelines",
           "teaching_methods": [
             "LGT",
@@ -336,7 +336,7 @@
           ]
         },
         {
-          "number": "DR9.6",
+          "competency_code": "DR9.6",
           "competency": "Effectively manage complications of Leprosy and counsel regarding disability and stigma",
           "teaching_methods": [
             "LGT",
@@ -356,7 +356,7 @@
       "topic": "Sexually Transmitted Diseases",
       "competencies": [
         {
-          "number": "DR10.1",
+          "competency_code": "DR10.1",
           "competency": "Understand the rationale and Effectively use Syndromic case management for patients presenting with sexually transmitted diseases",
           "teaching_methods": [
             "SGT",
@@ -369,7 +369,7 @@
           ]
         },
         {
-          "number": "DR10.2",
+          "competency_code": "DR10.2",
           "competency": "Describe the clinical features, stages, and appropriate use of diagnostic tests for diagnosis of Syphilis",
           "teaching_methods": [
             "LGT",
@@ -383,7 +383,7 @@
           ]
         },
         {
-          "number": "DR10.3",
+          "competency_code": "DR10.3",
           "competency": "Describe the clinical features, stages, and appropriate use of diagnostic tests for diagnosis of non-syphilitic genital ulcer namely chancroid and herpes genitalis",
           "teaching_methods": [
             "LGT",
@@ -399,7 +399,7 @@
           ]
         },
         {
-          "number": "DR10.4",
+          "competency_code": "DR10.4",
           "competency": "Conduct a proper examination in a patient with GUD ensuring privacy, confidentiality in presence of chaperone",
           "teaching_methods": [
             "Bedside teaching",
@@ -413,7 +413,7 @@
           ]
         },
         {
-          "number": "DR10.5",
+          "competency_code": "DR10.5",
           "competency": "Effectively take sexual history and provide patient education on safe sexual behaviours including pretest counselling for HIV",
           "teaching_methods": [
             "Role play",
@@ -426,7 +426,7 @@
           ]
         },
         {
-          "number": "DR10.6",
+          "competency_code": "DR10.6",
           "competency": "Effectively manage syphilis and genital ulcer disease based on clinical features and serological tests including in pregnancy and neonates and advise as per syndromic case management",
           "teaching_methods": [
             "SGT",
@@ -440,7 +440,7 @@
           ]
         },
         {
-          "number": "DR10.7",
+          "competency_code": "DR10.7",
           "competency": "Recognize a patient with LGV and Donovanosis based on clinical findings and provide appropriate therapy using syndromic case management",
           "teaching_methods": [
             "LGT",
@@ -456,7 +456,7 @@
           ]
         },
         {
-          "number": "DR10.8",
+          "competency_code": "DR10.8",
           "competency": "Describe the etiology, diagnostic and clinical features and management of gonococcal and non-gonococcal urethritis",
           "teaching_methods": [
             "LGT",
@@ -470,7 +470,7 @@
           ]
         },
         {
-          "number": "DR10.9",
+          "competency_code": "DR10.9",
           "competency": "Effectively manage a patient with urethral discharge and counsel regarding prevention as per syndrome case management guidelines",
           "teaching_methods": [
             "SGT",
@@ -484,7 +484,7 @@
           ]
         },
         {
-          "number": "DR10.10",
+          "competency_code": "DR10.10",
           "competency": "Diagnose and manage a patient presenting with vaginal discharge as per syndrome case management guidelines",
           "teaching_methods": [
             "SGT",
@@ -497,7 +497,7 @@
           ]
         },
         {
-          "number": "DR10.11",
+          "competency_code": "DR10.11",
           "competency": "Diagnose and treat a patient with genital warts and provide patient education",
           "teaching_methods": [
             "LGT",
@@ -516,7 +516,7 @@
       "topic": "HIV",
       "competencies": [
         {
-          "number": "DR11.1",
+          "competency_code": "DR11.1",
           "competency": "Diagnose and manage common dermatologic manifestations of HIV including opportunistic infections based on clinical features and appropriate lab tests",
           "teaching_methods": [
             "LGT",
@@ -533,7 +533,7 @@
           ]
         },
         {
-          "number": "DR11.2",
+          "competency_code": "DR11.2",
           "competency": "Recognize common dermatological manifestations of ART drugs and initiate primary management appropriately",
           "teaching_methods": [
             "LGT",
@@ -555,7 +555,7 @@
       "topic": "Eczemas, Erythroderma and cutaneous adverse drug reactions",
       "competencies": [
         {
-          "number": "DR12.1",
+          "competency_code": "DR12.1",
           "competency": "Identify common types of eczema (both endogenous and exogenous) based on clinical features and history",
           "teaching_methods": [
             "LGT",
@@ -571,7 +571,7 @@
           ]
         },
         {
-          "number": "DR12.2",
+          "competency_code": "DR12.2",
           "competency": "Provide basic management for common eczemas including topical and systemic therapy",
           "teaching_methods": [
             "SGT",
@@ -586,7 +586,7 @@
           ]
         },
         {
-          "number": "DR12.3",
+          "competency_code": "DR12.3",
           "competency": "Diagnose Erythroderma, including medical complications and provide appropriate primary care to stabilize a patient before referral",
           "teaching_methods": [
             "SGT",
@@ -600,7 +600,7 @@
           ]
         },
         {
-          "number": "DR12.4",
+          "competency_code": "DR12.4",
           "competency": "Distinguish adverse drug reactions like Fixed drug eruption, Drug Hypersensitivity syndrome and Steven Johnson syndrome/ Toxic epidermal necrolysis from other skin conditions",
           "teaching_methods": [
             "LGT",
@@ -616,7 +616,7 @@
           ]
         },
         {
-          "number": "DR12.5",
+          "competency_code": "DR12.5",
           "competency": "Provide primary care in patients with Adverse drug reactions",
           "teaching_methods": [
             "SGT",
@@ -635,7 +635,7 @@
       "topic": "Vesiculo-Bullous Lesions",
       "competencies": [
         {
-          "number": "DR13.1",
+          "competency_code": "DR13.1",
           "competency": "Diagnose common auto Immune vesiculo- bullous disorders like pemphigus and bullous pemphigoid based on clinical features and appropriate use of Nikolsky\u2019s sign and Bulla spread sign",
           "teaching_methods": [
             "LGT",
