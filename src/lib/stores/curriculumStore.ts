@@ -13,9 +13,9 @@ export const fetchCurriculumData = async () => {
     try {
         const data = await curriculumService.getCurriculumData();
         curriculumStore.set(data);
-        debugger
     } catch (error) {
         console.error('Error fetching curriculum data:', error);
         curriculumStore.set(null);
+        throw error; // Re-throw to allow handling by the component
     }
 }; 

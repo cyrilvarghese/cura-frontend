@@ -39,6 +39,18 @@ export class DocumentService {
 
         return await response.json();
     }
+
+    async getDocumentsByTopic(topicName: string): Promise<DocumentUploadResponse[]> {
+        const response = await fetch(
+            `${this.baseUrl}/curriculum/topics/${topicName}/documents`
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch documents for topic');
+        }
+
+        return await response.json();
+    }
 }
 
 export const documentService = new DocumentService(); 

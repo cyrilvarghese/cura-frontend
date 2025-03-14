@@ -1,14 +1,20 @@
 <script lang="ts">
     import PageLayout from "../../../04-templates/page-layout.svelte";
-    import CaseAssessmentData from "./case-assessment-data.svelte";
+    import CreateCase from "./create-case.svelte";
     import {
         uploadedFileStore,
         caseIdStore,
     } from "$lib/stores/caseCreationFileUploadStore";
+    import { onMount } from "svelte";
 
     // Initialize stores if needed
     uploadedFileStore.set(null);
     caseIdStore.set("");
+    let { topic, code } = $props();
+
+    onMount(() => {
+        console.log(topic, code);
+    });
 </script>
 
 <PageLayout
@@ -31,7 +37,7 @@
         </div>
 
         <div class="p-4">
-            <CaseAssessmentData />
+            <CreateCase topic={topic} code={code} />
         </div>
     </div>
 </PageLayout>

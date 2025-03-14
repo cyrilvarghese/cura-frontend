@@ -11,12 +11,19 @@
         type CaseStoreState,
         updateCaseId,
         updateUploadedFile,
+        generatePersonaFromUrl,
+        generatePhysicalExamFromUrl,
     } from "$lib/stores/caseCreatorStore";
-    import { onDestroy } from "svelte";
-
+    import { onDestroy, onMount } from "svelte";
+    import {
+        documentStore,
+        fetchDocumentsByTopic,
+    } from "$lib/stores/documentStore";
+    import type { DocumentUploadResponse } from "$lib/services/documentService";
+    //on mount get documetns for teh topic
     // Define initialValue based on the expected structure of CaseStoreState
     const initialValue: CaseStoreState = {
-        fileUploaded: false,
+        // fileUploaded: false,
         generating: false,
         error: null,
         persona: null,
@@ -34,9 +41,28 @@
         isGeneratingPhysicalExam: false,
         isGeneratingDifferential: false,
         isSearchingImages: false,
-        searchedImages: null
-
+        searchedImages: null,
+        selectedDocument: null,
     };
+    let { topic, code } = $props();
+
+    let topicDocuments = $state<DocumentUploadResponse[]>([]);
+    let isLoadingDocuments = $state(false);
+    let documentError = $state<string | null>(null);
+
+    const unsubscribeDocStore = documentStore.subscribe((state) => {
+        topicDocuments = state.documents[topic] || [];
+        isLoadingDocuments = state.isLoading;
+        documentError = state.error;
+    });
+
+    onMount(() => {
+        if (topic) {
+            fetchDocumentsByTopic(topic).catch((error) => {
+                console.error("Error fetching documents:", error);
+            });
+        }
+    });
 
     let uploadState = $state(initialValue);
     let currentTab = $state<
@@ -52,48 +78,18 @@
 
     // Subscribe to the caseStore
     const unsubscribe = caseStore.subscribe((state) => {
+        debugger;   
         uploadState = state;
         uploadedFileName = state.uploadedFileName;
     });
 
     onDestroy(() => {
         unsubscribe(); // Clean up the subscription when the component is destroyed
+        unsubscribeDocStore(); // Clean up the document store subscription
     });
 
-    function handleFileUpload(event: Event) {
-        const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
-
-        const file = input.files[0];
-        if (
-            !file.type.includes("pdf") &&
-            !file.type.includes("markdown") &&
-            !file.name.endsWith(".md")
-        ) {
-            alert("Please upload a PDF or Markdown file only");
-            return;
-        }
-
-        updateUploadedFile(file);
-    }
-
-    function triggerFileUpload() {
-        const input = document.getElementById(
-            "file-upload-input",
-        ) as HTMLInputElement;
-        input.click();
-    }
-
-    function handleCaseIdChange(newCaseId: string) {
-        //check if its a number
-        if (isNaN(Number(newCaseId))) {
-            alert("Case ID must be a number");
-            //reset the case id
-            updateCaseId("");
-            return;
-        }
-        updateCaseId(newCaseId);
-    }
+ 
+ 
 
     async function handleGenerateAll() {
         if (!uploadState.uploadedFile || !uploadState.caseId) return;
@@ -127,12 +123,14 @@
     }
 
     async function handleGeneratePersona() {
-        if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        debugger;
+        if (!uploadState.selectedDocument) return;
         currentTab = "patient-persona";
         uploadState.isGeneratingPersona = true;
 
         try {
-            await generatePersona(uploadState.uploadedFile, uploadState.caseId);
+            if (!uploadState.selectedDocument) return;
+            await generatePersonaFromUrl(uploadState.selectedDocument.url, uploadState.selectedDocument);
         } catch (error) {
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
@@ -143,13 +141,16 @@
     }
 
     async function handleGenerateCaseData() {
-        if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        debugger;
+        console.log("uploadState.selectedDocument", uploadState.selectedDocument);
+        console.log("uploadState.caseId", uploadState.caseId);
+        if (!uploadState.selectedDocument || !uploadState.caseId) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
 
         try {
-            await generatePhysicalExam(
-                uploadState.uploadedFile,
+            await generatePhysicalExamFromUrl(
+                uploadState.selectedDocument.url,
                 uploadState.caseId,
             );
         } catch (error) {
@@ -185,75 +186,50 @@
             <Card.Root class="max-w-md shadow-md rounded-lg bg-white w-[300px]">
                 <Card.Header>
                     <Card.Title class="text-lg font-semibold"
-                        >Upload Patient Case Document</Card.Title
+                        >Select case document</Card.Title
                     >
                 </Card.Header>
                 <Card.Content>
                     <div class="space-y-8">
                         <div class="grid w-full items-center gap-1.5">
-                            <label for="case-id" class="text-sm leading-none"
-                                >Case ID</label
-                            >
-                            <input
-                                id="case-id"
-                                type="text"
-                                bind:value={uploadState.caseId}
-                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                placeholder="Enter case ID"
-                                disabled={uploadState.loading ||
-                                    uploadState.generating}
-                                oninput={(e) =>
-                                    handleCaseIdChange(e.currentTarget.value)}
-                            />
-                        </div>
-
-                        <div class="grid w-full items-center gap-1.5">
                             <label
-                                for="file-upload"
+                                for="document-select"
                                 class="text-sm leading-none"
-                                >Patient Case Document</label
                             >
-                            <input
-                                id="file-upload-input"
-                                type="file"
-                                class="hidden"
-                                onchange={handleFileUpload}
+                                Select Document
+                            </label>
+                            <select
+                                id="document-select"
+                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                bind:value={uploadState.selectedDocument}
                                 disabled={uploadState.loading ||
                                     uploadState.generating}
-                                accept=".pdf,.md"
-                            />
-
-                            {#if uploadedFileName}
-                                <p class="text-xs font-bold mt-1">
-                                    {uploadedFileName}
-                                </p>
-                            {:else}
+                            >
+                                <option value="">Select a document...</option>
+                                {#each topicDocuments as document}
+                                    <option value={document}>
+                                        {document.title}
+                                    </option>
+                                {/each}
+                            </select>
+                            {#if topicDocuments.length === 0}
                                 <p class="text-xs text-muted-foreground mt-1">
-                                    Accepted formats: PDF, Markdown
+                                    No documents available for this topic
                                 </p>
                             {/if}
-                            <Button
-                                class="hover:bg-gray-300"
-                                onclick={triggerFileUpload}
-                                variant="secondary"
-                                disabled={uploadState.loading ||
-                                    uploadState.generating}
-                            >
-                                <Upload class="mr-2" />
-                                Upload PDF or Markdown
-                            </Button>
                         </div>
                     </div>
                 </Card.Content>
             </Card.Root>
         </div>
 
+        <!-- Topic Documents Section -->
+
         <div class="flex flex-col justify-start mt-4 mb-12">
             <Button
                 onclick={handleGenerateAll}
                 disabled={uploadState.generating ||
-                    !uploadState.caseId ||
-                    !uploadState.uploadedFile}
+                    !uploadState.selectedDocument}
             >
                 {#if uploadState.generating}
                     Generating All...
@@ -272,8 +248,7 @@
             <Button
                 onclick={handleGeneratePersona}
                 disabled={uploadState.generating ||
-                    !uploadState.caseId ||
-                    !uploadState.uploadedFile}
+                    !uploadState.selectedDocument}
             >
                 {#if uploadState.isGeneratingPersona}
                     Generating Patient Persona...
@@ -291,8 +266,7 @@
             <Button
                 onclick={handleGenerateCaseData}
                 disabled={uploadState.generating ||
-                    !uploadState.caseId ||
-                    !uploadState.uploadedFile}
+                    !uploadState.selectedDocument}
             >
                 {#if uploadState.isGeneratingPhysicalExam}
                     Generating Physical Exam Data...
@@ -310,8 +284,7 @@
             <Button
                 onclick={handleGenerateDifferentialDiagnosis}
                 disabled={uploadState.generating ||
-                    !uploadState.caseId ||
-                    !uploadState.uploadedFile}
+                    !uploadState.selectedDocument}
             >
                 {#if uploadState.isGeneratingDifferential}
                     Extracting Differential Diagnosis...
@@ -319,7 +292,7 @@
                     Generate Differential Diagnosis
                 {/if}
             </Button>
-            {#if (!uploadState.caseId || !uploadState.uploadedFile) && !uploadState.generating}
+            {#if (!uploadState.selectedDocument) && !uploadState.generating}
                 <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
                 </p>

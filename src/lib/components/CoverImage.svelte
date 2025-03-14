@@ -10,7 +10,6 @@
     import cover2 from "../../assets/cover2.webp";
     import cover3 from "../../assets/cover3.webp";
     import { API_BASE_URL } from "$lib/config/api";
-    
 
     const coverImageService = new CoverImageService();
     const coverImageData = writable<{
@@ -21,14 +20,13 @@
     } | null>(null);
     const isLoading = writable(true);
     const isError = writable(false);
-    let currentPrompt: string = "";
-
+    let currentPrompt = $state("");
+    let { caseId } = $props();
     async function generateCoverImage() {
         isLoading.set(false);
         try {
             isLoading.set(true);
-            const response =
-                await coverImageService.createCoverImage($lastCaseIdStore);
+            const response = await coverImageService.createCoverImage(caseId);
             coverImageData.set({
                 image_url: API_BASE_URL + response.image_url,
                 prompt: response.prompt,
@@ -61,7 +59,7 @@
                 $lastCaseIdStore,
                 currentPrompt,
                 $coverImageData.title ?? "",
-                $coverImageData.quote ?? ""
+                $coverImageData.quote ?? "",
             );
             coverImageData.set({
                 image_url: API_BASE_URL + response.image_url,
@@ -91,7 +89,7 @@
     });
 </script>
 
-<div class="w-full bg-white  ">
+<div class="w-full bg-white">
     {#if $isLoading && !$coverImageData}
         <LoadingMessage message="Generating cover image" />
     {:else if $coverImageData}
@@ -102,13 +100,10 @@
                     src={$coverImageData.image_url}
                     alt="Generated cover"
                 />
-            
             </div>
 
             <!-- Text Overlay (Green Box) -->
-            <div
-                class="w-full  bg-white/90 backdrop-blur-sm  p-4 pt-0 "
-            >
+            <div class="w-full bg-white/90 backdrop-blur-sm p-4 pt-0">
                 <h3 class="text-lg text-muted-foreground font-medium mb-2">
                     Image Description (prompt)
                 </h3>
@@ -144,7 +139,10 @@
         <div class="text-center text-muted-foreground py-8">
             {#if $isError}
                 <p>Error generating cover image</p>
-                <Button class="bg-red-500 text-white mt-4" onclick={generateCoverImage}>Retry</Button>
+                <Button
+                    class="bg-red-500 text-white mt-4"
+                    onclick={generateCoverImage}>Retry</Button
+                >
             {:else}
                 <p>No cover image generated yet</p>
             {/if}

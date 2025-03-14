@@ -7,20 +7,30 @@
     import WrittenDialog from "../../03-organisms/dialogs/written-assessment-dialog.svelte";
     import VivaDialog from "../../03-organisms/dialogs/viva-assessment-dialog.svelte";
     import { navigate } from "svelte-routing";
+    import type { Document } from "$lib/types/curriculum";
+    let {
+        documents = [],
+        competencyCode = "",
+        competencyText = "",
+        disabled = false,
+        topic = "",
+    } = $props<{
+        documents: Document[];
+        competencyCode: string;
+        competencyText: string;
+        disabled?: boolean;
+        topic?: string;
+    }>();
 
-    export let competencyCode: string;
-    export let competencyText: string;
-    export let fileUrls: string[];
-
-    let showCaseDialog = false;
-    let showOsceDialog = false;
-    let showWrittenDialog = false;
-    let showVivaDialog = false;
+    let showCaseDialog = $state(false);
+    let showOsceDialog = $state(false);
+    let showWrittenDialog = $state(false);
+    let showVivaDialog = $state(false);
 
     function handleAssessment(type: string) {
         switch (type) {
             case "case":
-                showCaseDialog = true;
+                navigate(`/curriculum/${topic}/${competencyCode}/new-case`);
                 break;
             case "osce":
                 showOsceDialog = true;
@@ -40,6 +50,7 @@
         variant="outline"
         size="sm"
         class="rounded-r-none"
+        {disabled}
         onclick={() => handleAssessment("case")}
     >
         Add Assessment
@@ -72,10 +83,9 @@
 
     <CaseDialog
         bind:open={showCaseDialog}
-        fileUrls={fileUrls || []}
+        {documents}
         {competencyCode}
         {competencyText}
-        onSubmit={(data) => console.log("Case:", data)}
     />
     <OsceDialog
         bind:open={showOsceDialog}

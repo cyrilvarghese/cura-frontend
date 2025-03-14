@@ -16,7 +16,6 @@
 
     // Define initialValue based on the expected structure of CaseStoreState
     const initialValue: CaseStoreState = {
-        fileUploaded: false,
         generating: false,
         error: null,
         persona: null,
@@ -34,8 +33,8 @@
         isGeneratingPhysicalExam: false,
         isGeneratingDifferential: false,
         isSearchingImages: false,
-        searchedImages: null
-
+        searchedImages: null,
+        selectedDocument: null,
     };
 
     let uploadState = $state(initialValue);

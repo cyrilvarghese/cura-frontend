@@ -10,6 +10,7 @@
     import CoverImage from "$lib/components/CoverImage.svelte";
     import { onMount } from "svelte";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
+    import { Button } from "$lib/components/ui/button";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -33,6 +34,8 @@
     function syncMarked(content: string): string {
         return marked.parse(content) as string;
     }
+
+    let showCoverImage = $state(false);
 </script>
 
 <Card.Root class="flex-1">
@@ -58,7 +61,7 @@
                 >
             </Tabs.List>
 
-            <div class="mt-4 h-[calc(100vh-354px)] overflow-y-auto">
+            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto">
                 <Tabs.Content value="patient-persona">
                     {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
@@ -69,7 +72,20 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.persona}
-                        <CoverImage />
+                        <div class="mb-4">
+                            {#if !showCoverImage}
+                                <Button
+                                    variant="outline"
+                                    onclick={() => (showCoverImage = true)}
+                                >
+                                    Generate Cover Image
+                                </Button>
+                            {:else}
+                                <div class="mt-4">
+                                    <CoverImage caseId={uploadState.caseId} />
+                                </div>
+                            {/if}
+                        </div>
                         <div class="rounded-lg pt-4">
                             <MarkdownContent
                                 content={syncMarked(
@@ -96,7 +112,10 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.testData}
-                        <TestDataDisplay testData={uploadState.testData} caseId={uploadState.caseId} />
+                        <TestDataDisplay
+                            testData={uploadState.testData}
+                            caseId={uploadState.caseId}
+                        />
                     {:else}
                         <div class="text-center text-muted-foreground py-8">
                             <p>Physical exams are not available yet</p>

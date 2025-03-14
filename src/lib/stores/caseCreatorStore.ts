@@ -5,6 +5,7 @@ import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
 import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
+import type { DocumentUploadResponse } from '$lib/services/documentService';
 
 
 
@@ -12,7 +13,7 @@ import { imageSearchService, type ImageSearchResponse } from '$lib/services/imag
 export interface CaseStoreState {
     caseId: string | null;
     loading: boolean;
-    fileUploaded: boolean;
+    // fileUploaded: boolean;
     generating: boolean;
     error: string | null;
     persona: FormattedPersonaResponse | null; // Adjust the type based on your response structure
@@ -29,12 +30,13 @@ export interface CaseStoreState {
     isGeneratingDifferential: boolean;
     searchedImages: ImageSearchResponse | null;
     isSearchingImages: boolean;
+    selectedDocument: DocumentUploadResponse | null;
 }
 
 // Create a writable store with initial state
 const initialState: CaseStoreState = {
     loading: false,
-    fileUploaded: false,
+    // fileUploaded: false,
     generating: false,
     error: null,
     persona: null,
@@ -49,6 +51,7 @@ const initialState: CaseStoreState = {
     isGeneratingDifferential: false,
     searchedImages: null,
     isSearchingImages: false,
+    selectedDocument: null,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -92,6 +95,7 @@ export async function generatePersona(uploadedFile: File, caseId: string) {
                 content: response.content,
                 timestamp: new Date().toISOString(),
                 type: "ai",
+                case_id: response.case_id,
             },
             generating: false,
             isGeneratingPersona: false,
@@ -194,6 +198,69 @@ export async function searchMedicalImages(query: string) {
         return response;
     } catch (error) {
         console.error('Image search failed:', error);
-      
+
+    }
+}
+
+export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string,) {
+    caseStore.update(state => ({
+        ...state,
+        generating: true,
+        error: null,
+        isGeneratingPersona: true,
+        selectedDocument: selectedDocument || null
+    }));
+
+    if (caseId) {
+        lastCaseIdStore.set(caseId);
+    }
+
+    try {
+        const response = await patientPersonaService.createPatientPersonaFromUrl(fileUrl, caseId || null);
+        debugger;
+        caseStore.update(state => ({
+            ...state,
+            persona: {
+                id: response.id,
+                content: response.content,
+                timestamp: new Date().toISOString(),
+                type: "ai",
+                case_id: response.case_id,
+            },
+            caseId: response.case_id,
+            generating: false,
+            isGeneratingPersona: false,
+        }));
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Generation failed",
+            generating: false,
+            isGeneratingPersona: false,
+        }));
+    }
+}
+// Function to generate a physical exam
+export async function generatePhysicalExamFromUrl(fileUrl: string, caseId: string) {
+    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPhysicalExam: true }));
+
+    try {
+        const response = await testDataService.createExamTestDataFromUrl(caseId, fileUrl);
+        caseStore.update(state => ({
+            ...state,
+            testData: {
+                physical_exam: response.content.physical_exam,
+                lab_test: response.content.lab_test
+            },
+            generating: false,
+            isGeneratingPhysicalExam: false,
+        }));
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Generation failed",
+            generating: false,
+            isGeneratingPhysicalExam: false,
+        }));
     }
 }

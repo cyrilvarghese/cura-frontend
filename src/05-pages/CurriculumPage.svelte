@@ -21,70 +21,26 @@
     import { API_BASE_URL } from "$lib/config/api";
     import AssessmentButton from "$lib/components/AssessmentButton.svelte";
 
+    let searchQuery = $state("");
+    let uploadError = $state("");
+    let showAlert = $state(false);
+
     onMount(() => {
         fetchCurriculumData();
     });
 
-    let searchQuery = "";
-    let uploadError = "";
-    let showAlert = false;
-
-    async function handleFileUpload(event: Event, topicName: string) {
-        const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
-
-        const file = input.files[0];
-        const isMarkdown =
-            file.name.toLowerCase().endsWith(".md") ||
-            file.name.toLowerCase().endsWith(".markdown") ||
-            file.type.includes("text/markdown") ||
-            file.type.includes("text/x-markdown");
-
-        if (
-            !file.type.includes("pdf") &&
-            !file.type.includes("image/") &&
-            !isMarkdown
-        ) {
-            uploadError = "Please upload a PDF, image, or markdown file";
-            showAlert = true;
-            setTimeout(() => (showAlert = false), 3000);
-            return;
-        }
-
-        try {
-            await uploadDocument(file, topicName, file.name, "");
-            showAlert = false;
-        } catch (error) {
-            uploadError =
-                error instanceof Error ? error.message : "Upload failed";
-            showAlert = true;
-        }
-    }
-
-    interface Assessment {
-        id: number;
-        title: string;
-    }
-
-    $: filteredTopics =
+    const filteredTopics = $derived(
         $curriculumStore?.topics
-            .map((topic) => ({
-                title: topic.topic,
+            ?.map((topic) => ({
+                ...topic,
+                // Combine API documents and newly uploaded documents
                 documents: [
                     ...(topic.documents || []),
                     ...($documentStore.documents[topic.topic] || []),
                 ],
-                items: topic.competencies.map((comp) => ({
-                    competency_code: comp.competency_code,
-                    competency: comp.competency,
-                    teaching: comp.teaching_methods,
-                    assessments: comp.assessments.map((assessment) => ({
-                        id: assessment.id,
-                        title: assessment.title,
-                    })),
-                })),
             }))
-            .filter((topic) => topic.items.length > 0) ?? [];
+            .filter((topic) => topic.competencies.length > 0) ?? [],
+    );
 </script>
 
 <PageLayout
@@ -108,7 +64,7 @@
         {#each filteredTopics as topic}
             <div class="mb-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">{topic.title}</h2>
+                    <h2 class="text-xl font-semibold">{topic.topic}</h2>
                     <div class="flex items-center gap-4">
                         {#if topic.documents?.length > 0}
                             <div class="flex gap-2 flex-wrap">
@@ -125,7 +81,7 @@
                                 {/each}
                             </div>
                         {/if}
-                        <DocumentUploadButton topicName={topic.title} />
+                        <DocumentUploadButton topicName={topic.topic} />
                     </div>
                 </div>
                 <div class="border rounded-lg overflow-hidden">
@@ -145,14 +101,17 @@
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {#each topic.items as item}
+                            {#each topic.competencies as competency}
                                 <TableRow>
-                                    <TableCell>{item.competency_code}</TableCell
+                                    <TableCell
+                                        >{competency.competency_code}</TableCell
                                     >
-                                    <TableCell>{item.competency}</TableCell>
+                                    <TableCell
+                                        >{competency.competency}</TableCell
+                                    >
                                     <TableCell>
                                         <div class="flex gap-2 flex-wrap">
-                                            {#each item.teaching as method}
+                                            {#each competency.teaching_methods as method}
                                                 <span
                                                     class="text-sm bg-gray-100 px-2 py-1 rounded"
                                                     >{method}</span
@@ -162,8 +121,8 @@
                                     </TableCell>
                                     <TableCell>
                                         <div class="flex gap-2 flex-wrap">
-                                            {#if item.assessments.length > 0}
-                                                {#each item.assessments as assessment}
+                                            {#if competency.assessments.length > 0}
+                                                {#each competency.assessments as assessment}
                                                     <a
                                                         href={`/case-library/${assessment.id}`}
                                                         class="text-sm text-blue-600 hover:underline cursor-pointer"
@@ -182,9 +141,12 @@
                                     <TableCell>
                                         <div class="flex gap-2">
                                             <AssessmentButton
-                                                competencyText={item.competency}
-                                                competencyCode={item.competency_code}
-                                                fileUrls={topic.documents?.map((doc) => doc.url) || []}
+                                                competencyText={competency.competency}
+                                                competencyCode={competency.competency_code}
+                                                documents={topic.documents}
+                                                disabled={!topic.documents
+                                                    ?.length}
+                                                topic={topic.topic}
                                             />
                                             <Button
                                                 variant="ghost"
@@ -219,4 +181,3 @@
         </Alert>
     {/if}
 </PageLayout>
-

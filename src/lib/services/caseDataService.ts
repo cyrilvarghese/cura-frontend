@@ -19,11 +19,11 @@ export class CaseDataService {
     async getCaseData(caseId: string): Promise<CaseData> {
         const response = await fetch(`${this.baseUrl}/cases/${caseId}`);
         const data = await response.json();
-        
+
         return {
             physicalExamReports: data.content.physical_exam,
             labTestReports: data.content.lab_test,
-            coverMessage:  data.content.case_cover,
+            coverMessage: data.content.case_cover,
         };
     }
 
@@ -39,5 +39,13 @@ export class CaseDataService {
             console.error('Error fetching all cases:', error);
             throw error;
         }
+    }
+
+    async getDocumentsByTopic(topicName: string): Promise<any[]> {
+        const response = await fetch(`${this.baseUrl}/curriculum/topics/${topicName}/documents`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch documents');
+        }
+        return response.json();
     }
 } 

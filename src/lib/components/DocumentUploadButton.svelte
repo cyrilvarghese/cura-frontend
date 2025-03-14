@@ -56,6 +56,13 @@
         accept="*"
         onchange={handleFileUpload}
     />
+    {#if isUploading}
+        <span
+            class= "ml-2 whitespace-nowrap text-sm text-blue-600"
+        >
+            Uploading...
+        </span>
+    {/if}
     <Button
         variant="outline"
         size="icon"
@@ -70,13 +77,7 @@
             <Upload class="h-4 w-4" />
         {/if}
     </Button>
-    {#if isUploading}
-        <span
-            class="absolute left-full ml-2 whitespace-nowrap text-sm text-blue-600"
-        >
-            Uploading...
-        </span>
-    {/if}
+    
 </div>
 
 {#if showAlert}

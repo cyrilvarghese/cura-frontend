@@ -5,232 +5,192 @@
     import { Input } from "$lib/components/ui/input";
     import { Alert, AlertDescription } from "$lib/components/ui/alert";
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
-    import { onMount } from "svelte";
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
     import { marked } from "marked";
+    import {
+        caseStore,
+        generatePersonaFromUrl,
+        type CaseStoreState,
+    } from "$lib/stores/caseCreatorStore";
+    import { onDestroy, onMount } from "svelte";
+    import CoverImage from "$lib/components/CoverImage.svelte";
 
-    export let open = false;
-    export let competencyCode: string;
-    export let competencyText: string;
-    
-    export let onSubmit: (data: any) => void;
+    // Props
+    let {
+        open = $bindable(false),
+        competencyCode,
+        competencyText,
+        documents = [],
+    } = $props<{
+        open: boolean;
+        competencyCode: string;
+        competencyText: string;
+        documents: Array<{
+            id: number;
+            title: string;
+            type: string;
+            url: string;
+            description: string;
+            created_at: string;
+            topic_name: string;
+        }>;
+    }>();
+    // Define initialValue based on the expected structure of CaseStoreState
+    const initialValue: CaseStoreState = {
+        fileUploaded: false,
+        generating: false,
+        error: null,
+        persona: null,
+        loading: false,
+        testData: {
+            physical_exam: null,
+            lab_test: null,
+        },
+        coverImage: null,
+        caseId: null,
+        differentialDiagnosis: null,
+        uploadedFile: null,
+        uploadedFileName: null,
+        isGeneratingPersona: false,
+        isGeneratingPhysicalExam: false,
+        isGeneratingDifferential: false,
+        isSearchingImages: false,
+        searchedImages: null,
+    };
+    // Local state
+    console.log("dialog initialized");
+    let title = $state("");
+    let currentTab = $state("patient-persona");
+    let hasStartedGeneration = $state(false);
+    let caseState = $state<CaseStoreState>($caseStore);
+    let hasGeneratedOnce = $state(false);
+    let selectedDocument = $state<(typeof documents)[0] | null>(null);
 
-    let title = "";
-    let currentTab = "patient-persona";
-    let error = "";
+    // Subscribe to store with cleanup
+    const unsubscribe = caseStore.subscribe((state) => {
+        caseState = state;
+    });
 
-    // Loading states for each tab
-    let isLoadingPersona = false;
-    let isLoadingPhysicalExams = false;
-    let isLoadingDifferential = false;
+    // Markdown helper
+    function syncMarked(content: string): string {
+        return marked.parse(content) as string;
+    }
 
-    // Generated content states
-    let personaContent: string | null = null;
-    let physicalExamsContent: string | null = null;
-    let differentialDiagnosis: string[] | null = null;
+    // Generation logic
+    async function generateSequentially() {
+        if (!selectedDocument) {
+            console.error("No file selected");
+            return;
+        }
 
-    async function generatePersona() {
-        isLoadingPersona = true;
-        error = "";
         try {
-            // Replace with your actual API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            personaContent = "Generated patient information...";
-        } catch (e) {
-            error = "Failed to generate patient persona";
-        } finally {
-            isLoadingPersona = false;
+            await generatePersonaFromUrl(
+                selectedDocument.url,
+                caseState.caseId ?? "",
+            );
+            currentTab = "cover-image";
+            // await generatePhysicalExamFromUrl(selectedDocument.url, caseState.caseId ?? "");
+            // await generateDifferentialDiagnosisFromUrl(selectedDocument.url, caseState.caseId ?? "");
+        } catch (error) {
+            console.error("Error in sequential generation:", error);
         }
     }
 
-    async function generatePhysicalExams() {
-        isLoadingPhysicalExams = true;
-        error = "";
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            physicalExamsContent = "Generated physical exams...";
-        } catch (e) {
-            error = "Failed to generate physical exams";
-        } finally {
-            isLoadingPhysicalExams = false;
-        }
-    }
-
-    async function generateDifferential() {
-        isLoadingDifferential = true;
-        error = "";
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            differentialDiagnosis = [
-                "Diagnosis 1",
-                "Diagnosis 2",
-                "Diagnosis 3",
-            ];
-        } catch (e) {
-            error = "Failed to generate differential diagnosis";
-        } finally {
-            isLoadingDifferential = false;
-        }
-    }
-
-    // Auto-generate content when dialog opens
-    $: if (open) {
-        generatePersona();
-        generatePhysicalExams();
-        generateDifferential();
-    }
+    onDestroy(() => {
+        unsubscribe(); // Cleanup subscription when component is destroyed
+    });
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content class="sm:max-w-[900px]">
+    <Dialog.Content class="sm:max-w-[1200px]">
         <Dialog.Header>
-            <Dialog.Title class="text-lg font-semibold"
-                >Add Case Assessment</Dialog.Title
-            >
-            <Dialog.Description>Create a new case assessment</Dialog.Description
-            >
+            <Dialog.Title>Add Case Assessment ({competencyCode})</Dialog.Title>
+            <Dialog.Description>
+                Create a new case assessment for {competencyText}
+            </Dialog.Description>
         </Dialog.Header>
 
-        <form
-            on:submit|preventDefault={(e) =>
-                onSubmit({
-                    title,
-                    personaContent,
-                    physicalExamsContent,
-                    differentialDiagnosis,
-                })}
-            class="space-y-6"
-        >
+        <div class="space-y-6">
             <div class="grid gap-2">
                 <label for="title">Title</label>
                 <Input id="title" bind:value={title} required />
             </div>
+
+            <div class="grid gap-2">
+                <label for="fileSelect">Select Source File</label>
+                <select
+                    id="fileSelect"
+                    bind:value={selectedDocument}
+                    class="w-full px-3 py-2 border rounded-md border-input bg-background"
+                >
+                    <option value={null}>Select a file...</option>
+                    {#each documents as doc}
+                        <option value={doc}>{doc.title}</option>
+                    {/each}
+                </select>
+            </div>
+
+            <Button
+                type="button"
+                disabled={!selectedDocument}
+                onclick={generateSequentially}
+                class="w-full"
+            >
+                Generate from {selectedDocument
+                    ? selectedDocument.title
+                    : "Selected File"}
+            </Button>
 
             <Tabs.Root value={currentTab} class="w-full">
                 <Tabs.List class="border-b w-full flex justify-start gap-8">
                     <Tabs.Trigger value="patient-persona"
                         >Patient Persona</Tabs.Trigger
                     >
+                    <Tabs.Trigger value="cover-image">Cover Image</Tabs.Trigger>
+
                     <Tabs.Trigger value="physical-exams"
-                        >Physical Examination & Lab Tests</Tabs.Trigger
+                        >Physical Exams</Tabs.Trigger
                     >
-                    <Tabs.Trigger value="differential-diagnosis"
-                        >Differential Diagnosis</Tabs.Trigger
+                    <Tabs.Trigger value="differential"
+                        >Differential</Tabs.Trigger
                     >
                 </Tabs.List>
 
-                <div class="mt-4 h-[calc(100vh-500px)] overflow-y-auto">
+                <div class="mt-4">
                     <Tabs.Content value="patient-persona">
-                        {#if isLoadingPersona}
-                            <LoadingMessage
-                                message="Creating patient persona..."
-                            />
-                        {:else if error}
-                            <Alert variant="destructive">
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        {:else if personaContent}
-                            <div class="rounded-lg pt-4">
-                                <div class="flex justify-end mb-4">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onclick={generatePersona}
-                                    >
-                                        Regenerate Patient Persona
-                                    </Button>
+                        <div class=" max-h-[40vh] overflow-y-auto">
+                            {#if caseState.isGeneratingPersona}
+                                <LoadingMessage
+                                    message="Creating patient persona..."
+                                />
+                            {:else if caseState.persona}
+                                <MarkdownContent
+                                    content={syncMarked(
+                                        caseState.persona.content,
+                                    )}
+                                />
+                            {:else}
+                                <div
+                                    class="text-center text-muted-foreground py-8"
+                                >
+                                    <p>No patient persona generated yet</p>
                                 </div>
-                                <div class="prose dark:prose-invert">
-                                    <MarkdownContent
-                                        content={marked(personaContent)}
-                                    />
-                                </div>
-                            </div>
-                        {:else}
-                            <div class="text-center text-muted-foreground py-8">
-                                <p>No patient persona generated yet</p>
-                            </div>
-                        {/if}
+                            {/if}
+                        </div>
                     </Tabs.Content>
-
+                    <Tabs.Content value="cover-image">
+                        <div class="max-h-[40vh] overflow-y-auto">
+                            {#if currentTab === "cover-image"}
+                                <CoverImage />
+                            {/if}
+                        </div>
+                    </Tabs.Content>
                     <Tabs.Content value="physical-exams">
-                        {#if isLoadingPhysicalExams}
-                            <LoadingMessage
-                                message="Generating physical examinations and lab tests..."
-                            />
-                        {:else if error}
-                            <Alert variant="destructive">
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        {:else if physicalExamsContent}
-                            <div class="rounded-lg pt-4">
-                                <div class="flex justify-end mb-4">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onclick={generatePhysicalExams}
-                                    >
-                                        Regenerate Physical Exams
-                                    </Button>
-                                </div>
-                                <div class="prose dark:prose-invert">
-                                    <MarkdownContent
-                                        content={marked(physicalExamsContent)}
-                                    />
-                                </div>
-                            </div>
-                        {:else}
-                            <div class="text-center text-muted-foreground py-8">
-                                <p>Physical exams are not available yet</p>
-                            </div>
-                        {/if}
+                        <div class="min-h-[200px]">Physical Exams Content</div>
                     </Tabs.Content>
 
-                    <Tabs.Content value="differential-diagnosis">
-                        {#if isLoadingDifferential}
-                            <LoadingMessage
-                                message="Generating differential diagnosis..."
-                            />
-                        {:else if error}
-                            <Alert variant="destructive">
-                                <AlertDescription>{error}</AlertDescription>
-                            </Alert>
-                        {:else if differentialDiagnosis}
-                            <div class="rounded-lg pt-4">
-                                <div class="flex justify-end mb-4">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onclick={generateDifferential}
-                                    >
-                                        Regenerate Differential Diagnosis
-                                    </Button>
-                                </div>
-                                <ul class="space-y-2">
-                                    {#each differentialDiagnosis as diagnosis, index}
-                                        <li
-                                            class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                        >
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3"
-                                            >
-                                                {index + 1}
-                                            </span>
-                                            <span
-                                                class="text-gray-700 dark:text-gray-200"
-                                                >{diagnosis}</span
-                                            >
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </div>
-                        {:else}
-                            <div class="text-center text-muted-foreground py-8">
-                                <p>
-                                    Differential diagnosis is not available yet
-                                </p>
-                            </div>
-                        {/if}
+                    <Tabs.Content value="differential">
+                        <div class="min-h-[200px]">Differential Content</div>
                     </Tabs.Content>
                 </div>
             </Tabs.Root>
@@ -239,9 +199,9 @@
                 <Dialog.Close>
                     <Button type="button" variant="outline">Cancel</Button>
                 </Dialog.Close>
-                <Button type="submit">Create Case Assessment</Button>
+                <Button type="submit">Create Assessment</Button>
             </Dialog.Footer>
-        </form>
+        </div>
     </Dialog.Content>
 </Dialog.Root>
 

@@ -14,11 +14,11 @@ export interface TestResult {
     status: TestStatus;
     results: TestResultContent;
     interpretation: string;
-    timestamp: Date|null;
+    timestamp: Date | null;
 }
 export interface UploadResponse {
     patient_prompt: string;
-} 
+}
 
 
 export interface FormattedPersonaResponse {
@@ -26,6 +26,8 @@ export interface FormattedPersonaResponse {
     content: string;
     timestamp: string;
     type: 'ai';
+    case_id: string;
+
 }
 
 export interface Message {
@@ -49,8 +51,8 @@ export interface StudentMessage {
 export interface ExaminationResult {
     name: string;
     purpose: string;
-    findings:FindingContent;
-    timestamp: Date|null;
+    findings: FindingContent;
+    timestamp: Date | null;
     status: TestStatus;
     interpretation: string;
 }
