@@ -3,28 +3,28 @@ import { API_BASE_URL } from '$lib/config/api';
 export class TestDataService {
     private baseUrl = API_BASE_URL;
 
-    // async createExamTestData(caseId: string, pdfFile: File): Promise<any> {
-    //     const formData = new FormData();
-    //     formData.append('file', pdfFile);
-    //     formData.append('case_id', caseId.toString());
+    async createExamTestData(caseId: string, pdfFile: File): Promise<any> {
+        const formData = new FormData();
+        formData.append('file', pdfFile);
+        formData.append('case_id', caseId.toString());
 
-    //     const response = await fetch(`${this.baseUrl}/exam_test_data/create`, {
-    //         method: 'POST',
-    //         body: formData,
-    //     });
+        const response = await fetch(`${this.baseUrl}/exam_test_data/create`, {
+            method: 'POST',
+            body: formData,
+        });
 
-    //     if (!response.ok) {
-    //         throw new Error('Failed to create examination test data');
-    //     }
-
-
-    //     return response.json(); // Return the response data
-    // }
+        if (!response.ok) {
+            throw new Error('Failed to create examination test data');
+        }
 
 
+        return response.json(); // Return the response data
+    }
 
 
-    async createExamTestDataFromUrl(caseId: string, fileUrl: string): Promise<any> {
+
+
+    async createExamTestDataFromUrl(fileUrl: string, caseId?: string | null): Promise<any> {
         const response = await fetch(`${this.baseUrl}/exam_test_data/create-from-url`, {
             method: 'POST',
             body: JSON.stringify({ case_id: caseId, file_url: fileUrl }),

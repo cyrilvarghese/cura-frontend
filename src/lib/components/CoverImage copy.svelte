@@ -44,8 +44,8 @@
     }
 
     async function generateWithPrompt() {
-        if (!currentPrompt.trim() || !$lastCaseIdStore)
-            return generateCoverImage();
+        debugger;
+        if (!currentPrompt.trim()) return generateCoverImage();
         try {
             isLoading.set(true);
             // const response = await coverImageService.generateWithPrompt(
@@ -73,7 +73,7 @@
     });
 </script>
 
-<div class="w-full bg-white  ">
+<div class="w-full bg-white">
     {#if $isLoading && !$coverImageData}
         <LoadingMessage message="Generating cover image" />
     {:else if $coverImageData}
@@ -97,9 +97,7 @@
             </div>
 
             <!-- Text Overlay (Green Box) -->
-            <div
-                class="w-full  bg-white/90 backdrop-blur-sm  p-4 pt-0 "
-            >
+            <div class="w-full bg-white/90 backdrop-blur-sm p-4 pt-0">
                 <h3 class="text-lg text-muted-foreground font-medium mb-2">
                     Image Description (prompt)
                 </h3>

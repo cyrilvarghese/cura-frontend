@@ -2,7 +2,6 @@
     import { ChevronDown } from "lucide-svelte";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Button } from "$lib/components/ui/button";
-    import CaseDialog from "../../03-organisms/dialogs/case-assessment-dialog.svelte";
     import OsceDialog from "../../03-organisms/dialogs/osce-assessment-dialog.svelte";
     import WrittenDialog from "../../03-organisms/dialogs/written-assessment-dialog.svelte";
     import VivaDialog from "../../03-organisms/dialogs/viva-assessment-dialog.svelte";
@@ -80,13 +79,7 @@
             >
         </DropdownMenu.Content>
     </DropdownMenu.Root>
-
-    <CaseDialog
-        bind:open={showCaseDialog}
-        {documents}
-        {competencyCode}
-        {competencyText}
-    />
+ 
     <OsceDialog
         bind:open={showOsceDialog}
         {competencyCode}

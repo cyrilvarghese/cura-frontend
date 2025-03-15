@@ -33,14 +33,26 @@
         $curriculumStore?.topics
             ?.map((topic) => ({
                 ...topic,
-                // Combine API documents and newly uploaded documents
                 documents: [
+                    // Get existing documents from the curriculum API
                     ...(topic.documents || []),
+                    // Get any newly uploaded documents from the document store
                     ...($documentStore.documents[topic.topic] || []),
-                ],
+                ].filter(
+                    (doc, index, self) =>
+                        // Keep only the first occurrence of each document with a unique ID
+                        // - doc: current document being checked
+                        // - index: current index in array
+                        // - self: the full array of documents
+                        // - findIndex: returns index of first document with matching ID
+                        // If current index matches first occurrence, keep it (removes duplicates)
+                        index === self.findIndex((d) => d.id === doc.id),
+                ),
             }))
+            // Only show topics that have competencies
             .filter((topic) => topic.competencies.length > 0) ?? [],
     );
+
 </script>
 
 <PageLayout

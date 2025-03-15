@@ -241,11 +241,17 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
     }
 }
 // Function to generate a physical exam
-export async function generatePhysicalExamFromUrl(fileUrl: string, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPhysicalExam: true }));
+export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
+    debugger;
+    caseStore.update(state => ({
+        ...state,
+        generating: true, error: null, isGeneratingPhysicalExam: true,
+        caseId: caseId || null,
+        selectedDocument: selectedDocument || null
+    }));
 
     try {
-        const response = await testDataService.createExamTestDataFromUrl(caseId, fileUrl);
+        const response = await testDataService.createExamTestDataFromUrl(fileUrl);
         caseStore.update(state => ({
             ...state,
             testData: {
@@ -254,6 +260,7 @@ export async function generatePhysicalExamFromUrl(fileUrl: string, caseId: strin
             },
             generating: false,
             isGeneratingPhysicalExam: false,
+            caseId: response.case_id,
         }));
     } catch (error) {
         caseStore.update(state => ({
@@ -261,6 +268,36 @@ export async function generatePhysicalExamFromUrl(fileUrl: string, caseId: strin
             error: error instanceof Error ? error.message : "Generation failed",
             generating: false,
             isGeneratingPhysicalExam: false,
+        }));
+    }
+}
+
+export async function generateDifferentialDiagnosisFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
+    caseStore.update(state => ({
+        ...state,
+        generating: true,
+        error: null,
+        isGeneratingDifferential: true,
+        caseId: caseId || null,
+        selectedDocument: selectedDocument || null
+    }));
+
+    try {
+        const response = await differentialDiagnosisService.createDifferentialDiagnosisFromUrl(fileUrl, caseId || null);
+        caseStore.update(state => ({
+            ...state,
+            differentialDiagnosis: response.content,
+            generating: false,
+            isGeneratingDifferential: false,
+            caseId: response.case_id,
+        }));
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
+            generating: false,
+            isGeneratingDifferential: false,
+            
         }));
     }
 }

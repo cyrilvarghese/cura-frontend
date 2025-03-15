@@ -51,12 +51,12 @@
     }
 
     async function generateWithPrompt() {
-        if (!currentPrompt.trim() || !$lastCaseIdStore || !$coverImageData)
+        if (!currentPrompt.trim() || !$coverImageData)
             return generateCoverImage();
         try {
             isLoading.set(true);
             const response = await coverImageService.generateWithPrompt(
-                $lastCaseIdStore,
+                caseId,
                 currentPrompt,
                 $coverImageData.title ?? "",
                 $coverImageData.quote ?? "",

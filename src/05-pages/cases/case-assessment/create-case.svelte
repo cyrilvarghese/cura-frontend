@@ -5,14 +5,10 @@
     import { Upload } from "lucide-svelte";
     import {
         caseStore,
-        generatePersona,
-        generatePhysicalExam,
-        generateDifferentialDiagnosis,
-        type CaseStoreState,
-        updateCaseId,
-        updateUploadedFile,
         generatePersonaFromUrl,
         generatePhysicalExamFromUrl,
+        generateDifferentialDiagnosisFromUrl,
+        type CaseStoreState,
     } from "$lib/stores/caseCreatorStore";
     import { onDestroy, onMount } from "svelte";
     import {
@@ -78,7 +74,7 @@
 
     // Subscribe to the caseStore
     const unsubscribe = caseStore.subscribe((state) => {
-        debugger;   
+        debugger;
         uploadState = state;
         uploadedFileName = state.uploadedFileName;
     });
@@ -88,11 +84,8 @@
         unsubscribeDocStore(); // Clean up the document store subscription
     });
 
- 
- 
-
     async function handleGenerateAll() {
-        if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        if (!uploadState.selectedDocument) return;
         uploadState.generating = true;
         uploadState.error = null;
 
@@ -130,7 +123,10 @@
 
         try {
             if (!uploadState.selectedDocument) return;
-            await generatePersonaFromUrl(uploadState.selectedDocument.url, uploadState.selectedDocument);
+            await generatePersonaFromUrl(
+                uploadState.selectedDocument.url,
+                uploadState.selectedDocument,
+            );
         } catch (error) {
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
@@ -142,16 +138,19 @@
 
     async function handleGenerateCaseData() {
         debugger;
-        console.log("uploadState.selectedDocument", uploadState.selectedDocument);
+        console.log(
+            "uploadState.selectedDocument",
+            uploadState.selectedDocument,
+        );
         console.log("uploadState.caseId", uploadState.caseId);
-        if (!uploadState.selectedDocument || !uploadState.caseId) return;
+        if (!uploadState.selectedDocument) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
 
         try {
             await generatePhysicalExamFromUrl(
                 uploadState.selectedDocument.url,
-                uploadState.caseId,
+                uploadState.selectedDocument,
             );
         } catch (error) {
             console.error("Error generating physical exam:", error);
@@ -162,14 +161,15 @@
     }
 
     async function handleGenerateDifferentialDiagnosis() {
-        if (!uploadState.uploadedFile || !uploadState.caseId) return;
+        debugger;
+        if (!uploadState.selectedDocument) return;
         currentTab = "differential-diagnosis";
         uploadState.isGeneratingDifferential = true;
-
+        
         try {
-            await generateDifferentialDiagnosis(
-                uploadState.uploadedFile,
-                uploadState.caseId,
+            await generateDifferentialDiagnosisFromUrl(
+                uploadState.selectedDocument?.url || "",
+                uploadState.selectedDocument || undefined,
             );
         } catch (error) {
             console.error("Error generating differential diagnosis:", error);
@@ -292,7 +292,7 @@
                     Generate Differential Diagnosis
                 {/if}
             </Button>
-            {#if (!uploadState.selectedDocument) && !uploadState.generating}
+            {#if !uploadState.selectedDocument && !uploadState.generating}
                 <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
                 </p>
