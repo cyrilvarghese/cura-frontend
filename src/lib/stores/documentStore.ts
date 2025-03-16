@@ -26,7 +26,6 @@ export async function uploadDocument(
     documentStore.update(state => ({ ...state, isUploading: true, error: null }));
 
     try {
-        debugger;
         const response = await documentService.uploadDocument(file, topicName, title, description);
 
         documentStore.update(state => {

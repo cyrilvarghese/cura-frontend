@@ -19,10 +19,9 @@
 
 <PageLayout
     breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Curriculum", href: "/curriculum" },
-        { label: "Add Assessment", href: "/curriculum" },
-        { label: "Case" },
+        { label: topic, href: "/curriculum" },
+        { label: code, href: "/curriculum" },
+        { label: "New Case", href: "/" },
     ]}
 >
     <div class="bg-muted/50 rounded-xl w-full h-full flex flex-col">

@@ -8,7 +8,7 @@
 	import { fetchCases } from "$lib/stores/casePlayerStore";
 	import { onMount } from "svelte";
 	import CurriculumPage from "../../05-pages/CurriculumPage.svelte";
-	import CaseLibraryPage from "../../05-pages/CaseLibraryPage.svelte";
+	import CaseLibraryPage from "../../05-pages/CaseLibrary.svelte";
 	import CaseAssessment from "../../05-pages/cases/case-assessment/create-case-wrapper.svelte";
 
 	// Get the current URL for Router

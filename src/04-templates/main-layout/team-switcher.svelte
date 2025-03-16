@@ -3,7 +3,7 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import ChevronDown from "lucide-svelte/icons/chevron-down";
 	import Plus from "lucide-svelte/icons/plus";
-	import { currentTeam } from "$lib/stores/teamStore";
+	import { currentDepartment } from "$lib/stores/teamStore";
 
 	let {
 		teams,
@@ -18,15 +18,15 @@
 	} = $props();
 
 	// Initialize the store with the first team
-	let activeTeam = $state($currentTeam || teams[0]);
+	let activeDepartment = $state($currentDepartment || teams[0]);
 
 	$effect(() => {
-		currentTeam.set(activeTeam);
+		currentDepartment.set(activeDepartment);
 	});
 
 	function handleTeamChange(team: (typeof teams)[0]) {
-		activeTeam = team;
-		currentTeam.set(team);
+		activeDepartment = team;
+		currentDepartment.set(team);
 		console.log("Team changed:", team);
 	}
 </script>
@@ -40,10 +40,10 @@
 						<div
 							class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-5 items-center justify-center rounded-md"
 						>
-							<activeTeam.logo class="size-3" />
+							<activeDepartment.logo class="size-3" />
 						</div>
 						<span class="truncate font-semibold"
-							>{activeTeam.name}</span
+							>{activeDepartment.name}</span
 						>
 						<ChevronDown class="opacity-50" />
 					</Sidebar.MenuButton>

@@ -16,6 +16,11 @@
         fetchDocumentsByTopic,
     } from "$lib/stores/documentStore";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
+    import {
+        CaseDataService,
+        type PublishCaseParams,
+    } from "$lib/services/caseDataService";
+    import { currentDepartment, type Department } from "$lib/stores/teamStore";
     //on mount get documetns for teh topic
     // Define initialValue based on the expected structure of CaseStoreState
     const initialValue: CaseStoreState = {
@@ -42,9 +47,21 @@
     };
     let { topic, code } = $props();
 
+    // Create an instance of CaseDataService
+    const caseDataService = new CaseDataService();
+
     let topicDocuments = $state<DocumentUploadResponse[]>([]);
     let isLoadingDocuments = $state(false);
     let documentError = $state<string | null>(null);
+    let isPublishing = $state(false);
+    let publishError = $state<string | null>(null);
+    let publishSuccess = $state(false);
+    let department = $state<Department | null>(null);
+
+    // Subscribe to the currentDepartment store
+    const unsubscribeDepartment = currentDepartment.subscribe((value) => {
+        department = value;
+    });
 
     const unsubscribeDocStore = documentStore.subscribe((state) => {
         topicDocuments = state.documents[topic] || [];
@@ -74,7 +91,6 @@
 
     // Subscribe to the caseStore
     const unsubscribe = caseStore.subscribe((state) => {
-        debugger;
         uploadState = state;
         uploadedFileName = state.uploadedFileName;
     });
@@ -82,6 +98,7 @@
     onDestroy(() => {
         unsubscribe(); // Clean up the subscription when the component is destroyed
         unsubscribeDocStore(); // Clean up the document store subscription
+        unsubscribeDepartment(); // Clean up the department store subscription
     });
 
     async function handleGenerateAll() {
@@ -116,7 +133,6 @@
     }
 
     async function handleGeneratePersona() {
-        debugger;
         if (!uploadState.selectedDocument) return;
         currentTab = "patient-persona";
         uploadState.isGeneratingPersona = true;
@@ -137,13 +153,12 @@
     }
 
     async function handleGenerateCaseData() {
-        debugger;
         console.log(
             "uploadState.selectedDocument",
             uploadState.selectedDocument,
         );
         console.log("uploadState.caseId", uploadState.caseId);
-        if (!uploadState.selectedDocument) return;
+        if (!uploadState.selectedDocument || !uploadState.caseId) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
 
@@ -151,6 +166,7 @@
             await generatePhysicalExamFromUrl(
                 uploadState.selectedDocument.url,
                 uploadState.selectedDocument,
+                uploadState.caseId || "",
             );
         } catch (error) {
             console.error("Error generating physical exam:", error);
@@ -161,21 +177,47 @@
     }
 
     async function handleGenerateDifferentialDiagnosis() {
-        debugger;
-        if (!uploadState.selectedDocument) return;
+        if (!uploadState.selectedDocument || !uploadState.caseId) return;
         currentTab = "differential-diagnosis";
         uploadState.isGeneratingDifferential = true;
-        
+
         try {
             await generateDifferentialDiagnosisFromUrl(
                 uploadState.selectedDocument?.url || "",
                 uploadState.selectedDocument || undefined,
+                uploadState.caseId || "",
             );
         } catch (error) {
             console.error("Error generating differential diagnosis:", error);
             throw error;
         } finally {
             uploadState.isGeneratingDifferential = false;
+        }
+    }
+
+    async function handlePublishCase() {
+        if (!uploadState.caseId || !department) return;
+
+        isPublishing = true;
+        publishError = null;
+        publishSuccess = false;
+
+        try {
+            const params: PublishCaseParams = {
+                published: true,
+                department: department.name,
+            };
+
+            await caseDataService.publishCase(uploadState.caseId, params);
+            publishSuccess = true;
+        } catch (error) {
+            publishError =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to publish case";
+            console.error("Error publishing case:", error);
+        } finally {
+            isPublishing = false;
         }
     }
 </script>
@@ -295,6 +337,49 @@
             {#if !uploadState.selectedDocument && !uploadState.generating}
                 <p class="text-xs mt-1 text-muted-foreground">
                     Please fill in all fields and upload a PDF file
+                </p>
+            {/if}
+        </div>
+
+        <!-- Publish Case Button -->
+        <div class="flex flex-col justify-start mt-4">
+            <Button
+                onclick={handlePublishCase}
+                disabled={isPublishing ||
+                    !uploadState.caseId ||
+                    !department ||
+                    uploadState.generating}
+                class="bg-green-600 hover:bg-green-700 text-white"
+            >
+                {#if isPublishing}
+                    Publishing Case...
+                {:else}
+                    Publish Case
+                {/if}
+            </Button>
+
+            {#if publishSuccess}
+                <p class="text-xs mt-1 text-green-600 font-medium">
+                    Case published successfully!
+                </p>
+            {/if}
+
+            {#if publishError}
+                <p class="text-xs mt-1 text-red-600 font-medium">
+                    Error: {publishError}
+                </p>
+            {/if}
+
+            {#if !uploadState.caseId && !isPublishing}
+                <p class="text-xs mt-1 text-muted-foreground">
+                    Please generate case data before publishing
+                </p>
+            {/if}
+
+            {#if !department && !isPublishing}
+                <p class="text-xs mt-1 text-muted-foreground">
+                    No department selected. Please select a department before
+                    publishing.
                 </p>
             {/if}
         </div>

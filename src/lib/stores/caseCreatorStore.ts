@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { patientPersonaService } from '$lib/services/patientPersonaService'; // Adjust the import based on your project structure
 import { testDataService } from '$lib/services/testDataService'; // Adjust the import based on your project structure
 import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
@@ -6,6 +6,8 @@ import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
 import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
 import type { DocumentUploadResponse } from '$lib/services/documentService';
+import { number } from 'zod';
+import { currentDepartment } from './teamStore';
 
 
 
@@ -59,12 +61,15 @@ export const lastCaseIdStore = writable<string | null>(null);
 
 // Function to update case ID
 export function updateCaseId(caseId: string) {
+    //make sure its strigyfied if its a number
+    caseId = caseId.toString();
     caseStore.update(state => ({
         ...state,
         caseId
     }));
     lastCaseIdStore.set(caseId);
 }
+
 
 // Function to update uploaded file
 export function updateUploadedFile(file: File) {
@@ -202,6 +207,7 @@ export async function searchMedicalImages(query: string) {
     }
 }
 
+
 export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string,) {
     caseStore.update(state => ({
         ...state,
@@ -214,10 +220,13 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
     if (caseId) {
         lastCaseIdStore.set(caseId);
     }
-
+    let department = '';
+    const currentDepartmentValue = get(currentDepartment);
+    if (currentDepartmentValue) {
+        department = currentDepartmentValue.name;
+    }
     try {
-        const response = await patientPersonaService.createPatientPersonaFromUrl(fileUrl, caseId || null);
-        debugger;
+        const response = await patientPersonaService.createPatientPersonaFromUrl(fileUrl, caseId || null, department);
         caseStore.update(state => ({
             ...state,
             persona: {
@@ -231,6 +240,7 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
             generating: false,
             isGeneratingPersona: false,
         }));
+        updateCaseId(response.case_id);
     } catch (error) {
         caseStore.update(state => ({
             ...state,
@@ -242,7 +252,6 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
 }
 // Function to generate a physical exam
 export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
-    debugger;
     caseStore.update(state => ({
         ...state,
         generating: true, error: null, isGeneratingPhysicalExam: true,
@@ -262,6 +271,8 @@ export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocum
             isGeneratingPhysicalExam: false,
             caseId: response.case_id,
         }));
+        updateCaseId(response.case_id);
+
     } catch (error) {
         caseStore.update(state => ({
             ...state,
@@ -291,13 +302,14 @@ export async function generateDifferentialDiagnosisFromUrl(fileUrl: string, sele
             isGeneratingDifferential: false,
             caseId: response.case_id,
         }));
+        updateCaseId(response.case_id);
     } catch (error) {
         caseStore.update(state => ({
             ...state,
             error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
             generating: false,
             isGeneratingDifferential: false,
-            
+
         }));
     }
 }

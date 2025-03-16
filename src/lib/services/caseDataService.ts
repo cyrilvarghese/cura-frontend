@@ -7,6 +7,13 @@ export interface CaseListItem {
     title: string;
     quote: string;
     image_url: string;
+    department: string;
+    published: boolean;
+}
+
+export interface PublishCaseParams {
+    published: boolean;
+    department: string;
 }
 
 export class CaseDataService {
@@ -47,5 +54,26 @@ export class CaseDataService {
             throw new Error('Failed to fetch documents');
         }
         return response.json();
+    }
+
+    async publishCase(caseId: string, params: PublishCaseParams): Promise<any> {
+        try {
+            const response = await fetch(`${this.baseUrl}/cases/${caseId}/publish`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to publish case');
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('Error publishing case:', error);
+            throw error;
+        }
     }
 } 

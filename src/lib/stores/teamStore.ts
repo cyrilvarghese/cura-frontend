@@ -1,17 +1,17 @@
 import { writable } from 'svelte/store';
 
-type Team = {
+export type Department = {
     name: string;
     logo: any; // TODO: Update this type when lucide-svelte updates types
     plan: string;
 };
 
-const storedTeam = localStorage.getItem('currentTeam');
-export const currentTeam = writable<Team | null>(storedTeam ? JSON.parse(storedTeam) : null);
+const storedDepartment = localStorage.getItem('currentDepartment');
+export const currentDepartment = writable<Department>(storedDepartment ? JSON.parse(storedDepartment) : null);
 
 // Subscribe to changes and update localStorage
-currentTeam.subscribe(value => {
+currentDepartment.subscribe(value => {
     if (value) {
-        localStorage.setItem('currentTeam', JSON.stringify(value));
+        localStorage.setItem('currentDepartment', JSON.stringify(value));
     }
 });

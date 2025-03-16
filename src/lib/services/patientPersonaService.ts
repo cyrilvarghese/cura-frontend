@@ -24,10 +24,10 @@ export class PatientPersonaService {
         return await response.json();
     }
 
-    async createPatientPersonaFromUrl(fileUrl: string, caseId: string | null): Promise<FormattedPersonaResponse> {
+    async createPatientPersonaFromUrl(fileUrl: string, caseId: string | null, department: string): Promise<FormattedPersonaResponse> {
         debugger;
         const response = await fetch(
-            `${this.baseUrl}/patient_persona_from_url/create`,
+            `${this.baseUrl}/patient_persona/create-from-url`,
             {
                 method: 'POST',
                 headers: {
@@ -35,7 +35,8 @@ export class PatientPersonaService {
                 },
                 body: JSON.stringify({
                     file_url: fileUrl,
-                    case_id: caseId
+                    case_id: caseId,
+                    department: department
                 })
             }
         );

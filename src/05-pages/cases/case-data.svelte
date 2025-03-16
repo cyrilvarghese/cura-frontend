@@ -73,18 +73,18 @@
                         </Alert>
                     {:else if uploadState.persona}
                         <div class="mb-4">
-                            {#if !showCoverImage}
+                            <!-- {#if !showCoverImage}
                                 <Button
                                     variant="outline"
                                     onclick={() => (showCoverImage = true)}
                                 >
                                     Generate Cover Image
                                 </Button>
-                            {:else}
+                            {:else} -->
                                 <div class="mt-4">
                                     <CoverImage caseId={uploadState.caseId} />
                                 </div>
-                            {/if}
+                            <!-- {/if} -->
                         </div>
                         <div class="rounded-lg pt-4">
                             <MarkdownContent

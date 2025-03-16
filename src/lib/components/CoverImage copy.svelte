@@ -44,7 +44,6 @@
     }
 
     async function generateWithPrompt() {
-        debugger;
         if (!currentPrompt.trim()) return generateCoverImage();
         try {
             isLoading.set(true);

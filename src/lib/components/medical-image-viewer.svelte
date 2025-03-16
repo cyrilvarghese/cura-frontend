@@ -72,21 +72,18 @@
         try {
             isUploading = true;
             uploadError = null;
-            debugger;
             const response = await testAssetService.uploadTestAsset(
                 file,
                 caseId,
                 testName,
                 testType,
             );
-            debugger;
             console.log(response);
             onUploadSuccess?.(response);
             currentImageUrl = response.file_path;
             if (currentImageUrl) {
                 imageError = false;
             }
-            debugger;
         } catch (error) {
             console.error("Upload failed:", error);
             uploadError = "Failed to upload image";
@@ -203,6 +200,7 @@
                         <Button
                             variant="outline"
                             onclick={() => {
+                                debugger;
                                 const url = (
                                     document.getElementById(
                                         "image-url",
