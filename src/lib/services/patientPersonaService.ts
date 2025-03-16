@@ -25,7 +25,7 @@ export class PatientPersonaService {
     }
 
     async createPatientPersonaFromUrl(fileUrl: string, caseId: string | null, department: string): Promise<FormattedPersonaResponse> {
-        debugger;
+        
         const response = await fetch(
             `${this.baseUrl}/patient_persona/create-from-url`,
             {

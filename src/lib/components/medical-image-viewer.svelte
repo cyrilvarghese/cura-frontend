@@ -133,7 +133,7 @@
                          from the actual server and not 
                          from the our server, so we need to
                           add the base url -->
-                          {@debug currentImageUrl}
+                          {currentImageUrl}
                         <img
                             src={currentImageUrl.startsWith("http") ||
                             currentImageUrl.startsWith("www")
@@ -200,7 +200,7 @@
                         <Button
                             variant="outline"
                             onclick={() => {
-                                debugger;
+                                
                                 const url = (
                                     document.getElementById(
                                         "image-url",

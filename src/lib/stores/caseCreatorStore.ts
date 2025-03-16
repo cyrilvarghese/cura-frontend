@@ -252,6 +252,7 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
 }
 // Function to generate a physical exam
 export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
+ 
     caseStore.update(state => ({
         ...state,
         generating: true, error: null, isGeneratingPhysicalExam: true,
@@ -260,7 +261,7 @@ export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocum
     }));
 
     try {
-        const response = await testDataService.createExamTestDataFromUrl(fileUrl);
+        const response = await testDataService.createExamTestDataFromUrl(fileUrl, caseId || null);
         caseStore.update(state => ({
             ...state,
             testData: {

@@ -13,7 +13,7 @@
     export let result: TestResult;
    
     export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
-    debugger
+    
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
         pending: "bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20",

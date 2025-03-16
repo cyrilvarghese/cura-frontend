@@ -18,8 +18,7 @@
         await fetchCases();
         cases = $casesListStore || [];
     });
-    debugger;
-    console.log("cases", cases);
+ 
 
     //filter cases based on department and published status
     $: filteredCases = cases.length

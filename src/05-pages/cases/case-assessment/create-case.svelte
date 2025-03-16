@@ -161,7 +161,8 @@
         if (!uploadState.selectedDocument || !uploadState.caseId) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
-
+        
+        console.log("uploadState.caseId", uploadState.caseId);
         try {
             await generatePhysicalExamFromUrl(
                 uploadState.selectedDocument.url,
