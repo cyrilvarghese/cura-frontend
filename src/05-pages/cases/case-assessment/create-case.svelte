@@ -206,7 +206,7 @@
         try {
             const params: PublishCaseParams = {
                 published: true,
-                department: department.name,
+                competency_code: code,
             };
 
             await caseDataService.publishCase(uploadState.caseId, params);

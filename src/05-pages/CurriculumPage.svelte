@@ -20,6 +20,7 @@
     import DocumentUploadButton from "$lib/components/DocumentUploadButton.svelte";
     import { API_BASE_URL } from "$lib/config/api";
     import AssessmentButton from "$lib/components/AssessmentButton.svelte";
+    import AssessmentPill from "$lib/components/AssessmentPill.svelte";
 
     let searchQuery = $state("");
     let uploadError = $state("");
@@ -34,25 +35,40 @@
             ?.map((topic) => ({
                 ...topic,
                 documents: [
-                    // Get existing documents from the curriculum API
                     ...(topic.documents || []),
-                    // Get any newly uploaded documents from the document store
                     ...($documentStore.documents[topic.topic] || []),
                 ].filter(
                     (doc, index, self) =>
-                        // Keep only the first occurrence of each document with a unique ID
-                        // - doc: current document being checked
-                        // - index: current index in array
-                        // - self: the full array of documents
-                        // - findIndex: returns index of first document with matching ID
-                        // If current index matches first occurrence, keep it (removes duplicates)
                         index === self.findIndex((d) => d.id === doc.id),
                 ),
             }))
-            // Only show topics that have competencies
-            .filter((topic) => topic.competencies.length > 0) ?? [],
-    );
+            .filter((topic) => {
+                // Only show topics that have competencies
+                if (!topic.competencies.length) return false;
 
+                // If no search query, show all topics
+                if (!searchQuery) return true;
+
+                const query = searchQuery.toLowerCase();
+                return (
+                    // Search in topic name
+                    topic.topic.toLowerCase().includes(query) ||
+                    // Search in competencies - match individual words
+                    topic.competencies.some((comp) => {
+                        const words = query
+                            .split(" ")
+                            .filter((word) => word.length > 0);
+                        return words.every(
+                            (word) =>
+                                comp.competency.toLowerCase().includes(word) ||
+                                comp.competency_code
+                                    .toLowerCase()
+                                    .includes(word),
+                        );
+                    })
+                );
+            }) ?? [],
+    );
 </script>
 
 <PageLayout
@@ -67,7 +83,8 @@
                 type="search"
                 placeholder="Search..."
                 bind:value={searchQuery}
-                class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                style="background-color: #eff6ff;"
+                class="px-4 py-2 border bg-blue-50! rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
         </div>
     </div>
@@ -107,7 +124,7 @@
                                 <TableHead class="w-[200px]">Teaching</TableHead
                                 >
                                 <TableHead class="w-[300px]"
-                                    >Assessment Method</TableHead
+                                    >Assessment</TableHead
                                 >
                                 <TableHead class="w-[100px]">Action</TableHead>
                             </TableRow>
@@ -135,12 +152,7 @@
                                         <div class="flex gap-2 flex-wrap">
                                             {#if competency.assessments.length > 0}
                                                 {#each competency.assessments as assessment}
-                                                    <a
-                                                        href={`/case-library/${assessment.id}`}
-                                                        class="text-sm text-blue-600 hover:underline cursor-pointer"
-                                                    >
-                                                        {assessment.title}
-                                                    </a>
+                                                    <AssessmentPill {assessment}   onDelete={(id) => fetchCurriculumData()}  />
                                                 {/each}
                                             {:else}
                                                 <span

@@ -133,7 +133,7 @@
                          from the actual server and not 
                          from the our server, so we need to
                           add the base url -->
-                          {currentImageUrl}
+                       
                         <img
                             src={currentImageUrl.startsWith("http") ||
                             currentImageUrl.startsWith("www")
@@ -195,7 +195,7 @@
                             type="url"
                             id="image-url"
                             placeholder="Enter a link to an image to add"
-                            class="flex-1 px-3 py-2 border rounded-md"
+                            class="flex-1 px-3 py-2 border rounded-md bg-white"
                         />
                         <Button
                             variant="outline"

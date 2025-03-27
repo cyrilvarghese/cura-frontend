@@ -11,6 +11,9 @@
     import { onMount } from "svelte";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     import { Button } from "$lib/components/ui/button";
+    import * as Dialog from "$lib/components/ui/dialog";
+    import { Textarea } from "$lib/components/ui/textarea";
+    import { phrasesToAvoidStore } from "$lib/stores/phrasesToAvoidStore";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -36,6 +39,19 @@
     }
 
     let showCoverImage = $state(false);
+    let showPhraseDialog = $state(false);
+    let newPhrase = $state("");
+
+    async function addPhrase() {
+        if (newPhrase.trim()) {
+            await phrasesToAvoidStore.addPhrase(
+                uploadState.caseId,
+                newPhrase.trim(),
+            );
+            newPhrase = "";
+            showPhraseDialog = false;
+        }
+    }
 </script>
 
 <Card.Root class="flex-1">
@@ -72,19 +88,51 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.persona}
-                        <div class="mb-4">
-                            <!-- {#if !showCoverImage}
+                        <div class="relative">
+                            <div class="flex justify-start mb-4">
                                 <Button
                                     variant="outline"
-                                    onclick={() => (showCoverImage = true)}
+                                    size="sm"
+                                    onclick={() => (showPhraseDialog = true)}
                                 >
-                                    Generate Cover Image
+                                    Add phrases to avoid
                                 </Button>
-                            {:else} -->
+                            </div>
+
+                            {#if $phrasesToAvoidStore.isLoading}
+                                <div class="text-sm text-muted-foreground">
+                                    Adding phrase...
+                                </div>
+                            {/if}
+
+                            {#if $phrasesToAvoidStore.error}
+                                <Alert variant="destructive" class="mb-4">
+                                    <AlertDescription>
+                                        {$phrasesToAvoidStore.error}
+                                    </AlertDescription>
+                                </Alert>
+                            {/if}
+
+                            {#if $phrasesToAvoidStore.phrases.length > 0}
+                                <ul class="mb-4 text-sm">
+                                    {#each $phrasesToAvoidStore.phrases as phrase}
+                                        <li class="flex items-center space-x-2">
+                                            <span
+                                                class="size-1.5 rounded-full bg-muted-foreground/20"
+                                            ></span>
+                                            <span class="text-foreground"
+                                                >{phrase}</span
+                                            >
+                                        </li>
+                                    {/each}
+                                </ul>
+                            {/if}
+
+                            <div class="mb-4">
                                 <div class="mt-4">
                                     <CoverImage caseId={uploadState.caseId} />
                                 </div>
-                            <!-- {/if} -->
+                            </div>
                         </div>
                         <div class="rounded-lg pt-4">
                             <MarkdownContent
@@ -164,6 +212,34 @@
         </Tabs.Root>
     </Card.Content>
 </Card.Root>
+
+<Dialog.Root bind:open={showPhraseDialog}>
+    <Dialog.Content class="sm:max-w-[425px]">
+        <Dialog.Header>
+            <Dialog.Title>Add phrase to avoid</Dialog.Title>
+            <Dialog.Description>
+                Enter a phrase that should be avoided in the case description.
+            </Dialog.Description>
+        </Dialog.Header>
+        <div class="grid gap-4 py-4">
+            <Textarea
+                placeholder="Enter phrase to avoid..."
+                bind:value={newPhrase}
+                class="resize-none"
+                rows={1}
+            />
+        </div>
+        <Dialog.Footer>
+            <Button
+                variant="outline"
+                onclick={() => (showPhraseDialog = false)}
+            >
+                Cancel
+            </Button>
+            <Button onclick={addPhrase}>Add phrase</Button>
+        </Dialog.Footer>
+    </Dialog.Content>
+</Dialog.Root>
 
 <style>
     :global(.prose) {

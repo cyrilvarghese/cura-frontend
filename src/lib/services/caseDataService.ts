@@ -13,7 +13,7 @@ export interface CaseListItem {
 
 export interface PublishCaseParams {
     published: boolean;
-    department: string;
+    competency_code: string;
 }
 
 export class CaseDataService {
@@ -57,8 +57,9 @@ export class CaseDataService {
     }
 
     async publishCase(caseId: string, params: PublishCaseParams): Promise<any> {
+        debugger;
         try {
-            const response = await fetch(`${this.baseUrl}/cases/${caseId}/publish`, {
+            const response = await fetch(`${this.baseUrl}/cases/${caseId}/publish-and-save-assessment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

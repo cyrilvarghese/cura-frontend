@@ -15,7 +15,10 @@
     import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
     import { onMount, onDestroy } from "svelte";
-
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
+    import { get } from "svelte/store";
+    let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     const { message } = $props<{ message: Message }>();
 
     function getRelativeTime(date: Date): string {
@@ -115,11 +118,17 @@
     const messageTypeComponents = {
         loading: () => LoadingMessage,
         diagnosis: (msg: Message) => {
-            const diagnosisData = parseDiagnosisMessage(msg.content as string, "initial");
+            const diagnosisData = parseDiagnosisMessage(
+                msg.content as string,
+                "initial",
+            );
             return diagnosisData ? DiagnosisCard : null;
         },
         "final-diagnosis": (msg: Message) => {
-            const diagnosisData = parseDiagnosisMessage(msg.content as string, "final");
+            const diagnosisData = parseDiagnosisMessage(
+                msg.content as string,
+                "final",
+            );
             return diagnosisData ? DiagnosisCard : null;
         },
         "relevant-info": () => RelevantInfoCard,
@@ -129,32 +138,36 @@
     } as const;
 
     function getComponentProps(msg: Message) {
-        switch(msg.type) {
+        switch (msg.type) {
             case "diagnosis":
             case "final-diagnosis": {
-                const diagnosisType = msg.type === "final-diagnosis" ? "final" : "initial";
-                const diagnosisData = parseDiagnosisMessage(msg.content as string, diagnosisType);
+                const diagnosisType =
+                    msg.type === "final-diagnosis" ? "final" : "initial";
+                const diagnosisData = parseDiagnosisMessage(
+                    msg.content as string,
+                    diagnosisType,
+                );
                 if (!diagnosisData) return null;
                 return {
                     diagnosis: diagnosisData,
-                    type: diagnosisType
+                    type: diagnosisType,
                 };
             }
             case "relevant-info":
                 return {
-                    relevantInfo: parseRelevantInfo(msg.content as string)
+                    relevantInfo: parseRelevantInfo(msg.content as string),
                 };
             case "test-result":
                 return {
-                    result: msg.content as TestResult
+                    result: msg.content as TestResult,
                 };
             case "examination":
                 return {
-                    result: msg.content as ExaminationResult
+                    result: msg.content as ExaminationResult,
                 };
             case "feedback":
                 return {
-                    feedback: msg.content as FeedbackResponse
+                    feedback: msg.content as FeedbackResponse,
                 };
             default:
                 return {};
@@ -186,25 +199,30 @@
                         alt={message.title}
                         class="w-full h-64 object-contain"
                     />
-                    <div class="p-4"> 
+                    <div class="p-4">
                         <h3 class="font-medium text-md mb-1">
                             "{message.content}"
-                           
                         </h3>
-                        
+
                         <div class="flex items-center gap-2 mt-2">
                             <span class="text-sm text-muted-foreground"
-                                >You may ask the patient questions about their condition</span
+                                >You may ask the patient questions about their
+                                condition</span
                             >
                         </div>
                     </div>
                 </div>
             {:else if message.type in messageTypeComponents}
-                {@const MessageComponent = messageTypeComponents[message.type as keyof typeof messageTypeComponents](message)}
+                {@const MessageComponent =
+                    messageTypeComponents[
+                        message.type as keyof typeof messageTypeComponents
+                    ](message)}
                 {#if MessageComponent}
                     {#key message.type}
                         <!-- @ts-ignore  fix the type error -->
-                        <MessageComponent {...getComponentProps(message) as any} />
+                        <MessageComponent
+                            {...getComponentProps(message) as any}
+                        />
                     {/key}
                 {/if}
             {:else}

@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as Table from "$lib/components/ui/table";
-    import type { TabularData } from "$lib/stores/diagnostic-test-data";
+    import type { TabularData } from "$lib/types";
 
     export let data: TabularData;
 </script>

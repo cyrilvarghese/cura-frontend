@@ -9,8 +9,13 @@
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    export let result: ExaminationResult;
-    export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
+    import { caseDataStore } from "$lib/stores/casePlayerStore";
+
+    const caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
+    const { result } = $props<{
+        result: ExaminationResult;
+    }>();
+
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":
@@ -55,10 +60,17 @@
                     {findingContent}
                 </p>
             {:else if findingContent.type === "table"}
-                <FindingsTable data={findingContent.content} />
+                {@debug result}
+                {@debug caseId}
+                <FindingsTable
+                    data={findingContent.content}
+                    {caseId}
+                    testName={result.name}
+                    testType="physical_exam"
+                />
             {:else if findingContent.type === "image"}
                 <MedicalImageViewer
-                    caseId={caseId}
+                    {caseId}
                     testName={result.name}
                     testType="physical_exam"
                     imageUrl={findingContent.content.url}
@@ -76,10 +88,15 @@
                                 {item.content}
                             </p> -->
                         {:else if item.type === "table"}
-                            <FindingsTable data={item.content} />
+                            <FindingsTable
+                                data={item.content}
+                                {caseId}
+                                testName={result.name}
+                                testType="physical_exam"
+                            />
                         {:else if item.type === "image"}
                             <MedicalImageViewer
-                                caseId={caseId}
+                                {caseId}
                                 testName={result.name}
                                 testType="physical_exam"
                                 imageUrl={item.content.url}

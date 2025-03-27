@@ -29,6 +29,7 @@ export interface CurriculumData {
             assessments: {
                 id: number;
                 title: string;
+                url: string;
             }[];
         }[];
     }[];

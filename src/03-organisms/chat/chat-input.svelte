@@ -2,15 +2,12 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import { Textarea } from "$lib/components/ui/textarea/index.js";
     import { sendMessage } from "$lib/stores/apiStore";
-    import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
-    import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     import { examinationStore } from "$lib/stores/examinationStore";
     import { laboratoryStore } from "$lib/stores/labTestStore";
-    import type { ExaminationName, Message } from "$lib/types";
+    import type { ExaminationName } from "$lib/types";
     import type { DiagnosticTestName } from "$lib/types";
     import type { ExaminationResult } from "$lib/types";
-    import { apiStore } from "$lib/stores/apiStore";
     import LabTestsDropdown from "../lab-tests/LabTestsDropdown.svelte";
     import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
     import { onMount } from "svelte";

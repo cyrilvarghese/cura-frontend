@@ -7,13 +7,13 @@
 
 <Sonner
 	theme={$mode}
-	class="toaster group"
+	class="toaster sonner-toaster"
 	toastOptions={{
 		classes: {
-			toast: "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",
-			description: "group-[.toast]:text-muted-foreground",
-			actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-			cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+			toast: "sonner-toast group-[.sonner-toaster]:bg-background group-[.sonner-toaster]:text-foreground group-[.sonner-toaster]:border-border group-[.sonner-toaster]:shadow-lg",
+			description: "group-[.sonner-toast]:text-muted-foreground",
+			actionButton: "group-[.sonner-toast]:bg-primary group-[.sonner-toast]:text-primary-foreground",
+			cancelButton: "group-[.sonner-toast]:bg-muted group-[.sonner-toast]:text-muted-foreground",
 		},
 	}}
 	{...restProps}
