@@ -4,7 +4,7 @@
     import type { TabularData } from "$lib/types";
     import * as Dialog from "$lib/components/ui/dialog";
     import * as Table from "$lib/components/ui/table";
-    import { editPETableStore } from "$lib/stores/editPETableStore";
+    import { editPhysicalExamTableStore } from "$lib/stores/editPhysdicalExamTable";
 
     const { data, caseId, testName, testType } = $props<{
         data: TabularData;
@@ -31,7 +31,7 @@
 
     async function handleSave() {
         if (editingRow) {
-            await editPETableStore.updateTable(
+            await editPhysicalExamTableStore.updateTable(
                 caseId,
                 testName,
                 testType,

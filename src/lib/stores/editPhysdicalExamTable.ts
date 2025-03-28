@@ -6,7 +6,7 @@ interface TestTableState {
     error: string | null;
 }
 
-function createTestTableStore() {
+function createEditPhysicalExamTableStore() {
     const { subscribe, set, update } = writable<TestTableState>({
         isUpdating: false,
         error: null
@@ -45,4 +45,4 @@ function createTestTableStore() {
     };
 }
 
-export const editPETableStore = createTestTableStore(); 
+export const editPhysicalExamTableStore = createEditPhysicalExamTableStore(); 
