@@ -60,8 +60,7 @@
                     {findingContent}
                 </p>
             {:else if findingContent.type === "table"}
-                {@debug result}
-                {@debug caseId}
+              
                 <FindingsTable
                     data={findingContent.content}
                     {caseId}

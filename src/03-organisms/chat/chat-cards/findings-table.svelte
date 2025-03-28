@@ -6,38 +6,50 @@
     import * as Table from "$lib/components/ui/table";
     import { editPhysicalExamTableStore } from "$lib/stores/editPhysdicalExamTable";
 
-    const { data, caseId, testName, testType } = $props<{
+    const {
+        data: propData,
+        caseId,
+        testName,
+        testType,
+    } = $props<{
         data: TabularData;
         caseId: string;
         testName: string;
         testType: string;
     }>();
 
-    console.log("data:", data);
+    // Create a local reactive copy of the data
+    let localData = $state<TabularData>({
+        headers: [...propData.headers],
+        rows: propData.rows.map((row: (string | number)[]) => [...row]),
+    });
 
     let showEditDialog = $state(false);
     let editingRow = $state<(string | number)[] | null>(null);
+    let editingRowIndex = $state(-1); // Track the index of the row being edited
 
-    function handleRowEdit(rowData: (string | number)[]) {
-        console.log("Editing row with:", {
-            caseId,
-            testName,
-            testType,
-            rowData,
-        });
-        editingRow = [...rowData];
+    function handleEdit(row: (string | number)[], index: number) {
+        editingRow = [...row];
+        editingRowIndex = index; // Store the index of the row being edited
         showEditDialog = true;
     }
 
     async function handleSave() {
         if (editingRow) {
-            await editPhysicalExamTableStore.updateTable(
+            const success = await editPhysicalExamTableStore.updateTable(
                 caseId,
                 testName,
                 testType,
                 editingRow,
             );
+
+            if (success && editingRowIndex !== -1) {
+                // Update the local reactive data
+                localData.rows[editingRowIndex] = [...editingRow];
+            }
+
             showEditDialog = false;
+            editingRowIndex = -1; // Reset the editing index
         }
     }
 </script>
@@ -45,13 +57,13 @@
 <Table.Root>
     <Table.Header>
         <Table.Row>
-            {#each data.headers as header}
+            {#each localData.headers as header}
                 <Table.Head>{header}</Table.Head>
             {/each}
         </Table.Row>
     </Table.Header>
     <Table.Body>
-        {#each data.rows as row}
+        {#each localData.rows as row, index}
             <Table.Row>
                 {#each row as cell}
                     <Table.Cell>{cell}</Table.Cell>
@@ -60,7 +72,7 @@
                     <Button
                         variant="ghost"
                         size="sm"
-                        onclick={() => handleRowEdit(row)}
+                        onclick={() => handleEdit(row, index)}
                         class="h-8 w-8 p-0 ml-2"
                     >
                         <Edit class="h-4 w-4" />
@@ -79,7 +91,7 @@
         </Dialog.Header>
         <div class="grid gap-4 py-4">
             {#if editingRow}
-                {#each data.headers as header, index}
+                {#each localData.headers as header, index}
                     <div class="grid grid-cols-4 items-center gap-4">
                         <label
                             for={`field-${index}`}

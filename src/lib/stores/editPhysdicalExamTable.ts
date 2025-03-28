@@ -31,12 +31,14 @@ function createEditPhysicalExamTableStore() {
                 });
 
                 update(state => ({ ...state, isUpdating: false }));
+                return true;
             } catch (error) {
                 update(state => ({
                     ...state,
                     isUpdating: false,
                     error: error instanceof Error ? error.message : 'Failed to update table'
                 }));
+                return false;
             }
         },
         reset: () => {
