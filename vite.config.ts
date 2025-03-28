@@ -8,5 +8,10 @@ export default defineConfig({
     alias: {
       $lib: path.resolve("./src/lib"),
     },
+  },
+  base: '/',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
   }
 })
