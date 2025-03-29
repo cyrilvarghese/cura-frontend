@@ -12,6 +12,7 @@
     
     export let result: TestResult;
    
+    debugger;
     export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     
     const statusColors = {
@@ -65,7 +66,7 @@
                     {resultContent}
                 </p>
             {:else if resultContent.type === "table"}
-                <TestResultsTable data={resultContent.content} />
+                <TestResultsTable data={resultContent.content} caseId={caseId} testName={result.testName} testType="lab_test" />
             {:else if resultContent.type === "image"}
         
                 <MedicalImageViewer
