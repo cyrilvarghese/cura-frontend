@@ -5,16 +5,20 @@
     import { getRelativeTime } from "$lib/utils/time";
     import TestResultsTable from "./test-results-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
-    import type { TestResult, TestResultContent } from '$lib/types';
+    import type { TestResult, TestResultContent } from "$lib/types";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    
-    export let result: TestResult;
-   
-    debugger;
-    export let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
-    
+    import getFullImageUrl from "$lib/utils/getFullURl";
+
+    const {
+        result,
+        caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "",
+    } = $props<{
+        result: TestResult;
+        caseId?: string;
+    }>();
+
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
         pending: "bg-yellow-500/10 text-yellow-700 hover:bg-yellow-500/20",
@@ -22,7 +26,7 @@
     };
 
     function renderResult(
-        result: TestResultContent
+        result: TestResultContent,
     ): string | TestResultContent {
         switch (result.type) {
             case "text":
@@ -37,8 +41,19 @@
                 return "Unsupported result type";
         }
     }
-    
-    
+
+    // Image error handling
+    let imageErrorCount = 0;
+    let hasImageError = $state(false);
+
+    function handleImageError() {
+        imageErrorCount++;
+        console.log("Image error occurred");
+        hasImageError = true;
+        if (imageErrorCount > 3) {
+            console.log("Too many images failed to load, hiding them");
+        }
+    }
 
     const resultContent = renderResult(result.results);
 </script>
@@ -52,7 +67,7 @@
                 <TestTube class="h-5 w-5 text-amber-900/70" />
                 <Card.Title class="pr-4">{result.testName}</Card.Title>
             </div>
-            <Badge class={statusColors[result.status]}>
+            <Badge class={statusColors[result.status as keyof typeof statusColors]}>
                 {result.status}
             </Badge>
         </div>
@@ -66,23 +81,28 @@
                     {resultContent}
                 </p>
             {:else if resultContent.type === "table"}
-                <TestResultsTable data={resultContent.content} caseId={caseId} testName={result.testName} testType="lab_test" />
-            {:else if resultContent.type === "image"}
-        
-                <MedicalImageViewer
-                    imageUrl={resultContent.content.url}
-                    altText=""
-                    caption={resultContent.content.caption}
-                    subtitle={getRelativeTime(result.timestamp ?? new Date())}
-                    caseId={caseId}
+                <TestResultsTable
+                    data={resultContent.content}
+                    {caseId}
                     testName={result.testName}
                     testType="lab_test"
-                    onUploadSuccess={(response) => {
-                        // Handle successful upload
-                        console.log('Upload successful:', response);
-                        // Update your UI with the new image URL
-                    }}
                 />
+            {:else if resultContent.type === "image"}
+               
+                    <MedicalImageViewer
+                        {caseId}
+                        testName={result.testName}
+                        testType="lab_test"
+                        imageUrls={Array.isArray(resultContent.content.url)
+                            ? resultContent.content.url
+                            : [resultContent.content.url]}
+                        altText={resultContent.content.altText || ""}
+                        caption={resultContent.content.caption}
+                        subtitle={getRelativeTime(
+                            result.timestamp ?? new Date(),
+                        )}
+                    />
+             
             {:else if resultContent.type === "mixed"}
                 <div class="space-y-4">
                     {#each resultContent.content as item}
@@ -90,25 +110,31 @@
                             <p
                                 class="text-sm text-muted-foreground whitespace-pre-wrap"
                             >
-                                {item.content}
+                                <!-- {item.content}  remove this from student --> 
                             </p>
                         {:else if item.type === "table"}
-                            <TestResultsTable data={item.content} />
-                        {:else if item.type === "image"}
-                            <MedicalImageViewer
-                                imageUrl={item.content.url}
-                                altText={item.content.altText}
-                                caption={item.content.caption}
-                                subtitle={getRelativeTime(result.timestamp ?? new Date())}
-                                caseId={caseId}
+                            <TestResultsTable
+                                data={item.content}
+                                {caseId}
                                 testName={result.testName}
                                 testType="lab_test"
-                                onUploadSuccess={(response) => {
-                                    // Handle successful upload
-                                    console.log('Upload successful:', response);
-                                    // Update your UI with the new image URL
-                                }}
                             />
+                        {:else if item.type === "image"}
+                            
+                                <MedicalImageViewer
+                                    {caseId}
+                                    testName={result.testName}
+                                    testType="lab_test"
+                                    imageUrls={Array.isArray(item.content.url)
+                                        ? item.content.url
+                                        : [item.content.url]}
+                                    altText={item.content.altText || ""}
+                                    caption={item.content.caption}
+                                    subtitle={getRelativeTime(
+                                        result.timestamp ?? new Date(),
+                                    )}
+                                />
+                            
                         {/if}
                     {/each}
                 </div>

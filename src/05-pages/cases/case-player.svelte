@@ -1,5 +1,5 @@
 <script lang="ts">
-    import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
+    // import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ChatInput from "../../03-organisms/chat/chat-input.svelte";
     import Message from "../../03-organisms/chat/message.svelte";
     import { apiStore } from "$lib/stores/apiStore";
@@ -45,7 +45,7 @@
                 "#messages-container > div:last-child",
             );
             if (lastMessage) {
-                console.log("Scrolling last message into view");
+            
                 lastMessage.scrollIntoView({
                     behavior: "smooth",
                     block: "end",
@@ -219,7 +219,7 @@
         </div>
 
         <div class="bg-muted/10 rounded-xl w-[30%] h-full">
-            <CaseSidebar />
+            <!-- <CaseSidebar /> -->
         </div>
     </div>
 

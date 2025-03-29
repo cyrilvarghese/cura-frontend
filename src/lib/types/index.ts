@@ -108,7 +108,7 @@ export interface PatientFileItem {
 
 
 export interface ImageData {
-    url: string;
+    url: string[];
     caption?: string;
     altText: string;
 }

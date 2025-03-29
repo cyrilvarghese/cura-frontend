@@ -13,7 +13,6 @@
 
     // Subscribe to caseDataStore changes using $ syntax
     $effect(() => {
-        console.log("caseDataStore changed");
         if ($caseDataStore?.labTestReports) {
             labTestReportNames = Object.keys($caseDataStore.labTestReports) as DiagnosticTestName[];
         }

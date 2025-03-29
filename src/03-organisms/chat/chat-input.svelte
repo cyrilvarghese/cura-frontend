@@ -77,7 +77,7 @@
 
     async function handlePhysicalExam(examName: ExaminationName) {
         const result = await examinationStore.performPhysicalExam(examName);
-        console.log(result);
+      
         if (result) {
             const message = {
                 id: crypto.randomUUID(),
