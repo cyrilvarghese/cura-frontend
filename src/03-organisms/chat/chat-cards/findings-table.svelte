@@ -4,7 +4,8 @@
     import type { TabularData } from "$lib/types";
     import * as Dialog from "$lib/components/ui/dialog";
     import * as Table from "$lib/components/ui/table";
-    import { editPhysicalExamTableStore } from "$lib/stores/editPhysdicalExamTable";
+    import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
+    import { Trash2 } from "lucide-svelte";
 
     const {
         data: propData,
@@ -52,7 +53,56 @@
             editingRowIndex = -1; // Reset the editing index
         }
     }
+
+    function handleAddRow() {
+        // Create an empty row with the correct number of columns
+        const emptyRow = Array(localData.headers.length).fill("");
+
+        // Add the empty row to the data
+        localData.rows = [...localData.rows, emptyRow];
+
+        // Optionally, immediately open the edit dialog for the new row
+        editingRow = emptyRow;
+        editingRowIndex = localData.rows.length - 1;
+        showEditDialog = true;
+    }
+
+    async function handleDelete(index: number) {
+        if (confirm("Are you sure you want to delete this row?")) {
+            // Get the parameter name (row identifier) from the first column
+            const rowIdentifier = localData.rows[index][0].toString();
+
+            // Call the API to delete the row
+            const success = await editPhysicalExamTableStore.deleteRow(
+                caseId,
+                testName,
+                testType,
+                rowIdentifier,
+            );
+
+            if (success) {
+                // Remove the row from the local data if API call was successful
+                localData.rows = localData.rows.filter((_, i) => i !== index);
+
+                // Close the edit dialog if it's open
+                if (showEditDialog) {
+                    showEditDialog = false;
+                    editingRow = null;
+                    editingRowIndex = -1;
+                }
+            }
+        }
+    }
 </script>
+
+<div class="flex justify-between items-center mb-4">
+    <button
+        class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+        onclick={handleAddRow}
+    >
+        Add Row
+    </button>
+</div>
 
 <Table.Root>
     <Table.Header>
@@ -78,6 +128,15 @@
                         <Edit class="h-4 w-4" />
                         <span class="sr-only">Edit row</span>
                     </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onclick={() => handleDelete(index)}
+                        class="h-8 w-8 p-0 ml-2 text-red-500 hover:text-red-700 hover:bg-red-100"
+                    >
+                        <Trash2 class="h-4 w-4" />
+                        <span class="sr-only">Delete row</span>
+                    </Button>
                 </Table.Cell>
             </Table.Row>
         {/each}
@@ -99,12 +158,20 @@
                         >
                             {header}
                         </label>
-                        <input
-                            id={`field-${index}`}
-                            type="text"
-                            bind:value={editingRow[index]}
-                            class="col-span-3 h-10 rounded-md border border-input px-3"
-                        />
+                        {#if index === 0 && editingRowIndex !== null && editingRowIndex < localData.rows.length - 1}
+                            <div
+                                class="col-span-3 h-10 rounded-md border border-input bg-muted px-3 flex items-center"
+                            >
+                                {editingRow[index]}
+                            </div>
+                        {:else}
+                            <input
+                                id={`field-${index}`}
+                                type="text"
+                                bind:value={editingRow[index]}
+                                class="col-span-3 h-10 rounded-md border border-input px-3"
+                            />
+                        {/if}
                     </div>
                 {/each}
             {/if}

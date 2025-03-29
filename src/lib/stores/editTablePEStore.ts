@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { testTableService } from '$lib/services/testTableService';
+import { testTableService } from '$lib/services/editTablePEService';
 
 interface TestTableState {
     isUpdating: boolean;
@@ -37,6 +37,33 @@ function createEditPhysicalExamTableStore() {
                     ...state,
                     isUpdating: false,
                     error: error instanceof Error ? error.message : 'Failed to update table'
+                }));
+                return false;
+            }
+        },
+        deleteRow: async (
+            caseId: string,
+            testName: string,
+            testType: string,
+            rowIdentifier: string
+        ) => {
+            update(state => ({ ...state, isUpdating: true, error: null }));
+
+            try {
+                await testTableService.deleteRow({
+                    case_id: caseId,
+                    test_name: testName,
+                    test_type: testType,
+                    row_identifier: rowIdentifier
+                });
+
+                update(state => ({ ...state, isUpdating: false }));
+                return true;
+            } catch (error) {
+                update(state => ({
+                    ...state,
+                    isUpdating: false,
+                    error: error instanceof Error ? error.message : 'Failed to delete row'
                 }));
                 return false;
             }
