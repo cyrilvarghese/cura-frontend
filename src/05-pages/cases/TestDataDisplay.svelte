@@ -1,16 +1,11 @@
 <script lang="ts">
     import ExaminationCard from "../../03-organisms/chat/chat-cards/examination-card.svelte";
     import TestResultCard from "../../03-organisms/chat/chat-cards/test-result-card.svelte";
-    import RelevantInfoCard from "../../03-organisms/chat/chat-cards/relevant-info-card.svelte";
-    import { get } from "svelte/store";
-    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    import { currentCaseId } from "$lib/stores/casePlayerStore";
-    export let testData: {
+        export let testData: {
         physical_exam: Record<string, any>;
         lab_test: Record<string, any>;
     };
-    export let caseId: string =
-        get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
+    export let caseId: string;
 </script>
 
 <div class="space-y-6">
