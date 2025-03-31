@@ -149,7 +149,10 @@
 		<NavMain items={data.navMain} />
 	</Sidebar.Header>
 	<Sidebar.Content>
-		<NavSecondary items={data.navSecondary} class="mt-auto" />
-	</Sidebar.Content>
+		 
+			<NavSecondary items={data.navSecondary} class="mt-auto pb-10" />
+
+		 
+	</Sidebar.Content >
 	<Sidebar.Rail />
 </Sidebar.Root>
