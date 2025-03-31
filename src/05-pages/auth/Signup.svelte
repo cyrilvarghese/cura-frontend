@@ -137,7 +137,7 @@
           {#if isLoading}
             <span class="mr-2">Loading...</span>
           {:else}
-            Sign In with Email
+            Sign Up
           {/if}
         </button>
       </form>
