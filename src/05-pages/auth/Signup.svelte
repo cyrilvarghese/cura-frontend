@@ -26,13 +26,7 @@
   }
 </script>
 
-<!-- Add error message display -->
-{#if error}
-  <div class="text-red-500 text-sm mt-2">
-    {error}
-  </div>
-{/if}
-
+ 
 <div class="flex min-h-screen">
   <!-- Left side with image and testimonial -->
   <div class="hidden md:flex md:w-1/2 bg-black text-white relative">
