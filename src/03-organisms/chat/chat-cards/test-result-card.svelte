@@ -75,7 +75,6 @@
     </Card.Header>
     <Card.Content class="grid gap-4">
         <div class="space-y-2 bg-amber-50/50 p-3 rounded-md">
-            <h4 class="font-medium leading-none text-amber-900">Results</h4>
             {#if typeof resultContent === "string"}
                 <p class="text-sm text-muted-foreground whitespace-pre-wrap">
                     {resultContent}
