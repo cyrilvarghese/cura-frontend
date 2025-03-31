@@ -16,12 +16,25 @@
 		MessageCircleQuestion,
 		Settings2,
 		Calendar,
+		LogOut,
 	} from "lucide-svelte";
 	import NavMain from "./nav-main.svelte";
 	import NavSecondary from "./nav-secondary.svelte";
 	import TeamSwitcher from "./team-switcher.svelte";
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import type { ComponentProps } from "svelte";
+	import { authStore } from "$lib/stores/authStore";
+	import { navigate } from "svelte-routing";
+
+	async function handleLogout() {
+		console.log("Logging out");
+		try {
+			await authStore.logout();
+			navigate("/login");
+		} catch (error) {
+			console.error("Logout failed:", error);
+		}
+	}
 
 	const data = $state({
 		teams: [
@@ -114,6 +127,12 @@
 				title: "Help",
 				url: "#",
 				icon: MessageCircleQuestion,
+			},
+			{
+				title: "Logout",
+				url: "#",
+				icon: LogOut,
+				onClick: handleLogout,
 			},
 		],
 	});

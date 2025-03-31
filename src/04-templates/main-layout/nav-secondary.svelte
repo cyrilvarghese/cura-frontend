@@ -10,26 +10,57 @@
 		typeof Sidebar.Group
 		// The `any` should be `Component` after lucide-svelte updates types
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	> & { items: { title: string; url: string; icon: any; badge?: string }[] } = $props();
+	> & {
+		items: {
+			title: string;
+			url: string;
+			icon: any;
+			badge?: string;
+			onClick?: () => void;
+		}[];
+	} = $props();
 </script>
 
 <Sidebar.Group bind:ref {...restProps}>
 	<Sidebar.GroupContent>
 		<Sidebar.Menu>
-			{#each items as item (item.title)}
-				<Sidebar.MenuItem>
-					<Sidebar.MenuButton>
-						{#snippet child({ props })}
-							<a href={item.url} {...props}>
-								<item.icon />
-								<span>{item.title}</span>
-							</a>
-						{/snippet}
-					</Sidebar.MenuButton>
-					{#if item.badge}
-						<Sidebar.MenuBadge>{item.badge}</Sidebar.MenuBadge>
-					{/if}
-				</Sidebar.MenuItem>
+			{#each items as item}
+				{#if item.onClick}
+					<Sidebar.MenuItem>
+						<Sidebar.MenuButton>
+							{#snippet child({ props })}
+								<a
+									href={item.url}
+									onclick={(e) => {
+										e.preventDefault();
+										item.onClick?.();
+									}}
+									{...props}
+								>
+									<item.icon />
+									<span>{item.title}</span>
+								</a>
+							{/snippet}
+						</Sidebar.MenuButton>
+						{#if item.badge}
+							<Sidebar.MenuBadge>{item.badge}</Sidebar.MenuBadge>
+						{/if}
+					</Sidebar.MenuItem>
+				{:else}
+					<Sidebar.MenuItem>
+						<Sidebar.MenuButton>
+							{#snippet child({ props })}
+								<a href={item.url} {...props}>
+									<item.icon />
+									<span>{item.title}</span>
+								</a>
+							{/snippet}
+						</Sidebar.MenuButton>
+						{#if item.badge}
+							<Sidebar.MenuBadge>{item.badge}</Sidebar.MenuBadge>
+						{/if}
+					</Sidebar.MenuItem>
+				{/if}
 			{/each}
 		</Sidebar.Menu>
 	</Sidebar.GroupContent>
