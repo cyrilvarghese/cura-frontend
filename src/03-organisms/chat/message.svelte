@@ -219,6 +219,7 @@
                     ](message)}
                 {#if MessageComponent}
                     {#key message.type}
+                    
                         <!-- @ts-ignore  fix the type error -->
                         <MessageComponent
                             {...getComponentProps(message) as any}

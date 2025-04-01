@@ -3,26 +3,24 @@
     export let title: string;
 </script>
 
-<div class="flex flex-col p-8 mt-14">
-    <h1 class="text-4xl font-bold mb-8">{title}</h1>
+<div class="container mx-auto px-10 py-20">
+    <div class="flex flex-col gap-8">
+        <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-bold">{title}</h1>
+        </div>
 
-    <div class="flex items-center justify-center flex-1">
-        <Card.Root class="w-[500px] shadow-lg mt-20">
-            <Card.Header class="text-center">
-                <Card.Title class="text-2xl text-muted-foreground"
-                    >Coming Soon</Card.Title
-                >
-            </Card.Header>
-
-            <Card.Content class="text-center">
-                <p class="text-sm text-muted-foreground">
+        <Card.Root>
+            <Card.Content
+                class="flex flex-col items-center justify-center py-16"
+            >
+                <h2 class="text-2xl font-semibold text-muted-foreground mb-4">
+                    Coming Soon
+                </h2>
+                <p class="text-muted-foreground">
                     This feature is currently under development.
                 </p>
+                <div class="mt-8 w-16 h-1 bg-primary rounded-full"></div>
             </Card.Content>
-
-            <Card.Footer class="flex justify-center pt-6">
-                <div class="w-16 h-1 bg-primary rounded-full"></div>
-            </Card.Footer>
         </Card.Root>
     </div>
 </div>

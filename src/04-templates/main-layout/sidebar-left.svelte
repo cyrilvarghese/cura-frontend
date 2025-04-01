@@ -62,20 +62,17 @@
 				isActive: true,
 			},
 			{
-				title: "Class",
-				url: "/class",
-				icon: GraduationCap,
-			},
-			{
 				title: "Case Library",
 				url: "/case-library",
 				icon: Library,
 			},
 			{
-				title: "Tools",
-				url: "/tools/case-data-creator",
-				icon: Wrench,
+				title: "Class",
+				url: "/class",
+				icon: GraduationCap,
 			},
+			
+		
 			{
 				title: "OSCE/OSPE",
 				url: "/osce",
@@ -111,6 +108,11 @@
 				url: "/knowledge-base",
 				icon: BookOpen,
 			},
+			{
+				title: "Tools",
+				url: "/tools/case-data-creator",
+				icon: Wrench,
+			}
 		],
 		navSecondary: [
 			{
