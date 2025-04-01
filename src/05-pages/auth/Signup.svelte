@@ -142,7 +142,7 @@
         </button>
       </form>
 
-      <div class="mt-6">
+      <!-- <div class="mt-6">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
             <div class="w-full border-t border-gray-300"></div>
@@ -182,7 +182,7 @@
             <span>Google</span>
           </button>
         </div>
-      </div>
+      </div> -->
 
       <p class="mt-8 text-center text-sm text-gray-500">
         By clicking continue, you agree to our
