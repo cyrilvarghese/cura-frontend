@@ -51,7 +51,7 @@
 					</header>
 					<main>
 						<Route path="/">
-							<CaseCreatorWrapper />
+							<CaseLibraryPage />
 						</Route>
 						<Route path="/tools/case-data-creator">
 							<CaseCreatorWrapper />
