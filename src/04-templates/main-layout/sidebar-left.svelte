@@ -17,6 +17,7 @@
 		Settings2,
 		Calendar,
 		LogOut,
+		ClipboardCheck,
 	} from "lucide-svelte";
 	import NavMain from "./nav-main.svelte";
 	import NavSecondary from "./nav-secondary.svelte";
@@ -67,12 +68,15 @@
 				icon: Library,
 			},
 			{
+				title: "Case Review",
+				url: "/case-review",
+				icon: ClipboardCheck,
+			},
+			{
 				title: "Class",
 				url: "/class",
 				icon: GraduationCap,
 			},
-			
-		
 			{
 				title: "OSCE/OSPE",
 				url: "/osce",
@@ -112,7 +116,7 @@
 				title: "Tools",
 				url: "/tools/case-data-creator",
 				icon: Wrench,
-			}
+			},
 		],
 		navSecondary: [
 			{
@@ -151,10 +155,7 @@
 		<NavMain items={data.navMain} />
 	</Sidebar.Header>
 	<Sidebar.Content>
-		 
-			<NavSecondary items={data.navSecondary} class="mt-auto pb-10" />
-
-		 
-	</Sidebar.Content >
+		<NavSecondary items={data.navSecondary} class="mt-auto pb-10" />
+	</Sidebar.Content>
 	<Sidebar.Rail />
 </Sidebar.Root>

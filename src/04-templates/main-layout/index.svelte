@@ -21,6 +21,7 @@
 	import ForumPage from "../../05-pages/ForumPage.svelte";
 	import KnowledgeBasePage from "../../05-pages/KnowledgeBasePage.svelte";
 	import VivaQuestionsPage from "../../05-pages/VivaQuestionsPage.svelte";
+	import CaseReviewPage from "../../05-pages/CaseReview.svelte";
 
 	// Get the current URL for Router
 	export let url = "";
@@ -69,6 +70,9 @@
 						</Route>
 						<Route path="/case-library">
 							<CaseLibraryPage />
+						</Route>
+						<Route path="/case-review">
+							<CaseReviewPage />
 						</Route>
 						<Route path="/case-library/:id" let:params>
 							<CasePlayer id={params.id} />

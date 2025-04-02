@@ -8,7 +8,7 @@
         TableRow,
     } from "$lib/components/ui/table";
     import { Button } from "$lib/components/ui/button";
-    import { MoreVertical, Upload, FileIcon, X } from "lucide-svelte";
+    import { MoreVertical, Upload, FileIcon, X, Search } from "lucide-svelte";
     import {
         curriculumStore,
         fetchCurriculumData,
@@ -79,12 +79,14 @@
             {$curriculumStore?.department ?? "Loading..."}
         </h1>
         <div class="relative">
+            <Search
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4"
+            />
             <input
                 type="search"
                 placeholder="Search..."
                 bind:value={searchQuery}
-                style="background-color: #eff6ff;"
-                class="px-4 py-2 border bg-blue-50! rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+                class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
         </div>
     </div>
@@ -100,7 +102,7 @@
                                 {#each topic.documents as doc}
                                     <a
                                         href={`${API_BASE_URL}${doc.url}`}
-                                        class="inline-flex items-center gap-2 px-3 py-1 text-sm bg-muted rounded-full hover:bg-muted/80"
+                                        class="inline-flex items-center gap-2 px-3 py-1 text-sm bg-blue-50 text-blue-800 rounded-full hover:bg-blue-100"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
@@ -116,33 +118,47 @@
                 <div class="border rounded-lg overflow-hidden">
                     <Table>
                         <TableHeader>
-                            <TableRow class="bg-muted/50 text-muted-foreground">
-                                <TableHead class="w-[100px]">Code</TableHead>
-                                <TableHead class="w-[400px]"
+                            <TableRow class="bg-gray-50 border-b">
+                                <TableHead
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
+                                    >Code</TableHead
+                                >
+                                <TableHead
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[40%]"
                                     >Competency</TableHead
                                 >
-                                <TableHead class="w-[200px]">Teaching</TableHead
+                                <TableHead
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]"
+                                    >Teaching</TableHead
                                 >
-                                <TableHead class="w-[300px]"
+                                <TableHead
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >Assessment</TableHead
                                 >
-                                <TableHead class="w-[100px]">Action</TableHead>
+                                <TableHead
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32"
+                                    >Action</TableHead
+                                >
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {#each topic.competencies as competency}
-                                <TableRow>
+                                <TableRow class="hover:bg-gray-50">
                                     <TableCell
+                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                         >{competency.competency_code}</TableCell
                                     >
                                     <TableCell
+                                        class="px-6 py-4 text-sm text-gray-900 break-words"
                                         >{competency.competency}</TableCell
                                     >
                                     <TableCell>
-                                        <div class="flex gap-2 flex-wrap">
+                                        <div
+                                            class="flex gap-2 flex-wrap w-full"
+                                        >
                                             {#each competency.teaching_methods as method}
                                                 <span
-                                                    class="text-sm bg-gray-100 px-2 py-1 rounded"
+                                                    class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800"
                                                     >{method}</span
                                                 >
                                             {/each}
@@ -152,7 +168,11 @@
                                         <div class="flex gap-2 flex-wrap">
                                             {#if competency.assessments.length > 0}
                                                 {#each competency.assessments as assessment}
-                                                    <AssessmentPill {assessment}   onDelete={(id) => fetchCurriculumData()}  />
+                                                    <AssessmentPill
+                                                        {assessment}
+                                                        onDelete={(id) =>
+                                                            fetchCurriculumData()}
+                                                    />
                                                 {/each}
                                             {:else}
                                                 <span
