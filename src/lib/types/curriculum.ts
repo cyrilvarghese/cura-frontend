@@ -5,7 +5,7 @@ export type TopicItem = {
     assessmentMethod: string[];
 };
 
- 
+
 
 export interface Document {
     id: number;
@@ -14,6 +14,7 @@ export interface Document {
     url: string;
     description?: string;
     created_at: string;
+    google_doc_link: string;
 }
 
 export interface CurriculumData {

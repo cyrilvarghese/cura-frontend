@@ -10,6 +10,8 @@
         CheckCheck,
         CheckCircle,
         RefreshCw,
+        Trash2,
+        Loader2,
     } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
     import type { GoogleDoc } from "$lib/services/googleDocsService";
@@ -20,6 +22,8 @@
     let activeTab = $state("pending");
     let isLoading = $state(true);
     let isLoadingComments = $state(false);
+    let deletingDocIds = $state(new Set<string>());
+    let isDeleting = $state(false);
 
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
@@ -105,6 +109,17 @@
             await googleDocsStore.refreshCommentCount(docId);
         } finally {
             isLoadingComments = false;
+        }
+    }
+
+    async function handleDelete(docId: string, title: string) {
+        if (confirm(`Are you sure you want to delete "${title}"?`)) {
+            isDeleting = true;
+            try {
+                const success = await googleDocsStore.deleteDoc(docId, title);
+            } finally {
+                isDeleting = false;
+            }
         }
     }
 </script>
@@ -232,20 +247,32 @@
                                             {#if review.commentCount === 0}
                                                 <button
                                                     class="hover:bg-gray-100 p-1 rounded-full transition-colors"
-                                                    on:click={() => handleRefreshComments(review.docId)}
+                                                    on:click={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
                                                 >
                                                     <RefreshCw
-                                                        class="h-5 w-5 text-gray-600 {isLoadingComments ? 'animate-spin' : ''}"
+                                                        class="h-5 w-5 text-gray-600 {isLoadingComments
+                                                            ? 'animate-spin'
+                                                            : ''}"
                                                         strokeWidth={2.5}
                                                     />
                                                 </button>
                                             {:else}
                                                 <button
                                                     class="hover:bg-gray-100 rounded-full transition-colors"
-                                                    on:click={() => handleRefreshComments(review.docId)}
+                                                    on:click={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
                                                 >
-                                                    <span class="relative inline-flex items-center px-2 py-1">
-                                                        <span class="text-xs rounded-full bg-gray-100 text-gray-800">
+                                                    <span
+                                                        class="relative inline-flex items-center px-2 py-1"
+                                                    >
+                                                        <span
+                                                            class="text-xs rounded-full bg-gray-100 text-gray-800"
+                                                        >
                                                             {review.commentCount}
                                                         </span>
                                                         {#if isLoadingComments}
@@ -269,14 +296,39 @@
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                         >
                                             {#if review.status === "Case Review Pending"}
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    href={review.docLink}
-                                                    target="_blank"
+                                                <div
+                                                    class="flex items-center gap-2"
                                                 >
-                                                    Review Case
-                                                </Button>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        href={review.docLink}
+                                                        target="_blank"
+                                                    >
+                                                        Review Case
+                                                    </Button>
+                                                    <Button
+                                                        class="ml-4"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        disabled={isDeleting}
+                                                        onclick={() =>
+                                                            handleDelete(
+                                                                review.docId,
+                                                                review.title,
+                                                            )}
+                                                    >
+                                                        {#if isDeleting}
+                                                            <Loader2
+                                                                class="h-4 w-4 text-red-600 animate-spin"
+                                                            />
+                                                        {:else}
+                                                            <Trash2
+                                                                class="h-4 w-4 text-red-600 hover:text-red-700"
+                                                            />
+                                                        {/if}
+                                                    </Button>
+                                                </div>
                                             {:else if review.status === "Case Review in Progress"}
                                                 <Button
                                                     variant="link"
@@ -418,20 +470,32 @@
                                             {#if review.commentCount === 0}
                                                 <button
                                                     class="hover:bg-gray-100 p-1 rounded-full transition-colors"
-                                                    on:click={() => handleRefreshComments(review.docId)}
+                                                    on:click={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
                                                 >
                                                     <RefreshCw
-                                                        class="h-5 w-5 text-gray-600 {isLoadingComments ? 'animate-spin' : ''}"
+                                                        class="h-5 w-5 text-gray-600 {isLoadingComments
+                                                            ? 'animate-spin'
+                                                            : ''}"
                                                         strokeWidth={2.5}
                                                     />
                                                 </button>
                                             {:else}
                                                 <button
                                                     class="hover:bg-gray-100 rounded-full transition-colors"
-                                                    on:click={() => handleRefreshComments(review.docId)}
+                                                    on:click={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
                                                 >
-                                                    <span class="relative inline-flex items-center px-2 py-1">
-                                                        <span class="text-xs rounded-full bg-gray-100 text-gray-800">
+                                                    <span
+                                                        class="relative inline-flex items-center px-2 py-1"
+                                                    >
+                                                        <span
+                                                            class="text-xs rounded-full bg-gray-100 text-gray-800"
+                                                        >
                                                             {review.commentCount}
                                                         </span>
                                                         {#if isLoadingComments}
@@ -455,14 +519,39 @@
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                         >
                                             {#if review.status === "Case Review Pending"}
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    href={review.docLink}
-                                                    target="_blank"
+                                                <div
+                                                    class="flex items-center gap-2"
                                                 >
-                                                    Review Case
-                                                </Button>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        href={review.docLink}
+                                                        target="_blank"
+                                                    >
+                                                        Review Case
+                                                    </Button>
+                                                    <Button
+                                                        class="ml-4"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        disabled={isDeleting}
+                                                        onclick={() =>
+                                                            handleDelete(
+                                                                review.docId,
+                                                                review.title,
+                                                            )}
+                                                    >
+                                                        {#if isDeleting}
+                                                            <Loader2
+                                                                class="h-4 w-4 text-red-600 animate-spin"
+                                                            />
+                                                        {:else}
+                                                            <Trash2
+                                                                class="h-4 w-4 text-red-600 hover:text-red-700"
+                                                            />
+                                                        {/if}
+                                                    </Button>
+                                                </div>
                                             {:else if review.status === "Case Review in Progress"}
                                                 <Button
                                                     variant="link"

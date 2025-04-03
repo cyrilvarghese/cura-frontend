@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { toast } from 'svelte-sonner';
 
 export interface GoogleDoc {
     id: string;
@@ -63,6 +64,32 @@ export class GoogleDocsService {
         } catch (error) {
             console.error('Error fetching comments:', error);
             return 0;
+        }
+    }
+
+    async deleteDoc(docId: string, docName: string): Promise<void> {
+        try {
+            const response = await fetch(`${this.baseUrl}/google-docs/${docId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                toast.error('Delete failed', {
+                    description: 'Failed to delete document'
+                });
+                throw new Error('Failed to delete document');
+            }
+
+            toast.success('Document deleted', {
+                description: `Successfully deleted "${docName}"`
+            });
+
+        } catch (error) {
+            console.error('Error deleting document:', error);
+            toast.error('Delete failed', {
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
+            throw error;
         }
     }
 } 

@@ -8,12 +8,12 @@
         TableRow,
     } from "$lib/components/ui/table";
     import { Button } from "$lib/components/ui/button";
-    import { MoreVertical, Upload, FileIcon, X, Search } from "lucide-svelte";
+    import { MoreVertical, FileIcon, Search } from "lucide-svelte";
     import {
         curriculumStore,
         fetchCurriculumData,
     } from "$lib/stores/curriculumStore";
-    import { documentStore, uploadDocument } from "$lib/stores/documentStore";
+    import { documentStore } from "$lib/stores/documentStore";
     import { onMount } from "svelte";
     import PageLayout from "../04-templates/page-layout.svelte";
     import { Alert, AlertDescription } from "$lib/components/ui/alert";
@@ -101,7 +101,7 @@
                             <div class="flex gap-2 flex-wrap">
                                 {#each topic.documents as doc}
                                     <a
-                                        href={`${API_BASE_URL}${doc.url}`}
+                                        href={doc.google_doc_link}
                                         class="inline-flex items-center gap-2 px-3 py-1 text-sm bg-blue-50 text-blue-800 rounded-full hover:bg-blue-100"
                                         target="_blank"
                                         rel="noopener noreferrer"

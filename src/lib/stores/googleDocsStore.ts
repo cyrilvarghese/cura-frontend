@@ -37,6 +37,16 @@ function createGoogleDocsStore() {
             } catch (error) {
                 console.error('Error refreshing comment count:', error);
             }
+        },
+        deleteDoc: async (docId: string, docName: string) => {
+            try {
+                await googleDocsService.deleteDoc(docId, docName);
+                update(docs => docs.filter(doc => doc.id !== docId));
+                return true;
+            } catch (error) {
+                console.error('Error deleting doc:', error);
+                return false;
+            }
         }
     };
 }
