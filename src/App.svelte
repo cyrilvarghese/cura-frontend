@@ -1,11 +1,10 @@
 <script lang="ts">
   import "./app.css";
   import MainLayout from "./04-templates/main-layout/index.svelte";
-  import { Toaster } from "$lib/components/ui/sonner";
   // Get the current URL for the router
   let url = window.location.pathname;
 </script>
-<Toaster />
+
 <main class="min-h-screen bg-background">
   <MainLayout {url} />
 </main>

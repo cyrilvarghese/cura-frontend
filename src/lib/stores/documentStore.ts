@@ -4,7 +4,7 @@ import { documentService, type DocumentUploadResponse } from '../services/docume
 interface DocumentState {
     isUploading: boolean;
     error: string | null;
-    documents: Record<string, DocumentUploadResponse[]>; // Keyed by topic name
+    documents: Record<string, DocumentUploadResponse[]>; // Keyed by department name
     isLoading: boolean;
 }
 
@@ -19,23 +19,23 @@ export const documentStore = writable<DocumentState>(initialState);
 
 export async function uploadDocument(
     file: File,
-    topicName: string,
+    departmentName: string,
     title: string,
     description: string
 ) {
     documentStore.update(state => ({ ...state, isUploading: true, error: null }));
 
     try {
-        const response = await documentService.uploadDocument(file, topicName, title, description);
+        const response = await documentService.uploadDocument(file, departmentName, title, description);
 
         documentStore.update(state => {
-            const topicDocs = state.documents[topicName] || [];
+            const departmentDocs = state.documents[departmentName] || [];
             return {
                 ...state,
                 isUploading: false,
                 documents: {
                     ...state.documents,
-                    [topicName]: [...topicDocs, response]
+                    [departmentName]: [...departmentDocs, response]
                 }
             };
         });
@@ -52,24 +52,24 @@ export async function uploadDocument(
     }
 }
 
-export async function fetchDocumentsByTopic(topicName: string) {
+export async function fetchDocumentsByDepartment(departmentName: string) {
     documentStore.update(state => ({ ...state, isLoading: true, error: null }));
 
     try {
-        const documents = await documentService.getDocumentsByTopic(topicName);
+        const documents = await documentService.getDocumentsByDepartment(departmentName);
 
         documentStore.update(state => ({
             ...state,
             isLoading: false,
             documents: {
                 ...state.documents,
-                [topicName]: documents
+                [departmentName]: documents
             }
         }));
 
         return documents;
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch documents';
+        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch department documents';
         documentStore.update(state => ({
             ...state,
             isLoading: false,

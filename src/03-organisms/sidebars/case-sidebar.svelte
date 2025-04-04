@@ -8,7 +8,7 @@
     type PatientFiles = {
         name: string;
         caption: string;
-        url: string;
+        url: string[];
         aspect: string;
     };
 

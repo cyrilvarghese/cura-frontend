@@ -92,4 +92,72 @@ export class GoogleDocsService {
             throw error;
         }
     }
+
+    async approveCase(docId: string): Promise<void> {
+        try {
+            const response = await fetch(`${this.baseUrl}/google-docs/${docId}/approve`);
+
+            if (!response.ok) {
+                toast.error('Approval failed', {
+                    description: 'Failed to approve document'
+                });
+                throw new Error('Failed to approve document');
+            }
+
+            toast.success('Case approved', {
+                description: 'Document has been approved successfully'
+            });
+
+        } catch (error) {
+            console.error('Error approving document:', error);
+            toast.error('Approval failed', {
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
+            throw error;
+        }
+    }
+
+    async uploadDocument(file: File, title: string): Promise<GoogleDoc> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('title', title);
+
+            const response = await fetch(`${this.baseUrl}/google-docs`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                // Handle 400 error specifically for duplicate titles
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    toast.error('Upload failed', {
+                        description: errorData.detail || 'A document with this title already exists'
+                    });
+                    throw new Error(errorData.detail);
+                }
+
+                toast.error('Upload failed', {
+                    description: 'Failed to upload document'
+                });
+                throw new Error('Failed to upload document');
+            }
+
+            toast.success('Document uploaded', {
+                description: `Successfully uploaded "${title}"`
+            });
+
+            return response.json();
+        } catch (error) {
+            console.error('Error uploading document:', error);
+            // Only show generic toast if it wasn't already handled above
+            if (!(error instanceof Error && error.message.includes('already exists'))) {
+                toast.error('Upload failed', {
+                    description: error instanceof Error ? error.message : 'Please try again later'
+                });
+            }
+            throw error;
+        }
+    }
 } 

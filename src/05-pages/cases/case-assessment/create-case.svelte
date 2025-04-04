@@ -13,7 +13,7 @@
     import { onDestroy, onMount } from "svelte";
     import {
         documentStore,
-        fetchDocumentsByTopic,
+        fetchDocumentsByDepartment,
     } from "$lib/stores/documentStore";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
     import {
@@ -21,6 +21,7 @@
         type PublishCaseParams,
     } from "$lib/services/caseDataService";
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
+    import * as Select from "$lib/components/ui/select";
     //on mount get documetns for teh topic
     // Define initialValue based on the expected structure of CaseStoreState
     const initialValue: CaseStoreState = {
@@ -45,18 +46,40 @@
         searchedImages: null,
         selectedDocument: null,
     };
-    let { topic, code } = $props();
 
     // Create an instance of CaseDataService
     const caseDataService = new CaseDataService();
 
-    let topicDocuments = $state<DocumentUploadResponse[]>([]);
+    let departmentDocuments = $state<DocumentUploadResponse[]>([]);
     let isLoadingDocuments = $state(false);
     let documentError = $state<string | null>(null);
     let isPublishing = $state(false);
     let publishError = $state<string | null>(null);
     let publishSuccess = $state(false);
     let department = $state<Department | null>(null);
+    const { selectedDocId } = $props<{
+        selectedDocId?: string;
+    }>();
+
+    let selectedValue = $state(selectedDocId || "");
+
+    const triggerContent = $derived(
+        departmentDocuments.find((doc) => doc.id.toString() === selectedValue)
+            ?.title ?? "Select a document...",
+    );
+
+    $effect(() => {
+        const selectedDoc = departmentDocuments.find(
+            (doc) => doc.id.toString() === selectedValue,
+        );
+        uploadState.selectedDocument = selectedDoc || null;
+    });
+
+    $effect(() => {
+        if (selectedDocId && departmentDocuments.length > 0) {
+            selectedValue = selectedDocId;
+        }
+    });
 
     // Subscribe to the currentDepartment store
     const unsubscribeDepartment = currentDepartment.subscribe((value) => {
@@ -64,17 +87,13 @@
     });
 
     const unsubscribeDocStore = documentStore.subscribe((state) => {
-        topicDocuments = state.documents[topic] || [];
+        departmentDocuments = state.documents[department?.name || ""] || [];
         isLoadingDocuments = state.isLoading;
         documentError = state.error;
     });
 
     onMount(() => {
-        if (topic) {
-            fetchDocumentsByTopic(topic).catch((error) => {
-                console.error("Error fetching documents:", error);
-            });
-        }
+        fetchDocumentsByDepartment(department?.name || "");
     });
 
     let uploadState = $state(initialValue);
@@ -161,7 +180,7 @@
         if (!uploadState.selectedDocument || !uploadState.caseId) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
-        
+
         console.log("uploadState.caseId", uploadState.caseId);
         try {
             await generatePhysicalExamFromUrl(
@@ -206,7 +225,6 @@
         try {
             const params: PublishCaseParams = {
                 published: true,
-                competency_code: code,
             };
 
             await caseDataService.publishCase(uploadState.caseId, params);
@@ -241,23 +259,36 @@
                             >
                                 Select Document
                             </label>
-                            <select
-                                id="document-select"
-                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                bind:value={uploadState.selectedDocument}
+                            <Select.Root
+                                type="single"
+                                value={selectedValue}
+                                onValueChange={(value) => {
+                                    selectedValue = value;
+                                }}
                                 disabled={uploadState.loading ||
                                     uploadState.generating}
                             >
-                                <option value="">Select a document...</option>
-                                {#each topicDocuments as document}
-                                    <option value={document}>
-                                        {document.title}
-                                    </option>
-                                {/each}
-                            </select>
-                            {#if topicDocuments.length === 0}
+                                <Select.Trigger
+                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                                >
+                                    {triggerContent}
+                                </Select.Trigger>
+                                <Select.Content class="w-full">
+                                    <Select.Group>
+                                        {#each departmentDocuments as document}
+                                            <Select.Item
+                                                value={document.id.toString()}
+                                                label={document.title}
+                                            >
+                                                {document.title}
+                                            </Select.Item>
+                                        {/each}
+                                    </Select.Group>
+                                </Select.Content>
+                            </Select.Root>
+                            {#if departmentDocuments.length === 0}
                                 <p class="text-xs text-muted-foreground mt-1">
-                                    No documents available for this topic
+                                    No documents available for this department
                                 </p>
                             {/if}
                         </div>

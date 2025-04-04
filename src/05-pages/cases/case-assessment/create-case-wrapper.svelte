@@ -6,21 +6,15 @@
         caseIdStore,
     } from "$lib/stores/caseCreationFileUploadStore";
     import { onMount } from "svelte";
-
+    export let selectedDocId: string | undefined;
     // Initialize stores if needed
     uploadedFileStore.set(null);
     caseIdStore.set("");
-    let { topic, code } = $props();
-
-    onMount(() => {
-        console.log(topic, code);
-    });
 </script>
 
 <PageLayout
     breadcrumbs={[
-        { label: topic, href: "/curriculum" },
-        { label: code, href: "/curriculum" },
+        { label: "Curriculum", href: "/curriculum" },
         { label: "New Case", href: "/" },
     ]}
 >
@@ -36,7 +30,7 @@
         </div>
 
         <div class="p-4">
-            <CreateCase topic={topic} code={code} />
+            <CreateCase {selectedDocId} />
         </div>
     </div>
 </PageLayout>

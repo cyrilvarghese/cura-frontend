@@ -18,16 +18,7 @@ function createGoogleDocsStore() {
                 set([]);
             }
         },
-        updateStatus: async (docId: string, newStatus: string) => {
-            try {
-                const updatedDoc = await googleDocsService.updateDocStatus(docId, newStatus);
-                update(docs => docs.map(doc =>
-                    doc.id === docId ? updatedDoc : doc
-                ));
-            } catch (error) {
-                console.error('Error updating doc status:', error);
-            }
-        },
+
         async refreshCommentCount(docId: string) {
             try {
                 const commentCount = await googleDocsService.refreshCommentCount(docId);
@@ -45,6 +36,15 @@ function createGoogleDocsStore() {
                 return true;
             } catch (error) {
                 console.error('Error deleting doc:', error);
+                return false;
+            }
+        },
+        approveCase: async (docId: string) => {
+            try {
+                await googleDocsService.approveCase(docId);
+                return true;
+            } catch (error) {
+                console.error('Error approving case:', error);
                 return false;
             }
         }

@@ -22,6 +22,7 @@
 	import KnowledgeBasePage from "../../05-pages/KnowledgeBasePage.svelte";
 	import VivaQuestionsPage from "../../05-pages/VivaQuestionsPage.svelte";
 	import CaseReviewPage from "../../05-pages/CaseReview.svelte";
+	import { Toaster } from "svelte-sonner";
 
 	// Get the current URL for Router
 	export let url = "";
@@ -32,15 +33,12 @@
 		(window.location.pathname.includes("login") ||
 			window.location.pathname.includes("signup"));
 
-	onMount(() => {
-		fetchCases();
-	});
-
 	$: if (!$isAuthenticated) {
 		navigate("/login", { replace: true });
 	}
 </script>
 
+<Toaster position="top-center" />
 <Router {url}>
 	{#if $isAuthenticated}
 		<Sidebar.Provider>
@@ -78,12 +76,11 @@
 							<CasePlayer id={params.id} />
 						</Route>
 						<Route
-							path="/curriculum/:topic/:code/new-case"
+							path="/curriculum/new-case/:selectedDocId"
 							let:params
 						>
 							<CaseAssessment
-								topic={params.topic}
-								code={params.code}
+								selectedDocId={params.selectedDocId}
 							/>
 						</Route>
 						<Route path="/class">
