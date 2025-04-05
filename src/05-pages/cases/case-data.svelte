@@ -54,15 +54,8 @@
     }
 </script>
 
-<Card.Root class="flex-1">
-    <Card.Header>
-        <Card.Title class="text-lg font-semibold"
-            >Data for case {$lastCaseIdStore}</Card.Title
-        >
-        <Card.Description
-            >Upload and analyze patient case documents</Card.Description
-        >
-    </Card.Header>
+<Card.Root class="flex-1 rounded-none border-none">
+     
     <Card.Content>
         <Tabs.Root value={currentTab} class="w-full">
             <Tabs.List class="border-b w-full flex justify-start gap-8">
@@ -77,7 +70,7 @@
                 >
             </Tabs.List>
 
-            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto">
+            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl">
                 <Tabs.Content value="patient-persona">
                     {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
@@ -160,7 +153,7 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.testData}
-                    {@debug uploadState}
+                        {@debug uploadState}
                         <TestDataDisplay
                             testData={uploadState.testData}
                             caseId={uploadState.caseId}

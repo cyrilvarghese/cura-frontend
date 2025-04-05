@@ -8,6 +8,7 @@ import { imageSearchService, type ImageSearchResponse } from '$lib/services/imag
 import type { DocumentUploadResponse } from '$lib/services/documentService';
 import { number } from 'zod';
 import { currentDepartment } from './teamStore';
+import type { S } from 'node_modules/vite/dist/node/types.d-aGj9QkWt';
 
 
 
@@ -32,7 +33,7 @@ export interface CaseStoreState {
     isGeneratingDifferential: boolean;
     searchedImages: ImageSearchResponse | null;
     isSearchingImages: boolean;
-    selectedDocument: DocumentUploadResponse | null;
+    selectedDocumentName: string | null;
 }
 
 // Create a writable store with initial state
@@ -53,7 +54,7 @@ const initialState: CaseStoreState = {
     isGeneratingDifferential: false,
     searchedImages: null,
     isSearchingImages: false,
-    selectedDocument: null,
+    selectedDocumentName: null,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -87,58 +88,8 @@ export function resetStore() {
     lastCaseIdStore.set(null);
 }
 
-// Function to generate a persona
-export async function generatePersona(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPersona: true }));
-    lastCaseIdStore.set(caseId);
-    try {
-        const response = await patientPersonaService.createPatientPersona(uploadedFile, caseId);
-        caseStore.update(state => ({
-            ...state,
-            persona: {
-                id: response.id,
-                content: response.content,
-                timestamp: new Date().toISOString(),
-                type: "ai",
-                case_id: response.case_id,
-            },
-            generating: false,
-            isGeneratingPersona: false,
-        }));
-    } catch (error) {
-        caseStore.update(state => ({
-            ...state,
-            error: error instanceof Error ? error.message : "Generation failed",
-            generating: false,
-            isGeneratingPersona: false,
-        }));
-    }
-}
 
-// Function to generate a physical exam
-export async function generatePhysicalExam(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingPhysicalExam: true }));
 
-    try {
-        const response = await testDataService.createExamTestData(caseId, uploadedFile);
-        caseStore.update(state => ({
-            ...state,
-            testData: {
-                physical_exam: response.content.physical_exam,
-                lab_test: response.content.lab_test
-            },
-            generating: false,
-            isGeneratingPhysicalExam: false,
-        }));
-    } catch (error) {
-        caseStore.update(state => ({
-            ...state,
-            error: error instanceof Error ? error.message : "Generation failed",
-            generating: false,
-            isGeneratingPhysicalExam: false,
-        }));
-    }
-}
 
 export async function generateCoverImage(caseId: string) {
     caseStore.update(state => ({ ...state, generating: true, error: null }));
@@ -166,28 +117,6 @@ export async function generateCoverImage(caseId: string) {
     }
 }
 
-export async function generateDifferentialDiagnosis(uploadedFile: File, caseId: string) {
-    caseStore.update(state => ({ ...state, generating: true, error: null, isGeneratingDifferential: true }));
-
-    try {
-        const response = await differentialDiagnosisService.createDifferentialDiagnosis(caseId, uploadedFile);
-        caseStore.update(state => ({
-            ...state,
-            differentialDiagnosis: response.content,
-            generating: false,
-            isGeneratingDifferential: false,
-        }));
-    } catch (error) {
-        caseStore.update(state =>
-        ({
-            ...state,
-            error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
-            generating: false,
-            isGeneratingDifferential: false,
-        }));
-    }
-}
-
 // Function to search medical images
 export async function searchMedicalImages(query: string) {
     caseStore.update(state => ({ ...state, isSearchingImages: true, error: null }));
@@ -208,13 +137,13 @@ export async function searchMedicalImages(query: string) {
 }
 
 
-export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string,) {
+export async function generatePersona(selectedDocumentName: string, caseId?: string) {
     caseStore.update(state => ({
         ...state,
         generating: true,
         error: null,
         isGeneratingPersona: true,
-        selectedDocument: selectedDocument || null
+        selectedDocumentName: selectedDocumentName || null
     }));
 
     if (caseId) {
@@ -226,7 +155,7 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
         department = currentDepartmentValue.name;
     }
     try {
-        const response = await patientPersonaService.createPatientPersonaFromUrl(fileUrl, caseId || null, department);
+        const response = await patientPersonaService.createPatientPersonaFromUrl(selectedDocumentName, caseId || null, department);
         caseStore.update(state => ({
             ...state,
             persona: {
@@ -251,17 +180,17 @@ export async function generatePersonaFromUrl(fileUrl: string, selectedDocument?:
     }
 }
 // Function to generate a physical exam
-export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
- 
+export async function generatePhysicalExam(selectedDocumentName: string, caseId?: string, department?: string) {
+
     caseStore.update(state => ({
         ...state,
         generating: true, error: null, isGeneratingPhysicalExam: true,
         caseId: caseId || null,
-        selectedDocument: selectedDocument || null
+        selectedDocumentName: selectedDocumentName || null
     }));
 
     try {
-        const response = await testDataService.createExamTestDataFromUrl(fileUrl, caseId || null);
+        const response = await testDataService.createExamTestData(selectedDocumentName, caseId || null);
         caseStore.update(state => ({
             ...state,
             testData: {
@@ -284,18 +213,21 @@ export async function generatePhysicalExamFromUrl(fileUrl: string, selectedDocum
     }
 }
 
-export async function generateDifferentialDiagnosisFromUrl(fileUrl: string, selectedDocument?: DocumentUploadResponse, caseId?: string) {
+export async function generateDifferentialDiagnosis(selectedDocumentName: string, caseId?: string) {
     caseStore.update(state => ({
         ...state,
         generating: true,
         error: null,
         isGeneratingDifferential: true,
         caseId: caseId || null,
-        selectedDocument: selectedDocument || null
+        selectedDocumentName: selectedDocumentName || null
     }));
 
     try {
-        const response = await differentialDiagnosisService.createDifferentialDiagnosisFromUrl(fileUrl, caseId || null);
+        if (!selectedDocumentName) {
+            throw new Error("Selected document name is required");
+        }
+        const response = await differentialDiagnosisService.createDifferentialDiagnosis(selectedDocumentName, caseId || null);
         caseStore.update(state => ({
             ...state,
             differentialDiagnosis: response.content,

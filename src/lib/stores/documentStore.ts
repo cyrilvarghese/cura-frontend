@@ -6,13 +6,15 @@ interface DocumentState {
     error: string | null;
     documents: Record<string, DocumentUploadResponse[]>; // Keyed by department name
     isLoading: boolean;
+    selectedCaseDocument: DocumentUploadResponse | null;
 }
 
 const initialState: DocumentState = {
     isUploading: false,
     error: null,
     documents: {},
-    isLoading: false
+    isLoading: false,
+    selectedCaseDocument: null
 };
 
 export const documentStore = writable<DocumentState>(initialState);
@@ -77,4 +79,11 @@ export async function fetchDocumentsByDepartment(departmentName: string) {
         }));
         throw error;
     }
+}
+
+export function setSelectedCaseDocument(document: DocumentUploadResponse | null) {
+    documentStore.update(state => ({
+        ...state,
+        selectedCaseDocument: document
+    }));
 } 

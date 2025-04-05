@@ -68,8 +68,8 @@
 				icon: Library,
 			},
 			{
-				title: "Case Review",
-				url: "/case-review",
+				title: "Master Document Review",
+				url: "/master-document-review",
 				icon: ClipboardCheck,
 			},
 			{

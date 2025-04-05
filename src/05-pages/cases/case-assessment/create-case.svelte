@@ -1,31 +1,31 @@
 <script lang="ts">
     import CaseData from "../case-data.svelte";
     import { Button } from "$lib/components/ui/button";
-    import * as Card from "$lib/components/ui/card";
-    import { Upload } from "lucide-svelte";
     import {
         caseStore,
-        generatePersonaFromUrl,
-        generatePhysicalExamFromUrl,
-        generateDifferentialDiagnosisFromUrl,
+        generatePersona,
+        generatePhysicalExam,
+        generateDifferentialDiagnosis,
         type CaseStoreState,
     } from "$lib/stores/caseCreatorStore";
     import { onDestroy, onMount } from "svelte";
-    import {
-        documentStore,
-        fetchDocumentsByDepartment,
-    } from "$lib/stores/documentStore";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
     import {
         CaseDataService,
         type PublishCaseParams,
     } from "$lib/services/caseDataService";
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
-    import * as Select from "$lib/components/ui/select";
-    //on mount get documetns for teh topic
-    // Define initialValue based on the expected structure of CaseStoreState
+    import PageLayout from "../../../04-templates/page-layout.svelte";
+
+    const caseDataService = new CaseDataService();
+
+    let selectedCaseDocument = $state<DocumentUploadResponse | null>(null);
+    let department = $state<Department | null>(null);
+    let isPublishing = $state(false);
+    let publishError = $state<string | null>(null);
+    let publishSuccess = $state(false);
+
     const initialValue: CaseStoreState = {
-        // fileUploaded: false,
         generating: false,
         error: null,
         persona: null,
@@ -44,57 +44,8 @@
         isGeneratingDifferential: false,
         isSearchingImages: false,
         searchedImages: null,
-        selectedDocument: null,
+        selectedDocumentName: null,
     };
-
-    // Create an instance of CaseDataService
-    const caseDataService = new CaseDataService();
-
-    let departmentDocuments = $state<DocumentUploadResponse[]>([]);
-    let isLoadingDocuments = $state(false);
-    let documentError = $state<string | null>(null);
-    let isPublishing = $state(false);
-    let publishError = $state<string | null>(null);
-    let publishSuccess = $state(false);
-    let department = $state<Department | null>(null);
-    const { selectedDocId } = $props<{
-        selectedDocId?: string;
-    }>();
-
-    let selectedValue = $state(selectedDocId || "");
-
-    const triggerContent = $derived(
-        departmentDocuments.find((doc) => doc.id.toString() === selectedValue)
-            ?.title ?? "Select a document...",
-    );
-
-    $effect(() => {
-        const selectedDoc = departmentDocuments.find(
-            (doc) => doc.id.toString() === selectedValue,
-        );
-        uploadState.selectedDocument = selectedDoc || null;
-    });
-
-    $effect(() => {
-        if (selectedDocId && departmentDocuments.length > 0) {
-            selectedValue = selectedDocId;
-        }
-    });
-
-    // Subscribe to the currentDepartment store
-    const unsubscribeDepartment = currentDepartment.subscribe((value) => {
-        department = value;
-    });
-
-    const unsubscribeDocStore = documentStore.subscribe((state) => {
-        departmentDocuments = state.documents[department?.name || ""] || [];
-        isLoadingDocuments = state.isLoading;
-        documentError = state.error;
-    });
-
-    onMount(() => {
-        fetchDocumentsByDepartment(department?.name || "");
-    });
 
     let uploadState = $state(initialValue);
     let currentTab = $state<
@@ -106,27 +57,36 @@
         | "examination-editor"
         | "differential-diagnosis"
     >("patient-persona");
-    let uploadedFileName: string | null = $state(null);
 
-    // Subscribe to the caseStore
+    const unsubscribeDepartment = currentDepartment.subscribe((value) => {
+        department = value;
+    });
+
     const unsubscribe = caseStore.subscribe((state) => {
         uploadState = state;
-        uploadedFileName = state.uploadedFileName;
+    });
+
+    onMount(() => {
+        // selectedCaseDocument = $documentStore.selectedCaseDocument;
+        console.log("Selected case document from store:", selectedCaseDocument);
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileName = urlParams.get("fileName");
+        uploadState.selectedDocumentName = fileName;
+        console.log("File name from URL:", fileName);
     });
 
     onDestroy(() => {
-        unsubscribe(); // Clean up the subscription when the component is destroyed
-        unsubscribeDocStore(); // Clean up the document store subscription
-        unsubscribeDepartment(); // Clean up the department store subscription
+        unsubscribe();
+        unsubscribeDepartment();
     });
 
     async function handleGenerateAll() {
-        if (!uploadState.selectedDocument) return;
+        if (!uploadState.selectedDocumentName) return;
+
         uploadState.generating = true;
         uploadState.error = null;
 
         try {
-            // Update store loading states instead of local ones
             uploadState.isGeneratingPersona = true;
             await handleGeneratePersona();
             uploadState.isGeneratingPersona = false;
@@ -144,7 +104,6 @@
             console.error("Generation error:", error);
         } finally {
             uploadState.generating = false;
-            // Reset all loading states in case of error
             uploadState.isGeneratingPersona = false;
             uploadState.isGeneratingPhysicalExam = false;
             uploadState.isGeneratingDifferential = false;
@@ -152,15 +111,15 @@
     }
 
     async function handleGeneratePersona() {
-        if (!uploadState.selectedDocument) return;
+        if (!uploadState.selectedDocumentName) return;
         currentTab = "patient-persona";
         uploadState.isGeneratingPersona = true;
 
         try {
-            if (!uploadState.selectedDocument) return;
-            await generatePersonaFromUrl(
-                uploadState.selectedDocument.url,
-                uploadState.selectedDocument,
+            if (!uploadState.selectedDocumentName) return;
+            await generatePersona(
+                uploadState.selectedDocumentName,
+                uploadState.caseId || "",
             );
         } catch (error) {
             uploadState.error =
@@ -174,18 +133,17 @@
     async function handleGenerateCaseData() {
         console.log(
             "uploadState.selectedDocument",
-            uploadState.selectedDocument,
+            uploadState.selectedDocumentName,
         );
         console.log("uploadState.caseId", uploadState.caseId);
-        if (!uploadState.selectedDocument || !uploadState.caseId) return;
+        if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
 
         console.log("uploadState.caseId", uploadState.caseId);
         try {
-            await generatePhysicalExamFromUrl(
-                uploadState.selectedDocument.url,
-                uploadState.selectedDocument,
+            await generatePhysicalExam(
+                uploadState.selectedDocumentName,
                 uploadState.caseId || "",
             );
         } catch (error) {
@@ -197,14 +155,13 @@
     }
 
     async function handleGenerateDifferentialDiagnosis() {
-        if (!uploadState.selectedDocument || !uploadState.caseId) return;
+        if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
         currentTab = "differential-diagnosis";
         uploadState.isGeneratingDifferential = true;
 
         try {
-            await generateDifferentialDiagnosisFromUrl(
-                uploadState.selectedDocument?.url || "",
-                uploadState.selectedDocument || undefined,
+            await generateDifferentialDiagnosis(
+                uploadState.selectedDocumentName || "",
                 uploadState.caseId || "",
             );
         } catch (error) {
@@ -241,69 +198,18 @@
     }
 </script>
 
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold">Create Case</h1>
+</div>
+<p class="text-gray-500 mb-8">Create a new case from a master document</p>
 <div class="flex flex-row items-start justify-start gap-4">
-    <div>
-        <div class="flex w-full gap-4">
-            <Card.Root class="max-w-md shadow-md rounded-lg bg-white w-[300px]">
-                <Card.Header>
-                    <Card.Title class="text-lg font-semibold"
-                        >Select case document</Card.Title
-                    >
-                </Card.Header>
-                <Card.Content>
-                    <div class="space-y-8">
-                        <div class="grid w-full items-center gap-1.5">
-                            <label
-                                for="document-select"
-                                class="text-sm leading-none"
-                            >
-                                Select Document
-                            </label>
-                            <Select.Root
-                                type="single"
-                                value={selectedValue}
-                                onValueChange={(value) => {
-                                    selectedValue = value;
-                                }}
-                                disabled={uploadState.loading ||
-                                    uploadState.generating}
-                            >
-                                <Select.Trigger
-                                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                                >
-                                    {triggerContent}
-                                </Select.Trigger>
-                                <Select.Content class="w-full">
-                                    <Select.Group>
-                                        {#each departmentDocuments as document}
-                                            <Select.Item
-                                                value={document.id.toString()}
-                                                label={document.title}
-                                            >
-                                                {document.title}
-                                            </Select.Item>
-                                        {/each}
-                                    </Select.Group>
-                                </Select.Content>
-                            </Select.Root>
-                            {#if departmentDocuments.length === 0}
-                                <p class="text-xs text-muted-foreground mt-1">
-                                    No documents available for this department
-                                </p>
-                            {/if}
-                        </div>
-                    </div>
-                </Card.Content>
-            </Card.Root>
-        </div>
-
-        <!-- Topic Documents Section -->
-
-        <div class="flex flex-col justify-start mt-4 mb-12">
+    <div class="pt-8">
+        <p class="text-md font-medium pb-6 ">Available Actions</p>
+        <div class="flex flex-col justify-center mb-12">
             <Button
                 onclick={handleGenerateAll}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocument}
+                    !uploadState.selectedDocumentName}
             >
                 {#if uploadState.generating}
                     Generating All...
@@ -311,18 +217,14 @@
                     Generate All Data
                 {/if}
             </Button>
-            {#if (!uploadState.caseId || !uploadState.uploadedFile) && !uploadState.generating}
-                <p class="text-xs mt-1 text-muted-foreground">
-                    Please fill in all fields and upload a PDF file
-                </p>
-            {/if}
         </div>
 
         <div class="flex flex-col justify-start mt-4">
             <Button
+                variant="secondary"
                 onclick={handleGeneratePersona}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocument}
+                    !uploadState.selectedDocumentName}
             >
                 {#if uploadState.isGeneratingPersona}
                     Generating Patient Persona...
@@ -330,17 +232,13 @@
                     Generate Patient Persona
                 {/if}
             </Button>
-            {#if (!uploadState.caseId || !uploadState.uploadedFile) && !uploadState.generating}
-                <p class="text-xs mt-1 text-muted-foreground">
-                    Please fill in all fields and upload a PDF file
-                </p>
-            {/if}
         </div>
         <div class="flex flex-col justify-start mt-4">
             <Button
+                variant="secondary"
                 onclick={handleGenerateCaseData}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocument}
+                    !uploadState.selectedDocumentName}
             >
                 {#if uploadState.isGeneratingPhysicalExam}
                     Generating Physical Exam Data...
@@ -348,17 +246,13 @@
                     Generate Physical Exam Data
                 {/if}
             </Button>
-            {#if (!uploadState.caseId || !uploadState.uploadedFile) && !uploadState.generating}
-                <p class="text-xs mt-1 text-muted-foreground">
-                    Please fill in all fields and upload a PDF file
-                </p>
-            {/if}
         </div>
         <div class="flex flex-col justify-start mt-4">
             <Button
+                variant="secondary"
                 onclick={handleGenerateDifferentialDiagnosis}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocument}
+                    !uploadState.selectedDocumentName}
             >
                 {#if uploadState.isGeneratingDifferential}
                     Extracting Differential Diagnosis...
@@ -366,11 +260,6 @@
                     Generate Differential Diagnosis
                 {/if}
             </Button>
-            {#if !uploadState.selectedDocument && !uploadState.generating}
-                <p class="text-xs mt-1 text-muted-foreground">
-                    Please fill in all fields and upload a PDF file
-                </p>
-            {/if}
         </div>
 
         <!-- Publish Case Button -->

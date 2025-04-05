@@ -4,7 +4,6 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { Route, Router, useLocation, navigate } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte";
-	import CaseCreatorWrapper from "../../05-pages/cases/case-creator-wrapper.svelte";
 	import { fetchCases } from "$lib/stores/casePlayerStore";
 	import { onMount } from "svelte";
 	import CurriculumPage from "../../05-pages/CurriculumPage.svelte";
@@ -21,7 +20,7 @@
 	import ForumPage from "../../05-pages/ForumPage.svelte";
 	import KnowledgeBasePage from "../../05-pages/KnowledgeBasePage.svelte";
 	import VivaQuestionsPage from "../../05-pages/VivaQuestionsPage.svelte";
-	import CaseReviewPage from "../../05-pages/CaseReview.svelte";
+	import MasterDocReview from "../../05-pages/MasterDocReview.svelte";
 	import { Toaster } from "svelte-sonner";
 
 	// Get the current URL for Router
@@ -60,28 +59,21 @@
 						<Route path="/">
 							<CaseLibraryPage />
 						</Route>
-						<Route path="/tools/case-data-creator">
-							<CaseCreatorWrapper />
-						</Route>
+
 						<Route path="/curriculum">
 							<CurriculumPage />
 						</Route>
 						<Route path="/case-library">
 							<CaseLibraryPage />
 						</Route>
-						<Route path="/case-review">
-							<CaseReviewPage />
+						<Route path="/master-document-review">
+							<MasterDocReview />
 						</Route>
 						<Route path="/case-library/:id" let:params>
 							<CasePlayer id={params.id} />
 						</Route>
-						<Route
-							path="/curriculum/new-case/:selectedDocId"
-							let:params
-						>
-							<CaseAssessment
-								selectedDocId={params.selectedDocId}
-							/>
+						<Route path="/curriculum/new-case">
+							<CaseAssessment />
 						</Route>
 						<Route path="/class">
 							<ClassPage />

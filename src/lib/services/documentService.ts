@@ -2,9 +2,8 @@ import { API_BASE_URL } from '$lib/config/api';
 import { toast } from 'svelte-sonner';
 
 export interface DocumentUploadResponse {
-    id: number;
+    id: string;
     title: string;
-    type: string;
     url: string;
     description?: string;
     google_doc_link: string;
