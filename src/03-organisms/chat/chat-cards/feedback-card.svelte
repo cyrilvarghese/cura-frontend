@@ -7,6 +7,7 @@
     import * as Accordion from "$lib/components/ui/accordion";
     import { ExternalLink } from "lucide-svelte";
     import DrugDialog from "./drug-dialog.svelte";
+    import TestDialog from "./test-dialog.svelte";
 
     export let feedback: FeedbackResponse;
     import { onMount } from "svelte";
@@ -134,8 +135,16 @@
     let isDrugDialogOpen = false;
 
     function openDrugDialog(drug: string) {
-        selectedDrug = drug.split("/")[0]; // Handle cases like "Loratadine/Fexofenadine"
+        selectedDrug = drug;
         isDrugDialogOpen = true;
+    }
+
+    let selectedTest = "";
+    let isTestDialogOpen = false;
+
+    function openTestDialog(test: string) {
+        selectedTest = test;
+        isTestDialogOpen = true;
     }
 </script>
 
@@ -261,9 +270,9 @@
                                                                     class="p-2 text-muted-foreground"
                                                                 >
                                                                     {#if cellIndex === 0}
-                                                                        <!-- First column is drug name -->
+                                                                        <!-- First column is drug name - Updated styling -->
                                                                         <button
-                                                                            class="text-primary hover:underline text-left font-medium"
+                                                                            class="text-blue-600 hover:text-blue-800 underline decoration-blue-400/50 hover:decoration-blue-600 decoration-2 text-left font-medium transition-colors"
                                                                             on:click={() =>
                                                                                 openDrugDialog(
                                                                                     cell,
@@ -487,6 +496,7 @@
 </div>
 
 <DrugDialog drugName={selectedDrug} bind:isOpen={isDrugDialogOpen} />
+<TestDialog testName={selectedTest} bind:isOpen={isTestDialogOpen} />
 
 <style>
     /* Fixed column widths */

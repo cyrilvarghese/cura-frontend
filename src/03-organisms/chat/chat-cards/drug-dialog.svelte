@@ -11,6 +11,19 @@
         contraindications: string[];
         sideEffects: string[];
         monitoring: string[];
+        clinicalContext: string;
+        examTips: string[];
+        specialPopulations: {
+            renal?: string;
+            pregnancy?: string;
+            elderly?: string;
+        };
+        relatedTopics: {
+            diseases: string[];
+            concepts: string[];
+        };
+        category: "first-line" | "second-line" | "severe";
+        requiresMonitoring: boolean;
     };
 
     type DrugDetails = {
@@ -31,6 +44,23 @@
                 "No routine monitoring required",
                 "Adjust dose in renal impairment",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Hydroxyzine: {
             class: "First-generation antihistamine",
@@ -56,6 +86,23 @@
                 "ECG monitoring in high-risk patients",
                 "Mental status in elderly",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         "Loratadine/Fexofenadine": {
             class: "Second-generation antihistamine",
@@ -76,29 +123,74 @@
                 "Minimal sedation",
             ],
             monitoring: ["Liver function in long-term use"],
+            clinicalContext:
+                "Non-sedating antihistamine preferred for daytime use. Less anticholinergic effects compared to first-generation agents.",
+            examTips: [
+                "Key differentiator: No significant sedation vs first-generation",
+                "Fexofenadine has no cardiac concerns unlike other 2nd gen antihistamines",
+            ],
+            specialPopulations: {
+                renal: "Fexofenadine needs dose adjustment in renal impairment",
+                pregnancy: "Category B - preferred antihistamine in pregnancy",
+                elderly:
+                    "Preferred over first-generation due to less anticholinergic effects",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: [
+                    "Histamine Pathway",
+                    "Blood-Brain Barrier Penetration",
+                ],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Ibuprofen: {
             class: "NSAID (Non-steroidal anti-inflammatory drug)",
             mechanism: "COX-1 and COX-2 inhibitor",
-            indications: ["Pain", "Inflammation", "Fever"],
+            indications: [
+                "Pain",
+                "Inflammation",
+                "Fever",
+                "Acute urticaria with angioedema",
+            ],
             contraindications: [
-                "Peptic ulcer disease",
+                "Active GI bleeding",
                 "Severe heart failure",
                 "Third trimester pregnancy",
-                "Bleeding disorders",
+                "CrCl < 30 mL/min",
             ],
             sideEffects: [
-                "GI upset/bleeding",
-                "Increased bleeding risk",
-                "Renal impairment",
-                "Cardiovascular risks",
+                "GI ulceration/bleeding",
+                "Increased blood pressure",
+                "Acute kidney injury",
+                "Platelet dysfunction",
             ],
             monitoring: [
-                "Renal function",
                 "Blood pressure",
+                "Renal function",
                 "GI symptoms",
-                "CBC in long-term use",
+                "CBC if long-term use",
             ],
+            clinicalContext:
+                "Useful for inflammatory conditions with pain component. Consider GI prophylaxis in high-risk patients.",
+            examTips: [
+                "Remember 'triple whammy' - NSAIDs + ACEi/ARB + Diuretics = AKI risk",
+                "High-risk GI bleed patients need PPI coverage",
+            ],
+            specialPopulations: {
+                renal: "Avoid if CrCl < 30ml/min, use with caution if 30-60ml/min",
+                pregnancy:
+                    "Contraindicated in 3rd trimester, caution in 1st/2nd",
+                elderly:
+                    "Higher risk of GI/renal complications, use lowest effective dose",
+            },
+            relatedTopics: {
+                diseases: ["Peptic Ulcer Disease", "Acute Kidney Injury"],
+                concepts: ["COX Inhibition", "Prostaglandin Effects"],
+            },
+            category: "first-line",
+            requiresMonitoring: true,
         },
         Naproxen: {
             class: "NSAID (Non-steroidal anti-inflammatory drug)",
@@ -121,33 +213,70 @@
                 "GI symptoms",
                 "CBC in long-term use",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Prednisolone: {
             class: "Corticosteroid",
-            mechanism: "Anti-inflammatory and immunosuppressive effects",
+            mechanism:
+                "Multiple anti-inflammatory and immunosuppressive effects",
             indications: [
                 "Severe allergic reactions",
+                "Refractory urticaria",
                 "Autoimmune conditions",
-                "Inflammatory disorders",
+                "Acute asthma exacerbations",
             ],
             contraindications: [
-                "Systemic infections",
+                "Active untreated infections",
                 "Live vaccines",
-                "Peptic ulcer disease",
+                "Systemic fungal infections",
             ],
             sideEffects: [
-                "Weight gain",
-                "Mood changes",
-                "Increased blood sugar",
+                "Hyperglycemia",
+                "Hypertension",
                 "Osteoporosis",
+                "Adrenal suppression",
                 "Increased infection risk",
             ],
             monitoring: [
-                "Blood pressure",
                 "Blood glucose",
-                "Bone density",
+                "Blood pressure",
                 "Electrolytes",
+                "Bone density if long-term",
             ],
+            clinicalContext:
+                "Rapid-acting anti-inflammatory for severe symptoms. Requires careful tapering if used > 2 weeks.",
+            examTips: [
+                "Know tapering rules: gradual if >2 weeks use",
+                "Morning dosing mimics natural cortisol rhythm",
+                "Stress dose needed for surgery if chronic use",
+            ],
+            specialPopulations: {
+                renal: "No dose adjustment needed, but monitor fluid/electrolytes",
+                pregnancy: "Category C - use if benefit outweighs risk",
+                elderly: "Higher risk of side effects, especially osteoporosis",
+            },
+            relatedTopics: {
+                diseases: ["Cushing Syndrome", "Adrenal Insufficiency"],
+                concepts: ["HPA Axis", "Glucocorticoid Tapering"],
+            },
+            category: "second-line",
+            requiresMonitoring: true,
         },
         Hydroxychloroquine: {
             class: "Disease-modifying antirheumatic drug (DMARD)",
@@ -174,6 +303,23 @@
                 "Liver function",
                 "ECG in high-risk patients",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Dapsone: {
             class: "Sulfone antibiotic",
@@ -200,33 +346,69 @@
                 "Liver function",
                 "Methemoglobin levels",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Methotrexate: {
             class: "Disease-modifying antirheumatic drug (DMARD)",
-            mechanism: "Folic acid antagonist with immunosuppressive effects",
+            mechanism: "Folate antagonist with immunomodulatory effects",
             indications: [
                 "Severe chronic urticaria",
                 "Rheumatoid arthritis",
-                "Psoriasis",
+                "Severe psoriasis",
             ],
             contraindications: [
-                "Pregnancy",
-                "Liver disease",
+                "Pregnancy/planning pregnancy",
                 "Active infection",
+                "Significant liver disease",
                 "Bone marrow suppression",
             ],
             sideEffects: [
                 "Bone marrow suppression",
                 "Hepatotoxicity",
-                "GI upset",
+                "Pulmonary toxicity",
                 "Teratogenicity",
+                "Oral ulcers",
             ],
             monitoring: [
-                "CBC",
-                "Liver function",
-                "Renal function",
-                "Pregnancy testing",
+                "CBC weekly for first month, then monthly",
+                "Liver function tests monthly",
+                "Chest X-ray baseline",
+                "Pregnancy test before starting",
             ],
+            clinicalContext:
+                "Reserved for severe refractory cases. Requires careful monitoring and mandatory contraception.",
+            examTips: [
+                "MUST give folic acid supplementation",
+                "Friday dose, CBC Monday (toxicity monitoring)",
+                "Alcohol strictly contraindicated",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose if CrCl < 60ml/min, avoid if < 30ml/min",
+                pregnancy: "Absolutely contraindicated - teratogenic",
+                elderly: "Higher risk of toxicity, consider dose reduction",
+            },
+            relatedTopics: {
+                diseases: ["Rheumatoid Arthritis", "Interstitial Lung Disease"],
+                concepts: ["Folate Metabolism", "DMARD Monitoring"],
+            },
+            category: "severe",
+            requiresMonitoring: true,
         },
         Azathioprine: {
             class: "Immunosuppressant",
@@ -253,6 +435,23 @@
                 "TPMT testing before initiation",
                 "Regular skin cancer screening",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
         Rituximab: {
             class: "Monoclonal antibody",
@@ -279,66 +478,163 @@
                 "Hepatitis B screening",
                 "Infection surveillance",
             ],
+            clinicalContext:
+                "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
+            examTips: [
+                "Compare sedation profile with first-generation antihistamines",
+                "Know dose adjustment in renal impairment",
+            ],
+            specialPopulations: {
+                renal: "Reduce dose by 50% if CrCl < 30ml/min",
+                pregnancy: "Category B - generally considered safe",
+                elderly: "No routine dose adjustment needed",
+            },
+            relatedTopics: {
+                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
+                concepts: ["Histamine Pathway", "Antihistamine Classification"],
+            },
+            category: "first-line",
+            requiresMonitoring: false,
         },
     };
 </script>
 
 <Dialog.Root bind:open={isOpen}>
-    <Dialog.Content class="max-w-2xl">
+    <Dialog.Content class="max-w-4xl">
         <Dialog.Header>
-            <Dialog.Title>{drugName}</Dialog.Title>
+            <Dialog.Title class="flex items-center gap-2">
+                <span class="text-xl">{drugName}</span>
+                {#if drugDetails[drugName]}
+                    {#if drugDetails[drugName].requiresMonitoring}
+                        <span class="text-amber-500 text-sm"
+                            >🧪 Monitoring Required</span
+                        >
+                    {/if}
+                    <span
+                        class="px-2 py-1 rounded-full text-xs bg-slate-100 text-slate-700"
+                    >
+                        {drugDetails[drugName].category}
+                    </span>
+                {/if}
+            </Dialog.Title>
         </Dialog.Header>
 
         {#if drugDetails[drugName]}
-            <div class="space-y-4">
-                <div>
-                    <h3 class="font-medium mb-2">Drug Class</h3>
-                    <p class="text-sm text-muted-foreground">
-                        {drugDetails[drugName].class}
-                    </p>
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Left Column - Core Information -->
+                <div class="space-y-4">
+                    <!-- Clinical Context Card -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-medium text-blue-800">
+                            Clinical Context
+                        </h3>
+                        <p class="text-sm text-blue-700">
+                            {drugDetails[drugName].clinicalContext}
+                        </p>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="bg-white p-4 rounded-lg border">
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-slate-700">
+                                Drug Class
+                            </h3>
+                            <p class="text-sm text-slate-600">
+                                {drugDetails[drugName].class}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-medium text-slate-700">
+                                Mechanism
+                            </h3>
+                            <p class="text-sm text-slate-600">
+                                {drugDetails[drugName].mechanism}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Indications & Contraindications -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h3 class="text-sm font-medium text-slate-700 mb-2">
+                                Indications
+                            </h3>
+                            <ul class="text-sm text-slate-600 space-y-1">
+                                {#each drugDetails[drugName].indications as indication}
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-green-500">•</span>
+                                        {indication}
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h3 class="text-sm font-medium text-red-700 mb-2">
+                                Contraindications
+                            </h3>
+                            <ul class="text-sm text-slate-600 space-y-1">
+                                {#each drugDetails[drugName].contraindications as contraindication}
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-red-500">⚠️</span>
+                                        {contraindication}
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <h3 class="font-medium mb-2">Mechanism of Action</h3>
-                    <p class="text-sm text-muted-foreground">
-                        {drugDetails[drugName].mechanism}
-                    </p>
-                </div>
+                <!-- Right Column - Additional Information -->
+                <div class="space-y-4">
+                    <!-- Exam Tips -->
+                    <div class="bg-amber-50 p-4 rounded-lg">
+                        <h3 class="font-medium text-amber-800 mb-2">
+                            📝 Exam Tips
+                        </h3>
+                        <ul class="text-sm text-amber-700 space-y-2">
+                            {#each drugDetails[drugName].examTips as tip}
+                                <li>• {tip}</li>
+                            {/each}
+                        </ul>
+                    </div>
 
-                <div>
-                    <h3 class="font-medium mb-2">Indications</h3>
-                    <ul class="list-disc pl-4 text-sm text-muted-foreground">
-                        {#each drugDetails[drugName].indications as indication}
-                            <li>{indication}</li>
-                        {/each}
-                    </ul>
-                </div>
+                    <!-- Special Populations -->
+                    <div class="bg-white p-4 rounded-lg border">
+                        <h3 class="text-sm font-medium text-slate-700 mb-2">
+                            Special Populations
+                        </h3>
+                        <div class="space-y-2">
+                            {#each Object.entries(drugDetails[drugName].specialPopulations) as [population, info]}
+                                <div>
+                                    <span
+                                        class="text-sm font-medium text-slate-600"
+                                        >{population}:</span
+                                    >
+                                    <span class="text-sm text-slate-600 ml-1"
+                                        >{info}</span
+                                    >
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
 
-                <div>
-                    <h3 class="font-medium mb-2">Contraindications</h3>
-                    <ul class="list-disc pl-4 text-sm text-muted-foreground">
-                        {#each drugDetails[drugName].contraindications as contraindication}
-                            <li>{contraindication}</li>
-                        {/each}
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-medium mb-2">Side Effects</h3>
-                    <ul class="list-disc pl-4 text-sm text-muted-foreground">
-                        {#each drugDetails[drugName].sideEffects as effect}
-                            <li>{effect}</li>
-                        {/each}
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="font-medium mb-2">Monitoring</h3>
-                    <ul class="list-disc pl-4 text-sm text-muted-foreground">
-                        {#each drugDetails[drugName].monitoring as item}
-                            <li>{item}</li>
-                        {/each}
-                    </ul>
+                    <!-- Related Topics -->
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-slate-700 mb-2">
+                            Related Topics
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            {#each drugDetails[drugName].relatedTopics.diseases as disease}
+                                <span
+                                    class="px-2 py-1 bg-slate-200 rounded-full text-xs text-slate-700"
+                                >
+                                    {disease}
+                                </span>
+                            {/each}
+                        </div>
+                    </div>
                 </div>
             </div>
         {:else}
