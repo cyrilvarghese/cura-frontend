@@ -70,7 +70,7 @@
                 >
             </Tabs.List>
 
-            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl">
+            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl p-6">
                 <Tabs.Content value="patient-persona">
                     {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
@@ -82,13 +82,16 @@
                         </Alert>
                     {:else if uploadState.persona}
                         <div class="relative">
-                            <div class="flex justify-start mb-4">
+                            <div class="flex justify-between mb-4">
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onclick={() => (showPhraseDialog = true)}
                                 >
                                     Add phrases to avoid
+                                </Button>
+                                <Button variant="outline" size="sm" onclick={() => (showPhraseDialog = true)}>
+                                    Test Patient Dialogue
                                 </Button>
                             </div>
 
