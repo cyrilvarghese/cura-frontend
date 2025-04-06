@@ -1,0 +1,371 @@
+{
+    "annotations": [
+        {
+            "action": "hi how are you doing?",
+            "step": "history_taking",
+            "relevance": "neutral",
+            "correctness": null,
+            "justification": "The question is conversational and does not address specific symptoms or relevant history."
+        },
+        {
+            "action": "Examination: Skin Examination",
+            "step": "examination",
+            "relevance": "relevant",
+            "correctness": null,
+            "justification": "A skin examination is crucial for assessing the rash's characteristics, which are key to diagnosing urticarial vasculitis."
+        },
+        {
+            "action": "rash with joint pain since two weeks",
+            "step": "relevant-info",
+            "relevance": "relevant",
+            "correctness": null,
+            "justification": "This information is directly relevant as it highlights the duration and nature of symptoms, which are critical for diagnosis."
+        },
+        {
+            "action": "Test: Rheumatoid Factor (RF)",
+            "step": "examination",
+            "relevance": null,
+            "correctness": "incorrect",
+            "justification": "While RF can be relevant in autoimmune conditions, it is not directly useful for diagnosing urticarial vasculitis."
+        },
+        {
+            "action": "Test: Skin Biopsy",
+            "step": "examination",
+            "relevance": null,
+            "correctness": "correct",
+            "justification": "A skin biopsy is a definitive test for diagnosing urticarial vasculitis, as it can reveal leukocytoclastic vasculitis."
+        },
+        {
+            "action": "Primary Diagnosis: Urticarial Vasculitis Justification: rash with joint pain Differential Diagnoses: Systemic Lupus Erythematosus (SLE) with cutaneous manifestations, Hypersensitivity Vasculitis, Chronic Idiopathic Urticaria",
+            "step": "diagnosis",
+            "relevance": null,
+            "correctness": "correct",
+            "justification": "The primary diagnosis is correct, and the differential diagnoses are mostly appropriate, though chronic idiopathic urticaria is less likely."
+        },
+        {
+            "action": "Primary Diagnosis: urticarial vasculitis Justification: rash with joint pain + biopsy Differential Diagnoses: ",
+            "step": "final-diagnosis",
+            "relevance": null,
+            "correctness": "correct",
+            "justification": "The final diagnosis is correct, and the justification is strengthened by the inclusion of biopsy results."
+        }
+    ],
+    "feedback": {
+        "history_taking": {
+            "score": 5,
+            "comments": "The student asked a general question but did not delve into specific history questions that could have provided more insight into the patient's condition.",
+            "missed": [
+                "Family history of autoimmune conditions",
+                "Duration and pattern of joint symptoms",
+                "Previous similar episodes"
+            ],
+            "relevance": [
+                "Autoimmune conditions often have genetic predisposition",
+                "Pattern helps distinguish between acute and chronic conditions",
+                "Recurrence pattern indicates disease progression"
+            ],
+            "readMore": "https://www.medicaleducation.com/history-taking"
+        },
+        "examinations_performed": {
+            "score": 8,
+            "comments": "The student correctly performed a skin examination, which is crucial for this case. However, they did not perform a musculoskeletal examination, which would have been relevant given the joint symptoms.",
+            "missed": [
+                "Musculoskeletal examination",
+                "Joint mobility assessment",
+                "Lymph node examination"
+            ],
+            "relevance": [
+                "Essential for evaluating joint involvement",
+                "Helps determine range of motion limitations",
+                "Important for systemic disease evaluation"
+            ],
+            "readMore": "https://www.medicaleducation.com/physical-examination"
+        },
+        "tests_ordered": {
+            "score": 7,
+            "comments": "The student correctly ordered a skin biopsy, which is essential for diagnosis. However, ordering a Rheumatoid Factor test was not directly relevant to the case.",
+            "missed": [
+                "Complement Levels (C3, C4)",
+                "Anti-dsDNA antibodies",
+                "Urinalysis"
+            ],
+            "relevance": [
+                "Important markers for vasculitis activity",
+                "Helps differentiate between autoimmune conditions",
+                "Necessary to assess kidney involvement"
+            ],
+            "readMore": "https://www.medicaleducation.com/diagnostic-tests"
+        },
+        "diagnostic_reasoning": {
+            "score": 8,
+            "comments": "The student correctly identified urticarial vasculitis as the primary diagnosis and provided a reasonable differential diagnosis list. However, they included chronic idiopathic urticaria, which is less likely given the symptoms.",
+            "missed": [
+                "Consideration of systemic involvement",
+                "Age-specific differential diagnoses",
+                "Risk factor analysis"
+            ],
+            "relevance": [
+                "Vasculitis can affect multiple organs",
+                "Prevalence varies by age group",
+                "Helps in prognosis and treatment planning"
+            ],
+            "readMore": "https://www.medicaleducation.com/clinical-reasoning"
+        },
+        "synthesis_organization": {
+            "score": 7,
+            "comments": "The student synthesized the information well but could have organized their reasoning more clearly, particularly in differentiating between the primary and differential diagnoses.",
+            "missed": [
+                "Temporal sequence of symptoms",
+                "Integration of findings",
+                "Clear documentation structure"
+            ],
+            "relevance": [
+                "Important for understanding disease progression",
+                "Helps establish clear clinical picture",
+                "Essential for continuity of care"
+            ],
+            "readMore": "https://www.medicaleducation.com/clinical-documentation"
+        },
+        "pre_treatment_investigations": {
+            "score": 5,
+            "comments": "Several critical pre-treatment investigations were missed, particularly for drug-specific screening tests.",
+            "missed": {
+                "table_headers": [
+                    "Investigation",
+                    "Purpose",
+                    "Drugs Involved"
+                ],
+                "rows": [
+                    [
+                        "CBC & Retic Count",
+                        "Detect anemia, cytopenia",
+                        "Methotrexate, Azathioprine"
+                    ],
+                    [
+                        "LFTs",
+                        "Hepatotoxicity",
+                        "Methotrexate, Azathioprine"
+                    ],
+                    [
+                        "RFTs",
+                        "Baseline renal function",
+                        "NSAIDs, Methotrexate"
+                    ],
+                    [
+                        "G6PD Screening",
+                        "Prevent hemolysis",
+                        "Dapsone"
+                    ],
+                    [
+                        "Eye Exam",
+                        "Monitor for retinopathy",
+                        "Hydroxychloroquine"
+                    ],
+                    [
+                        "Hepatitis B/C, TB Screening",
+                        "Prior to biologics",
+                        "Rituximab"
+                    ]
+                ]
+            },
+            "relevance": [
+                "Early detection of potential complications",
+                "Prevention of drug-induced adverse effects",
+                "Establishing baseline for monitoring",
+                "Essential for safe medication initiation"
+            ],
+            "readMore": "https://www.medicaleducation.com/pre-treatment-screening"
+        },
+        "prescription_writing": {
+            "score": 6,
+            "comments": "Treatment plan lacks proper staging and detailed dosing schedules.",
+            "missed": {
+                "table_headers": [
+                    "Drug",
+                    "Dose",
+                    "Route",
+                    "Frequency",
+                    "Notes"
+                ],
+                "sections": [
+                    {
+                        "title": "🟢 First-Line (Mild-Moderate Cases)",
+                        "rows": [
+                            [
+                                "Cetirizine",
+                                "10 mg",
+                                "Oral",
+                                "OD or BD",
+                                "Non-sedating antihistamine"
+                            ],
+                            [
+                                "Hydroxyzine",
+                                "25-50 mg",
+                                "Oral",
+                                "Nocte",
+                                "Sedating; helpful at night"
+                            ],
+                            [
+                                "Loratadine/Fexofenadine",
+                                "-",
+                                "Oral",
+                                "OD",
+                                "Non-sedating alternatives"
+                            ],
+                            [
+                                "Ibuprofen",
+                                "400 mg",
+                                "Oral",
+                                "TID",
+                                "Avoid if renal or GI contraindications"
+                            ],
+                            [
+                                "Naproxen",
+                                "250-500 mg",
+                                "Oral",
+                                "BID",
+                                "Longer-acting NSAID alternative"
+                            ]
+                        ]
+                    },
+                    {
+                        "title": "🟡 Second-Line (Persistent/Severe)",
+                        "rows": [
+                            [
+                                "Prednisolone",
+                                "0.5-1 mg/kg/day",
+                                "Oral",
+                                "OD",
+                                "Taper gradually over 4-8 weeks"
+                            ],
+                            [
+                                "Hydroxychloroquine",
+                                "200-400 mg/day",
+                                "Oral",
+                                "OD",
+                                "Requires baseline and annual eye exams"
+                            ],
+                            [
+                                "Dapsone",
+                                "50-100 mg/day",
+                                "Oral",
+                                "OD",
+                                "G6PD test required before initiation"
+                            ]
+                        ]
+                    },
+                    {
+                        "title": "🔴 Severe/Refractory Cases",
+                        "rows": [
+                            [
+                                "Methotrexate",
+                                "7.5-15 mg/week",
+                                "Oral/SC",
+                                "Weekly",
+                                "Give folic acid; monitor CBC and LFT"
+                            ],
+                            [
+                                "Azathioprine",
+                                "1-2.5 mg/kg/day",
+                                "Oral",
+                                "OD",
+                                "Monitor blood counts and liver function"
+                            ],
+                            [
+                                "Rituximab",
+                                "As per protocol",
+                                "IV",
+                                "Monthly",
+                                "Use for autoimmune-associated vasculitis"
+                            ]
+                        ]
+                    }
+                ],
+                "tips": [
+                    "Taper steroids to avoid adrenal suppression",
+                    "Test G6PD before starting Dapsone",
+                    "Avoid NSAIDs in renal impairment or GI risk",
+                    "Eye monitoring is essential with Hydroxychloroquine"
+                ]
+            },
+            "relevance": [
+                "Stepwise approach ensures appropriate escalation",
+                "Precise dosing prevents under/over treatment",
+                "Proper tapering prevents rebound",
+                "Drug combinations need careful consideration"
+            ],
+            "readMore": "https://www.medicaleducation.com/prescription-guidelines"
+        },
+        "post_treatment_monitoring": {
+            "score": 5,
+            "comments": "Monitoring plan lacks specific timelines and comprehensive parameters.",
+            "missed": {
+                "table_headers": [
+                    "Time Point",
+                    "Investigation",
+                    "Purpose",
+                    "Applicable Drug(s)"
+                ],
+                "rows": [
+                    [
+                        "Monthly (Initial Phase)",
+                        "CBC, LFTs",
+                        "Monitor myelosuppression/hepatotoxicity",
+                        "Methotrexate, Azathioprine"
+                    ],
+                    [
+                        "Monthly (Initial Phase)",
+                        "Complement levels (C3, C4)",
+                        "Track disease activity",
+                        "General"
+                    ],
+                    [
+                        "Monthly (Initial Phase)",
+                        "Eye check (visual symptoms)",
+                        "Prevent retinopathy",
+                        "Hydroxychloroquine"
+                    ],
+                    [
+                        "Every 3 months",
+                        "RFTs",
+                        "NSAID safety, Methotrexate use",
+                        "NSAIDs, Methotrexate"
+                    ],
+                    [
+                        "Every 3 months",
+                        "Retinal exam",
+                        "Long-term monitoring",
+                        "Hydroxychloroquine"
+                    ],
+                    [
+                        "If symptomatic",
+                        "Urinalysis",
+                        "Detect renal involvement",
+                        "General"
+                    ],
+                    [
+                        "If symptomatic",
+                        "Chest X-ray",
+                        "Rule out TB before biologics",
+                        "Rituximab"
+                    ],
+                    [
+                        "If symptomatic",
+                        "Anti-dsDNA/ANA panel",
+                        "Rule out autoimmune progression",
+                        "General"
+                    ]
+                ]
+            },
+            "relevance": [
+                "Early detection of drug toxicity",
+                "Tracking disease activity",
+                "Preventing organ damage",
+                "Adjusting treatment based on response"
+            ],
+            "readMore": "https://www.medicaleducation.com/treatment-monitoring"
+        }
+    },
+    "total_score": 7.2,
+    "suggestions": "To improve, focus on asking more targeted history questions to gather relevant information. Ensure all relevant physical examinations are performed, especially when symptoms suggest involvement of multiple systems. When ordering tests, prioritize those that directly contribute to the diagnosis. Finally, clearly differentiate between primary and differential diagnoses in your reasoning."
+}

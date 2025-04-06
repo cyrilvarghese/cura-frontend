@@ -139,6 +139,20 @@ export interface Annotation {
 export interface FeedbackCategory {
     score: number;
     comments: string;
+    missed: {
+        table_headers?: string[];
+        rows?: string[][];
+        sections?: {
+            title: string;
+            medications: {
+                class: string;
+                drugs: string[];
+                note?: string;
+            }[];
+        }[];
+    };
+    relevance: string[];
+    readMore: string;
 }
 
 export interface DetailedFeedback {
@@ -150,10 +164,19 @@ export interface DetailedFeedback {
 }
 
 export interface FeedbackResponse {
-    annotations: Annotation[];
-    feedback: DetailedFeedback;
     total_score: number;
-    suggestions: string;
+    feedback: {
+        history_taking: FeedbackCategory;
+        examinations_performed: FeedbackCategory;
+        tests_ordered: FeedbackCategory;
+        diagnostic_reasoning: FeedbackCategory;
+        synthesis_organization: FeedbackCategory;
+        pre_treatment_investigations: FeedbackCategory;
+        prescription_writing: FeedbackCategory;
+        post_treatment_monitoring: FeedbackCategory;
+    };
+    suggestions?: string;
+    annotations: Annotation[];
 }
 
 export interface FeedbackState {
