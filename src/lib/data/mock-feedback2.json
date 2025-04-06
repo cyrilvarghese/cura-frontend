@@ -1,0 +1,276 @@
+{
+    "annotations": [
+        {
+            "action": "Did you notice the skin changes yourself or were they pointed out to you?",
+            "step": "history_taking",
+            "relevance": "relevant",
+            "correctness": "correct",
+            "justification": "This helps determine awareness and progression of cutaneous symptoms — crucial in leprosy where sensory loss is common."
+        },
+        {
+            "action": "Examination: Sensory testing of lesions and extremities",
+            "step": "examination",
+            "relevance": "relevant",
+            "correctness": "correct",
+            "justification": "Essential for confirming nerve involvement, which is a hallmark of multibacillary leprosy."
+        },
+        {
+            "action": "Test: Slit-skin smear",
+            "step": "tests_ordered",
+            "relevance": "relevant",
+            "correctness": "correct",
+            "justification": "Confirms multibacillary disease and is part of WHO diagnostic criteria."
+        },
+        {
+            "action": "Primary Diagnosis: Vitiligo",
+            "step": "diagnosis",
+            "relevance": "irrelevant",
+            "correctness": "incorrect",
+            "justification": "Vitiligo lacks nerve involvement and systemic features — does not explain neuropathy or plaques with anesthesia."
+        },
+        {
+            "action": "Final Diagnosis: Multibacillary Leprosy (Lepromatous Type)",
+            "step": "final-diagnosis",
+            "relevance": "relevant",
+            "correctness": "correct",
+            "justification": "Consistent with skin lesions, sensory loss, systemic findings, and positive smear."
+        }
+    ],
+    "feedback": {
+        "history_taking": {
+            "score": 7,
+            "comments": "The student asked about symptom duration and distribution but missed targeted questions on nasal symptoms, foot injuries, and reproductive health.",
+            "missed": [
+                "Slipping of footwear",
+                "Nasal stuffiness or crusting",
+                "Sexual function or testicular changes"
+            ],
+            "relevance": [
+                "Suggests sensory loss and motor weakness",
+                "Helps detect nasal mucosa involvement",
+                "Indicates systemic disease progression"
+            ],
+            "readMore": "https://www.medicaleducation.com/history-taking-leprosy"
+        },
+        "examinations_performed": {
+            "score": 9,
+            "comments": "Most relevant physical exams were performed including skin, sensory, and VMT. Missed reflexes and lymph node palpation.",
+            "missed": [
+                "Reflex testing",
+                "Lymph node examination"
+            ],
+            "relevance": [
+                "Reflexes help assess motor neuron integrity",
+                "Lymphadenopathy may suggest secondary infections"
+            ],
+            "readMore": "https://www.medicaleducation.com/leprosy-physical-exam"
+        },
+        "tests_ordered": {
+            "score": 9,
+            "comments": "Core diagnostic tests were ordered appropriately. Addition of AFB nasal smear or nerve conduction studies would improve completeness.",
+            "missed": [
+                "AFB nasal smear",
+                "Nerve conduction studies"
+            ],
+            "relevance": [
+                "Nasal smear helps in highly bacillary cases",
+                "Nerve studies assess severity of neural damage"
+            ],
+            "readMore": "https://www.medicaleducation.com/diagnostics-leprosy"
+        },
+        "diagnostic_reasoning": {
+            "score": 8,
+            "comments": "Correct primary diagnosis identified. Student included some non-relevant differentials like Vitiligo but covered borderline leprosy variants well.",
+            "missed": [
+                "Ruling out fungal infections (e.g., Tinea)",
+                "Correlation with endemic exposure history"
+            ],
+            "relevance": [
+                "Superficial fungal diseases can mimic skin lesions",
+                "Environmental exposure supports clinical reasoning"
+            ],
+            "readMore": "https://www.medicaleducation.com/leprosy-differential"
+        },
+        "synthesis_organization": {
+            "score": 7,
+            "comments": "Good information collection but could improve sequencing — especially relating neural findings to skin lesion distribution.",
+            "missed": [
+                "Link between nerve thickening and sensory loss",
+                "Temporal progression of deformities"
+            ],
+            "relevance": [
+                "Improves diagnostic confidence",
+                "Helps predict long-term disability risk"
+            ],
+            "readMore": "https://www.medicaleducation.com/clinical-synthesis"
+        },
+        "pre_treatment_investigations": {
+            "score": 6,
+            "comments": "Student captured CBC and G6PD but missed drug-specific safety screens for Clofazimine and Thalidomide.",
+            "missed": {
+                "table_headers": [
+                    "Investigation",
+                    "Purpose",
+                    "Drugs Involved"
+                ],
+                "rows": [
+                    [
+                        "G6PD screening",
+                        "Prevent hemolysis",
+                        "Dapsone"
+                    ],
+                    [
+                        "LFTs",
+                        "Hepatotoxicity monitoring",
+                        "Rifampicin, Clofazimine, Prednisolone"
+                    ],
+                    [
+                        "RFTs",
+                        "Renal safety",
+                        "Thalidomide"
+                    ],
+                    [
+                        "Blood Glucose",
+                        "Steroid-induced hyperglycemia",
+                        "Prednisolone"
+                    ],
+                    [
+                        "Pregnancy test",
+                        "Teratogenic risk",
+                        "Thalidomide"
+                    ],
+                    [
+                        "Eye exam",
+                        "Pigmentation monitoring",
+                        "Clofazimine"
+                    ]
+                ]
+            },
+            "relevance": [
+                "Ensures safe initiation of MDT",
+                "Prevents avoidable complications"
+            ],
+            "readMore": "https://www.medicaleducation.com/leprosy-drug-screening"
+        },
+        "prescription_writing": {
+            "score": 8,
+            "comments": "Correctly prescribed MDT with dosage but missed taper guidance for steroids in ENL management.",
+            "missed": {
+                "table_headers": [
+                    "Drug",
+                    "Dose",
+                    "Route",
+                    "Frequency",
+                    "Notes"
+                ],
+                "sections": [
+                    {
+                        "title": "WHO MDT Regimen",
+                        "rows": [
+                            [
+                                "Rifampicin",
+                                "600 mg",
+                                "Oral",
+                                "Monthly (supervised)",
+                                "Bactericidal"
+                            ],
+                            [
+                                "Clofazimine",
+                                "300 mg + 50 mg daily",
+                                "Oral",
+                                "Monthly + Daily",
+                                "Anti-inflammatory and anti-mycobacterial"
+                            ],
+                            [
+                                "Dapsone",
+                                "100 mg",
+                                "Oral",
+                                "Daily",
+                                "Bacteriostatic"
+                            ]
+                        ]
+                    },
+                    {
+                        "title": "ENL Reaction",
+                        "rows": [
+                            [
+                                "Prednisolone",
+                                "40-60 mg/day",
+                                "Oral",
+                                "Daily",
+                                "Taper required"
+                            ],
+                            [
+                                "Thalidomide",
+                                "100-300 mg/day",
+                                "Oral",
+                                "Daily",
+                                "Men only — teratogenic"
+                            ]
+                        ]
+                    }
+                ],
+                "tips": [
+                    "Always taper steroids slowly to avoid adrenal suppression",
+                    "Never prescribe Thalidomide in women of reproductive age without strict precautions"
+                ]
+            },
+            "relevance": [
+                "Accurate dosage essential for cure and resistance prevention",
+                "Steroid management impacts complication control"
+            ],
+            "readMore": "https://www.medicaleducation.com/leprosy-treatment"
+        },
+        "post_treatment_monitoring": {
+            "score": 7,
+            "comments": "Monitoring plan included clinical exams and slit-skin smear but missed some drug toxicity screens.",
+            "missed": {
+                "table_headers": [
+                    "Time Point",
+                    "Investigation",
+                    "Purpose",
+                    "Applicable Drug(s)"
+                ],
+                "rows": [
+                    [
+                        "Monthly",
+                        "Clinical exam (skin, nerves, ulcers)",
+                        "Track disease activity, detect neuritis",
+                        "General"
+                    ],
+                    [
+                        "Every 3 months",
+                        "CBC, LFTs",
+                        "Monitor anemia, hepatotoxicity",
+                        "Dapsone, Rifampicin"
+                    ],
+                    [
+                        "Every 3 months",
+                        "RFTs",
+                        "Renal monitoring if Thalidomide used",
+                        "Thalidomide"
+                    ],
+                    [
+                        "6 & 12 months",
+                        "Slit-skin smear",
+                        "Monitor bacillary load",
+                        "—"
+                    ],
+                    [
+                        "If symptomatic",
+                        "Eye exam",
+                        "Detect Clofazimine-related pigmentation",
+                        "Clofazimine"
+                    ]
+                ]
+            },
+            "relevance": [
+                "Ensures drug safety and effectiveness",
+                "Allows early detection of relapse"
+            ],
+            "readMore": "https://www.medicaleducation.com/leprosy-followup"
+        }
+    },
+    "total_score": 7.4,
+    "suggestions": "Improve by linking symptom history to neural involvement, completing pre-treatment drug screenings, and reinforcing reaction management (ENL) including safe steroid tapering and Thalidomide use monitoring."
+}
