@@ -7,6 +7,7 @@
         generatePhysicalExam,
         generateDifferentialDiagnosis,
         type CaseStoreState,
+        lastCaseIdStore,
     } from "$lib/stores/caseCreatorStore";
     import { onDestroy, onMount } from "svelte";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
@@ -15,15 +16,17 @@
         type PublishCaseParams,
     } from "$lib/services/caseDataService";
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
-    import PageLayout from "../../../04-templates/page-layout.svelte";
 
     const caseDataService = new CaseDataService();
 
-    let selectedCaseDocument = $state<DocumentUploadResponse | null>(null);
     let department = $state<Department | null>(null);
     let isPublishing = $state(false);
     let publishError = $state<string | null>(null);
     let publishSuccess = $state(false);
+    let isEditMode = $state(false);
+    let caseId = $state<string | null>(null);
+
+    const { type = "new" } = $props<{ type?: "new" | "edit" }>();
 
     const initialValue: CaseStoreState = {
         generating: false,
@@ -31,19 +34,26 @@
         persona: null,
         loading: false,
         testData: {
-            physical_exam: null,
-            lab_test: null,
+            physical_exam: {},
+            lab_test: {},
         },
-        coverImage: null,
+        coverImage: {
+            image_url: "",
+            prompt: "",
+            title: "",
+            quote: "",
+        },
         caseId: null,
-        differentialDiagnosis: null,
+        differentialDiagnosis: [],
         uploadedFile: null,
         uploadedFileName: null,
         isGeneratingPersona: false,
         isGeneratingPhysicalExam: false,
         isGeneratingDifferential: false,
         isSearchingImages: false,
-        searchedImages: null,
+        searchedImages: {
+            images: [],
+        },
         selectedDocumentName: null,
     };
 
@@ -66,13 +76,25 @@
         uploadState = state;
     });
 
-    onMount(() => {
-        // selectedCaseDocument = $documentStore.selectedCaseDocument;
-        console.log("Selected case document from store:", selectedCaseDocument);
+    onMount(async () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const fileName = urlParams.get("fileName");
-        uploadState.selectedDocumentName = fileName;
-        console.log("File name from URL:", fileName);
+        caseId = urlParams.get("caseId");
+        console.log("Case ID:", caseId);
+
+        if (type === "new") {
+            // Clear state for new cases
+            caseStore.set(initialValue);
+            isEditMode = false;
+            const fileName = urlParams.get("fileName");
+            uploadState.selectedDocumentName = fileName;
+            console.log("File name from URL:", fileName);
+        } else if (caseId) {
+            // Load existing case for edit mode
+            isEditMode = true;
+            lastCaseIdStore.set(caseId);
+
+            await loadExistingCase(caseId);
+        }
     });
 
     onDestroy(() => {
@@ -172,8 +194,41 @@
         }
     }
 
+    async function loadExistingCase(id: string) {
+        try {
+            uploadState.loading = true;
+
+            // Fetch case data from API
+            const caseData = await caseDataService.getCaseById(id);
+
+            // Update store with existing data
+            caseStore.update((state) => ({
+                ...state,
+                caseId: id,
+                persona: caseData.persona,
+                testData: {
+                    physical_exam: caseData.testData?.physical_exam,
+                    lab_test: caseData.testData?.lab_test,
+                },
+                coverImage: {
+                    image_url: caseData.coverImage?.image_url || "",
+                    prompt: caseData.coverImage?.prompt || "",
+                    title: caseData.coverImage?.title || "",
+                    quote: caseData.coverImage?.quote || "",
+                },
+                differentialDiagnosis: caseData.differentialDiagnosis,
+                selectedDocumentName: caseData.selectedDocumentName,
+            }));
+        } catch (err) {
+            console.error("Error loading case:", err);
+            uploadState.error = "Failed to load case data";
+        } finally {
+            uploadState.loading = false;
+        }
+    }
+
     async function handlePublishCase() {
-        if (!uploadState.caseId || !department) return;
+        if (!department) return;
 
         isPublishing = true;
         publishError = null;
@@ -182,16 +237,17 @@
         try {
             const params: PublishCaseParams = {
                 published: true,
+                // Add other case data here
             };
 
-            await caseDataService.publishCase(uploadState.caseId, params);
+            await caseDataService.publishCase(uploadState.caseId!, params);
+
             publishSuccess = true;
         } catch (error) {
             publishError =
                 error instanceof Error
                     ? error.message
                     : "Failed to publish case";
-            console.error("Error publishing case:", error);
         } finally {
             isPublishing = false;
         }
@@ -199,17 +255,26 @@
 </script>
 
 <div class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold">Create Case</h1>
+    <h1 class="text-3xl font-bold">
+        {isEditMode ? "Edit Case" : "Create Case"}
+    </h1>
 </div>
-<p class="text-gray-500 mb-8">Create a new case from a master document</p>
+<p class="text-gray-500 mb-8">
+    {#if isEditMode}
+        Edit an existing case
+    {:else}
+        Create a new case from a master document
+    {/if}
+</p>
 <div class="flex flex-row items-start justify-start gap-4">
     <div class="pt-8">
-        <p class="text-md font-medium pb-6 ">Available Actions</p>
+        <p class="text-md font-medium pb-6">Available Actions</p>
         <div class="flex flex-col justify-center mb-12">
             <Button
                 onclick={handleGenerateAll}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocumentName}
+                    (!uploadState.selectedDocumentName && !isEditMode) ||
+                    (isEditMode && !caseId)}
             >
                 {#if uploadState.generating}
                     Generating All...
@@ -224,7 +289,8 @@
                 variant="secondary"
                 onclick={handleGeneratePersona}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocumentName}
+                    (!uploadState.selectedDocumentName && !isEditMode) ||
+                    (isEditMode && !caseId)}
             >
                 {#if uploadState.isGeneratingPersona}
                     Generating Patient Persona...
@@ -238,7 +304,7 @@
                 variant="secondary"
                 onclick={handleGenerateCaseData}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocumentName}
+                    (!uploadState.selectedDocumentName && !isEditMode)}
             >
                 {#if uploadState.isGeneratingPhysicalExam}
                     Generating Physical Exam Data...
@@ -252,7 +318,7 @@
                 variant="secondary"
                 onclick={handleGenerateDifferentialDiagnosis}
                 disabled={uploadState.generating ||
-                    !uploadState.selectedDocumentName}
+                    (!uploadState.selectedDocumentName && !isEditMode)}
             >
                 {#if uploadState.isGeneratingDifferential}
                     Extracting Differential Diagnosis...
@@ -267,15 +333,15 @@
             <Button
                 onclick={handlePublishCase}
                 disabled={isPublishing ||
-                    !uploadState.caseId ||
+                    (!uploadState.caseId && !isEditMode) ||
                     !department ||
                     uploadState.generating}
                 class="bg-green-600 hover:bg-green-700 text-white"
             >
                 {#if isPublishing}
-                    Publishing Case...
+                    {isEditMode ? "Updating Case..." : "Publishing Case..."}
                 {:else}
-                    Publish Case
+                    {isEditMode ? "Update Case" : "Publish Case"}
                 {/if}
             </Button>
 
@@ -291,13 +357,13 @@
                 </p>
             {/if}
 
-            {#if !uploadState.caseId && !isPublishing}
+            {#if !uploadState.caseId && !isPublishing && !isEditMode}
                 <p class="text-xs mt-1 text-muted-foreground">
                     Please generate case data before publishing
                 </p>
             {/if}
 
-            {#if !department && !isPublishing}
+            {#if !department && !isPublishing && !isEditMode}
                 <p class="text-xs mt-1 text-muted-foreground">
                     No department selected. Please select a department before
                     publishing.

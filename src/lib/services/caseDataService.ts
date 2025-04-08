@@ -1,5 +1,7 @@
 import { API_BASE_URL } from '$lib/config/api';
+import type { CaseStoreState } from '$lib/stores/caseCreatorStore';
 import type { CaseData } from '$lib/stores/casePlayerStore';
+import type { FormattedPersonaResponse } from '$lib/types';
 
 export interface CaseListItem {
     case_id: number;
@@ -13,6 +15,28 @@ export interface CaseListItem {
 
 export interface PublishCaseParams {
     published: boolean;
+}
+
+interface CaseDetailsResponse {
+    content: {
+        case_cover: {
+            case_name: string;
+            case_id: number;
+            title: string;
+            quote: string;
+            image_url: string;
+            cover_image_prompt: string;
+            differentials: any[];
+            last_updated: string;
+            department: string;
+            published: boolean;
+        };
+        test_data: {
+            physical_exam: any;
+            lab_test: any;
+        };
+        patient_persona: FormattedPersonaResponse;
+    };
 }
 
 export class CaseDataService {
@@ -75,5 +99,42 @@ export class CaseDataService {
             console.error('Error publishing case:', error);
             throw error;
         }
+    }
+
+    async getCaseById(id: string): Promise<CaseStoreState> {
+        const response = await fetch(`${this.baseUrl}/case-details/${id}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch case data');
+        }
+
+        const data: CaseDetailsResponse = await response.json();
+
+        // Transform the API response to match the store structure
+        return {
+            caseId: data.content.case_cover.case_id.toString(),
+            persona: data.content.patient_persona,
+            testData: {
+                physical_exam: data.content.test_data.physical_exam,
+                lab_test: data.content.test_data.lab_test
+            },
+            coverImage: {
+                image_url: data.content.case_cover.image_url,
+                prompt: data.content.case_cover.cover_image_prompt,
+                title: data.content.case_cover.title,
+                quote: data.content.case_cover.quote
+            },
+            differentialDiagnosis: data.content.case_cover.differentials,
+            generating: false,
+            error: null,
+            loading: false,
+            uploadedFile: null,
+            uploadedFileName: data.content.case_cover.case_name,
+            isGeneratingPersona: false,
+            isGeneratingPhysicalExam: false,
+            isGeneratingDifferential: false,
+            isSearchingImages: false,
+            searchedImages: null,
+            selectedDocumentName: data.content.case_cover.case_name + ".md"
+        };
     }
 } 

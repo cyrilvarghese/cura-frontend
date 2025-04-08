@@ -162,7 +162,7 @@
                                         </div>
                                     </Link>
                                     <Link
-                                        to={`/case-library/${caseItem.case_id}/edit`}
+                                        to={`/case-library/edit?caseId=${caseItem.case_id}`}
                                         class="absolute bottom-2 right-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
                                     >
                                         <Pencil class="w-4 h-4 text-gray-500" />

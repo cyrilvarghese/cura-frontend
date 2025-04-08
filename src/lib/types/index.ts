@@ -22,11 +22,11 @@ export interface UploadResponse {
 
 
 export interface FormattedPersonaResponse {
-    id: string;
+    id: string | null;
     content: string;
-    timestamp: string;
+    timestamp: string | null;
     type: 'ai';
-    case_id: string;
+    case_id: string | null;
 
 }
 

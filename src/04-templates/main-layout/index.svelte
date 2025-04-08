@@ -73,8 +73,8 @@
 						<Route path="/case-library/:id" let:params>
 							<CasePlayer id={params.id} />
 						</Route>
-						<Route path="/case-library/:id/edit" let:params>
-							<CaseEditPage id={params.id} />
+						<Route path="/case-library/edit">
+							<CaseEditPage />
 						</Route>
 						<Route path="/curriculum/new-case">
 							<CaseAssessment />

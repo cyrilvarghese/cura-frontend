@@ -5,7 +5,6 @@ export class PatientPersonaService {
     private baseUrl = API_BASE_URL;
 
     async createPatientPersona(file: File, caseId: string): Promise<FormattedPersonaResponse> {
-        debugger;
         const formData = new FormData();
         formData.append('file', file);
         formData.append('case_id', caseId);
@@ -26,7 +25,7 @@ export class PatientPersonaService {
     }
 
     async createPatientPersonaFromUrl(selectedDocumentName: string, caseId: string | null, department: string): Promise<FormattedPersonaResponse> {
-        
+
         const response = await fetch(
             `${this.baseUrl}/patient_persona/create`,
             {

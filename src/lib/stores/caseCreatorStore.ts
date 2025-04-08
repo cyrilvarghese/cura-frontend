@@ -5,10 +5,8 @@ import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
 import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
-import type { DocumentUploadResponse } from '$lib/services/documentService';
-import { number } from 'zod';
 import { currentDepartment } from './teamStore';
-import type { S } from 'node_modules/vite/dist/node/types.d-aGj9QkWt';
+import { CaseDataService } from '$lib/services/caseDataService';
 
 
 
@@ -244,5 +242,23 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
             isGeneratingDifferential: false,
 
         }));
+    }
+}
+
+export async function loadCase(id: string) {
+    try {
+        caseStore.update(state => ({ ...state, loading: true, error: null }));
+
+        const caseDataService = new CaseDataService();
+        const caseData = await caseDataService.getCaseById(id);
+
+        caseStore.set(caseData);
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : 'Failed to load case'
+        }));
+    } finally {
+        caseStore.update(state => ({ ...state, loading: false }));
     }
 }

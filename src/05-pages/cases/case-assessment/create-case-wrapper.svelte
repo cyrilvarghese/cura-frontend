@@ -24,7 +24,5 @@
         { label: "New Case", href: "/" },
     ]}
 >
-     
-            <CreateCase />
-    
+    <CreateCase type="new" />
 </PageLayout>
