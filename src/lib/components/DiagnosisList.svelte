@@ -5,16 +5,8 @@
     import { Textarea } from "$lib/components/ui/textarea";
     import { caseDataStore } from "$lib/stores/casePlayerStore";
 
-    const predefinedDiagnoses = [
-        "Urticarial Vasculitis",
-        "Systemic Lupus Erythematosus (SLE)",
-        "Hypersensitivity Vasculitis",
-        "Chronic Idiopathic Urticaria",
-        "Drug-Induced Urticarial Rash",
-    ];
     // Subscribe to caseDataStore changes using $ syntax
     $effect(() => {
-     
         if ($caseDataStore?.coverMessage?.differentials) {
             diagnoses = $caseDataStore.coverMessage.differentials.map(
                 (diagnosis: string, index: number) => ({
@@ -92,7 +84,7 @@
     }
 </script>
 
-<div class="space-y-4">
+<div class="space-y-4 max-h-[500px] overflow-y-auto p-4">
     {#if diagnoses && diagnoses.length > 0}
         {#each diagnoses as diagnosis}
             <div class="flex flex-col space-y-2 py-2 border-b">
@@ -158,12 +150,5 @@
                 {/if}
             </div>
         {/each}
-
-        <div class="text-sm text-muted-foreground mt-2">
-            <p>
-                Select the status for each diagnosis using the dropdown menu.
-                Provide justification for your primary diagnosis.
-            </p>
-        </div>
     {/if}
 </div>

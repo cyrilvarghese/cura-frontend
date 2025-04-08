@@ -140,6 +140,7 @@ export interface FeedbackCategory {
     score: number;
     comments: string;
     missed: {
+        tips?: string[];
         table_headers?: string[];
         rows?: string[][];
         sections?: {

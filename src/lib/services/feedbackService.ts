@@ -1,12 +1,16 @@
 import type { FeedbackResponse, FeedbackState, StudentMessage } from "$lib/types";
 import { API_BASE_URL } from '$lib/config/api';
 import mockFeedback from "$lib/data/mock-feedback.json";
+import mockFeedback2 from "$lib/data/mock-feedback2.json";
 
 export class FeedbackService {
     private baseUrl = API_BASE_URL;
 
     async getFeedback(studentMessageHistory: StudentMessage[], caseId: string): Promise<FeedbackResponse> {
-        // Return mock data instead of making API call
+        // Return different mock data based on caseId
+        if (caseId === '11') {
+            return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
+        }
         return Promise.resolve(mockFeedback as unknown as FeedbackResponse);
 
         /* Commented out API call for now

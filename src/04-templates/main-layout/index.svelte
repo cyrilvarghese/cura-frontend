@@ -22,6 +22,7 @@
 	import VivaQuestionsPage from "../../05-pages/VivaQuestionsPage.svelte";
 	import MasterDocReview from "../../05-pages/MasterDocReview.svelte";
 	import { Toaster } from "svelte-sonner";
+	import CaseEditPage from "../../05-pages/cases/case-edit.svelte";
 
 	// Get the current URL for Router
 	export let url = "";
@@ -71,6 +72,9 @@
 						</Route>
 						<Route path="/case-library/:id" let:params>
 							<CasePlayer id={params.id} />
+						</Route>
+						<Route path="/case-library/:id/edit" let:params>
+							<CaseEditPage id={params.id} />
 						</Route>
 						<Route path="/curriculum/new-case">
 							<CaseAssessment />

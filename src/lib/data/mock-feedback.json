@@ -132,37 +132,44 @@
             "missed": {
                 "table_headers": [
                     "Investigation",
+                    "Missed",
                     "Purpose",
                     "Drugs Involved"
                 ],
                 "rows": [
                     [
                         "CBC & Retic Count",
+                        true,
                         "Detect anemia, cytopenia",
                         "Methotrexate, Azathioprine"
                     ],
                     [
                         "LFTs",
+                        true,
                         "Hepatotoxicity",
                         "Methotrexate, Azathioprine"
                     ],
                     [
                         "RFTs",
+                        false,
                         "Baseline renal function",
                         "NSAIDs, Methotrexate"
                     ],
                     [
                         "G6PD Screening",
+                        false,
                         "Prevent hemolysis",
                         "Dapsone"
                     ],
                     [
                         "Eye Exam",
+                        false,
                         "Monitor for retinopathy",
                         "Hydroxychloroquine"
                     ],
                     [
                         "Hepatitis B/C, TB Screening",
+                        false,
                         "Prior to biologics",
                         "Rituximab"
                     ]
@@ -182,6 +189,7 @@
             "missed": {
                 "table_headers": [
                     "Drug",
+                    "Missed",
                     "Dose",
                     "Route",
                     "Frequency",
@@ -193,6 +201,7 @@
                         "rows": [
                             [
                                 "Cetirizine",
+                                false,
                                 "10 mg",
                                 "Oral",
                                 "OD or BD",
@@ -200,6 +209,7 @@
                             ],
                             [
                                 "Hydroxyzine",
+                                true,
                                 "25-50 mg",
                                 "Oral",
                                 "Nocte",
@@ -207,6 +217,7 @@
                             ],
                             [
                                 "Loratadine/Fexofenadine",
+                                false,
                                 "-",
                                 "Oral",
                                 "OD",
@@ -214,6 +225,7 @@
                             ],
                             [
                                 "Ibuprofen",
+                                false,
                                 "400 mg",
                                 "Oral",
                                 "TID",
@@ -221,6 +233,7 @@
                             ],
                             [
                                 "Naproxen",
+                                false,
                                 "250-500 mg",
                                 "Oral",
                                 "BID",
@@ -233,6 +246,7 @@
                         "rows": [
                             [
                                 "Prednisolone",
+                                false,
                                 "0.5-1 mg/kg/day",
                                 "Oral",
                                 "OD",
@@ -240,6 +254,7 @@
                             ],
                             [
                                 "Hydroxychloroquine",
+                                false,
                                 "200-400 mg/day",
                                 "Oral",
                                 "OD",
@@ -247,6 +262,7 @@
                             ],
                             [
                                 "Dapsone",
+                                false,
                                 "50-100 mg/day",
                                 "Oral",
                                 "OD",
@@ -259,6 +275,7 @@
                         "rows": [
                             [
                                 "Methotrexate",
+                                false,
                                 "7.5-15 mg/week",
                                 "Oral/SC",
                                 "Weekly",
@@ -266,6 +283,7 @@
                             ],
                             [
                                 "Azathioprine",
+                                false,
                                 "1-2.5 mg/kg/day",
                                 "Oral",
                                 "OD",
@@ -273,6 +291,7 @@
                             ],
                             [
                                 "Rituximab",
+                                false,
                                 "As per protocol",
                                 "IV",
                                 "Monthly",
@@ -302,6 +321,7 @@
             "missed": {
                 "table_headers": [
                     "Time Point",
+                    "Missed",
                     "Investigation",
                     "Purpose",
                     "Applicable Drug(s)"
@@ -309,48 +329,56 @@
                 "rows": [
                     [
                         "Monthly (Initial Phase)",
+                        true,
                         "CBC, LFTs",
                         "Monitor myelosuppression/hepatotoxicity",
                         "Methotrexate, Azathioprine"
                     ],
                     [
                         "Monthly (Initial Phase)",
+                        false,
                         "Complement levels (C3, C4)",
                         "Track disease activity",
                         "General"
                     ],
                     [
                         "Monthly (Initial Phase)",
+                        false,
                         "Eye check (visual symptoms)",
                         "Prevent retinopathy",
                         "Hydroxychloroquine"
                     ],
                     [
                         "Every 3 months",
+                        false,
                         "RFTs",
                         "NSAID safety, Methotrexate use",
                         "NSAIDs, Methotrexate"
                     ],
                     [
                         "Every 3 months",
+                        false,
                         "Retinal exam",
                         "Long-term monitoring",
                         "Hydroxychloroquine"
                     ],
                     [
                         "If symptomatic",
+                        false,
                         "Urinalysis",
                         "Detect renal involvement",
                         "General"
                     ],
                     [
                         "If symptomatic",
+                        false,
                         "Chest X-ray",
                         "Rule out TB before biologics",
                         "Rituximab"
                     ],
                     [
                         "If symptomatic",
+                        false,
                         "Anti-dsDNA/ANA panel",
                         "Rule out autoimmune progression",
                         "General"

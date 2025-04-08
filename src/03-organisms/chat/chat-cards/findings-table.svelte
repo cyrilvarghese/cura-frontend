@@ -96,6 +96,8 @@
 </script>
 
 <div class="flex justify-between items-center mb-4">
+    <h4 class="ml-4 font-medium leading-none text-blue-900">Results</h4>
+
     <button
         class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         onclick={handleAddRow}

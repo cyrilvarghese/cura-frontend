@@ -12,15 +12,10 @@
         sideEffects: string[];
         monitoring: string[];
         clinicalContext: string;
-        examTips: string[];
         specialPopulations: {
             renal?: string;
             pregnancy?: string;
             elderly?: string;
-        };
-        relatedTopics: {
-            diseases: string[];
-            concepts: string[];
         };
         category: "first-line" | "second-line" | "severe";
         requiresMonitoring: boolean;
@@ -46,18 +41,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -88,18 +75,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -125,22 +104,11 @@
             monitoring: ["Liver function in long-term use"],
             clinicalContext:
                 "Non-sedating antihistamine preferred for daytime use. Less anticholinergic effects compared to first-generation agents.",
-            examTips: [
-                "Key differentiator: No significant sedation vs first-generation",
-                "Fexofenadine has no cardiac concerns unlike other 2nd gen antihistamines",
-            ],
             specialPopulations: {
                 renal: "Fexofenadine needs dose adjustment in renal impairment",
                 pregnancy: "Category B - preferred antihistamine in pregnancy",
                 elderly:
                     "Preferred over first-generation due to less anticholinergic effects",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: [
-                    "Histamine Pathway",
-                    "Blood-Brain Barrier Penetration",
-                ],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -174,20 +142,12 @@
             ],
             clinicalContext:
                 "Useful for inflammatory conditions with pain component. Consider GI prophylaxis in high-risk patients.",
-            examTips: [
-                "Remember 'triple whammy' - NSAIDs + ACEi/ARB + Diuretics = AKI risk",
-                "High-risk GI bleed patients need PPI coverage",
-            ],
             specialPopulations: {
                 renal: "Avoid if CrCl < 30ml/min, use with caution if 30-60ml/min",
                 pregnancy:
                     "Contraindicated in 3rd trimester, caution in 1st/2nd",
                 elderly:
                     "Higher risk of GI/renal complications, use lowest effective dose",
-            },
-            relatedTopics: {
-                diseases: ["Peptic Ulcer Disease", "Acute Kidney Injury"],
-                concepts: ["COX Inhibition", "Prostaglandin Effects"],
             },
             category: "first-line",
             requiresMonitoring: true,
@@ -215,18 +175,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -261,19 +213,10 @@
             ],
             clinicalContext:
                 "Rapid-acting anti-inflammatory for severe symptoms. Requires careful tapering if used > 2 weeks.",
-            examTips: [
-                "Know tapering rules: gradual if >2 weeks use",
-                "Morning dosing mimics natural cortisol rhythm",
-                "Stress dose needed for surgery if chronic use",
-            ],
             specialPopulations: {
                 renal: "No dose adjustment needed, but monitor fluid/electrolytes",
                 pregnancy: "Category C - use if benefit outweighs risk",
                 elderly: "Higher risk of side effects, especially osteoporosis",
-            },
-            relatedTopics: {
-                diseases: ["Cushing Syndrome", "Adrenal Insufficiency"],
-                concepts: ["HPA Axis", "Glucocorticoid Tapering"],
             },
             category: "second-line",
             requiresMonitoring: true,
@@ -305,18 +248,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -348,18 +283,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -393,19 +320,10 @@
             ],
             clinicalContext:
                 "Reserved for severe refractory cases. Requires careful monitoring and mandatory contraception.",
-            examTips: [
-                "MUST give folic acid supplementation",
-                "Friday dose, CBC Monday (toxicity monitoring)",
-                "Alcohol strictly contraindicated",
-            ],
             specialPopulations: {
                 renal: "Reduce dose if CrCl < 60ml/min, avoid if < 30ml/min",
                 pregnancy: "Absolutely contraindicated - teratogenic",
                 elderly: "Higher risk of toxicity, consider dose reduction",
-            },
-            relatedTopics: {
-                diseases: ["Rheumatoid Arthritis", "Interstitial Lung Disease"],
-                concepts: ["Folate Metabolism", "DMARD Monitoring"],
             },
             category: "severe",
             requiresMonitoring: true,
@@ -437,18 +355,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -480,18 +390,10 @@
             ],
             clinicalContext:
                 "Helps reduce histamine-driven wheals and itching. First-line choice for chronic urticaria due to favorable safety profile.",
-            examTips: [
-                "Compare sedation profile with first-generation antihistamines",
-                "Know dose adjustment in renal impairment",
-            ],
             specialPopulations: {
                 renal: "Reduce dose by 50% if CrCl < 30ml/min",
                 pregnancy: "Category B - generally considered safe",
                 elderly: "No routine dose adjustment needed",
-            },
-            relatedTopics: {
-                diseases: ["Allergic Rhinitis", "Chronic Urticaria"],
-                concepts: ["Histamine Pathway", "Antihistamine Classification"],
             },
             category: "first-line",
             requiresMonitoring: false,
@@ -588,18 +490,6 @@
 
                 <!-- Right Column - Additional Information -->
                 <div class="space-y-4">
-                    <!-- Exam Tips -->
-                    <div class="bg-amber-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-amber-800 mb-2">
-                            📝 Exam Tips
-                        </h3>
-                        <ul class="text-sm text-amber-700 space-y-2">
-                            {#each drugDetails[drugName].examTips as tip}
-                                <li>• {tip}</li>
-                            {/each}
-                        </ul>
-                    </div>
-
                     <!-- Special Populations -->
                     <div class="bg-white p-4 rounded-lg border">
                         <h3 class="text-sm font-medium text-slate-700 mb-2">
@@ -620,19 +510,34 @@
                         </div>
                     </div>
 
-                    <!-- Related Topics -->
-                    <div class="bg-slate-50 p-4 rounded-lg">
-                        <h3 class="text-sm font-medium text-slate-700 mb-2">
-                            Related Topics
-                        </h3>
-                        <div class="flex flex-wrap gap-2">
-                            {#each drugDetails[drugName].relatedTopics.diseases as disease}
-                                <span
-                                    class="px-2 py-1 bg-slate-200 rounded-full text-xs text-slate-700"
-                                >
-                                    {disease}
-                                </span>
-                            {/each}
+                    <!-- Side Effects & Monitoring -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h3 class="text-sm font-medium text-slate-700 mb-2">
+                                Side Effects
+                            </h3>
+                            <ul class="text-sm text-slate-600 space-y-1">
+                                {#each drugDetails[drugName].sideEffects as effect}
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-yellow-500">•</span>
+                                        {effect}
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border">
+                            <h3 class="text-sm font-medium text-slate-700 mb-2">
+                                Monitoring
+                            </h3>
+                            <ul class="text-sm text-slate-600 space-y-1">
+                                {#each drugDetails[drugName].monitoring as item}
+                                    <li class="flex items-center gap-2">
+                                        <span class="text-blue-500">•</span>
+                                        {item}
+                                    </li>
+                                {/each}
+                            </ul>
                         </div>
                     </div>
                 </div>

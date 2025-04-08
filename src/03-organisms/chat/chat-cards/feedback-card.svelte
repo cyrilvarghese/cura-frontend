@@ -316,12 +316,28 @@
                                     <table class="w-full text-sm">
                                         <thead>
                                             <tr>
-                                                {#each categoryFeedback.missed.table_headers || ["What was missed", "Why it's relevant"] as header}
+                                                {#if categoryFeedback.missed.table_headers}
+                                                    {#each categoryFeedback.missed.table_headers as header}
+                                                        <th
+                                                            class="text-left p-2 border-b font-medium"
+                                                        >
+                                                            {header}
+                                                        </th>
+                                                    {/each}
+                                                {:else}
                                                     <th
                                                         class="text-left p-2 border-b font-medium"
-                                                        >{header}</th
+                                                        >What was missed</th
                                                     >
-                                                {/each}
+                                                    <th
+                                                        class="text-left p-2 border-b font-medium"
+                                                        >Missed</th
+                                                    >
+                                                    <th
+                                                        class="text-left p-2 border-b font-medium"
+                                                        >Why it's relevant</th
+                                                    >
+                                                {/if}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -333,8 +349,21 @@
                                                         {#each row as cell}
                                                             <td
                                                                 class="p-2 text-muted-foreground"
-                                                                >{cell}</td
                                                             >
+                                                                {#if typeof cell === "boolean"}
+                                                                    <span
+                                                                        class={cell
+                                                                            ? "text-red-500"
+                                                                            : "text-green-500"}
+                                                                    >
+                                                                        {cell
+                                                                            ? "Yes"
+                                                                            : "No"}
+                                                                    </span>
+                                                                {:else}
+                                                                    {cell}
+                                                                {/if}
+                                                            </td>
                                                         {/each}
                                                     </tr>
                                                 {/each}
@@ -349,11 +378,18 @@
                                                         >
                                                         <td
                                                             class="p-2 text-muted-foreground"
-                                                            >{categoryFeedback
-                                                                .relevance[
-                                                                i
-                                                            ]}</td
                                                         >
+                                                            <span
+                                                                class="text-red-500"
+                                                                >Yes</span
+                                                            >
+                                                        </td>
+                                                        <td
+                                                            class="p-2 text-muted-foreground"
+                                                        >
+                                                            {categoryFeedback
+                                                                .relevance[i]}
+                                                        </td>
                                                     </tr>
                                                 {/each}
                                             {/if}
@@ -497,37 +533,3 @@
 
 <DrugDialog drugName={selectedDrug} bind:isOpen={isDrugDialogOpen} />
 <TestDialog testName={selectedTest} bind:isOpen={isTestDialogOpen} />
-
-<style>
-    /* Fixed column widths */
-    :global(th:nth-child(1)),
-    :global(td:nth-child(1)) {
-        /* Drug */
-        width: 30%;
-        min-width: 200px;
-    }
-    :global(th:nth-child(2)),
-    :global(td:nth-child(2)) {
-        /* Dose */
-        width: 15%;
-        min-width: 120px;
-    }
-    :global(th:nth-child(3)),
-    :global(td:nth-child(3)) {
-        /* Route */
-        width: 10%;
-        min-width: 80px;
-    }
-    :global(th:nth-child(4)),
-    :global(td:nth-child(4)) {
-        /* Frequency */
-        width: 15%;
-        min-width: 100px;
-    }
-    :global(th:nth-child(5)),
-    :global(td:nth-child(5)) {
-        /* Notes */
-        width: 40%;
-        min-width: 200px;
-    }
-</style>

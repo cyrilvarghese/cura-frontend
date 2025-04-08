@@ -7,7 +7,7 @@
     import PageLayout from "../04-templates/page-layout.svelte";
     import { Link } from "svelte-routing";
     import * as Tabs from "$lib/components/ui/tabs";
-    import { FileCheck } from "lucide-svelte";
+    import { FileCheck, Pencil } from "lucide-svelte";
     import type { CaseListItem } from "$lib/services/caseDataService";
 
     let cases: CaseListItem[] = [];
@@ -18,7 +18,6 @@
         await fetchCases();
         cases = $casesListStore || [];
     });
- 
 
     //filter cases based on department and published status
     $: filteredCases = cases.length
@@ -131,12 +130,12 @@
                     >
                         {#each filteredCases as caseItem}
                             <div class="animate-in fade-in duration-500">
-                                <Link
-                                    to={`/case-library/${caseItem.case_id}`}
-                                    class="group"
+                                <div
+                                    class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
                                 >
-                                    <div
-                                        class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                                    <Link
+                                        to={`/case-library/${caseItem.case_id}`}
+                                        class="group"
                                     >
                                         <div class="relative aspect-square">
                                             <img
@@ -161,8 +160,14 @@
                                                     "No description available"}
                                             </p>
                                         </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+                                    <Link
+                                        to={`/case-library/${caseItem.case_id}/edit`}
+                                        class="absolute bottom-2 right-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                    >
+                                        <Pencil class="w-4 h-4 text-gray-500" />
+                                    </Link>
+                                </div>
                             </div>
                         {/each}
                     </div>
