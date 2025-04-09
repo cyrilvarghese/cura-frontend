@@ -33,21 +33,6 @@
     }
 
     const findingContent = renderFinding(result.findings as FindingContent);
-
-    //  calculate imageerror Here
-    let imageErrorCount = 0;
-    let hasImageError = $state(false);
-
-    function handleImageError() {
-        imageErrorCount++;
-        console.log("Image error occurred");
-        hasImageError = true;
-        if (imageErrorCount > 3) {
-            console.log("Too many images failed to load, hiding them");
-        }
-    }
-     
-    //
 </script>
 
 <Card.Root
@@ -83,32 +68,17 @@
                     testType="physical_exam"
                 />
             {:else if findingContent.type === "image"}
-                {#if hasImageError}
-                    <MedicalImageViewer
-                        {caseId}
-                        testName={result.name}
-                        testType="physical_exam"
-                        imageUrls={Array.isArray(findingContent.content.url)
-                            ? findingContent.content.url
-                            : [findingContent.content.url]}
-                        altText={findingContent.content.altText}
-                        caption={findingContent.content.caption}
-                        subtitle={findingContent.content.altText}
-                    />
-                {:else}
-                    <!-- show gallery of images -->
-                    <div class="flex flex-wrap gap-2">
-                        {#each findingContent.content.url as url}
-                            <!-- show a simple list of images -->
-                            <img
-                                src={getFullImageUrl(url)}
-                                alt={findingContent.content.altText}
-                                class="w-1/4 h-auto"
-                                onerror={handleImageError}
-                            />
-                        {/each}
-                    </div>
-                {/if}
+                <MedicalImageViewer
+                    {caseId}
+                    testName={result.name}
+                    testType="physical_exam"
+                    imageUrls={Array.isArray(findingContent.content.url)
+                        ? findingContent.content.url
+                        : [findingContent.content.url]}
+                    altText={findingContent.content.altText}
+                    caption={findingContent.content.caption}
+                    subtitle={findingContent.content.altText}
+                />
             {:else if findingContent.type === "mixed"}
                 <div class="space-y-4">
                     {#each findingContent.content as item}
@@ -126,20 +96,17 @@
                                 testType="physical_exam"
                             />
                         {:else if item.type === "image"}
-                         
-                       
-                                <MedicalImageViewer
-                                    {caseId}
-                                    testName={result.name}
-                                    testType="physical_exam"
-                                    imageUrls={Array.isArray(item.content.url)
-                                        ? item.content.url
-                                        : [item.content.url]}
-                                    altText={item.content.altText}
-                                    caption={item.content.caption}
-                                    subtitle={item.content.altText}
-                                />
-                            
+                            <MedicalImageViewer
+                                {caseId}
+                                testName={result.name}
+                                testType="physical_exam"
+                                imageUrls={Array.isArray(item.content.url)
+                                    ? item.content.url
+                                    : [item.content.url]}
+                                altText={item.content.altText}
+                                caption={item.content.caption}
+                                subtitle={item.content.altText}
+                            />
                         {/if}
                     {/each}
                 </div>

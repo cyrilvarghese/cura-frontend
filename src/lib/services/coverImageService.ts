@@ -8,7 +8,7 @@ export class CoverImageService {
     // Create a cover image for a case
 
     async createCoverImage(caseId: string | null): Promise<CoverImageResponse> {
-        debugger;
+
         const response = await fetch(
             `${this.baseUrl}/cover_image/create?case_id=${caseId}`,
             {

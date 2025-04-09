@@ -32,6 +32,7 @@ export interface CaseStoreState {
     searchedImages: ImageSearchResponse | null;
     isSearchingImages: boolean;
     selectedDocumentName: string | null;
+    googleDocLink: string | null;
 }
 
 // Create a writable store with initial state
@@ -53,6 +54,7 @@ const initialState: CaseStoreState = {
     searchedImages: null,
     isSearchingImages: false,
     selectedDocumentName: null,
+    googleDocLink: null,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -167,7 +169,9 @@ export async function generatePersona(selectedDocumentName: string, caseId?: str
             generating: false,
             isGeneratingPersona: false,
         }));
-        updateCaseId(response.case_id);
+        if (response.case_id) {
+            updateCaseId(response.case_id);
+        }
     } catch (error) {
         caseStore.update(state => ({
             ...state,
@@ -245,18 +249,35 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
     }
 }
 
-export async function loadCase(id: string) {
+const caseDataService = new CaseDataService();
+
+export async function loadExistingCase(id: string) {
     try {
-        caseStore.update(state => ({ ...state, loading: true, error: null }));
-
-        const caseDataService = new CaseDataService();
+        caseStore.update(state => ({ ...state, loading: true }));
         const caseData = await caseDataService.getCaseById(id);
+        caseStore.update((state) => ({
+            ...state,
+            caseId: id,
+            persona: caseData.persona,
+            testData: {
+                physical_exam: caseData.testData?.physical_exam,
+                lab_test: caseData.testData?.lab_test,
+            },
+            coverImage: {
+                image_url: caseData.coverImage?.image_url || "",
+                prompt: caseData.coverImage?.prompt || "",
+                title: caseData.coverImage?.title || "",
+                quote: caseData.coverImage?.quote || "",
+            },
+            googleDocLink: caseData.googleDocLink || null,
 
-        caseStore.set(caseData);
+            differentialDiagnosis: caseData.differentialDiagnosis,
+            selectedDocumentName: caseData.selectedDocumentName,
+        }));
     } catch (error) {
         caseStore.update(state => ({
             ...state,
-            error: error instanceof Error ? error.message : 'Failed to load case'
+            error: error instanceof Error ? error.message : "Failed to load case data"
         }));
     } finally {
         caseStore.update(state => ({ ...state, loading: false }));

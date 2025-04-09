@@ -137,7 +137,11 @@
         }
     }
 
-    async function handleGenerateData(docId: string, fileName: string) {
+    async function handleGenerateData(
+        docId: string,
+        fileName: string,
+        googleDocLink: string,
+    ) {
         // Find the corresponding document from filteredCases
         const selectedDoc = filteredCases.find((doc) => doc.docId === docId);
 
@@ -157,7 +161,7 @@
 
         // Navigate with the fileName as a query parameter
         navigate(
-            `/curriculum/new-case?fileName=${encodeURIComponent(fileName)}`,
+            `/curriculum/new-case?fileName=${encodeURIComponent(fileName)}&googleDocLink=${encodeURIComponent(googleDocLink)}`,
         );
     }
 
@@ -190,7 +194,6 @@
             <DocumentUploadButton
                 topicName="Master Document"
                 onSuccess={() => {
-                    debugger;
                     googleDocsStore.loadDocs();
                 }}
             />
@@ -367,6 +370,7 @@
                                                         handleGenerateData(
                                                             review.docId,
                                                             review.title,
+                                                            review.docLink,
                                                         )}
                                                 >
                                                     New Case

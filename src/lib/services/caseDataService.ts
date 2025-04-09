@@ -30,6 +30,7 @@ interface CaseDetailsResponse {
             last_updated: string;
             department: string;
             published: boolean;
+            google_doc_link: string;
         };
         test_data: {
             physical_exam: any;
@@ -80,7 +81,7 @@ export class CaseDataService {
     }
 
     async publishCase(caseId: string, params: PublishCaseParams): Promise<any> {
-        debugger;
+
         try {
             const response = await fetch(`${this.baseUrl}/cases/${caseId}/publish`, {
                 method: 'POST',
@@ -134,7 +135,8 @@ export class CaseDataService {
             isGeneratingDifferential: false,
             isSearchingImages: false,
             searchedImages: null,
-            selectedDocumentName: data.content.case_cover.case_name + ".md"
+            selectedDocumentName: data.content.case_cover.case_name,
+            googleDocLink: data.content.case_cover.google_doc_link,
         };
     }
 } 

@@ -23,7 +23,7 @@ function createEditPhysicalExamTableStore() {
             update(state => ({ ...state, isUpdating: true, error: null }));
 
             try {
-                debugger;
+
                 await testTableService.updateTable({
                     case_id: caseId,
                     test_name: testName,

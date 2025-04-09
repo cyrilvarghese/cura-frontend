@@ -8,6 +8,7 @@
         generateDifferentialDiagnosis,
         type CaseStoreState,
         lastCaseIdStore,
+        loadExistingCase,
     } from "$lib/stores/caseCreatorStore";
     import { onDestroy, onMount } from "svelte";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
@@ -16,6 +17,7 @@
         type PublishCaseParams,
     } from "$lib/services/caseDataService";
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
+    import GoogleDocLink from "$lib/components/ui/google-doc-link.svelte";
 
     const caseDataService = new CaseDataService();
 
@@ -55,6 +57,7 @@
             images: [],
         },
         selectedDocumentName: null,
+        googleDocLink: null,
     };
 
     let uploadState = $state(initialValue);
@@ -87,12 +90,12 @@
             isEditMode = false;
             const fileName = urlParams.get("fileName");
             uploadState.selectedDocumentName = fileName;
+            uploadState.googleDocLink = urlParams.get("googleDocLink");
             console.log("File name from URL:", fileName);
         } else if (caseId) {
             // Load existing case for edit mode
             isEditMode = true;
             lastCaseIdStore.set(caseId);
-
             await loadExistingCase(caseId);
         }
     });
@@ -194,39 +197,6 @@
         }
     }
 
-    async function loadExistingCase(id: string) {
-        try {
-            uploadState.loading = true;
-
-            // Fetch case data from API
-            const caseData = await caseDataService.getCaseById(id);
-
-            // Update store with existing data
-            caseStore.update((state) => ({
-                ...state,
-                caseId: id,
-                persona: caseData.persona,
-                testData: {
-                    physical_exam: caseData.testData?.physical_exam,
-                    lab_test: caseData.testData?.lab_test,
-                },
-                coverImage: {
-                    image_url: caseData.coverImage?.image_url || "",
-                    prompt: caseData.coverImage?.prompt || "",
-                    title: caseData.coverImage?.title || "",
-                    quote: caseData.coverImage?.quote || "",
-                },
-                differentialDiagnosis: caseData.differentialDiagnosis,
-                selectedDocumentName: caseData.selectedDocumentName,
-            }));
-        } catch (err) {
-            console.error("Error loading case:", err);
-            uploadState.error = "Failed to load case data";
-        } finally {
-            uploadState.loading = false;
-        }
-    }
-
     async function handlePublishCase() {
         if (!department) return;
 
@@ -261,9 +231,17 @@
 </div>
 <p class="text-gray-500 mb-8">
     {#if isEditMode}
-        Edit an existing case
+        Edit an existing case for
+        <GoogleDocLink
+            docName={uploadState.selectedDocumentName || ""}
+            docLink={uploadState.googleDocLink}
+        />
     {:else}
-        Create a new case from a master document
+        Create a new case for
+        <GoogleDocLink
+            docName={uploadState.selectedDocumentName || ""}
+            docLink={uploadState.googleDocLink}
+        />
     {/if}
 </p>
 <div class="flex flex-row items-start justify-start gap-4">

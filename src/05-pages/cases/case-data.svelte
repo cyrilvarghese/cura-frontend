@@ -14,6 +14,7 @@
     import * as Dialog from "$lib/components/ui/dialog";
     import { Textarea } from "$lib/components/ui/textarea";
     import { phrasesToAvoidStore } from "$lib/stores/phrasesToAvoidStore";
+    import { Maximize2, X } from "lucide-svelte";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -52,25 +53,62 @@
             showPhraseDialog = false;
         }
     }
+
+    // Add state for modal
+    let isFullscreen = $state(false);
+    let activeTabContent = $state<string | null>(null);
+
+    function openFullscreen(tab: string) {
+        activeTabContent = tab;
+        isFullscreen = true;
+    }
 </script>
 
 <Card.Root class="flex-1 rounded-none border-none">
-     
     <Card.Content>
         <Tabs.Root value={currentTab} class="w-full">
             <Tabs.List class="border-b w-full flex justify-start gap-8">
-                <Tabs.Trigger value="patient-persona"
-                    >Patient Persona</Tabs.Trigger
-                >
-                <Tabs.Trigger value="physical-exams"
-                    >Physical Examination & Lab Tests</Tabs.Trigger
-                >
-                <Tabs.Trigger value="differential-diagnosis"
-                    >Differential Diagnosis</Tabs.Trigger
-                >
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="patient-persona"
+                        >Patient Persona</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() => openFullscreen("patient-persona")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="physical-exams"
+                        >Physical Examination & Lab Tests</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() => openFullscreen("physical-exams")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="differential-diagnosis"
+                        >Differential Diagnosis</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() => openFullscreen("differential-diagnosis")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
             </Tabs.List>
 
-            <div class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl p-6">
+            <div
+                class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl p-6"
+            >
                 <Tabs.Content value="patient-persona">
                     {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
@@ -90,7 +128,11 @@
                                 >
                                     Add phrases to avoid
                                 </Button>
-                                <Button variant="outline" size="sm" onclick={() => (showPhraseDialog = true)}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    href="/case-library/{uploadState.caseId}"
+                                >
                                     Test Patient Dialogue
                                 </Button>
                             </div>
@@ -235,6 +277,75 @@
             </Button>
             <Button onclick={addPhrase}>Add phrase</Button>
         </Dialog.Footer>
+    </Dialog.Content>
+</Dialog.Root>
+
+<!-- Fullscreen Dialog -->
+<Dialog.Root bind:open={isFullscreen}>
+    <Dialog.Content class="max-w-[95vw] max-h-[95vh] w-full h-full">
+        <div class="flex justify-between items-center mb-4">
+            <Dialog.Title>
+                {#if activeTabContent === "patient-persona"}
+                    Patient Persona
+                {:else if activeTabContent === "physical-exams"}
+                    Physical Examination & Lab Tests
+                {:else if activeTabContent === "differential-diagnosis"}
+                    Differential Diagnosis
+                {/if}
+            </Dialog.Title>
+        </div>
+
+        <div class="overflow-y-auto h-[calc(100vh-10rem)]">
+            {#if activeTabContent === "patient-persona"}
+                <!-- Patient Persona Content -->
+                {#if uploadState.isGeneratingPersona}
+                    <LoadingMessage message="Creating patient persona" />
+                {:else if uploadState.error}
+                    <Alert variant="destructive">
+                        <AlertDescription>
+                            {uploadState.error}
+                        </AlertDescription>
+                    </Alert>
+                {:else if uploadState.persona}
+                    <div class="rounded-lg pt-4">
+                        <MarkdownContent
+                            content={syncMarked(uploadState.persona.content)}
+                        />
+                    </div>
+                {/if}
+            {:else if activeTabContent === "physical-exams"}
+                <!-- Physical Exams Content -->
+                {#if uploadState.testData}
+                    <TestDataDisplay
+                        testData={uploadState.testData}
+                        caseId={uploadState.caseId}
+                    />
+                {/if}
+            {:else if activeTabContent === "differential-diagnosis"}
+                <!-- Differential Diagnosis Content -->
+                {#if uploadState.differentialDiagnosis}
+                    <div class="rounded-lg pt-4">
+                        <ul class="space-y-2">
+                            {#each uploadState.differentialDiagnosis as diagnosis, index}
+                                <li
+                                    class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg"
+                                >
+                                    <span
+                                        class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3"
+                                    >
+                                        {index + 1}
+                                    </span>
+                                    <span
+                                        class="text-gray-700 dark:text-gray-200"
+                                        >{diagnosis}</span
+                                    >
+                                </li>
+                            {/each}
+                        </ul>
+                    </div>
+                {/if}
+            {/if}
+        </div>
     </Dialog.Content>
 </Dialog.Root>
 

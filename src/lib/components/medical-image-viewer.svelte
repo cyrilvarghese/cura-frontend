@@ -37,8 +37,12 @@
     let uploadError = $state<string | null>(null);
     let viewerDialogOpen = $state(false);
 
-    // Initialize imageError after imageUrls is defined
-    let imageError = $state(initialImageUrls.length === 0);
+    // Check for example.com URLs on initialization
+    let imageError = $state(
+        initialImageUrls.some((url: string) => url.includes("example.com")) ||
+            initialImageUrls.length === 0,
+    );
+
     // Log when imageUrls changes
     $effect(() => {
         console.log("Image URLs updated:", imageUrls);
