@@ -36,7 +36,7 @@ export interface Message {
     content: string | TestResult | ExaminationResult | FeedbackResponse;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment';
     imageUrl?: string;
     title?: string;
 }

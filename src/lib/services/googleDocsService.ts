@@ -54,20 +54,30 @@ export class GoogleDocsService {
     }
 
     async refreshCommentCount(docId: string): Promise<number> {
+        const toastId = toast.loading('Refreshing comments...');
         try {
             const response = await fetch(`${this.baseUrl}/google-docs/${docId}/comments`);
             if (!response.ok) {
+                toast.error('Failed to refresh comments', {
+                    id: toastId,
+                });
                 throw new Error('Failed to fetch comments');
             }
             const comments = await response.json();
+            toast.success('Comments refreshed', { id: toastId });
             return Array.isArray(comments) ? comments.length : 0;
         } catch (error) {
             console.error('Error fetching comments:', error);
+            toast.error('Failed to refresh comments', {
+                id: toastId,
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
             return 0;
         }
     }
 
     async deleteDoc(docId: string, docName: string): Promise<void> {
+        const toastId = toast.loading('Deleting document...');
         try {
             const response = await fetch(`${this.baseUrl}/google-docs/${docId}`, {
                 method: 'DELETE',
@@ -75,18 +85,21 @@ export class GoogleDocsService {
 
             if (!response.ok) {
                 toast.error('Delete failed', {
+                    id: toastId,
                     description: 'Failed to delete document'
                 });
                 throw new Error('Failed to delete document');
             }
 
             toast.success('Document deleted', {
+                id: toastId,
                 description: `Successfully deleted "${docName}"`
             });
 
         } catch (error) {
             console.error('Error deleting document:', error);
             toast.error('Delete failed', {
+                id: toastId,
                 description: error instanceof Error ? error.message : 'Please try again later'
             });
             throw error;
@@ -94,23 +107,27 @@ export class GoogleDocsService {
     }
 
     async approveCase(docId: string): Promise<void> {
+        const toastId = toast.loading('Approving document...');
         try {
             const response = await fetch(`${this.baseUrl}/google-docs/${docId}/approve`);
 
             if (!response.ok) {
                 toast.error('Approval failed', {
+                    id: toastId,
                     description: 'Failed to approve document'
                 });
                 throw new Error('Failed to approve document');
             }
 
             toast.success('Case approved', {
+                id: toastId,
                 description: 'Document has been approved successfully'
             });
 
         } catch (error) {
             console.error('Error approving document:', error);
             toast.error('Approval failed', {
+                id: toastId,
                 description: error instanceof Error ? error.message : 'Please try again later'
             });
             throw error;
@@ -118,6 +135,7 @@ export class GoogleDocsService {
     }
 
     async uploadDocument(file: File, title: string): Promise<GoogleDoc> {
+        const toastId = toast.loading('Uploading document...');
         try {
             const formData = new FormData();
             formData.append('file', file);
@@ -129,31 +147,33 @@ export class GoogleDocsService {
             });
 
             if (!response.ok) {
-                // Handle 400 error specifically for duplicate titles
                 if (response.status === 400) {
                     const errorData = await response.json();
                     toast.error('Upload failed', {
+                        id: toastId,
                         description: errorData.detail || 'A document with this title already exists'
                     });
                     throw new Error(errorData.detail);
                 }
 
                 toast.error('Upload failed', {
+                    id: toastId,
                     description: 'Failed to upload document'
                 });
                 throw new Error('Failed to upload document');
             }
 
             toast.success('Document uploaded', {
+                id: toastId,
                 description: `Successfully uploaded "${title}"`
             });
 
             return response.json();
         } catch (error) {
             console.error('Error uploading document:', error);
-            // Only show generic toast if it wasn't already handled above
             if (!(error instanceof Error && error.message.includes('already exists'))) {
                 toast.error('Upload failed', {
+                    id: toastId,
                     description: error instanceof Error ? error.message : 'Please try again later'
                 });
             }

@@ -19,6 +19,39 @@ const initialState: DocumentState = {
 
 export const documentStore = writable<DocumentState>(initialState);
 
+export async function uploadDocuments(
+    files: Array<{ file: File; title: string; description: string }>,
+    departmentName: string
+) {
+    documentStore.update(state => ({ ...state, isUploading: true, error: null }));
+
+    try {
+        const responses = await documentService.uploadDocuments(files, departmentName);
+
+        documentStore.update(state => {
+            const departmentDocs = state.documents[departmentName] || [];
+            return {
+                ...state,
+                isUploading: false,
+                documents: {
+                    ...state.documents,
+                    [departmentName]: [...departmentDocs, ...responses]
+                }
+            };
+        });
+
+        return responses;
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to upload documents';
+        documentStore.update(state => ({
+            ...state,
+            isUploading: false,
+            error: errorMessage
+        }));
+        throw error;
+    }
+}
+
 export async function uploadDocument(
     file: File,
     departmentName: string,

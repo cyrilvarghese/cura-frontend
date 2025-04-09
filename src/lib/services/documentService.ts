@@ -14,6 +14,58 @@ export interface DocumentUploadResponse {
 export class DocumentService {
     private baseUrl = API_BASE_URL;
 
+    async uploadDocuments(
+        files: Array<{ file: File; title: string; description: string }>,
+        departmentName: string
+    ): Promise<DocumentUploadResponse[]> {
+        try {
+            const formData = new FormData();
+
+            // Add department name
+            formData.append('department_name', departmentName);
+
+            // Add files, titles, and descriptions as separate arrays
+            files.forEach((fileData, index) => {
+                formData.append('files', fileData.file);
+                formData.append('titles', fileData.title);
+                formData.append('descriptions', fileData.description || '');
+            });
+
+            const response = await fetch(
+                `${this.baseUrl}/documents/upload`,
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                if (response.status === 400) {
+                    toast.error(errorData.detail || 'One or more documents already exist', {
+                        style: 'background: white; color: rgb(220 38 38);'
+                    });
+                    throw new Error(errorData.detail);
+                }
+                toast.error('Failed to upload documents', {
+                    style: 'background: white; color: rgb(220 38 38);'
+                });
+                throw new Error('Failed to upload documents');
+            }
+
+            const results = await response.json();
+            return results;
+        } catch (error) {
+            console.error('Error uploading documents:', error);
+            if (!(error instanceof Error && error.message.includes('already exist'))) {
+                toast.error(error instanceof Error ? error.message : 'Please try again later', {
+                    style: 'background: white; color: rgb(220 38 38);'
+                });
+            }
+            throw error;
+        }
+    }
+
     async uploadDocument(
         file: File,
         departmentName: string,

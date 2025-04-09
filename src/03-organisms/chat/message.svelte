@@ -14,6 +14,8 @@
     import DiagnosisCard from "./chat-cards/diagnosis-card.svelte";
     import RelevantInfoCard from "./chat-cards/relevant-info-card.svelte";
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
+    import PreTreatmentCard from "./chat-cards/pre-treatment-card.svelte";
+    import TreatmentProtocolCard from "./chat-cards/treatment-protocol-card.svelte";
     import { onMount, onDestroy } from "svelte";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
@@ -135,6 +137,8 @@
         "test-result": () => TestResultCard,
         examination: () => ExaminationCard,
         feedback: () => FeedbackCard,
+        "pre-treatment": () => PreTreatmentCard,
+        "treatment-protocol": () => TreatmentProtocolCard,
     } as const;
 
     function getComponentProps(msg: Message) {
@@ -168,6 +172,14 @@
             case "feedback":
                 return {
                     feedback: msg.content as FeedbackResponse,
+                };
+            case "pre-treatment":
+                return {
+                    pretreatment: JSON.parse(msg.content as string),
+                };
+            case "treatment-protocol":
+                return {
+                    treatment: JSON.parse(msg.content as string),
                 };
             default:
                 return {};
@@ -219,7 +231,6 @@
                     ](message)}
                 {#if MessageComponent}
                     {#key message.type}
-                    
                         <!-- @ts-ignore  fix the type error -->
                         <MessageComponent
                             {...getComponentProps(message) as any}

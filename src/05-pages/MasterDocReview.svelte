@@ -20,6 +20,7 @@
         DropdownMenuItem,
         DropdownMenuTrigger,
     } from "$lib/components/ui/dropdown-menu";
+    import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     // Direct state declarations without import
     let searchQuery = $state("");
     let isLoading = $state(true);
@@ -238,7 +239,7 @@
                                 S.No
                             </th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                class="w-[400px] px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
                                 Title
                             </th>
@@ -268,58 +269,73 @@
                                     {index + 1}
                                 </td>
                                 <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    class="w-[400px] px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
                                     <div class="flex items-center gap-4">
-                                        <a
-                                            href={review.docLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="text-blue-600 hover:text-blue-800 hover:underline"
-                                        >
-                                            {review.title}
-                                        </a>
+                                        <Tooltip.Provider>
+                                            <Tooltip.Root>
+                                                <Tooltip.Trigger>
+                                                    <a
+                                                        href={review.docLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-blue-600 hover:text-blue-800 hover:underline truncate block max-w-[300px]"
+                                                    >
+                                                        {review.title}
+                                                    </a>
+                                                </Tooltip.Trigger>
+                                                <Tooltip.Content
+                                                    side="bottom"
+                                                    sideOffset={5}
+                                                    class="bg-stone-100 text-blue-900 border-blue-200 border px-3 py-1.5 rounded-md text-sm"
+                                                >
+                                                    <p>{review.title}</p>
+                                                </Tooltip.Content>
+                                            </Tooltip.Root>
+                                        </Tooltip.Provider>
 
-                                        {#if review.commentCount === 0}
-                                            <button
-                                                class="hover:bg-gray-100 p-1 rounded-full transition-colors"
-                                                onclick={() =>
-                                                    handleRefreshComments(
-                                                        review.docId,
-                                                    )}
-                                            >
-                                                <RefreshCw
-                                                    class="h-5 w-5 text-gray-600 {isLoadingComments
-                                                        ? 'animate-spin'
-                                                        : ''}"
-                                                    strokeWidth={2.5}
-                                                />
-                                            </button>
-                                        {:else}
-                                            <button
-                                                class="hover:bg-gray-100 rounded-full transition-colors"
-                                                onclick={() =>
-                                                    handleRefreshComments(
-                                                        review.docId,
-                                                    )}
-                                            >
-                                                <span
-                                                    class="relative inline-flex items-center px-2 py-1"
+                                        <div class="flex-shrink-0">
+                                            {#if review.commentCount === 0}
+                                                <button
+                                                    class="hover:bg-gray-100 p-1 rounded-full transition-colors"
+                                                    onclick={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
+                                                >
+                                                    <RefreshCw
+                                                        class="h-5 w-5 text-gray-600 {isLoadingComments
+                                                            ? 'animate-spin'
+                                                            : ''}"
+                                                        strokeWidth={2.5}
+                                                    />
+                                                </button>
+                                            {:else}
+                                                <button
+                                                    class="hover:bg-gray-100 rounded-full transition-colors"
+                                                    onclick={() =>
+                                                        handleRefreshComments(
+                                                            review.docId,
+                                                        )}
                                                 >
                                                     <span
-                                                        class="text-xs rounded-full bg-gray-100 text-gray-800"
+                                                        class="relative inline-flex items-center px-2 py-1"
                                                     >
-                                                        {review.commentCount}
+                                                        <span
+                                                            class="text-xs rounded-full bg-gray-100 text-gray-800"
+                                                        >
+                                                            {review.commentCount}
+                                                        </span>
+                                                        {#if isLoadingComments}
+                                                            <RefreshCw
+                                                                class="h-4 w-4 text-gray-600 animate-spin absolute right-0 translate-x-full ml-1"
+                                                                strokeWidth={2.5}
+                                                            />
+                                                        {/if}
                                                     </span>
-                                                    {#if isLoadingComments}
-                                                        <RefreshCw
-                                                            class="h-4 w-4 text-gray-600 animate-spin absolute right-0 translate-x-full ml-1"
-                                                            strokeWidth={2.5}
-                                                        />
-                                                    {/if}
-                                                </span>
-                                            </button>
-                                        {/if}
+                                                </button>
+                                            {/if}
+                                        </div>
                                     </div>
                                 </td>
                                 <td
@@ -340,7 +356,7 @@
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                 >
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
+                                        <DropdownMenuTrigger>
                                             <Button variant="ghost" size="sm">
                                                 <MoreVertical class="h-4 w-4" />
                                             </Button>

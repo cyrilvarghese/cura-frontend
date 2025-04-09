@@ -62,6 +62,8 @@
         activeTabContent = tab;
         isFullscreen = true;
     }
+
+    let showCoverImageSection = $state(false);
 </script>
 
 <Card.Root class="flex-1 rounded-none border-none">
@@ -79,6 +81,7 @@
                     >
                         <Maximize2 class="h-4 w-4" />
                     </Button>
+                    <hr class="h-4 w-4 bg-muted-foreground" />
                 </div>
                 <div class="flex items-center gap-2">
                     <Tabs.Trigger value="physical-exams"
@@ -110,6 +113,27 @@
                 class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl p-6"
             >
                 <Tabs.Content value="patient-persona">
+                    <!-- Cover Image Section -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onclick={() =>
+                                    (showCoverImageSection =
+                                        !showCoverImageSection)}
+                            >
+                                Generate Cover Image
+                            </Button>
+                        </div>
+
+                        {#if showCoverImageSection}
+                            <div class="mt-4">
+                                <CoverImage caseId={uploadState.caseId} />
+                            </div>
+                        {/if}
+                    </div>
+
                     {#if uploadState.isGeneratingPersona}
                         <LoadingMessage message="Creating patient persona" />
                     {:else if uploadState.error}
@@ -166,18 +190,13 @@
                                 </ul>
                             {/if}
 
-                            <div class="mb-4">
-                                <div class="mt-4">
-                                    <CoverImage caseId={uploadState.caseId} />
-                                </div>
+                            <div class="rounded-lg pt-4">
+                                <MarkdownContent
+                                    content={syncMarked(
+                                        uploadState.persona.content,
+                                    )}
+                                />
                             </div>
-                        </div>
-                        <div class="rounded-lg pt-4">
-                            <MarkdownContent
-                                content={syncMarked(
-                                    uploadState.persona.content,
-                                )}
-                            />
                         </div>
                     {:else}
                         <div class="text-center text-muted-foreground py-8">

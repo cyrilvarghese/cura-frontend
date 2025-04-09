@@ -21,6 +21,9 @@
     import { writable } from "svelte/store";
     import LoaderCircle from "lucide-svelte/icons/loader-circle";
     import PageLayout from "../../04-templates/page-layout.svelte";
+    import InvestigationDialog from "../../03-organisms/dialogs/pre-treatment-dialog.svelte";
+    import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
+    import { Pill } from "lucide-svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -35,9 +38,11 @@
     let diagnosisDialogOpen = $state(false);
     let finalDiagnosisDialogOpen = $state(false);
     let endCaseDialogOpen = $state(false);
+    let investigationDialogOpen = $state(false);
+    let treatmentProtocolDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("pre-treatment"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -45,7 +50,6 @@
                 "#messages-container > div:last-child",
             );
             if (lastMessage) {
-            
                 lastMessage.scrollIntoView({
                     behavior: "smooth",
                     block: "end",
@@ -104,12 +108,24 @@
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
-        currentStep = "end-case";
+        currentStep = "pre-treatment";
     }
 
     function handleEndCase() {
         console.log("Case ended");
         endCaseDialogOpen = false;
+    }
+
+    function handleInvestigationSubmit() {
+        console.log("Investigation submitted");
+        investigationDialogOpen = false;
+        currentStep = "treatment-protocol";
+    }
+
+    function handleTreatmentProtocolSubmit() {
+        console.log("Treatment protocol submitted");
+        treatmentProtocolDialogOpen = false;
+        currentStep = "end-case";
     }
 
     const stepButtons = {
@@ -131,6 +147,18 @@
             action: () => (finalDiagnosisDialogOpen = true),
             variant: "outline" as const,
         },
+        "pre-treatment": {
+            label: "Submit Pre-Treatment Investigations",
+            icon: Stethoscope,
+            action: () => (investigationDialogOpen = true),
+            variant: "outline" as const,
+        },
+        "treatment-protocol": {
+            label: "Submit Treatment Protocol",
+            icon: Pill,
+            action: () => (treatmentProtocolDialogOpen = true),
+            variant: "outline" as const,
+        },
         "end-case": {
             label: "End Case",
             icon: XCircle,
@@ -144,7 +172,7 @@
     breadcrumbs={[
         { label: "Home", href: "/" },
         { label: "Case Library", href: "/case-library" },
-        { label: `Case ${id}` }
+        { label: `Case ${id}` },
     ]}
 >
     <div class="flex gap-4 w-full h-full">
@@ -236,6 +264,16 @@
     <FinalDiagnosisDialog
         bind:open={finalDiagnosisDialogOpen}
         onSubmit={handleFinalDiagnosisSubmit}
+    />
+
+    <InvestigationDialog
+        bind:open={investigationDialogOpen}
+        onSubmit={handleInvestigationSubmit}
+    />
+
+    <TreatmentProtocolDialog
+        bind:open={treatmentProtocolDialogOpen}
+        onSubmit={handleTreatmentProtocolSubmit}
     />
 
     <EndCaseDialog bind:open={endCaseDialogOpen} onSubmit={handleEndCase} />

@@ -59,7 +59,7 @@ function getMessageFromCover(coverMessage: any): Message {
 
 // Initialize the store with the cover messages
 const initialState: ApiState = {
-    messages:[],
+    messages: [],
     error: null
 };
 
@@ -131,7 +131,18 @@ function updatePatientFile(content: TestResult | ExaminationResult, type: 'exami
     }
 }
 
-export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse, role: 'student' | 'assistant' | 'patient', step: string, type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' = 'text') {
+export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse,
+    role: 'student' | 'assistant' | 'patient',
+    step: string,
+    type: 'text' | 'image' | 'test-result'
+        | 'examination'
+        | 'diagnosis'
+        | 'relevant-info'
+        | 'final-diagnosis'
+        | 'pre-treatment'
+        | 'feedback' = 'text'
+
+) {
 
 
     let messageContent = typeof content === 'object' && content !== null
