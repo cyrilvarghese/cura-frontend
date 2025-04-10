@@ -1,12 +1,13 @@
 import { writable, get } from 'svelte/store';
 import { patientPersonaService } from '$lib/services/patientPersonaService'; // Adjust the import based on your project structure
 import { testDataService } from '$lib/services/testDataService'; // Adjust the import based on your project structure
-import type { CoverImageResponse, FormattedPersonaResponse } from '$lib/types';
+
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
 import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
 import { currentDepartment } from './teamStore';
 import { CaseDataService } from '$lib/services/caseDataService';
+import type { FormattedPersonaResponse, CoverImageResponse } from '$lib/types/index';
 
 
 
@@ -255,6 +256,7 @@ export async function loadExistingCase(id: string) {
     try {
         caseStore.update(state => ({ ...state, loading: true }));
         const caseData = await caseDataService.getCaseById(id);
+        console.log(caseData + "caseData");
         caseStore.update((state) => ({
             ...state,
             caseId: id,

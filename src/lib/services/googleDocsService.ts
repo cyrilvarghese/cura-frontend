@@ -9,6 +9,10 @@ export interface GoogleDoc {
     modifiedTime: string;
     commentCount: number;
     status: string;
+    approved_by_username?: string;
+    url: string;
+    department_name: string;
+    google_doc_id: string;
 }
 
 export class GoogleDocsService {
@@ -93,7 +97,7 @@ export class GoogleDocsService {
 
             toast.success('Document deleted', {
                 id: toastId,
-                description: `Successfully deleted "${docName}"`
+                description: `${docName}  deleted successfully`
             });
 
         } catch (error) {

@@ -25,7 +25,7 @@ interface CaseDetailsResponse {
             title: string;
             quote: string;
             image_url: string;
-            cover_image_prompt: string;
+            image_prompt: string;
             differentials: any[];
             last_updated: string;
             department: string;
@@ -120,7 +120,7 @@ export class CaseDataService {
             },
             coverImage: {
                 image_url: data.content.case_cover.image_url,
-                prompt: data.content.case_cover.cover_image_prompt,
+                prompt: data.content.case_cover.image_prompt,
                 title: data.content.case_cover.title,
                 quote: data.content.case_cover.quote
             },

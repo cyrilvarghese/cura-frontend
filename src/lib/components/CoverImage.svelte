@@ -12,7 +12,7 @@
     import { API_BASE_URL } from "$lib/config/api";
 
     const coverImageService = new CoverImageService();
-    const coverImageData = writable<{
+    let coverImageData = $state<{
         image_url: string;
         prompt: string;
         title?: string | null;
@@ -21,27 +21,31 @@
     const isLoading = writable(true);
     const isError = writable(false);
     let currentPrompt = $state("");
-    let { caseId } = $props();
+    let { caseId, imageUrl, prompt, title, quote } = $props();
     async function generateCoverImage() {
         isLoading.set(false);
         try {
-            isLoading.set(true);
-            const response = await coverImageService.createCoverImage(caseId);
-            coverImageData.set({
-                image_url: API_BASE_URL + response.image_url,
-                prompt: response.prompt,
-                title: response.title,
-                quote: response.quote,
-            });
-            currentPrompt = response.prompt;
-            // coverImageData.set({
-            //     image_url: cover2,
-            //     prompt: "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.",
-            //     title: "Test Title",
-            //     quote: "Test Quote",
-            // });
-            // currentPrompt =
-            //     "Your role is to provide realistic, conversational, and contextually accurate responses based on the embedded case details. You are being asked questions by a doctor (marked as student_query) and should respond as a patient would in a medical interview. While answering, reflect your personality, emotions, and minor personal anecdotes where appropriate, without deviating from the embedded case details. Provide only the information explicitly requested in the student_query and avoid volunteering unrelated details. If asked a general or open-ended question, share just one noticeable or bothersome symptom or fact at a time, ensuring your responses feel natural and realistic.";
+            debugger;
+            if (imageUrl && prompt && title && quote) {
+                coverImageData = {
+                    image_url: API_BASE_URL + imageUrl,
+                    prompt: prompt,
+                    title: title,
+                    quote: quote,
+                };
+                currentPrompt = prompt;
+            } else {
+                isLoading.set(true);
+                const response =
+                    await coverImageService.createCoverImage(caseId);
+                coverImageData = {
+                    image_url: API_BASE_URL + response.image_url,
+                    prompt: response.prompt,
+                    title: response.title,
+                    quote: response.quote,
+                };
+                currentPrompt = response.prompt;
+            }
         } catch (error) {
             console.error("Error generating cover image:", error);
             isError.set(true);
@@ -51,22 +55,22 @@
     }
 
     async function generateWithPrompt() {
-        if (!currentPrompt.trim() || !$coverImageData)
+        if (!currentPrompt.trim() || !coverImageData)
             return generateCoverImage();
         try {
             isLoading.set(true);
             const response = await coverImageService.generateWithPrompt(
                 caseId,
                 currentPrompt,
-                $coverImageData.title ?? "",
-                $coverImageData.quote ?? "",
+                coverImageData.title ?? "",
+                coverImageData.quote ?? "",
             );
-            coverImageData.set({
+            coverImageData = {
                 image_url: API_BASE_URL + response.image_url,
                 prompt: response.prompt,
                 title: response.title,
                 quote: response.quote,
-            });
+            };
             // coverImageData.set({
             //     image_url: cover2,
             //     prompt: currentPrompt,
@@ -81,8 +85,8 @@
         }
     }
 
-    onMount(() => {
-        if (!$coverImageData) {
+    $effect(() => {
+        if (caseId) {
             isLoading.set(false);
             generateCoverImage();
         }
@@ -90,14 +94,14 @@
 </script>
 
 <div class="w-full bg-white">
-    {#if $isLoading && !$coverImageData}
+    {#if $isLoading && !coverImageData}
         <LoadingMessage message="Generating cover image" />
-    {:else if $coverImageData}
+    {:else if coverImageData}
         <div class="flex w-full flex-row items-start justify-start">
             <div class="flex gap-2 relative">
                 <img
                     class="w-[400px] h-auto object-cover rounded-lg"
-                    src={$coverImageData.image_url}
+                    src={coverImageData.image_url}
                     alt="Generated cover"
                 />
             </div>
@@ -114,16 +118,16 @@
                 <blockquote
                     class="text-sm text-muted-foreground font-medium mb-2"
                 >
-                    "{$coverImageData.quote}"
+                    "{coverImageData.quote}"
                 </blockquote>
                 <Textarea
-                    bind:value={currentPrompt}
+                    bind:value={coverImageData.prompt}
                     class="h-[150px] overflow-y-auto w-full text-sm text-muted-foreground bg-transparent resize-none"
                 />
                 <Button
                     variant="outline"
                     onclick={generateWithPrompt}
-                    disabled={$isLoading || !currentPrompt.trim()}
+                    disabled={$isLoading || !coverImageData.prompt.trim()}
                     class="bg-white/90 mt-4 backdrop-blur-sm hover:bg-white"
                 >
                     <RefreshCw

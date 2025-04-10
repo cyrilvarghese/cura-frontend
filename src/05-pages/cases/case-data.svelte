@@ -39,7 +39,6 @@
         return marked.parse(content) as string;
     }
 
-    let showCoverImage = $state(false);
     let showPhraseDialog = $state(false);
     let newPhrase = $state("");
 
@@ -64,6 +63,12 @@
     }
 
     let showCoverImageSection = $state(false);
+
+    $effect(() => {
+        if (uploadState.coverImage?.image_url) {
+            showCoverImageSection = true;
+        }
+    });
 </script>
 
 <Card.Root class="flex-1 rounded-none border-none">
@@ -81,7 +86,6 @@
                     >
                         <Maximize2 class="h-4 w-4" />
                     </Button>
-                    <hr class="h-4 w-4 bg-muted-foreground" />
                 </div>
                 <div class="flex items-center gap-2">
                     <Tabs.Trigger value="physical-exams"
@@ -110,7 +114,7 @@
             </Tabs.List>
 
             <div
-                class="mt-4 h-[calc(100vh-404px)] overflow-y-auto bg-muted/50 rounded-xl p-6"
+                class="mt-4 h-[calc(100vh-350px)] overflow-y-auto bg-muted/50 rounded-xl p-6"
             >
                 <Tabs.Content value="patient-persona">
                     <!-- Cover Image Section -->
@@ -129,7 +133,13 @@
 
                         {#if showCoverImageSection}
                             <div class="mt-4">
-                                <CoverImage caseId={uploadState.caseId} />
+                                <CoverImage
+                                    caseId={uploadState.caseId}
+                                    prompt={uploadState.coverImage?.prompt}
+                                    imageUrl={uploadState.coverImage?.image_url}
+                                    title={uploadState.coverImage?.title}
+                                    quote={uploadState.coverImage?.quote}
+                                />
                             </div>
                         {/if}
                     </div>

@@ -8,7 +8,11 @@ export interface DocumentUploadResponse {
     description?: string;
     google_doc_link: string;
     created_at: string;
-    topic_name: string;
+    topic_name: string | null;
+    department_name: string;
+    google_doc_id: string;
+    status: string;
+    type: string;
 }
 
 export class DocumentService {
