@@ -49,6 +49,7 @@
             submittedDate: doc.modifiedTime,
             commentCount: doc.commentCount,
             docId: doc.id,
+            approvedBy: doc.approved_by_username,
         }));
     }
 
@@ -143,23 +144,6 @@
         fileName: string,
         googleDocLink: string,
     ) {
-        // Find the corresponding document from filteredCases
-        const selectedDoc = filteredCases.find((doc) => doc.docId === docId);
-
-        if (selectedDoc) {
-            // Set the selected document in the store before navigation
-            setSelectedCaseDocument({
-                id: selectedDoc.docId,
-                title: selectedDoc.title,
-                url: selectedDoc.docLink,
-
-                google_doc_link: selectedDoc.docLink,
-                created_at: selectedDoc.submittedDate,
-                topic_name: selectedDoc.title,
-                // Add any other required properties from your DocumentUploadResponse type
-            });
-        }
-
         // Navigate with the fileName as a query parameter
         navigate(
             `/curriculum/new-case?fileName=${encodeURIComponent(fileName)}&googleDocLink=${encodeURIComponent(googleDocLink)}`,
@@ -252,6 +236,11 @@
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
                                 Status
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Approved By
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -351,6 +340,11 @@
                                     >
                                         {review.status}
                                     </span>
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                >
+                                    {review.approvedBy}
                                 </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
