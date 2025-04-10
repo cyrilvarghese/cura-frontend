@@ -67,7 +67,9 @@
                 <TestTube class="h-5 w-5 text-amber-900/70" />
                 <Card.Title class="pr-4">{result.testName}</Card.Title>
             </div>
-            <Badge class={statusColors[result.status as keyof typeof statusColors]}>
+            <Badge
+                class={statusColors[result.status as keyof typeof statusColors]}
+            >
                 {result.status}
             </Badge>
         </div>
@@ -87,21 +89,17 @@
                     testType="lab_test"
                 />
             {:else if resultContent.type === "image"}
-               
-                    <MedicalImageViewer
-                        {caseId}
-                        testName={result.testName}
-                        testType="lab_test"
-                        imageUrls={Array.isArray(resultContent.content.url)
-                            ? resultContent.content.url
-                            : [resultContent.content.url]}
-                        altText={resultContent.content.altText || ""}
-                        caption={resultContent.content.caption}
-                        subtitle={getRelativeTime(
-                            result.timestamp ?? new Date(),
-                        )}
-                    />
-             
+                <MedicalImageViewer
+                    {caseId}
+                    testName={result.testName}
+                    testType="lab_test"
+                    imageUrls={Array.isArray(resultContent.content.url)
+                        ? resultContent.content.url
+                        : [resultContent.content.url]}
+                    altText={resultContent.content.altText || ""}
+                    caption={resultContent.content.caption}
+                    subtitle={getRelativeTime(result.timestamp ?? new Date())}
+                />
             {:else if resultContent.type === "mixed"}
                 <div class="space-y-4">
                     {#each resultContent.content as item}
@@ -109,7 +107,7 @@
                             <p
                                 class="text-sm text-muted-foreground whitespace-pre-wrap"
                             >
-                                <!-- {item.content}  remove this from student --> 
+                                <!-- {item.content} -->
                             </p>
                         {:else if item.type === "table"}
                             <TestResultsTable
@@ -119,21 +117,19 @@
                                 testType="lab_test"
                             />
                         {:else if item.type === "image"}
-                            
-                                <MedicalImageViewer
-                                    {caseId}
-                                    testName={result.testName}
-                                    testType="lab_test"
-                                    imageUrls={Array.isArray(item.content.url)
-                                        ? item.content.url
-                                        : [item.content.url]}
-                                    altText={item.content.altText || ""}
-                                    caption={item.content.caption}
-                                    subtitle={getRelativeTime(
-                                        result.timestamp ?? new Date(),
-                                    )}
-                                />
-                            
+                            <MedicalImageViewer
+                                {caseId}
+                                testName={result.testName}
+                                testType="lab_test"
+                                imageUrls={Array.isArray(item.content.url)
+                                    ? item.content.url
+                                    : [item.content.url]}
+                                altText={item.content.altText || ""}
+                                caption={item.content.caption}
+                                subtitle={getRelativeTime(
+                                    result.timestamp ?? new Date(),
+                                )}
+                            />
                         {/if}
                     {/each}
                 </div>

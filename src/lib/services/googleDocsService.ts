@@ -1,5 +1,7 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { toast } from 'svelte-sonner';
+import { navigate } from 'svelte-routing';
+import { authStore } from '$lib/stores/authStore';
 
 export interface GoogleDoc {
     id: string;
@@ -23,9 +25,14 @@ export class GoogleDocsService {
     }
 
     async getAllDocs(): Promise<GoogleDoc[]> {
+        const toastId = toast.loading('Fetching Google docs...');
         try {
             const response = await fetch(`${this.baseUrl}/google-docs`);
             if (!response.ok) {
+                toast.error('Failed to fetch Google docs', {
+                    id: toastId,
+                    description: 'Please try again later'
+                });
                 throw new Error('Failed to fetch Google docs');
             }
             const data = await response.json();
@@ -116,24 +123,44 @@ export class GoogleDocsService {
             const response = await fetch(`${this.baseUrl}/google-docs/${docId}/approve`);
 
             if (!response.ok) {
-                toast.error('Approval failed', {
+                if (response.status === 401) {
+
+                    toast.error('You are not logged in', {
+                        id: toastId,
+                        description: 'Redirecting to login page...'
+                    });
+                    authStore.logout();
+                    toast.dismiss();
+                }
+                else {
+                    toast.error('Approval failed', {
+                        id: toastId,
+                        description: 'Failed to approve document'
+                    });
+                    throw new Error('Failed to approve document');
+                }
+            }
+            else {
+                toast.success('Case approved', {
                     id: toastId,
-                    description: 'Failed to approve document'
+                    description: 'Document has been approved successfully'
                 });
-                throw new Error('Failed to approve document');
             }
 
-            toast.success('Case approved', {
-                id: toastId,
-                description: 'Document has been approved successfully'
-            });
-
         } catch (error) {
-            console.error('Error approving document:', error);
-            toast.error('Approval failed', {
-                id: toastId,
-                description: error instanceof Error ? error.message : 'Please try again later'
-            });
+            if (error instanceof Response && error.status === 401) {
+                toast.dismiss();
+                toast.error('You are not logged in', {
+                    id: toastId,
+                    description: 'Redirecting to login page...'
+                });
+                navigate('/login', { replace: true });
+            } else {
+                toast.error('Approval failed', {
+                    id: toastId,
+                    description: error instanceof Error ? error.message : 'Please try again later'
+                });
+            }
             throw error;
         }
     }

@@ -1,4 +1,4 @@
-import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types';
+import type { ExaminationResult, FeedbackResponse, FindingContent, Message, PatientFileItem, StudentMessage, TestResult, TestResultContent } from '$lib/types/index';
 import { writable, get } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
 import { caseDataStore } from '$lib/stores/casePlayerStore';

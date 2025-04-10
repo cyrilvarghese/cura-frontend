@@ -179,7 +179,22 @@
             {/if}
         </div>
         <Dialog.Footer>
-            <Button variant="outline" onclick={() => (showEditDialog = false)}>
+            <Button
+                variant="outline"
+                onclick={() => {
+                    // If we're editing the last row and it's empty, remove it
+                    if (
+                        editingRowIndex === localData.rows.length - 1 &&
+                        editingRow?.every((cell) => cell === "")
+                    ) {
+                        localData.rows = localData.rows.slice(0, -1);
+                    }
+
+                    showEditDialog = false;
+                    editingRow = null;
+                    editingRowIndex = -1;
+                }}
+            >
                 Cancel
             </Button>
             <Button onclick={handleSave}>Save changes</Button>

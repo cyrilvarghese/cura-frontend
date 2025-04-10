@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { CaseDataService, type CaseListItem } from '$lib/services/caseDataService';
-import type { DiagnosticTestName, ExaminationName } from '$lib/types';
+import type { DiagnosticTestName, ExaminationName } from '$lib/types/index';
 import { API_BASE_URL } from '$lib/config/api';
 // Current case ID store
 export const currentCaseId = writable<string | null>(null);

@@ -3,8 +3,9 @@
     import { Button } from "$lib/components/ui/button";
     import { Plus, X } from "lucide-svelte";
     import Loader2 from "lucide-svelte/icons/loader-2";
-    import { sendMessage } from "$lib/stores/apiStore";
-
+    import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
+    import { toast } from "svelte-sonner";
+    import { get } from "svelte/store";
     export let open = false;
     export let onSubmit: () => void;
 
@@ -28,38 +29,74 @@
 
     // Handle key press for adding points
     function handlePointKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
+        if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey) {
             event.preventDefault();
             addPoint();
         }
     }
 
     async function handleSubmit() {
-        if (relevantPoints.length === 0) return;
-
         try {
-            isSubmitting = true;
-            const messageContent = `${relevantPoints.join('\n')}`;
-            
-            await sendMessage(
-                messageContent,
-                "student",
-                "relevant-info",
-                "relevant-info"
+            const messageContent = relevantPoints.join("\n");
+
+            // Get all student messages
+            const messages = get(studentMessageHistory);
+
+            // Prepare the payload for the API
+            const payload = {
+                case_id: "123", // You might want to get this from your case store
+                questions: messages.map((msg) => msg.content),
+            };
+
+            // Make the API call
+            const response = await fetch(
+                "/student-evaluation/evaluate-questions",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                },
             );
 
-            onSubmit();
-            relevantPoints = [];
-            open = false;
+            if (!response.ok) {
+                throw new Error("Failed to evaluate questions");
+            }
+
+            const data = await response.json();
+
+            // Send the evaluation response to the chat
+            await sendMessage(
+                {
+                    content: data.evaluation,
+                    timestamp: data.timestamp,
+                    evaluation: true,
+                },
+                "assistant",
+                "relevant-info",
+                "relevant-info",
+            );
+
+            toast.success("Evaluation submitted successfully");
+            closeDialog();
         } catch (error) {
-            console.error("Error submitting relevant information:", error);
-        } finally {
-            isSubmitting = false;
+            toast.error("Failed to submit evaluation", {
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Unknown error occurred",
+            });
         }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter' && event.ctrlKey && relevantPoints.length > 0 && !isSubmitting) {
+        if (
+            event.key === "Enter" &&
+            event.ctrlKey &&
+            relevantPoints.length > 0 &&
+            !isSubmitting
+        ) {
             event.preventDefault();
             handleSubmit();
         }
@@ -67,14 +104,12 @@
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content 
-        class="sm:max-w-[800px]"
-        onkeydown={handleKeyDown}
-    >
+    <Dialog.Content class="sm:max-w-[800px]" onkeydown={handleKeyDown}>
         <Dialog.Header>
             <Dialog.Title>Positive Clinical Findings</Dialog.Title>
             <Dialog.Description>
-                Add key points you've gathered from this case which are relevant to the case.
+                Add key points you've gathered from this case which are relevant
+                to the case.
             </Dialog.Description>
         </Dialog.Header>
 
@@ -92,15 +127,14 @@
                         <Plus class="h-4 w-4" />
                     </Button>
                 </div>
-                
+
                 <div class="space-y-2">
                     {#each relevantPoints as point, index}
                         <div class="flex items-center gap-2">
-                            <input 
-                                type="text" 
-                                class="flex-1 rounded-md border p-2 bg-gray-50" 
-                                value={point} 
-                                 
+                            <input
+                                type="text"
+                                class="flex-1 rounded-md border p-2 bg-gray-50"
+                                value={point}
                             />
                             <Button
                                 variant="ghost"
@@ -118,10 +152,11 @@
 
         <Dialog.Footer>
             <Dialog.Close>
-                <Button variant="outline" disabled={isSubmitting}>Cancel</Button>
+                <Button variant="outline" disabled={isSubmitting}>Cancel</Button
+                >
             </Dialog.Close>
-            <Button 
-                variant="default" 
+            <Button
+                variant="default"
                 onclick={handleSubmit}
                 disabled={relevantPoints.length === 0 || isSubmitting}
             >

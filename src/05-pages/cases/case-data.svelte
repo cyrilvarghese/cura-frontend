@@ -154,7 +154,7 @@
                         </Alert>
                     {:else if uploadState.persona}
                         <div class="relative">
-                            <div class="flex justify-between mb-4">
+                            <div class="flex justify-start gap-2 mb-4">
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -282,7 +282,9 @@
 </Card.Root>
 
 <Dialog.Root bind:open={showPhraseDialog}>
-    <Dialog.Content class="sm:max-w-[425px]">
+    <Dialog.Overlay class="z-[100]" />
+
+    <Dialog.Content class="sm:max-w-[425px] z-[101]">
         <Dialog.Header>
             <Dialog.Title>Add phrase to avoid</Dialog.Title>
             <Dialog.Description>
@@ -336,6 +338,50 @@
                         </AlertDescription>
                     </Alert>
                 {:else if uploadState.persona}
+                    <div class="flex justify-start gap-2 mb-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onclick={() => (showPhraseDialog = true)}
+                        >
+                            Add phrases to avoid
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            href="/case-library/{uploadState.caseId}"
+                        >
+                            Test Patient Dialogue
+                        </Button>
+                    </div>
+                    {#if $phrasesToAvoidStore.isLoading}
+                        <div class="text-sm text-muted-foreground">
+                            Adding phrase...
+                        </div>
+                    {/if}
+
+                    {#if $phrasesToAvoidStore.error}
+                        <Alert variant="destructive" class="mb-4">
+                            <AlertDescription>
+                                {$phrasesToAvoidStore.error}
+                            </AlertDescription>
+                        </Alert>
+                    {/if}
+
+                    {#if $phrasesToAvoidStore.phrases.length > 0}
+                        <ul class="mb-4 text-sm">
+                            {#each $phrasesToAvoidStore.phrases as phrase}
+                                <li class="flex items-center space-x-2">
+                                    <span
+                                        class="size-1.5 rounded-full bg-muted-foreground/20"
+                                    ></span>
+                                    <span class="text-foreground">{phrase}</span
+                                    >
+                                </li>
+                            {/each}
+                        </ul>
+                    {/if}
+
                     <div class="rounded-lg pt-4">
                         <MarkdownContent
                             content={syncMarked(uploadState.persona.content)}
