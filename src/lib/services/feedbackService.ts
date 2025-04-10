@@ -8,12 +8,14 @@ export class FeedbackService {
 
     async getFeedback(studentMessageHistory: StudentMessage[], caseId: string): Promise<FeedbackResponse> {
         // Return different mock data based on caseId
-        if (caseId === '11') {
-            return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
-        }
-        return Promise.resolve(mockFeedback as unknown as FeedbackResponse);
+        // if (caseId === '2') {
+        //     return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
+        // }
+        // else {
+        //     return Promise.resolve(mockFeedback as unknown as FeedbackResponse);
+        // }   
 
-        /* Commented out API call for now
+
         try {
             const url = caseId
                 ? `${this.baseUrl}/get-feedback?case_id=${encodeURIComponent(caseId)}`
@@ -36,7 +38,7 @@ export class FeedbackService {
             console.error('Error getting feedback:', error);
             throw error;
         }
-        */
+
     }
 }
 
