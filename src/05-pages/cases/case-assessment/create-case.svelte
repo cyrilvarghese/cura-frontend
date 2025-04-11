@@ -18,6 +18,7 @@
     } from "$lib/services/caseDataService";
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
     import GoogleDocLink from "$lib/components/ui/google-doc-link.svelte";
+    import { setContext } from "svelte";
 
     const caseDataService = new CaseDataService();
 
@@ -29,6 +30,9 @@
     let caseId = $state<string | null>(null);
 
     const { type = "new" } = $props<{ type?: "new" | "edit" }>();
+
+    // Set the context at the top level
+    setContext("case-type", type);
 
     const initialValue: CaseStoreState = {
         generating: false,

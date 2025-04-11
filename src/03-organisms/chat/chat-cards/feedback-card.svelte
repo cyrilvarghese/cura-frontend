@@ -146,6 +146,17 @@
         selectedTest = test;
         isTestDialogOpen = true;
     }
+
+    let expandedQuestions: Set<number> = new Set();
+
+    function toggleQuestion(index: number) {
+        if (expandedQuestions.has(index)) {
+            expandedQuestions.delete(index);
+        } else {
+            expandedQuestions.add(index);
+        }
+        expandedQuestions = expandedQuestions; // trigger reactivity
+    }
 </script>
 
 <div class="bg-card rounded-lg p-4 shadow-sm border space-y-4">
@@ -251,11 +262,16 @@
                                                 <thead>
                                                     <tr>
                                                         {#if categoryFeedback.missed.table_headers}
-                                                            {#each categoryFeedback.missed.table_headers as header}
+                                                            {#each categoryFeedback.missed.table_headers as header, index}
                                                                 <th
                                                                     class="text-left p-2 border-b bg-muted font-medium whitespace-nowrap"
-                                                                    >{header}</th
+                                                                    style={index ===
+                                                                    0
+                                                                        ? "width: 180px"
+                                                                        : ""}
                                                                 >
+                                                                    {header}
+                                                                </th>
                                                             {/each}
                                                         {/if}
                                                     </tr>
@@ -268,6 +284,10 @@
                                                             {#each row as cell, cellIndex}
                                                                 <td
                                                                     class="p-2 text-muted-foreground"
+                                                                    style={cellIndex ===
+                                                                    0
+                                                                        ? "width: 180px"
+                                                                        : ""}
                                                                 >
                                                                     {#if cellIndex === 0}
                                                                         <!-- First column is drug name - Updated styling -->

@@ -15,6 +15,7 @@ export interface TestResult {
     results: TestResultContent;
     interpretation: string;
     timestamp: Date | null;
+    comments: string[];
 }
 export interface UploadResponse {
     patient_prompt: string;
@@ -55,6 +56,7 @@ export interface ExaminationResult {
     timestamp: Date | null;
     status: TestStatus;
     interpretation: string;
+    comments: string[];
 }
 
 export interface ExaminationState {

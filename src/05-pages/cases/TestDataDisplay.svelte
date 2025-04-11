@@ -1,7 +1,7 @@
 <script lang="ts">
     import ExaminationCard from "../../03-organisms/chat/chat-cards/examination-card.svelte";
     import TestResultCard from "../../03-organisms/chat/chat-cards/test-result-card.svelte";
-        export let testData: {
+    export let testData: {
         physical_exam: Record<string, any>;
         lab_test: Record<string, any>;
     };
@@ -20,6 +20,7 @@
                     status: examDetails.status,
                     interpretation: examDetails.interpretation,
                     timestamp: new Date(),
+                    comments: examDetails.comments,
                 }}
             />
         {/each}
@@ -37,6 +38,7 @@
                     status: testDetails.status,
                     interpretation: testDetails.interpretation,
                     timestamp: new Date(),
+                    comments: testDetails.comments,
                 }}
             />
         {/each}

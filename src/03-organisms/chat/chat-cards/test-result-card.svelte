@@ -5,11 +5,13 @@
     import { getRelativeTime } from "$lib/utils/time";
     import TestResultsTable from "./test-results-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
-    import type { TestResult, TestResultContent } from "$lib/types";
+    import type { TestResult, TestResultContent } from "$lib/types/index";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     import getFullImageUrl from "$lib/utils/getFullURl";
+    import CommentButton from "$lib/components/ui/comment-button.svelte";
+    import { getContext } from "svelte";
 
     const {
         result,
@@ -18,6 +20,8 @@
         result: TestResult;
         caseId?: string;
     }>();
+
+    const caseType = getContext<"new" | "edit">("case-type");
 
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
@@ -67,11 +71,24 @@
                 <TestTube class="h-5 w-5 text-amber-900/70" />
                 <Card.Title class="pr-4">{result.testName}</Card.Title>
             </div>
-            <Badge
-                class={statusColors[result.status as keyof typeof statusColors]}
-            >
-                {result.status}
-            </Badge>
+            <div class="flex items-center gap-2">
+                {#if caseType === "edit"}
+                    <CommentButton
+                        {caseId}
+                        testName={result.testName}
+                        testType="lab_test"
+                        initialCommentCount={result.total_comments ?? 0}
+                        initialComments={result.comments ?? []}
+                    />
+                {/if}
+                <Badge
+                    class={statusColors[
+                        result.status as keyof typeof statusColors
+                    ]}
+                >
+                    {result.status}
+                </Badge>
+            </div>
         </div>
         <Card.Description class="mt-2">{result.purpose}</Card.Description>
     </Card.Header>

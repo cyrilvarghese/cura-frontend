@@ -6,19 +6,14 @@
     import Loader2 from "lucide-svelte/icons/loader-2";
 
     export let open = false;
-    // svelte-ignore export_let_unused
-    export let onSubmit: (diagnosis: {
-        primaryDiagnosis: {
-            text: string;
-            justification: string;
-        };
-    }) => void;
+    export let onSubmit: () => void;
 
     let finalDiagnosis = "";
     let justification = "";
     let isSubmitting = false;
 
     async function handleSubmit() {
+        onSubmit();
         isSubmitting = true;
         try {
             const messageContent = `Primary Diagnosis: ${finalDiagnosis}\nJustification: ${justification}\nDifferential Diagnoses: `;
@@ -33,7 +28,7 @@
 
             // Get feedback
             const feedbackResponse = await feedbackStore.getFeedback(
-                $studentMessageHistory
+                $studentMessageHistory,
             );
 
             // Send feedback directly

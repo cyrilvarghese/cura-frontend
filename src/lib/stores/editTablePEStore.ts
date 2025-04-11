@@ -1,10 +1,14 @@
 import { writable } from 'svelte/store';
-import { testTableService } from '$lib/services/editTablePEService';
+import { testTableService } from '$lib/services/editPhysicalExamTableService';
 
 interface TestTableState {
     isUpdating: boolean;
     error: string | null;
+    comments?: string[];
+    totalComments?: number;
+    testName?: string;
 }
+
 
 function createEditPhysicalExamTableStore() {
     const { subscribe, set, update } = writable<TestTableState>({
@@ -71,6 +75,72 @@ function createEditPhysicalExamTableStore() {
         },
         reset: () => {
             set({ isUpdating: false, error: null });
+        },
+        addComment: async (
+            caseId: string,
+            testName: string,
+            testType: string,
+            comment: string
+        ) => {
+            update(state => ({ ...state, isUpdating: true, error: null }));
+
+            try {
+                const response = await testTableService.addComment({
+                    case_id: caseId,
+                    test_name: testName,
+                    test_type: testType,
+                    comment
+                });
+
+                update(state => ({
+                    ...state,
+                    isUpdating: false,
+                    comments: response.comments,
+                    totalComments: response.total_comments,
+                    testName: response.test_name
+                }));
+                return true;
+            } catch (error) {
+                update(state => ({
+                    ...state,
+                    isUpdating: false,
+                    error: error instanceof Error ? error.message : 'Failed to add comment'
+                }));
+                return false;
+            }
+        },
+        removeComment: async (
+            caseId: string,
+            testName: string,
+            testType: string,
+            commentIndex: number
+        ) => {
+            update(state => ({ ...state, isUpdating: true, error: null }));
+
+            try {
+                const response = await testTableService.removeComment({
+                    case_id: caseId,
+                    test_name: testName,
+                    test_type: testType,
+                    comment_index: commentIndex
+                });
+
+                update(state => ({
+                    ...state,
+                    isUpdating: false,
+                    comments: response.comments,
+                    totalComments: response.remaining_comments,
+                    testName: response.test_name
+                }));
+                return true;
+            } catch (error) {
+                update(state => ({
+                    ...state,
+                    isUpdating: false,
+                    error: error instanceof Error ? error.message : 'Failed to remove comment'
+                }));
+                return false;
+            }
         }
     };
 }

@@ -1,6 +1,13 @@
 import { writable, get } from 'svelte/store';
-import type { ExaminationState, ExaminationResult, FindingContent, ExaminationName } from '$lib/types';
+import type { ExaminationResult, FindingContent, ExaminationName, ExaminationState } from '$lib/types/index';
 import { caseDataStore } from './casePlayerStore';
+
+// Add type definition for physicalExamReports
+type PhysicalExamReports = Record<ExaminationName, {
+    purpose: string;
+    findings: FindingContent;
+    interpretation: string;
+}>;
 
 function createExaminationStore() {
     const { subscribe, update } = writable<ExaminationState>({
@@ -14,11 +21,11 @@ function createExaminationStore() {
         try {
             // Get data from caseDataStore instead of examination service
             const caseData = get(caseDataStore);
-            if (!caseData) {
-                throw new Error('Case data not loaded');
+            if (!caseData?.physicalExamReports) {
+                throw new Error("Case data not loaded");
             }
 
-            const examData = caseData.physicalExamReports[examName];
+            const examData = (caseData.physicalExamReports as PhysicalExamReports)[examName];
             if (!examData) {
                 throw new Error(`Examination data not found for ${examName}`);
             }

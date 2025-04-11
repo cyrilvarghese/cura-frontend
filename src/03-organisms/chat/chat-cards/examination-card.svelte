@@ -5,17 +5,23 @@
     import { getRelativeTime } from "$lib/utils/time";
     import FindingsTable from "./findings-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
-    import type { ExaminationResult, FindingContent } from "$lib/types";
+    import type { ExaminationResult, FindingContent } from "$lib/types/index";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    import { caseDataStore } from "$lib/stores/casePlayerStore";
-    import getFullImageUrl from "$lib/utils/getFullURl";
+    import { getContext } from "svelte";
+    import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
+    import CommentButton from "$lib/components/ui/comment-button.svelte";
 
     const caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     const { result } = $props<{
         result: ExaminationResult;
     }>();
+
+    const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
+
+    let comment = $state("");
+    let isPopoverOpen = $state(false);
 
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
@@ -44,12 +50,23 @@
                 <Stethoscope class="h-5 w-5 text-blue-500/70" />
                 <Card.Title class="pr-4">{result.name}</Card.Title>
             </div>
-            <Badge
-                variant="secondary"
-                class="bg-blue-500/10 text-blue-700 hover:bg-blue-500/20"
-            >
-                Physical Exam
-            </Badge>
+            <div class="flex items-center gap-2">
+                {#if caseType === "edit"}
+                    <CommentButton
+                        {caseId}
+                        testName={result.name}
+                        testType="physical_exam"
+                        initialCommentCount={result.comments?.length ?? 0}
+                        initialComments={result.comments ?? []}
+                    />
+                {/if}
+                <Badge
+                    variant="secondary"
+                    class="bg-blue-500/10 text-blue-700 hover:bg-blue-500/20"
+                >
+                    Physical Exam
+                </Badge>
+            </div>
         </div>
         <Card.Description class="mt-2">{result.purpose}</Card.Description>
     </Card.Header>

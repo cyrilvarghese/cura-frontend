@@ -42,7 +42,7 @@
     let treatmentProtocolDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("pre-treatment"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -102,17 +102,19 @@
     function handleDiagnosisSubmit() {
         console.log("Initial diagnosis submitted");
         diagnosisDialogOpen = false;
-        currentStep = "final-diagnosis";
+        currentStep = "pre-treatment";
     }
 
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
-        currentStep = "pre-treatment";
+        debugger;
+        currentStep = "end-case";
     }
 
     function handleEndCase() {
         console.log("Case ended");
+
         endCaseDialogOpen = false;
     }
 
@@ -125,7 +127,7 @@
     function handleTreatmentProtocolSubmit() {
         console.log("Treatment protocol submitted");
         treatmentProtocolDialogOpen = false;
-        currentStep = "end-case";
+        currentStep = "final-diagnosis";
     }
 
     const stepButtons = {
@@ -192,6 +194,7 @@
                     </p>
                 </div>
                 <div class="flex gap-2">
+                    {@debug currentStep}
                     {#if stepButtons[currentStep as keyof typeof stepButtons]}
                         {@const button =
                             stepButtons[
