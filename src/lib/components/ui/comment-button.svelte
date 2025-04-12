@@ -8,6 +8,7 @@
     import { Badge } from "$lib/components/ui/badge";
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
     import X from "lucide-svelte/icons/x";
+    import Check from "lucide-svelte/icons/check";
 
     const {
         caseId,
@@ -84,7 +85,7 @@
                                 class="ml-2 text-muted-foreground hover:text-foreground"
                                 onclick={() => handleRemoveComment(index)}
                             >
-                                <X class="h-3 w-3" />
+                                <Check class="h-3 w-3" />
                             </button>
                         </div>
                     {/each}

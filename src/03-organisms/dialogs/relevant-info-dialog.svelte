@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { Plus, X } from "lucide-svelte";
+    import { ArrowLeft, Plus, X } from "lucide-svelte";
     import Loader2 from "lucide-svelte/icons/loader-2";
     import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
@@ -158,28 +158,29 @@
             </div>
 
             <div class="mt-4 flex justify-between gap-2">
-                <Button
-                    variant="link"
-                    class="text-blue-600"
-                    onclick={handleSubmit}
-                    disabled={isEvaluating}
-                >
-                    {#if isEvaluating}
-                        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-                        checking...
-                    {:else}
-                        ? Check for missing findings
-                    {/if}
-                </Button>
                 <div class="flex flex-row gap-2">
-                    <Button variant="outline" onclick={closeDialog}
-                        >Cancel</Button
-                    >
-                    <Button
-                        disabled={isEvaluating || relevantPoints.length === 0}
-                        onclick={handleContinue}
-                    >
-                        Continue
+                    {#if evaluationResponse}
+                        <Button
+                            disabled={isEvaluating ||
+                                relevantPoints.length === 0}
+                            onclick={handleContinue}
+                        >
+                            Submit Current Findings
+                        </Button>
+                    {/if}
+                </div>
+                <div class="flex flex-row gap-2">
+                    <Button variant="outline" onclick={closeDialog}>
+                        <ArrowLeft class="h-4 w-4" />
+                        Back to conversation
+                    </Button>
+                    <Button onclick={handleSubmit} disabled={isEvaluating}>
+                        {#if isEvaluating}
+                            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                            Submitting...
+                        {:else}
+                            Submit
+                        {/if}
                     </Button>
                 </div>
             </div>
