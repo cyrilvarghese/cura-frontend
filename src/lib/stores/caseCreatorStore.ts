@@ -34,6 +34,7 @@ export interface CaseStoreState {
     isSearchingImages: boolean;
     selectedDocumentName: string | null;
     googleDocLink: string | null;
+    doc_has_changed: boolean;
 }
 
 // Create a writable store with initial state
@@ -56,6 +57,7 @@ const initialState: CaseStoreState = {
     isSearchingImages: false,
     selectedDocumentName: null,
     googleDocLink: null,
+    doc_has_changed: false,
 };
 
 export const caseStore = writable<CaseStoreState>(initialState);
@@ -272,7 +274,7 @@ export async function loadExistingCase(id: string) {
                 quote: caseData.coverImage?.quote || "",
             },
             googleDocLink: caseData.googleDocLink || null,
-
+            doc_has_changed: caseData.doc_has_changed || false,
             differentialDiagnosis: caseData.differentialDiagnosis,
             selectedDocumentName: caseData.selectedDocumentName,
         }));

@@ -31,6 +31,8 @@ interface CaseDetailsResponse {
             department: string;
             published: boolean;
             google_doc_link: string;
+            doc_has_changed: boolean;
+
         };
         test_data: {
             physical_exam: any;
@@ -137,6 +139,7 @@ export class CaseDataService {
             searchedImages: null,
             selectedDocumentName: data.content.case_cover.case_name,
             googleDocLink: data.content.case_cover.google_doc_link,
+            doc_has_changed: data.content.case_cover.doc_has_changed,
         };
     }
 } 

@@ -62,6 +62,7 @@
         },
         selectedDocumentName: null,
         googleDocLink: null,
+        doc_has_changed: false,
     };
 
     let uploadState = $state(initialValue);
@@ -217,6 +218,7 @@
             await caseDataService.publishCase(uploadState.caseId!, params);
 
             publishSuccess = true;
+            uploadState.doc_has_changed = false;
         } catch (error) {
             publishError =
                 error instanceof Error
@@ -240,6 +242,12 @@
             docName={uploadState.selectedDocumentName || ""}
             docLink={uploadState.googleDocLink}
         />
+        {#if uploadState.doc_has_changed}
+            <span class="text-xs text-red-600">
+                ( This case is out of date with the Google Doc. Please update
+                the case )
+            </span>
+        {/if}
     {:else}
         Create a new case for
         <GoogleDocLink
