@@ -1,44 +1,132 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { Plus, X } from "lucide-svelte";
+    import { Plus, X, CheckCircle2, Flag, Ban } from "lucide-svelte";
     import Loader2 from "lucide-svelte/icons/loader-2";
     import { sendMessage } from "$lib/stores/apiStore";
+    import { Checkbox } from "$lib/components/ui/checkbox";
+    import { treatmentProtocolStore } from "$lib/stores/treatmentProtocolStore";
+    import MedicationItem from "../../02-molecules/medication-item.svelte";
 
-    export let open = false;
-    export let onSubmit: () => void;
+    let { open = $bindable(), onSubmit } = $props<{
+        open: boolean;
+        onSubmit: () => void;
+    }>();
 
     type MedicationProtocol = {
         drugName: string;
         dosage: string;
-        notes: string;
+        indication: string;
+        isPrimary: boolean;
+        feedback: {
+            match: boolean;
+            classification_correct: boolean;
+            reason: string;
+        };
     };
 
-    let medications: MedicationProtocol[] = [];
-    let newDrug = "";
-    let newDosage = "";
-    let newNotes = "";
-    let isSubmitting = false;
+    let { medications } = $state({ medications: [] as MedicationProtocol[] });
+    let {
+        newDrug,
+        newDosage,
+        newIndication,
+        newMedicationIsPrimary,
+        isSubmitting,
+        feedback,
+    } = $state({
+        newDrug: "",
+        newDosage: "",
+        newIndication: "",
+        newMedicationIsPrimary: false,
+        isSubmitting: false,
+        feedback: {
+            match: false,
+            classification_correct: false,
+            reason: "",
+        },
+    });
 
-    function addMedication() {
+    let dosageInput: HTMLInputElement;
+    let indicationInput: HTMLInputElement;
+    let drugNameInput: HTMLInputElement;
+    let isAddingMedication = $state(false);
+
+    let { showSuccess, successMessage } = $state({
+        showSuccess: false,
+        successMessage: "",
+    });
+
+    async function addMedication() {
         if (newDrug.trim() && newDosage.trim()) {
-            medications = [
-                ...medications,
-                {
-                    drugName: newDrug.trim(),
-                    dosage: newDosage.trim(),
-                    notes: newNotes.trim(),
-                },
-            ];
-            // Clear inputs after adding
-            newDrug = "";
-            newDosage = "";
-            newNotes = "";
+            try {
+                isAddingMedication = true;
+                const response =
+                    await treatmentProtocolStore.evaluateTreatmentProtocol(
+                        newDrug.trim(),
+                        newDosage.trim(),
+                        newIndication.trim(),
+                        newMedicationIsPrimary,
+                    );
+
+                showSuccess = true;
+                successMessage = "First line of treatment";
+
+                medications = [
+                    ...medications,
+                    {
+                        drugName: newDrug.trim(),
+                        dosage: newDosage.trim(),
+                        indication: newIndication.trim(),
+                        isPrimary: newMedicationIsPrimary,
+                        feedback: response.feedback,
+                    },
+                ];
+
+                newDrug = "";
+                newDosage = "";
+                newIndication = "";
+                newMedicationIsPrimary = false;
+                drugNameInput.focus();
+            } catch (error) {
+                feedback = {
+                    match: false,
+                    classification_correct: false,
+                    reason: "",
+                };
+                showSuccess = false;
+                successMessage = "";
+                console.error("Error:", error);
+            } finally {
+                isAddingMedication = false;
+            }
         }
     }
 
     function removeMedication(index: number) {
         medications = medications.filter((_, i) => i !== index);
+    }
+
+    async function togglePrimary(index: number) {
+        const med = medications[index];
+        try {
+            const feedback =
+                await treatmentProtocolStore.evaluateTreatmentProtocol(
+                    med.drugName,
+                    med.dosage,
+                    med.indication,
+                    !med.isPrimary, // toggled state
+                );
+            console.log(
+                "Treatment Protocol Feedback (Primary Toggle):",
+                feedback,
+            );
+
+            medications = medications.map((m, i) =>
+                i === index ? { ...m, isPrimary: !m.isPrimary } : m,
+            );
+        } catch (error) {
+            console.error("Error getting treatment protocol feedback:", error);
+        }
     }
 
     async function handleSubmit() {
@@ -66,10 +154,31 @@
             isSubmitting = false;
         }
     }
+
+    function handleInputKeyDown(e: KeyboardEvent) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (e.ctrlKey) {
+                if (!isSubmitting && medications.length > 0) {
+                    handleSubmit();
+                }
+            } else {
+                if (e.target === drugNameInput) dosageInput.focus();
+                else if (e.target === dosageInput) indicationInput.focus();
+                else if (
+                    e.target === indicationInput &&
+                    newDrug.trim() &&
+                    newDosage.trim()
+                ) {
+                    addMedication();
+                }
+            }
+        }
+    }
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content class="sm:max-w-[800px]">
+    <Dialog.Content class="sm:max-w-[800px]" onkeydown={handleInputKeyDown}>
         <Dialog.Header>
             <Dialog.Title>Treatment Protocol</Dialog.Title>
             <Dialog.Description>
@@ -80,47 +189,83 @@
         <div class="grid gap-6 py-4">
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div class="grid gap-2">
-                        <label class="text-sm font-medium text-gray-700"
+                    <div class="space-y-2">
+                        <label
+                            for="drugName"
+                            class="text-sm font-medium text-gray-700"
                             >Drug Name</label
                         >
-                        <input
-                            type="text"
-                            class="rounded-md border p-2"
-                            placeholder="e.g., Hydroxyzine, Loratadine"
-                            bind:value={newDrug}
-                        />
+                        <div class="space-y-1.5">
+                            <input
+                                type="text"
+                                class="w-full rounded-md border p-2"
+                                placeholder="e.g., Hydroxyzine, Loratadine"
+                                bind:value={newDrug}
+                                bind:this={drugNameInput}
+                                onkeydown={handleInputKeyDown}
+                            />
+                        </div>
                     </div>
-                    <div class="grid gap-2">
-                        <label class="text-sm font-medium text-gray-700"
+
+                    <div class="space-y-2">
+                        <label
+                            for="dosage"
+                            class="text-sm font-medium text-gray-700"
                             >Dosage</label
                         >
                         <input
                             type="text"
-                            class="rounded-md border p-2"
-                            placeholder="e.g., 25-50 mg, 10 mg"
+                            class="w-full rounded-md border p-2"
+                            placeholder="e.g., 10 mg/once daily"
                             bind:value={newDosage}
+                            bind:this={dosageInput}
+                            onkeydown={handleInputKeyDown}
                         />
                     </div>
-                    <div class="grid gap-2">
-                        <label class="text-sm font-medium text-gray-700"
-                            >Additional Notes</label
+
+                    <div class="space-y-2">
+                        <label
+                            for="indication"
+                            class="text-sm font-medium text-gray-700"
+                            >Indication</label
                         >
                         <div class="flex gap-2">
                             <input
                                 type="text"
                                 class="flex-1 rounded-md border p-2"
-                                placeholder="e.g., Take at bedtime, Take with food"
-                                bind:value={newNotes}
+                                placeholder="e.g., for night time Pruritus"
+                                bind:value={newIndication}
+                                bind:this={indicationInput}
+                                onkeydown={handleInputKeyDown}
                             />
+
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onclick={addMedication}
-                                disabled={!newDrug.trim() || !newDosage.trim()}
+                                type="button"
+                                disabled={!newDrug.trim() ||
+                                    !newDosage.trim() ||
+                                    isAddingMedication}
                             >
-                                <Plus class="h-4 w-4" />
+                                {#if isAddingMedication}
+                                    <Loader2 class="h-4 w-4 animate-spin" />
+                                {:else}
+                                    <Plus class="h-4 w-4" />
+                                {/if}
                             </Button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <Checkbox
+                                id="firstLine"
+                                bind:checked={newMedicationIsPrimary}
+                            />
+                            <label
+                                for="firstLine"
+                                class="text-sm text-gray-600"
+                            >
+                                First line of treatment
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -135,29 +280,10 @@
 
                 <div class="space-y-2">
                     {#each medications as med, index}
-                        <div
-                            class="flex items-center justify-between bg-gray-50 p-3 rounded-md"
-                        >
-                            <div class="flex-1 flex gap-2">
-                                <span class="font-medium">{med.drugName}</span>
-                                <span class="text-gray-500">-</span>
-                                <span>{med.dosage}</span>
-                                {#if med.notes}
-                                    <span class="text-gray-500">-</span>
-                                    <span class="text-gray-600"
-                                        >{med.notes}</span
-                                    >
-                                {/if}
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onclick={() => removeMedication(index)}
-                                class="text-gray-500 hover:text-gray-700 ml-2"
-                            >
-                                <X class="h-4 w-4" />
-                            </Button>
-                        </div>
+                        <MedicationItem
+                            medication={med}
+                            onRemove={() => removeMedication(index)}
+                        />
                     {/each}
                 </div>
             </div>
@@ -183,3 +309,10 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+
+{#if showSuccess}
+    <div class="flex items-center gap-2 text-green-600">
+        <Flag class="h-4 w-4" />
+        <span class="text-sm">{successMessage}</span>
+    </div>
+{/if}

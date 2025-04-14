@@ -6,7 +6,8 @@
     type MedicationProtocol = {
         drugName: string;
         dosage: string;
-        notes: string;
+        indication: string;
+        isPrimary: boolean;
     };
 
     type TreatmentData = {
@@ -35,18 +36,21 @@
                 <div class="space-y-2 border-b pb-3 last:border-b-0">
                     <Badge
                         variant="outline"
-                        class="bg-green-50/50 text-green-800 hover:bg-green-50/80 border-green-200 flex items-center gap-1"
+                        class="bg-green-50/50 text-green-800 hover:bg-green-50/80 border-green-200 flex items-center gap-1 text-base font-medium"
                     >
                         <Pill class="h-3 w-3" />
                         {med.drugName}
+                        {#if med.isPrimary}
+                            <span class="ml-2 text-xs">(First line)</span>
+                        {/if}
                     </Badge>
                     <div class="pl-4 space-y-1">
-                        <p class="text-sm text-green-800 font-medium">
+                        <p class="text-sm text-green-800">
                             Dosage: {med.dosage}
                         </p>
-                        {#if med.notes}
+                        {#if med.indication}
                             <p class="text-sm text-green-600">
-                                Note: {med.notes}
+                                Indication: {med.indication}
                             </p>
                         {/if}
                     </div>

@@ -140,6 +140,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
         | 'relevant-info'
         | 'final-diagnosis'
         | 'pre-treatment'
+        | 'treatment-protocol'
         | 'feedback' = 'text'
 
 ) {

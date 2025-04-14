@@ -8,9 +8,8 @@
     import { CheckCircle2, XCircle, AlertCircle } from "lucide-svelte";
     import { preTreatmentStore } from "$lib/stores/preTreatmentStore";
     import type { TestFeedback } from "$lib/services/preTreatmentService";
-    import { Toggle } from "$lib/components/ui/toggle";
     import { Input } from "$lib/components/ui/input";
-    import * as Popover from "$lib/components/ui/popover";
+    import TestFeedbackPopover from "../../03-molecules/test-feedback-popover.svelte";
 
     let { open = $bindable(false), onSubmit } = $props<{
         open?: boolean;
@@ -43,6 +42,9 @@
     let isSubmitting = $state(false);
     let feedbackResults = $state<Record<string, TestFeedback>>({});
     let isMonitoringLoading = $state(false);
+
+    let showWhatItIs = $state(false);
+    let showWhereUsed = $state(false);
 
     async function addInvestigation() {
         if (newInvestigation.name.trim()) {
@@ -164,10 +166,19 @@
     }
 
     function getStatusIcon(testName: string) {
+        //This is added here because sometimes the match is not a boolean because of the llm
         const feedback = feedbackResults[testName];
         if (!feedback) return null;
 
-        switch (feedback.match) {
+        // Convert match to boolean if it's a string (except "NA")
+        const match =
+            feedback.match === "NA"
+                ? "NA"
+                : typeof feedback.match === "string"
+                  ? feedback.match === "true"
+                  : feedback.match;
+
+        switch (match) {
             case true:
                 return CheckCircle2;
             case false:
@@ -183,7 +194,15 @@
         const feedback = feedbackResults[testName];
         if (!feedback) return "";
 
-        switch (feedback.match) {
+        // Convert match to boolean if it's a string (except "NA")
+        const match =
+            feedback.match === "NA"
+                ? "NA"
+                : typeof feedback.match === "string"
+                  ? feedback.match === "true"
+                  : feedback.match;
+
+        switch (match) {
             case true:
                 return "text-green-500";
             case false:
@@ -236,76 +255,11 @@
 
                 <div class="flex flex-wrap gap-2">
                     {#each investigations as investigation, index}
-                        <Popover.Root>
-                            <Popover.Trigger>
-                                <Toggle
-                                    variant="outline"
-                                    size="sm"
-                                    pressed
-                                    class="group"
-                                >
-                                    {#if getStatusIcon(investigation.name)}
-                                        {@const Icon = getStatusIcon(
-                                            investigation.name,
-                                        )}
-                                        <Icon
-                                            class="mr-2 h-3 w-3 {getStatusColor(
-                                                investigation.name,
-                                            )}"
-                                        />
-                                    {/if}
-                                    <span>{investigation.name}</span>
-                                    <button
-                                        class="ml-2 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
-                                        onclick={() =>
-                                            removeInvestigation(index)}
-                                    >
-                                        <X class="h-3 w-3" />
-                                    </button>
-                                </Toggle>
-                            </Popover.Trigger>
-                            {#if feedbackResults[investigation.name]}
-                                <Popover.Content class="w-80">
-                                    <div class="space-y-2">
-                                        <p class="font-medium">
-                                            {investigation.name}
-                                        </p>
-                                        {#if feedbackResults[investigation.name].match === "NA"}
-                                            <p class="text-destructive">
-                                                Details not found
-                                            </p>
-                                        {:else}
-                                            <div class="text-sm space-y-1">
-                                                <p>
-                                                    <span class="font-medium"
-                                                        >Specific:</span
-                                                    >
-                                                    {feedbackResults[
-                                                        investigation.name
-                                                    ].specific}
-                                                </p>
-                                                <p>
-                                                    <span class="font-medium"
-                                                        >General:</span
-                                                    >
-                                                    {feedbackResults[
-                                                        investigation.name
-                                                    ].general}
-                                                </p>
-                                                <p>
-                                                    <span class="font-medium"
-                                                        >Lateral:</span
-                                                    >
-                                                    {feedbackResults[
-                                                        investigation.name
-                                                    ].lateral}
-                                                </p>
-                                            </div>
-                                        {/if}
-                                    </div>
-                                </Popover.Content>
-                            {/if}
-                        </Popover.Root>
+                        <TestFeedbackPopover
+                            name={investigation.name}
+                            feedback={feedbackResults[investigation.name]}
+                            onRemove={() => removeInvestigation(index)}
+                        />
                     {/each}
                 </div>
             </div>
@@ -318,17 +272,17 @@
                         <div class="flex items-center gap-2">
                             <Input
                                 type="text"
-                                id="monitoring-timepoint"
-                                placeholder="Time point..."
-                                bind:value={newMonitoring.timePoint}
+                                id="monitoring-test"
+                                placeholder="Test..."
+                                bind:value={newMonitoring.test}
                                 onkeydown={handleMonitoringKeydown}
                                 disabled={isMonitoringLoading}
                             />
                             <Input
                                 type="text"
-                                id="monitoring-test"
-                                placeholder="Test..."
-                                bind:value={newMonitoring.test}
+                                id="monitoring-timepoint"
+                                placeholder="Time point..."
+                                bind:value={newMonitoring.timePoint}
                                 onkeydown={handleMonitoringKeydown}
                                 disabled={isMonitoringLoading}
                             />
@@ -348,79 +302,13 @@
 
                         <div class="flex flex-wrap gap-2 mt-2">
                             {#each monitoring as monitor, index}
-                                <Popover.Root>
-                                    <Popover.Trigger>
-                                        <Toggle
-                                            variant="outline"
-                                            size="sm"
-                                            pressed
-                                            class="group"
-                                        >
-                                            {#if getStatusIcon(monitor.fullText)}
-                                                {@const Icon = getStatusIcon(
-                                                    monitor.fullText,
-                                                )}
-                                                <Icon
-                                                    class="mr-2 h-3 w-3 {getStatusColor(
-                                                        monitor.fullText,
-                                                    )}"
-                                                />
-                                            {/if}
-                                            <span
-                                                >{monitor.test} ({monitor.timePoint})</span
-                                            >
-                                            <button
-                                                class="ml-2 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
-                                                onclick={() =>
-                                                    removeMonitoring(index)}
-                                            >
-                                                <X class="h-3 w-3" />
-                                            </button>
-                                        </Toggle>
-                                    </Popover.Trigger>
-                                    <Popover.Content class="w-80">
-                                        <div class="space-y-2">
-                                            <p class="font-medium">
-                                                {monitor.fullText}
-                                            </p>
-                                            {#if feedbackResults[monitor.fullText]?.match === "NA"}
-                                                <p class="text-destructive">
-                                                    Details not found
-                                                </p>
-                                            {:else if feedbackResults[monitor.fullText]}
-                                                <div class="text-sm space-y-1">
-                                                    <p>
-                                                        <span
-                                                            class="font-medium"
-                                                            >Specific:</span
-                                                        >
-                                                        {feedbackResults[
-                                                            monitor.fullText
-                                                        ].specific}
-                                                    </p>
-                                                    <p>
-                                                        <span
-                                                            class="font-medium"
-                                                            >General:</span
-                                                        >
-                                                        {feedbackResults[
-                                                            monitor.fullText
-                                                        ].general}
-                                                    </p>
-                                                    <p>
-                                                        <span
-                                                            class="font-medium"
-                                                            >Lateral:</span
-                                                        >
-                                                        {feedbackResults[
-                                                            monitor.fullText
-                                                        ].lateral}
-                                                    </p>
-                                                </div>
-                                            {/if}
-                                        </div>
-                                    </Popover.Content>
-                                </Popover.Root>
+                                <TestFeedbackPopover
+                                    name={monitor.fullText}
+                                    timePoint={monitor.timePoint}
+                                    test={monitor.test}
+                                    feedback={feedbackResults[monitor.fullText]}
+                                    onRemove={() => removeMonitoring(index)}
+                                />
                             {/each}
                         </div>
                     </div>

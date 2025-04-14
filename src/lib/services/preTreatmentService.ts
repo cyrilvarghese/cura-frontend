@@ -46,7 +46,7 @@ export class PreTreatmentService {
 
     async evaluatePreTreatment(input: string[], caseId: string): Promise<PreTreatmentResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/pre_treatment`, {
+            const response = await fetch(`${this.baseUrl}/feedback/pre_treatment_gemini`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export class PreTreatmentService {
 
     async evaluateMonitoring(monitoringInputs: string[], caseId: string): Promise<MonitoringResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/monitoring`, {
+            const response = await fetch(`${this.baseUrl}/feedback/monitoring_gemini`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
