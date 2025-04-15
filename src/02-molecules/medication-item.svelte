@@ -1,24 +1,33 @@
 <script lang="ts">
-    import { CheckCircle2, Flag, Ban, X } from "lucide-svelte";
+    import { X } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
+    import MedicationDetailsPopover from "../03-molecules/medication-details-popover.svelte";
+    import type {
+        DrugDetails,
+        TreatmentFeedback,
+    } from "$lib/services/treatmentProtocolService";
 
-    export let medication: {
-        drugName: string;
-        dosage: string;
-        indication?: string;
-        feedback: {
-            match: boolean | "NA";
-            classification_correct: boolean;
-            reason: string;
+    const { medication, onRemove } = $props<{
+        medication: {
+            drugName: string;
+            dosage: string;
+            indication?: string;
+            isPrimary?: boolean;
+            feedback: TreatmentFeedback;
         };
-    };
+        onRemove: () => void;
+    }>();
 
-    export let onRemove: () => void;
-
-    $: bgColor =
+    const bgColor = $derived(
         Boolean(medication.feedback.match) && medication.feedback.match !== "NA"
             ? "bg-gray-50"
-            : "bg-red-50";
+            : "bg-red-50",
+    );
+
+    const isMatch = $derived(
+        Boolean(medication.feedback.match) &&
+            medication.feedback.match !== "NA",
+    );
 </script>
 
 <div class="flex items-center justify-between {bgColor} p-3 rounded-md">
@@ -30,46 +39,37 @@
             {#if medication.indication}
                 <span class="text-gray-600">- {medication.indication}</span>
             {/if}
-            {#if medication.feedback.match !== "NA"}
-                {#if medication.feedback.classification_correct}
-                    <span
-                        class="text-green-600 cursor-help"
-                        title="Well done! you identified the first line of treatment!"
-                    >
-                        ⭐
-                    </span>
-                {:else}
-                    <Ban class="h-4 w-4 text-red-600" />
-                {/if}
+            <span
+                class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full"
+            >
+                {medication.feedback.details.class}
+            </span>
+            {#if medication.feedback.classification_correct}
+                <span
+                    class="text-green-600 cursor-help"
+                    title="Well done - you identified the first line of treatment!"
+                >
+                    ⭐
+                </span>
             {/if}
         </div>
 
         <!-- Feedback section -->
         <div class="flex items-center gap-4">
-            {#if Boolean(medication.feedback.match) && medication.feedback.match !== "NA"}
+            {#if isMatch}
                 <div class="flex items-start justify-start flex-row gap-2">
                     <span class="text-green-600">✅</span>
-                    <span class="text-sm text-gray-600 w-[600px]"
-                        >{medication.feedback.reason}
-                        <Button
-                            variant="link"
-                            class="text-sm p-0 h-0 text-blue-800 hover:underline"
-                        >
-                            Read more
-                        </Button>
+                    <span class="text-sm text-gray-600 w-[600px]">
+                        {medication.feedback.reason}
+                        <MedicationDetailsPopover {medication} {isMatch} />
                     </span>
                 </div>
             {:else}
                 <div class="flex items-start justify-start gap-2">
                     <span class="text-sm">❌</span>
-                    <span class="text-sm text-gray-600 w-[600px]"
-                        >{medication.feedback.reason}
-                        <Button
-                            variant="link"
-                            class="text-sm p-0 h-0 text-blue-800 hover:underline"
-                        >
-                            Read more
-                        </Button>
+                    <span class="text-sm text-gray-600 w-[600px]">
+                        {medication.feedback.reason}
+                        <MedicationDetailsPopover {medication} {isMatch} />
                     </span>
                 </div>
             {/if}

@@ -23,7 +23,6 @@
     <Card.Header>
         <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
-                <Pill class="h-5 w-5 text-gray-900/70" />
                 <Card.Title class="text-gray-600">Treatment Protocol</Card.Title
                 >
             </div>
@@ -45,12 +44,12 @@
                         {/if}
                     </Badge>
                     <div class="pl-4 space-y-1">
-                        <p class="text-sm text-green-800">
-                            Dosage: {med.dosage}
+                        <p class="text-md text-green-800">
+                            {med.dosage}
                         </p>
                         {#if med.indication}
-                            <p class="text-sm text-green-600">
-                                Indication: {med.indication}
+                            <p class="text-sm">
+                                {med.indication}
                             </p>
                         {/if}
                     </div>

@@ -238,24 +238,33 @@
                                 bind:this={indicationInput}
                                 onkeydown={handleInputKeyDown}
                             />
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onclick={addMedication}
-                                type="button"
-                                disabled={!newDrug.trim() ||
-                                    !newDosage.trim() ||
-                                    isAddingMedication}
+                            <div
+                                title={!newDrug.trim()
+                                    ? "Please enter a drug name"
+                                    : !newDosage.trim()
+                                      ? "Please enter a dosage"
+                                      : !newIndication.trim()
+                                        ? "Please enter an indication"
+                                        : "Add medication"}
                             >
-                                {#if isAddingMedication}
-                                    <Loader2 class="h-4 w-4 animate-spin" />
-                                {:else}
-                                    <Plus class="h-4 w-4" />
-                                {/if}
-                            </Button>
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    onclick={addMedication}
+                                    disabled={!newDrug.trim() ||
+                                        !newDosage.trim() ||
+                                        !newIndication.trim() ||
+                                        isAddingMedication}
+                                >
+                                    {#if isAddingMedication}
+                                        <Loader2 class="h-4 w-4 animate-spin" />
+                                    {:else}
+                                        <Plus class="h-4 w-4" />
+                                    {/if}
+                                </Button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <!-- <div class="flex items-center gap-2">
                             <Checkbox
                                 id="firstLine"
                                 bind:checked={newMedicationIsPrimary}
@@ -266,7 +275,7 @@
                             >
                                 First line of treatment
                             </label>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -294,18 +303,25 @@
                 <Button variant="outline" disabled={isSubmitting}>Cancel</Button
                 >
             </Dialog.Close>
-            <Button
-                variant="default"
-                onclick={handleSubmit}
-                disabled={medications.length === 0 || isSubmitting}
+            <div
+                class="flex items-center gap-2"
+                title={medications.length === 0
+                    ? "Please add at least one medication"
+                    : "Submit treatment protocol"}
             >
-                {#if isSubmitting}
-                    <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                {:else}
-                    Submit Protocol
-                {/if}
-            </Button>
+                <Button
+                    variant="default"
+                    onclick={handleSubmit}
+                    disabled={medications.length === 0 || isSubmitting}
+                >
+                    {#if isSubmitting}
+                        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                        Submitting...
+                    {:else}
+                        Submit Protocol
+                    {/if}
+                </Button>
+            </div>
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
