@@ -29,11 +29,23 @@ export class GoogleDocsService {
         try {
             const response = await fetch(`${this.baseUrl}/google-docs`);
             if (!response.ok) {
-                toast.error('Failed to fetch Google docs', {
-                    id: toastId,
-                    description: 'Please try again later'
-                });
-                throw new Error('Failed to fetch Google docs');
+                if (response.status === 504) {
+                    toast.error('Google Docs API is down', {
+                        id: toastId,
+                        description: 'Retrying...'
+                    });
+                    setTimeout(async () => {
+                        await this.getAllDocs();
+                    }, 1000);
+                    toast.dismiss();
+                }
+                else {
+                    toast.error('Failed to fetch Google docs', {
+                        id: toastId,
+                        description: 'Please try again later'
+                    });
+                    throw new Error('Failed to fetch Google docs');
+                }
             }
             const data = await response.json();
             return data as GoogleDoc[];
