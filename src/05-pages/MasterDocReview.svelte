@@ -13,7 +13,6 @@
     import { Skeleton } from "$lib/components/ui/skeleton";
     import DocumentUploadButton from "$lib/components/DocumentUploadButton.svelte";
     import { navigate } from "svelte-routing";
-    import { setSelectedCaseDocument } from "$lib/stores/documentStore";
     import {
         DropdownMenu,
         DropdownMenuContent,
@@ -21,6 +20,8 @@
         DropdownMenuTrigger,
     } from "$lib/components/ui/dropdown-menu";
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
+    import { Checkbox } from "$lib/components/ui/checkbox/index.js";
+    import { Label } from "$lib/components/ui/label/index.js";
     // Direct state declarations without import
     let searchQuery = $state("");
     let isLoading = $state(true);
@@ -29,6 +30,7 @@
     let isDeleting = $state(false);
     let isApproving = $state(false);
     let isUploading = $state(false);
+    let showPendingOnly = $state(false);
 
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
@@ -62,16 +64,24 @@
 
     // Modify the filtered cases to remove tab filtering
     let filteredCases = $derived(
-        caseReviews.filter(
-            (review) =>
+        caseReviews.filter((review) => {
+            // First apply search filter
+            const matchesSearch =
                 !searchQuery ||
                 review.title
                     .toLowerCase()
                     .includes(searchQuery.toLowerCase()) ||
                 review.docLink
                     .toLowerCase()
-                    .includes(searchQuery.toLowerCase()),
-        ),
+                    .includes(searchQuery.toLowerCase());
+
+            // Then apply pending filter if enabled
+            return (
+                matchesSearch &&
+                (!showPendingOnly ||
+                    review.status === "Document Review Pending")
+            );
+        }),
     );
 
     function getStatusColor(status: string) {
@@ -185,9 +195,25 @@
         </div>
     </div>
 
-    <p class="text-gray-500 mb-8">
-        Review and manage submitted master documents from your department.
-    </p>
+    <div class="mb-6 flex items-center justify-between">
+        <p class="text-gray-500">
+            Review and manage submitted master documents from your department.
+        </p>
+        <div class="flex items-center space-x-2">
+            <Checkbox
+                id="pendingFilter"
+                bind:checked={showPendingOnly}
+                aria-labelledby="pending-filter-label"
+            />
+            <Label
+                id="pending-filter-label"
+                for="pendingFilter"
+                class="text-gray-700 cursor-pointer"
+            >
+                Show Pending Review Only
+            </Label>
+        </div>
+    </div>
 
     <div class="mt-6">
         <div class="overflow-x-auto">
