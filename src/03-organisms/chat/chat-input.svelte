@@ -5,9 +5,9 @@
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     import { examinationStore } from "$lib/stores/examinationStore";
     import { laboratoryStore } from "$lib/stores/labTestStore";
-    import type { ExaminationName } from "$lib/types";
-    import type { DiagnosticTestName } from "$lib/types";
-    import type { ExaminationResult } from "$lib/types";
+    import type { ExaminationName } from "$lib/types/index";
+    import type { DiagnosticTestName } from "$lib/types/index";
+    import type { ExaminationResult } from "$lib/types/index";
     import LabTestsDropdown from "../lab-tests/LabTestsDropdown.svelte";
     import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
     import { onMount } from "svelte";
@@ -61,6 +61,7 @@
                     interpretation:
                         result.interpretation || "Results are being analyzed.",
                     timestamp: result.timestamp,
+                    comments: result.comments,
                 },
                 timestamp: new Date(),
                 type: "test-result",
@@ -77,7 +78,7 @@
 
     async function handlePhysicalExam(examName: ExaminationName) {
         const result = await examinationStore.performPhysicalExam(examName);
-      
+
         if (result) {
             const message = {
                 id: crypto.randomUUID(),
@@ -113,7 +114,7 @@
         bind:value={textValue}
         class="flex-1 pl-[320px] pt-8 pr-12  focus-visible:ring-black/30"
         placeholder="Type your message... (Ctrl+Enter to send)"
-        disabled={isLoading} 
+        disabled={isLoading}
         onkeydown={handleKeyDown}
     />
     <div class="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2">

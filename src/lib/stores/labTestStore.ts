@@ -1,6 +1,6 @@
 import { writable, get } from 'svelte/store';
-import type { DiagnosticTestName } from '$lib/types';
-import type { TestResult } from '$lib/types';
+import type { DiagnosticTestName } from '$lib/types/index';
+import type { TestResult } from '$lib/types/index';
 import { caseDataStore } from './casePlayerStore';
 
 interface LabState {
@@ -30,7 +30,7 @@ const initialState: LabState = {
 function createLabStore() {
     const { subscribe, update } = writable<LabState>(initialState);
 
-    async function orderTest(testName: DiagnosticTestName) {
+    async function orderTest(testName: DiagnosticTestName, generatedData?: any) {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
@@ -40,19 +40,39 @@ function createLabStore() {
                 throw new Error('Case data not loaded');
             }
 
-            const testData = caseData.labTestReports[testName];
-            if (!testData) {
+            let result: TestResult;
+
+            // Check if the test exists in case data
+            if (testName in caseData.labTestReports) {
+                // Use type assertion to tell TypeScript this is safe
+                const testData = caseData.labTestReports[testName as keyof typeof caseData.labTestReports];
+
+                result = {
+                    testName,
+                    purpose: testData.purpose,
+                    results: testData.results,
+                    interpretation: testData.interpretation,
+                    timestamp: new Date(),
+                    status: 'completed' as const,
+                    comments: []
+                };
+            }
+            // If we have generated data, use it
+            else if (generatedData) {
+                result = {
+                    testName: generatedData.testName,
+                    purpose: generatedData.purpose,
+                    results: generatedData.results,
+                    interpretation: generatedData.interpretation,
+                    timestamp: new Date(),
+                    status: generatedData.status || 'completed' as const,
+                    comments: generatedData.comments || []
+                };
+            }
+            // No data available
+            else {
                 throw new Error(`Lab test data not found for ${testName}`);
             }
-
-            const result: TestResult = {
-                testName,
-                purpose: testData.purpose,
-                results: testData.results,
-                interpretation: testData.interpretation,
-                timestamp: new Date(),
-                status: 'completed' as const
-            };
 
             update(state => ({
                 ...state,

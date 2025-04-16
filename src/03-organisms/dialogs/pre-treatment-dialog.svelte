@@ -43,8 +43,13 @@
     let feedbackResults = $state<Record<string, TestFeedback>>({});
     let isMonitoringLoading = $state(false);
 
-    let showWhatItIs = $state(false);
-    let showWhereUsed = $state(false);
+    // Define the feedback structure to match the API response
+    interface FeedbackItem {
+        match: boolean;
+        specific: string;
+        general: string;
+        lateral: string;
+    }
 
     async function addInvestigation() {
         if (newInvestigation.name.trim()) {
@@ -54,6 +59,8 @@
                     newInvestigation.name.split(","),
                 );
                 feedbackResults = { ...feedbackResults, ...response.feedback };
+                debugger;
+                console.log(feedbackResults);
                 investigations = [
                     ...investigations,
                     { name: newInvestigation.name.trim() },
@@ -162,55 +169,6 @@
             console.error("Error submitting pre-treatment information:", error);
         } finally {
             isSubmitting = false;
-        }
-    }
-
-    function getStatusIcon(testName: string) {
-        //This is added here because sometimes the match is not a boolean because of the llm
-        const feedback = feedbackResults[testName];
-        if (!feedback) return null;
-
-        // Convert match to boolean if it's a string (except "NA")
-        const match =
-            feedback.match === "NA"
-                ? "NA"
-                : typeof feedback.match === "string"
-                  ? feedback.match === "true"
-                  : feedback.match;
-
-        switch (match) {
-            case true:
-                return CheckCircle2;
-            case false:
-                return XCircle;
-            case "NA":
-                return AlertCircle;
-            default:
-                return null;
-        }
-    }
-
-    function getStatusColor(testName: string) {
-        const feedback = feedbackResults[testName];
-        if (!feedback) return "";
-
-        // Convert match to boolean if it's a string (except "NA")
-        const match =
-            feedback.match === "NA"
-                ? "NA"
-                : typeof feedback.match === "string"
-                  ? feedback.match === "true"
-                  : feedback.match;
-
-        switch (match) {
-            case true:
-                return "text-green-500";
-            case false:
-                return "text-destructive";
-            case "NA":
-                return "text-yellow-500";
-            default:
-                return "";
         }
     }
 </script>

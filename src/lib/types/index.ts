@@ -78,7 +78,8 @@ export type ExaminationName =
     | 'Oral Examination'
     | 'Hair and Scalp Examination'
     | 'Spinal Examination'
-    | 'Peripheral Vascular Examination';
+    | 'Peripheral Vascular Examination'
+    | any;
 
 export type DiagnosticTestName =
     | 'Complete Blood Count and ESR'
@@ -88,7 +89,8 @@ export type DiagnosticTestName =
     | 'Rheumatoid Factor'
     | 'Anti-dsDNA and Anti-Sm'
     | 'Allergy Panel'
-    | 'Chest Imaging';
+    | 'Chest Imaging'
+    | any;
 
 
 

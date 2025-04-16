@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { ArrowLeft, Plus, X } from "lucide-svelte";
+    import { ArrowLeft, Plus, X, CheckCircle, XCircle } from "lucide-svelte";
     import Loader2 from "lucide-svelte/icons/loader-2";
     import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
@@ -10,6 +10,7 @@
     import { get } from "svelte/store";
     import EvaluationFeedback from "../../02-molecules/evaluation-feedback.svelte";
     import type { EvaluationResponse } from "$lib/services/evaluationService";
+    import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 
     let { open = $bindable(), onSubmit } = $props<{
         open: boolean;
@@ -29,11 +30,50 @@
     let evaluationResponse = $state<EvaluationResponse | null>(null);
     let isEvaluating = $state(false);
 
+    // Add this to track evaluation results for each point
+    let pointEvaluations = $state<Record<string, boolean>>({});
+    let evaluationInProgress = $state<Record<string, boolean>>({});
+
+    // Add this to store messages
+    let evaluationMessages = $state<Record<string, string>>({});
+
     // Function to add a new point
-    function addPoint() {
+    async function addPoint() {
         if (newPoint.trim()) {
-            relevantPoints = [...relevantPoints, newPoint.trim()];
+            const point = newPoint.trim();
+
+            // Add the point immediately
+            relevantPoints = [...relevantPoints, point];
+
+            // Mark this point as being evaluated
+            evaluationInProgress = { ...evaluationInProgress, [point]: true };
+
+            // Clear the input
             newPoint = "";
+
+            try {
+                // Call the API to evaluate the point
+                const result =
+                    await evaluationStore.evaluateSingleFinding(point);
+
+                // Store the evaluation result and message
+                pointEvaluations = {
+                    ...pointEvaluations,
+                    [point]: result.evaluation.match,
+                };
+                evaluationMessages = {
+                    ...evaluationMessages,
+                    [point]: result.evaluation.message,
+                };
+            } catch (error) {
+                console.error("Error evaluating point:", error);
+            } finally {
+                // Mark evaluation as complete
+                evaluationInProgress = {
+                    ...evaluationInProgress,
+                    [point]: false,
+                };
+            }
         }
     }
 
@@ -138,11 +178,50 @@
                     <div class="space-y-2">
                         {#each relevantPoints as point, index}
                             <div class="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    class="flex-1 rounded-md border p-2 bg-gray-50"
-                                    value={point}
-                                />
+                                <div
+                                    class="flex-1 flex-start rounded-md border p-2 bg-gray-50 flex items-center gap-2"
+                                >
+                                    <p>{point}</p>
+
+                                    {#if evaluationInProgress[point]}
+                                        <div
+                                            class="w-5 h-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+                                        ></div>
+                                    {:else if point in pointEvaluations}
+                                        <Tooltip.Provider>
+                                            <Tooltip.Root>
+                                                <Tooltip.Trigger class="pt-2">
+                                                    {#if pointEvaluations[point]}
+                                                        <Tooltip.Trigger>
+                                                            <CheckCircle
+                                                                class="h-5 w-5 text-green-500 flex-shrink-0"
+                                                            />
+                                                        </Tooltip.Trigger>
+                                                    {:else}
+                                                        <Tooltip.Trigger>
+                                                            <XCircle
+                                                                class="h-5 w-5 text-red-500 flex-shrink-0"
+                                                            />
+                                                        </Tooltip.Trigger>
+                                                    {/if}
+                                                </Tooltip.Trigger>
+                                                <Tooltip.Content>
+                                                    <p>
+                                                        {evaluationMessages[
+                                                            point
+                                                        ] ||
+                                                            (pointEvaluations[
+                                                                point
+                                                            ]
+                                                                ? "Correct finding"
+                                                                : "Incorrect finding")}
+                                                    </p>
+                                                </Tooltip.Content>
+                                            </Tooltip.Root>
+                                        </Tooltip.Provider>
+                                    {/if}
+                                </div>
+
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -158,24 +237,22 @@
             </div>
 
             <div class="mt-4 flex justify-between gap-2">
-                <div class="flex flex-row gap-2">
-                    {#if evaluationResponse}
-                        <Button
-                            disabled={isEvaluating ||
-                                relevantPoints.length === 0}
-                            onclick={handleContinue}
-                        >
-                            Submit Current Findings
-                        </Button>
-                    {/if}
-                </div>
+                <div class="flex flex-row gap-2"></div>
                 <div class="flex flex-row gap-2">
                     <Button variant="outline" onclick={closeDialog}>
                         <ArrowLeft class="h-4 w-4" />
                         Back to conversation
                     </Button>
                     <Button onclick={handleSubmit} disabled={isEvaluating}>
-                        {#if isEvaluating}
+                        {#if evaluationResponse}
+                            <Button
+                                disabled={isEvaluating ||
+                                    relevantPoints.length === 0}
+                                onclick={handleContinue}
+                            >
+                                Submit Current Findings
+                            </Button>
+                        {:else if isEvaluating}
                             <Loader2 class="mr-2 h-4 w-4 animate-spin" />
                             Submitting...
                         {:else}

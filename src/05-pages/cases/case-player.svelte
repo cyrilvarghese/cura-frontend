@@ -14,7 +14,6 @@
     import FinalDiagnosisDialog from "../../03-organisms/dialogs/final-diagnosis-dialog.svelte";
     import EndCaseDialog from "../../03-organisms/dialogs/end-case-dialog.svelte";
     import { studentMessageHistory } from "$lib/stores/apiStore";
-    import * as Breadcrumb from "$lib/components/ui/breadcrumb";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { fetchCaseData } from "$lib/stores/casePlayerStore";
     import { onDestroy } from "svelte";
@@ -24,8 +23,8 @@
     import InvestigationDialog from "../../03-organisms/dialogs/pre-treatment-dialog.svelte";
     import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
     import { Pill } from "lucide-svelte";
-    import { authStore } from "$lib/stores/authStore";
-
+    import mixpanel from "mixpanel-browser";
+    import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -35,7 +34,7 @@
     });
     const messages = $derived($apiStore.messages);
     const error = $derived($apiStore.error);
-    import mixpanel from "mixpanel-browser";
+
     let relevantInfoDialogOpen = $state(false);
     let diagnosisDialogOpen = $state(false);
     let finalDiagnosisDialogOpen = $state(false);
@@ -44,7 +43,7 @@
     let treatmentProtocolDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("pre-treatment"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -109,19 +108,22 @@
     function handleDiagnosisSubmit() {
         console.log("Initial diagnosis submitted");
         diagnosisDialogOpen = false;
-        currentStep = "pre-treatment";
+        currentStep = "final-diagnosis";
     }
 
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
-        debugger;
-        currentStep = "end-case";
+        currentStep = "pre-treatment";
     }
 
     function handleEndCase() {
         console.log("Case ended");
-
+        mixpanel.track("end case", {
+            "case ID": id,
+            "current step": currentStep,
+            "end time": new Date().toISOString(),
+        });
         endCaseDialogOpen = false;
     }
 
@@ -134,12 +136,7 @@
     function handleTreatmentProtocolSubmit() {
         console.log("Treatment protocol submitted");
         treatmentProtocolDialogOpen = false;
-        currentStep = "final-diagnosis";
-        mixpanel.track("end case", {
-            "case ID": id,
-            "current step": currentStep,
-            "end time": new Date().toISOString(),
-        });
+        currentStep = "end";
     }
 
     const stepButtons = {
@@ -257,7 +254,8 @@
             </ScrollArea>
 
             <div class=" pl-0 pt-6 border-t">
-                <ChatInput />
+                <!-- <ChatInput /> -->
+                <TestAutocomplete caseId={id} />
             </div>
         </div>
 

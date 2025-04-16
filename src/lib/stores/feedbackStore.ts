@@ -21,6 +21,7 @@ function createFeedbackStore() {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
+            console.log(studentMessageHistory);
             const response = await feedbackService.getFeedback(studentMessageHistory, get(currentCaseId) ?? '');
 
             update(state => ({

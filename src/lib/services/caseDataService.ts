@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { CaseStoreState } from '$lib/stores/caseCreatorStore';
 import type { CaseData } from '$lib/stores/casePlayerStore';
-import type { FormattedPersonaResponse } from '$lib/types';
+import type { FormattedPersonaResponse } from '$lib/types/index';
 
 export interface CaseListItem {
     case_id: number;

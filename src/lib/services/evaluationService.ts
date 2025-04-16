@@ -31,6 +31,18 @@ export interface EvaluationResponse {
     case_id: string;
 }
 
+export interface SingleFindingEvaluation {
+    finding: string;
+    evaluation: {
+        match: boolean;
+        message: string;
+        matched_finding?: string;
+    };
+    timestamp: string;
+    case_id: string;
+    metadata: Record<string, any>;
+}
+
 export class EvaluationService {
     private baseUrl = API_BASE_URL;
 
@@ -54,6 +66,30 @@ export class EvaluationService {
             return response.json();
         } catch (error) {
             console.error('Error evaluating findings:', error);
+            throw error;
+        }
+    }
+
+    async evaluateSingleFinding(finding: string, caseId: string): Promise<SingleFindingEvaluation> {
+        try {
+            const response = await fetch(`${this.baseUrl}/evaluate-single-finding`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    finding,
+                    case_id: caseId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to evaluate single finding');
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('Error evaluating single finding:', error);
             throw error;
         }
     }

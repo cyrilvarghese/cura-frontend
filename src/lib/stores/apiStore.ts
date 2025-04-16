@@ -225,7 +225,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
 
         default: // All other steps (examination, diagnosis, treatment)
             // Add artificial delay to simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // await new Promise(resolve => setTimeout(resolve, 1000));
             // Update store with simulated response for non-patient-history steps
             // types: text, image, test-result, examination, diagnosis, relevant-info, final-diagnosis, feedback
             let resultContent: TestResult | ExaminationResult;

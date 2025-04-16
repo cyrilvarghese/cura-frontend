@@ -310,9 +310,6 @@
                                                                         review.title,
                                                                 },
                                                             );
-                                                            // You can add analytics tracking here
-                                                            // For example: mixpanel.track('Document Link Clicked', { docId: review.docId, title: review.title });
-                                                            // The default navigation behavior will still occur
                                                         }}
                                                     >
                                                         {review.title}
