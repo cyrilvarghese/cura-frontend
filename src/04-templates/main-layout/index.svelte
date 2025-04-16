@@ -4,8 +4,6 @@
 	import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 	import { Route, Router, useLocation, navigate } from "svelte-routing";
 	import CasePlayer from "../../05-pages/cases/case-player.svelte";
-	import { fetchCases } from "$lib/stores/casePlayerStore";
-	import { onMount } from "svelte";
 	import CurriculumPage from "../../05-pages/CurriculumPage.svelte";
 	import CaseLibraryPage from "../../05-pages/CaseLibrary.svelte";
 	import CaseAssessment from "../../05-pages/cases/case-assessment/create-case-wrapper.svelte";
@@ -23,19 +21,21 @@
 	import MasterDocReview from "../../05-pages/MasterDocReview.svelte";
 	import { Toaster } from "svelte-sonner";
 	import CaseEditPage from "../../05-pages/cases/case-edit.svelte";
+	import mixpanel from "mixpanel-browser";
 
 	// Get the current URL for Router
 	export let url = "";
 
 	const location = useLocation();
-	$: isAuthRoute =
-		typeof window !== "undefined" &&
-		(window.location.pathname.includes("login") ||
-			window.location.pathname.includes("signup"));
 
 	$: if (!$isAuthenticated) {
 		navigate("/login", { replace: true });
 	}
+	mixpanel.init("d9cb0f2d5c9b4205ebf8939b60e2395c", {
+		debug: true,
+		track_pageview: true,
+		persistence: "localStorage",
+	});
 </script>
 
 <Toaster position="top-center" />

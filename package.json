@@ -13,6 +13,7 @@
     "@internationalized/date": "^3.5.6",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/mixpanel-browser": "^2.54.0",
     "@types/node": "^22.9.1",
     "autoprefixer": "^10.4.20",
     "bits-ui": "^1.0.0-next.63",
@@ -44,6 +45,7 @@
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
     "marked": "^15.0.3",
+    "mixpanel-browser": "^2.63.0",
     "path": "^0.12.7",
     "surge": "^0.24.6"
   }

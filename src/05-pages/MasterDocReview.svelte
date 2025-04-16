@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { googleDocsStore } from "$lib/stores/googleDocsStore";
     import PageLayout from "../04-templates/page-layout.svelte";
+    import mixpanel from "mixpanel-browser";
     import {
         ClipboardCheck,
         Search,
@@ -295,6 +296,24 @@
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         class="text-blue-600 hover:text-blue-800 hover:underline truncate block max-w-[300px]"
+                                                        onclick={() => {
+                                                            // Track the click event
+                                                            console.log(
+                                                                `Document clicked: ${review.title}`,
+                                                            );
+                                                            mixpanel.track(
+                                                                "Document Link Clicked",
+                                                                {
+                                                                    "doc ID":
+                                                                        review.docId,
+                                                                    "doc title":
+                                                                        review.title,
+                                                                },
+                                                            );
+                                                            // You can add analytics tracking here
+                                                            // For example: mixpanel.track('Document Link Clicked', { docId: review.docId, title: review.title });
+                                                            // The default navigation behavior will still occur
+                                                        }}
                                                     >
                                                         {review.title}
                                                     </a>

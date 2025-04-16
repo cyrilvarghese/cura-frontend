@@ -36,7 +36,7 @@ export class EvaluationService {
 
     async evaluateFindings(findings: string[], caseId: string): Promise<EvaluationResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/evaluate-findings`, {
+            const response = await fetch(`${this.baseUrl}/evaluate-findings-gemini`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

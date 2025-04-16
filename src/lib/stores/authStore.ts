@@ -1,5 +1,6 @@
 import { writable, get, derived } from 'svelte/store';
 import { authService } from '../services/authService';
+import mixpanel from "mixpanel-browser";
 
 interface AuthState {
     user: {
@@ -43,6 +44,16 @@ function createAuthStore() {
                 error: null
             };
 
+            mixpanel.identify(response.user.id)
+
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'role': response.user.role
+                // Add anything else about the user here
+            });
+            mixpanel.track('Sign Up')
+
             set(newState);
 
             if (typeof window !== 'undefined') {
@@ -74,6 +85,14 @@ function createAuthStore() {
                 isLoading: false,
                 error: null
             };
+            mixpanel.identify(response.user.id)
+
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'role': response.user.role
+                // Add anything else about the user here
+            });
 
             set(newState);
 

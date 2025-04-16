@@ -24,6 +24,8 @@
     import InvestigationDialog from "../../03-organisms/dialogs/pre-treatment-dialog.svelte";
     import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
     import { Pill } from "lucide-svelte";
+    import { authStore } from "$lib/stores/authStore";
+
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -33,7 +35,7 @@
     });
     const messages = $derived($apiStore.messages);
     const error = $derived($apiStore.error);
-
+    import mixpanel from "mixpanel-browser";
     let relevantInfoDialogOpen = $state(false);
     let diagnosisDialogOpen = $state(false);
     let finalDiagnosisDialogOpen = $state(false);
@@ -42,7 +44,7 @@
     let treatmentProtocolDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("treatment-protocol"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -82,6 +84,11 @@
     $effect(() => {
         console.log("Setting current case id to", id);
         currentCaseId.set(id);
+        mixpanel.track("start case", {
+            "case ID": id,
+            "current step": currentStep,
+            "start time": new Date().toISOString(),
+        });
     });
     $effect(() => {
         if (messages?.length) {
@@ -128,6 +135,11 @@
         console.log("Treatment protocol submitted");
         treatmentProtocolDialogOpen = false;
         currentStep = "final-diagnosis";
+        mixpanel.track("end case", {
+            "case ID": id,
+            "current step": currentStep,
+            "end time": new Date().toISOString(),
+        });
     }
 
     const stepButtons = {
