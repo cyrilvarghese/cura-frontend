@@ -69,7 +69,7 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <TestTube class="h-5 w-5 text-amber-900/70" />
-                <Card.Title class="pr-4">
+                <Card.Title class="pr-4 capitalize">
                     {result.testName}
                     {#if result.isVerified}
                         <span class="ml-1 text-green-600">✓</span>
@@ -95,7 +95,9 @@
                 </Badge>
             </div>
         </div>
-        <Card.Description class="mt-2">{result.purpose}</Card.Description>
+        {#if caseType === "edit"}
+            <Card.Description class="mt-2">{result.purpose}</Card.Description>
+        {/if}
     </Card.Header>
     <Card.Content class="grid gap-4">
         <div class="space-y-2 bg-amber-50/50 p-3 rounded-md">

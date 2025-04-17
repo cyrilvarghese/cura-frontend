@@ -18,12 +18,12 @@
     import { laboratoryStore } from "$lib/stores/labTestStore";
     import { examinationStore } from "$lib/stores/examinationStore";
     import { sendMessage } from "$lib/stores/apiStore";
+    import { caseDataStore } from "$lib/stores/casePlayerStore";
 
     // Import all test data
     import physicalExams from "$lib/data/physical_exam.json";
     import labTests from "$lib/data/lab_test.json";
     import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
-    import { caseDataStore } from "$lib/stores/casePlayerStore";
 
     const { caseId } = $props<{
         caseId?: string;
@@ -51,27 +51,33 @@
     const selectedValuePhysicalExams = $derived(
         valuePhysicalExams ? valuePhysicalExams : "Order Physical Exam...",
     );
-
-    // Get initial case data
+    let labTestsArray = $state<string[]>([]);
+    let physicalExamsArray = $state<string[]>([]);
+    // Get and monitor case data changes
     const initialCaseData = $caseDataStore;
+    console.log("Initial Case Data:", initialCaseData);
 
-    // Initialize arrays directly without filtering
-    const labTestsArray = [
-        ...new Set([
-            ...labTests,
-            ...Object.keys(initialCaseData?.labTestReports || {}),
-        ]),
-    ];
-    const physicalExamsArray = [
-        ...new Set([
-            ...physicalExams,
-            ...Object.keys(initialCaseData?.physicalExamReports || {}),
-        ]),
-    ];
-
-    onMount(() => {
-        console.log("Filtered Lab Tests:", labTestsArray);
-        console.log("Filtered Physical Exams:", physicalExamsArray);
+    $effect(() => {
+        if (
+            $caseDataStore?.labTestReports &&
+            $caseDataStore?.physicalExamReports &&
+            labTestsArray.length === 0 &&
+            physicalExamsArray.length === 0
+        ) {
+            labTestsArray = [
+                ...new Set([
+                    ...labTests,
+                    ...Object.keys($caseDataStore.labTestReports),
+                ]),
+            ];
+            physicalExamsArray = [
+                ...new Set([
+                    ...physicalExams,
+                    ...Object.keys($caseDataStore.physicalExamReports),
+                ]),
+            ];
+            console.log("Case Data Updated:", $caseDataStore);
+        }
     });
 
     // Close lab tests popover and refocus trigger button
@@ -93,8 +99,6 @@
     onMount(() => {
         if (triggerRefLabTests) {
             triggerRefLabTests.focus();
-            let labTestData = $caseDataStore?.labTestReports;
-            let examData = $caseDataStore?.physicalExamReports;
         }
     });
 
@@ -287,60 +291,6 @@
 <div class="relative space-y-4">
     <!-- Autocompletes in the same row -->
     <div class="flex gap-4">
-        <!-- Lab Tests Autocomplete -->
-        <div class="flex-1">
-            <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
-            <Popover.Root bind:open={openLabTests}>
-                <Popover.Trigger bind:ref={triggerRefLabTests}>
-                    {#snippet child({ props })}
-                        <Button
-                            variant="outline"
-                            class="w-full justify-between"
-                            {...props}
-                            role="combobox"
-                            aria-expanded={openLabTests}
-                        >
-                            <TestTubeDiagonal class="h-5 w-5" />
-                            {selectedValueLabTests}
-                            <ChevronsUpDown
-                                class="ml-2 h-4 w-4 shrink-0 opacity-50"
-                            />
-                        </Button>
-                    {/snippet}
-                </Popover.Trigger>
-                <Popover.Content class="w-[300px] p-0">
-                    <Command.Root>
-                        <Command.Input
-                            placeholder="SEARCH FOR A LAB TEST..."
-                            class="h-9"
-                        />
-                        <Command.List class="max-h-[300px] overflow-y-auto">
-                            <Command.Empty>No test found.</Command.Empty>
-                            <Command.Group>
-                                {#each labTestsArray as test}
-                                    <Command.Item
-                                        value={test}
-                                        onSelect={() =>
-                                            handleSelectLabTest(test)}
-                                    >
-                                        <Check
-                                            class={cn(
-                                                "mr-2 h-4 w-4",
-                                                valueLabTests.toLowerCase() !==
-                                                    test.toLowerCase() &&
-                                                    "text-transparent",
-                                            )}
-                                        />
-                                        {test.toUpperCase()}
-                                    </Command.Item>
-                                {/each}
-                            </Command.Group>
-                        </Command.List>
-                    </Command.Root>
-                </Popover.Content>
-            </Popover.Root>
-        </div>
-
         <!-- Physical Exams Autocomplete -->
         <div class="flex-1">
             <!-- <h3 class="text-sm font-medium mb-2">Physical Exams</h3> -->
@@ -348,17 +298,18 @@
                 <Popover.Trigger bind:ref={triggerRefPhysicalExams}>
                     {#snippet child({ props })}
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             class="w-full justify-between"
                             {...props}
                             role="combobox"
                             aria-expanded={openPhysicalExams}
                         >
-                            <ScanEye class="h-5 w-5" />
-                            {selectedValuePhysicalExams}
-                            <ChevronsUpDown
-                                class="ml-2 h-4 w-4 shrink-0 opacity-50"
-                            />
+                            <p class="hover:text-blue-600 flex items-center">
+                                <ScanEye class="h-5 w-5 mr-2" />
+                                <span class="">
+                                    {selectedValuePhysicalExams}
+                                </span>
+                            </p>
                         </Button>
                     {/snippet}
                 </Popover.Trigger>
@@ -386,6 +337,61 @@
                                             )}
                                         />
                                         {exam.toUpperCase()}
+                                    </Command.Item>
+                                {/each}
+                            </Command.Group>
+                        </Command.List>
+                    </Command.Root>
+                </Popover.Content>
+            </Popover.Root>
+        </div>
+        <p class="text-gray-500 pt-2">|</p>
+        <!-- Lab Tests Autocomplete -->
+        <div class="flex-1">
+            <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
+            <Popover.Root bind:open={openLabTests}>
+                <Popover.Trigger bind:ref={triggerRefLabTests}>
+                    {#snippet child({ props })}
+                        <Button
+                            variant="ghost"
+                            class="w-full justify-between"
+                            {...props}
+                            role="combobox"
+                            aria-expanded={openLabTests}
+                        >
+                            <p class="hover:text-blue-600 flex items-center">
+                                <TestTubeDiagonal class="h-5 w-5 mr-2" />
+                                <span class="w-[100px] truncate">
+                                    {selectedValueLabTests}
+                                </span>
+                            </p>
+                        </Button>
+                    {/snippet}
+                </Popover.Trigger>
+                <Popover.Content class="w-[300px] p-0">
+                    <Command.Root>
+                        <Command.Input
+                            placeholder="SEARCH FOR A LAB TEST..."
+                            class="h-9"
+                        />
+                        <Command.List class="max-h-[300px] overflow-y-auto">
+                            <Command.Empty>No test found.</Command.Empty>
+                            <Command.Group>
+                                {#each labTestsArray as test}
+                                    <Command.Item
+                                        value={test}
+                                        onSelect={() =>
+                                            handleSelectLabTest(test)}
+                                    >
+                                        <Check
+                                            class={cn(
+                                                "mr-2 h-4 w-4",
+                                                valueLabTests.toLowerCase() !==
+                                                    test.toLowerCase() &&
+                                                    "text-transparent",
+                                            )}
+                                        />
+                                        {test.toUpperCase()}
                                     </Command.Item>
                                 {/each}
                             </Command.Group>

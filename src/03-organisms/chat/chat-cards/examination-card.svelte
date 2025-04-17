@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
     import { Badge } from "$lib/components/ui/badge";
-    import Stethoscope from "lucide-svelte/icons/stethoscope";
+    import ScanEye from "lucide-svelte/icons/scan-eye";
     import { getRelativeTime } from "$lib/utils/time";
     import FindingsTable from "./findings-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
@@ -19,9 +19,6 @@
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
-
-    let comment = $state("");
-    let isPopoverOpen = $state(false);
 
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
@@ -47,8 +44,8 @@
     <Card.Header>
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <Stethoscope class="h-5 w-5 text-blue-500/70" />
-                <Card.Title class="pr-4">
+                <ScanEye class="h-5 w-5 text-blue-500/70" />
+                <Card.Title class="pr-4 capitalize">
                     {result.name}
                     {#if result.isVerified}
                         <span class="ml-1 text-green-600">✓</span>
@@ -73,7 +70,9 @@
                 </Badge>
             </div>
         </div>
-        <Card.Description class="mt-2">{result.purpose}</Card.Description>
+        {#if caseType === "edit"}
+            <Card.Description class="mt-2">{result.purpose}</Card.Description>
+        {/if}
     </Card.Header>
     <Card.Content>
         <div class="space-y-2 bg-blue-50/50 p-3 rounded-md">

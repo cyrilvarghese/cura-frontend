@@ -114,7 +114,7 @@
     <Textarea
         bind:ref={textareaRef}
         bind:value={textValue}
-        class="flex-1 pl-[500px] pt-8 pr-12  focus-visible:ring-black/30"
+        class="flex-1 pl-[440px] pt-8 pr-12  focus-visible:ring-black/30"
         placeholder="Type your message... (Ctrl+Enter to send)"
         disabled={isLoading}
         onkeydown={handleKeyDown}
@@ -141,6 +141,7 @@
             <p class="text-gray-500 pt-2">|</p>
         </Tooltip.Provider> -->
         <TestAutocomplete {caseId} />
+        <p class="text-gray-500 pt-2">|</p>
     </div>
     <Button
         class="absolute right-2 top-1/2 -translate-y-1/2"
