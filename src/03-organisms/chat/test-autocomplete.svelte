@@ -11,6 +11,7 @@
         DiagnosticTestName,
         ExaminationName,
         ExaminationResult,
+        TestResult,
     } from "$lib/types/index";
     import { testValidatorStore } from "$lib/stores/testValidatorStore";
     import type { TestValidationResponse } from "$lib/services/testValidatorService";
@@ -21,6 +22,8 @@
     // Import all test data
     import physicalExams from "$lib/data/physical_exam.json";
     import labTests from "$lib/data/lab_test.json";
+    import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
+    import { caseDataStore } from "$lib/stores/casePlayerStore";
 
     const { caseId } = $props<{
         caseId?: string;
@@ -31,14 +34,12 @@
     let valueLabTests = $state("");
     let searchQueryLabTests = $state("");
     let triggerRefLabTests = $state<HTMLButtonElement>(null!);
-    let filteredLabTestsArray = $state<string[]>(labTests);
 
     // State for physical exams autocomplete
     let openPhysicalExams = $state(false);
     let valuePhysicalExams = $state("");
     let searchQueryPhysicalExams = $state("");
     let triggerRefPhysicalExams = $state<HTMLButtonElement>(null!);
-    let filteredPhysicalExamsArray = $state<string[]>(physicalExams);
 
     // Shared state
     let validationResult = $state<TestValidationResponse | null>(null);
@@ -47,53 +48,33 @@
 
     // Derived values
     const selectedValueLabTests = $derived(
-        valueLabTests ? valueLabTests : "Select a lab test...",
+        valueLabTests ? valueLabTests : "Order Lab Test...",
     );
     const selectedValuePhysicalExams = $derived(
-        valuePhysicalExams ? valuePhysicalExams : "Select a physical exam...",
+        valuePhysicalExams ? valuePhysicalExams : "Order Physical Exam...",
     );
 
-    // Filter lab tests based on search query
-    $effect(() => {
-        console.log("Lab Tests Search Query:", searchQueryLabTests);
-        console.log("All Lab Tests:", labTests);
-    });
+    // Get initial case data
+    const initialCaseData = $caseDataStore;
 
-    const filteredLabTests = $derived(
-        searchQueryLabTests
-            ? labTests.filter((test) =>
-                  test
-                      .toUpperCase()
-                      .includes(searchQueryLabTests.toUpperCase()),
-              )
-            : labTests,
-    );
+    // Initialize arrays
+    let filteredLabTestsArray = $state<string[]>([
+        ...labTests,
+        ...Object.keys(initialCaseData?.labTestReports || {}),
+    ]);
 
-    // Filter physical exams based on search query
-    $effect(() => {
-        console.log("Physical Exams Search Query:", searchQueryPhysicalExams);
-        console.log("All Physical Exams:", physicalExams);
-    });
+    let filteredPhysicalExamsArray = $state<string[]>([
+        ...physicalExams,
+        ...Object.keys(initialCaseData?.physicalExamReports || {}),
+    ]);
 
-    const filteredPhysicalExams = $derived(
-        searchQueryPhysicalExams
-            ? physicalExams.filter((exam) =>
-                  exam
-                      .toUpperCase()
-                      .includes(searchQueryPhysicalExams.toUpperCase()),
-              )
-            : physicalExams,
-    );
+    onMount(() => {
+        // Deduplicate arrays
+        filteredLabTestsArray = [...new Set(filteredLabTestsArray)];
+        filteredPhysicalExamsArray = [...new Set(filteredPhysicalExamsArray)];
 
-    // Log filtered results
-    $effect(() => {
-        console.log("Filtered Lab Tests:", filteredLabTests);
-        console.log("Number of filtered lab tests:", filteredLabTests.length);
-        console.log("Filtered Physical Exams:", filteredPhysicalExams);
-        console.log(
-            "Number of filtered physical exams:",
-            filteredPhysicalExams.length,
-        );
+        console.log("Filtered Lab Tests:", filteredLabTestsArray);
+        console.log("Filtered Physical Exams:", filteredPhysicalExamsArray);
     });
 
     // Close lab tests popover and refocus trigger button
@@ -113,6 +94,14 @@
             triggerRefPhysicalExams?.focus();
         });
     }
+
+    onMount(() => {
+        if (triggerRefLabTests) {
+            triggerRefLabTests.focus();
+            let labTestData = $caseDataStore?.labTestReports;
+            let examData = $caseDataStore?.physicalExamReports;
+        }
+    });
 
     // Handle lab test selection
     async function handleSelectLabTest(testName: string) {
@@ -139,10 +128,12 @@
             try {
                 let testToOrder;
                 let generatedData = null;
+                let isVerified = false;
 
                 if (result.result.match && result.result.matched_test) {
                     // If match is true, use the matched_test value
                     testToOrder = result.result.matched_test;
+                    isVerified = true;
                 } else if (result.result.generated_data) {
                     // If match is false but we have generated data, use that
                     testToOrder = result.result.generated_data.testName;
@@ -175,12 +166,13 @@
                                 "Results are being analyzed.",
                             timestamp: labResult.timestamp,
                             comments: labResult.comments,
+                            isVerified: isVerified,
                         },
                         timestamp: new Date(),
                         type: "test-result",
                     };
                     await sendMessage(
-                        message.content,
+                        message.content as TestResult,
                         "assistant",
                         "examination",
                         "test-result",
@@ -221,48 +213,72 @@
             validationResult = result;
             console.log("Exam validation result:", result);
 
-            // If match is true, perform the physical exam using matched_test value
-            if (result.result.match) {
-                isOrdering = true;
-                try {
-                    // Use matched_test value if available
-                    const examToPerform =
-                        result.result.matched_test || exactExamName;
-                    console.log("Performing physical exam:", examToPerform);
+            isOrdering = true;
+            try {
+                let examToPerform;
+                let generatedData = null;
+                let isVerified = false;
 
-                    // Perform the physical exam
-                    const examResult =
-                        await examinationStore.performPhysicalExam(
-                            examToPerform as ExaminationName,
-                        );
-
-                    if (examResult) {
-                        // Create and send message
-                        const message = {
-                            id: crypto.randomUUID(),
-                            sender: "assistant",
-                            content: {
-                                name: examResult.name,
-                                purpose: examResult.purpose,
-                                findings: examResult.findings,
-                                timestamp: examResult.timestamp,
-                            },
-                            timestamp: new Date(),
-                            type: "examination",
-                        };
-                        await sendMessage(
-                            message.content as ExaminationResult,
-                            "assistant",
-                            "examination",
-                            "examination",
-                        );
-                    }
-                    console.log("Physical exam result:", examResult);
-                } catch (error) {
-                    console.error("Error performing physical exam:", error);
-                } finally {
-                    isOrdering = false;
+                if (result.result.match && result.result.matched_test) {
+                    // If match is true, use the matched_test value
+                    examToPerform = result.result.matched_test;
+                    isVerified = true;
+                } else if (result.result.generated_data) {
+                    // If match is false but we have generated data, use that
+                    examToPerform = result.test_name;
+                    generatedData = result.result.generated_data;
+                } else {
+                    // Fallback to the original exam name
+                    examToPerform = exactExamName;
                 }
+
+                if (result.result.match && result.result.matched_test) {
+                    // If match is true, use the matched_test value
+                    examToPerform = result.result.matched_test;
+                    isVerified = true;
+                } else if (result.result.generated_data) {
+                    // If match is false but we have generated data, use that
+                    examToPerform = result.test_name;
+                    generatedData = result.result.generated_data;
+                } else {
+                    // Fallback to the original exam name
+                    examToPerform = exactExamName;
+                }
+
+                console.log("Performing physical exam:", examToPerform);
+
+                // Perform the physical exam with generated data if available
+                const examResult = await examinationStore.performPhysicalExam(
+                    examToPerform as ExaminationName,
+                    generatedData,
+                );
+
+                if (examResult) {
+                    // Add verification status to the content
+                    const content = {
+                        name: examResult.name,
+                        purpose: examResult.purpose,
+                        findings: examResult.findings,
+                        timestamp: examResult.timestamp,
+                        status: examResult.status,
+                        interpretation: examResult.interpretation,
+                        comments: examResult.comments,
+                        isVerified: isVerified, // Add verification flag
+                    };
+
+                    // Create and send message
+                    await sendMessage(
+                        content as ExaminationResult,
+                        "assistant",
+                        "examination",
+                        "examination",
+                    );
+                }
+                console.log("Physical exam result:", examResult);
+            } catch (error) {
+                console.error("Error performing physical exam:", error);
+            } finally {
+                isOrdering = false;
             }
         } catch (error) {
             console.error("Error validating exam:", error);
@@ -304,12 +320,7 @@
         );
         console.log("Filtered Physical Exams:", filteredPhysicalExamsArray);
     }
-
-    onMount(() => {
-        if (triggerRefLabTests) {
-            triggerRefLabTests.focus();
-        }
-    });
+    //subscribe to caseDataStore
 </script>
 
 <div class="relative space-y-4">
@@ -317,7 +328,7 @@
     <div class="flex gap-4">
         <!-- Lab Tests Autocomplete -->
         <div class="flex-1">
-            <h3 class="text-sm font-medium mb-2">Lab Tests</h3>
+            <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
             <Popover.Root bind:open={openLabTests}>
                 <Popover.Trigger bind:ref={triggerRefLabTests}>
                     {#snippet child({ props })}
@@ -328,6 +339,7 @@
                             role="combobox"
                             aria-expanded={openLabTests}
                         >
+                            <TestTubeDiagonal class="h-5 w-5" />
                             {selectedValueLabTests}
                             <ChevronsUpDown
                                 class="ml-2 h-4 w-4 shrink-0 opacity-50"
@@ -375,7 +387,7 @@
 
         <!-- Physical Exams Autocomplete -->
         <div class="flex-1">
-            <h3 class="text-sm font-medium mb-2">Physical Exams</h3>
+            <!-- <h3 class="text-sm font-medium mb-2">Physical Exams</h3> -->
             <Popover.Root bind:open={openPhysicalExams}>
                 <Popover.Trigger bind:ref={triggerRefPhysicalExams}>
                     {#snippet child({ props })}
@@ -386,6 +398,7 @@
                             role="combobox"
                             aria-expanded={openPhysicalExams}
                         >
+                            <ScanEye class="h-5 w-5" />
                             {selectedValuePhysicalExams}
                             <ChevronsUpDown
                                 class="ml-2 h-4 w-4 shrink-0 opacity-50"

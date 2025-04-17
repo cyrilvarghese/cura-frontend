@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { DiagnosticTestName } from '$lib/types/index';
+import { toast } from 'svelte-sonner';
 
 export interface TestValidationRequest {
     case_id: string;
@@ -52,6 +53,7 @@ export class TestValidatorService {
     }
 
     async validateTest(request: TestValidationRequest): Promise<TestValidationResponse> {
+        const toastId = toast.loading('Fetching result data...');
         try {
             const response = await fetch(`${this.baseUrl}/test-validator/validate`, {
                 method: 'POST',
@@ -64,7 +66,7 @@ export class TestValidatorService {
             if (!response.ok) {
                 throw new Error(`Failed to validate test: ${response.statusText}`);
             }
-
+            toast.dismiss();
             return await response.json();
         } catch (error) {
             console.error('Error validating test:', error);

@@ -69,7 +69,12 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <TestTube class="h-5 w-5 text-amber-900/70" />
-                <Card.Title class="pr-4">{result.testName}</Card.Title>
+                <Card.Title class="pr-4">
+                    {result.testName}
+                    {#if result.isVerified}
+                        <span class="ml-1 text-green-600">✓</span>
+                    {/if}
+                </Card.Title>
             </div>
             <div class="flex items-center gap-2">
                 {#if caseType === "edit"}

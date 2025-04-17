@@ -16,6 +16,7 @@ export interface TestResult {
     interpretation: string;
     timestamp: Date | null;
     comments: string[];
+    isVerified: boolean;
 }
 export interface UploadResponse {
     patient_prompt: string;
@@ -57,6 +58,7 @@ export interface ExaminationResult {
     status: TestStatus;
     interpretation: string;
     comments: string[];
+    isVerified: boolean;
 }
 
 export interface ExaminationState {

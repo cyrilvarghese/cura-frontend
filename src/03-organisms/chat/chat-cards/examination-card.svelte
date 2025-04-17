@@ -48,7 +48,12 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <Stethoscope class="h-5 w-5 text-blue-500/70" />
-                <Card.Title class="pr-4">{result.name}</Card.Title>
+                <Card.Title class="pr-4">
+                    {result.name}
+                    {#if result.isVerified}
+                        <span class="ml-1 text-green-600">✓</span>
+                    {/if}
+                </Card.Title>
             </div>
             <div class="flex items-center gap-2">
                 {#if caseType === "edit"}

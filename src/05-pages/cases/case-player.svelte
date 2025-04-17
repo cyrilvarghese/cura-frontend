@@ -254,8 +254,8 @@
             </ScrollArea>
 
             <div class=" pl-0 pt-6 border-t">
-                <!-- <ChatInput /> -->
-                <TestAutocomplete caseId={id} />
+                <ChatInput caseId={id} />
+                <!-- <TestAutocomplete /> -->
             </div>
         </div>
 

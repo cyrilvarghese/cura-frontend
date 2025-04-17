@@ -5,16 +5,18 @@
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     import { examinationStore } from "$lib/stores/examinationStore";
     import { laboratoryStore } from "$lib/stores/labTestStore";
-    import type { ExaminationName } from "$lib/types/index";
+    import type { ExaminationName, TestResult } from "$lib/types/index";
     import type { DiagnosticTestName } from "$lib/types/index";
     import type { ExaminationResult } from "$lib/types/index";
     import LabTestsDropdown from "../lab-tests/LabTestsDropdown.svelte";
     import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
     import { onMount } from "svelte";
+    import TestAutocomplete from "./test-autocomplete.svelte";
 
-    let textValue = "";
-    let isLoading = false;
-    let textareaRef: null | HTMLTextAreaElement = null;
+    let textValue = $state("");
+    let isLoading = $state(false);
+    const { caseId } = $props<{ caseId: string }>();
+    let textareaRef = $state<null | HTMLTextAreaElement>(null);
     async function handleSend() {
         if (textValue.trim() && !isLoading) {
             isLoading = true;
@@ -67,7 +69,7 @@
                 type: "test-result",
             };
             await sendMessage(
-                message.content,
+                message.content as TestResult,
                 "assistant",
                 "examination",
                 "test-result",
@@ -112,13 +114,13 @@
     <Textarea
         bind:ref={textareaRef}
         bind:value={textValue}
-        class="flex-1 pl-[320px] pt-8 pr-12  focus-visible:ring-black/30"
+        class="flex-1 pl-[500px] pt-8 pr-12  focus-visible:ring-black/30"
         placeholder="Type your message... (Ctrl+Enter to send)"
         disabled={isLoading}
         onkeydown={handleKeyDown}
     />
     <div class="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2">
-        <Tooltip.Provider>
+        <!-- <Tooltip.Provider>
             <Tooltip.Root>
                 <Tooltip.Trigger>
                     <PhysicalExamDropdown onExamination={handlePhysicalExam} />
@@ -137,7 +139,8 @@
                 </Tooltip.Content>
             </Tooltip.Root>
             <p class="text-gray-500 pt-2">|</p>
-        </Tooltip.Provider>
+        </Tooltip.Provider> -->
+        <TestAutocomplete {caseId} />
     </div>
     <Button
         class="absolute right-2 top-1/2 -translate-y-1/2"
