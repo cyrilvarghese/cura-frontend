@@ -32,13 +32,11 @@
     // State for lab tests autocomplete
     let openLabTests = $state(false);
     let valueLabTests = $state("");
-    let searchQueryLabTests = $state("");
     let triggerRefLabTests = $state<HTMLButtonElement>(null!);
 
     // State for physical exams autocomplete
     let openPhysicalExams = $state(false);
     let valuePhysicalExams = $state("");
-    let searchQueryPhysicalExams = $state("");
     let triggerRefPhysicalExams = $state<HTMLButtonElement>(null!);
 
     // Shared state
@@ -57,30 +55,28 @@
     // Get initial case data
     const initialCaseData = $caseDataStore;
 
-    // Initialize arrays
-    let filteredLabTestsArray = $state<string[]>([
-        ...labTests,
-        ...Object.keys(initialCaseData?.labTestReports || {}),
-    ]);
-
-    let filteredPhysicalExamsArray = $state<string[]>([
-        ...physicalExams,
-        ...Object.keys(initialCaseData?.physicalExamReports || {}),
-    ]);
+    // Initialize arrays directly without filtering
+    const labTestsArray = [
+        ...new Set([
+            ...labTests,
+            ...Object.keys(initialCaseData?.labTestReports || {}),
+        ]),
+    ];
+    const physicalExamsArray = [
+        ...new Set([
+            ...physicalExams,
+            ...Object.keys(initialCaseData?.physicalExamReports || {}),
+        ]),
+    ];
 
     onMount(() => {
-        // Deduplicate arrays
-        filteredLabTestsArray = [...new Set(filteredLabTestsArray)];
-        filteredPhysicalExamsArray = [...new Set(filteredPhysicalExamsArray)];
-
-        console.log("Filtered Lab Tests:", filteredLabTestsArray);
-        console.log("Filtered Physical Exams:", filteredPhysicalExamsArray);
+        console.log("Filtered Lab Tests:", labTestsArray);
+        console.log("Filtered Physical Exams:", physicalExamsArray);
     });
 
     // Close lab tests popover and refocus trigger button
     function closeAndFocusLabTestsTrigger() {
         openLabTests = false;
-        searchQueryLabTests = "";
         tick().then(() => {
             triggerRefLabTests?.focus();
         });
@@ -89,7 +85,6 @@
     // Close physical exams popover and refocus trigger button
     function closeAndFocusPhysicalExamsTrigger() {
         openPhysicalExams = false;
-        searchQueryPhysicalExams = "";
         tick().then(() => {
             triggerRefPhysicalExams?.focus();
         });
@@ -287,40 +282,6 @@
             valuePhysicalExams = ""; // Reset after ordering
         }
     }
-
-    // Convert search queries to uppercase for display
-    $effect(() => {
-        if (searchQueryLabTests) {
-            searchQueryLabTests = searchQueryLabTests.toUpperCase();
-        }
-    });
-
-    $effect(() => {
-        if (searchQueryPhysicalExams) {
-            searchQueryPhysicalExams = searchQueryPhysicalExams.toUpperCase();
-        }
-    });
-
-    // Handle lab test search input
-    function handleLabTestSearch(event: KeyboardEvent) {
-        const query = (event.target as HTMLInputElement).value.toUpperCase();
-        searchQueryLabTests = query;
-        filteredLabTestsArray = labTests.filter((test) =>
-            test.toUpperCase().includes(query),
-        );
-        console.log("Filtered Lab Tests:", filteredLabTestsArray);
-    }
-
-    // Handle physical exam search input
-    function handlePhysicalExamSearch(event: KeyboardEvent) {
-        const query = (event.target as HTMLInputElement).value.toUpperCase();
-        searchQueryPhysicalExams = query;
-        filteredPhysicalExamsArray = physicalExams.filter((exam) =>
-            exam.toUpperCase().includes(query),
-        );
-        console.log("Filtered Physical Exams:", filteredPhysicalExamsArray);
-    }
-    //subscribe to caseDataStore
 </script>
 
 <div class="relative space-y-4">
@@ -351,34 +312,29 @@
                     <Command.Root>
                         <Command.Input
                             placeholder="SEARCH FOR A LAB TEST..."
-                            bind:value={searchQueryLabTests}
-                            onkeyup={handleLabTestSearch}
                             class="h-9"
                         />
                         <Command.List class="max-h-[300px] overflow-y-auto">
-                            {#if filteredLabTestsArray.length === 0}
-                                <Command.Empty>No test found.</Command.Empty>
-                            {:else}
-                                <Command.Group>
-                                    {#each filteredLabTestsArray as test}
-                                        <Command.Item
-                                            value={test}
-                                            onSelect={() =>
-                                                handleSelectLabTest(test)}
-                                        >
-                                            <Check
-                                                class={cn(
-                                                    "mr-2 h-4 w-4",
-                                                    valueLabTests.toLowerCase() !==
-                                                        test.toLowerCase() &&
-                                                        "text-transparent",
-                                                )}
-                                            />
-                                            {test.toUpperCase()}
-                                        </Command.Item>
-                                    {/each}
-                                </Command.Group>
-                            {/if}
+                            <Command.Empty>No test found.</Command.Empty>
+                            <Command.Group>
+                                {#each labTestsArray as test}
+                                    <Command.Item
+                                        value={test}
+                                        onSelect={() =>
+                                            handleSelectLabTest(test)}
+                                    >
+                                        <Check
+                                            class={cn(
+                                                "mr-2 h-4 w-4",
+                                                valueLabTests.toLowerCase() !==
+                                                    test.toLowerCase() &&
+                                                    "text-transparent",
+                                            )}
+                                        />
+                                        {test.toUpperCase()}
+                                    </Command.Item>
+                                {/each}
+                            </Command.Group>
                         </Command.List>
                     </Command.Root>
                 </Popover.Content>
@@ -410,34 +366,29 @@
                     <Command.Root>
                         <Command.Input
                             placeholder="SEARCH FOR A PHYSICAL EXAM..."
-                            bind:value={searchQueryPhysicalExams}
-                            onkeyup={handlePhysicalExamSearch}
                             class="h-9"
                         />
                         <Command.List class="max-h-[300px] overflow-y-auto">
-                            {#if filteredPhysicalExamsArray.length === 0}
-                                <Command.Empty>No exam found.</Command.Empty>
-                            {:else}
-                                <Command.Group>
-                                    {#each filteredPhysicalExamsArray as exam}
-                                        <Command.Item
-                                            value={exam}
-                                            onSelect={() =>
-                                                handleSelectPhysicalExam(exam)}
-                                        >
-                                            <Check
-                                                class={cn(
-                                                    "mr-2 h-4 w-4",
-                                                    valuePhysicalExams.toLowerCase() !==
-                                                        exam.toLowerCase() &&
-                                                        "text-transparent",
-                                                )}
-                                            />
-                                            {exam.toUpperCase()}
-                                        </Command.Item>
-                                    {/each}
-                                </Command.Group>
-                            {/if}
+                            <Command.Empty>No exam found.</Command.Empty>
+                            <Command.Group>
+                                {#each physicalExamsArray as exam}
+                                    <Command.Item
+                                        value={exam}
+                                        onSelect={() =>
+                                            handleSelectPhysicalExam(exam)}
+                                    >
+                                        <Check
+                                            class={cn(
+                                                "mr-2 h-4 w-4",
+                                                valuePhysicalExams.toLowerCase() !==
+                                                    exam.toLowerCase() &&
+                                                    "text-transparent",
+                                            )}
+                                        />
+                                        {exam.toUpperCase()}
+                                    </Command.Item>
+                                {/each}
+                            </Command.Group>
                         </Command.List>
                     </Command.Root>
                 </Popover.Content>
