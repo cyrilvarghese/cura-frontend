@@ -1,4 +1,4 @@
-import type { ApiResponse, Message, PatientResponse } from '$lib/types';
+import type { ApiResponse, Message, PatientResponse } from '$lib/types/index';
 import { threadStore } from '$lib/stores/threadStore';
 import { API_BASE_URL } from '$lib/config/api';
 import { currentCaseId } from '$lib/stores/casePlayerStore';
@@ -14,7 +14,7 @@ export class PatientApiService {
         currentCaseId.subscribe(value => caseId = value)();
 
         const response = await fetch(
-            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${caseId ? `&case_id=${caseId}` : ''}`,
+            `${this.baseUrl}/patient/ask-gemini?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${caseId ? `&case_id=${caseId}` : ''}`,
             {
                 method: 'GET',
                 headers: {

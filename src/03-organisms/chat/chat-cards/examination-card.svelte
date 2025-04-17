@@ -12,6 +12,7 @@
     import { getContext } from "svelte";
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
+    import { convertAsteriskToBold } from "$lib/utils/text";
 
     const caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     const { result } = $props<{
@@ -23,7 +24,7 @@
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":
-                return finding.content;
+                return convertAsteriskToBold(finding.content);
             case "table":
                 return finding;
             case "image":
@@ -79,7 +80,7 @@
             <!-- <h4 class="font-medium leading-none text-blue-700">Findings</h4> -->
             {#if typeof findingContent === "string"}
                 <p class="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {findingContent}
+                    {@html findingContent}
                 </p>
             {:else if findingContent.type === "table"}
                 <FindingsTable
