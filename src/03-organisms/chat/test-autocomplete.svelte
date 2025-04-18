@@ -299,7 +299,10 @@
                     {#snippet child({ props })}
                         <Button
                             variant="ghost"
-                            class="w-full justify-between"
+                            class={cn(
+                                "w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none hover:bg-transparent hover:no-underline ring-offset-0",
+                                openPhysicalExams && "text-blue-500",
+                            )}
                             {...props}
                             role="combobox"
                             aria-expanded={openPhysicalExams}
@@ -354,7 +357,10 @@
                     {#snippet child({ props })}
                         <Button
                             variant="ghost"
-                            class="w-full justify-between"
+                            class={cn(
+                                "w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none hover:bg-transparent hover:no-underline ring-offset-0",
+                                openLabTests && "text-blue-500",
+                            )}
                             {...props}
                             role="combobox"
                             aria-expanded={openLabTests}

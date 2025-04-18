@@ -21,6 +21,7 @@
                     interpretation: examDetails.interpretation,
                     timestamp: new Date(),
                     comments: examDetails.comments,
+                    isVerified: true,
                 }}
             />
         {/each}
@@ -39,6 +40,7 @@
                     interpretation: testDetails.interpretation,
                     timestamp: new Date(),
                     comments: testDetails.comments,
+                    isVerified: true,
                 }}
             />
         {/each}

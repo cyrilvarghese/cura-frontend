@@ -9,6 +9,7 @@
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
     import X from "lucide-svelte/icons/x";
     import Check from "lucide-svelte/icons/check";
+    import { AlertCircle, AlertTriangle, FlagIcon } from "lucide-svelte";
 
     const {
         caseId,
@@ -65,9 +66,24 @@
     <Popover.Root bind:open={isPopoverOpen}>
         <Popover.Trigger>
             {#snippet child({ props })}
-                <Button variant="ghost" size="icon" class="h-8 w-8" {...props}>
-                    <MessageSquare class="h-4 w-4" />
-                    <span class="sr-only">Add comment</span>
+                <Button
+                    variant="ghost"
+                    title="Report Errors"
+                    size="icon"
+                    class="h-8 w-8 text-red-500"
+                    {...props}
+                >
+                    <FlagIcon class="h-4 w-4" />
+                    <span class="sr-only">Report Errors</span>
+
+                    {#if currentCommentCount > 0}
+                        <Badge
+                            class="absolute -top-0 bg-red-500 text-white -right-0 h-4 min-w-4 px-1"
+                            variant="default"
+                        >
+                            {currentCommentCount}
+                        </Badge>
+                    {/if}
                 </Button>
             {/snippet}
         </Popover.Trigger>
@@ -114,12 +130,4 @@
             </div>
         </Popover.Content>
     </Popover.Root>
-    {#if currentCommentCount > 0}
-        <Badge
-            class="absolute -top-0 bg-blue-500 -right-0 h-4 min-w-4 px-1"
-            variant="default"
-        >
-            {currentCommentCount}
-        </Badge>
-    {/if}
 </div>

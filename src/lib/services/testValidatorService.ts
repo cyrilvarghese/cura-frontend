@@ -53,7 +53,7 @@ export class TestValidatorService {
     }
 
     async validateTest(request: TestValidationRequest): Promise<TestValidationResponse> {
-        const toastId = toast.loading('Fetching result data...');
+        const toastId = toast.loading('Fetching test results...');
         try {
             const response = await fetch(`${this.baseUrl}/test-validator/validate`, {
                 method: 'POST',

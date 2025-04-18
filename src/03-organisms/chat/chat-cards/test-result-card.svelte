@@ -77,15 +77,14 @@
                 </Card.Title>
             </div>
             <div class="flex items-center gap-2">
-                {#if caseType === "edit"}
-                    <CommentButton
-                        {caseId}
-                        testName={result.testName}
-                        testType="lab_test"
-                        initialCommentCount={result.total_comments ?? 0}
-                        initialComments={result.comments ?? []}
-                    />
-                {/if}
+                <CommentButton
+                    {caseId}
+                    testName={result.testName}
+                    testType="lab_test"
+                    initialCommentCount={result.total_comments ?? 0}
+                    initialComments={result.comments ?? []}
+                />
+
                 <Badge
                     class={statusColors[
                         result.status as keyof typeof statusColors

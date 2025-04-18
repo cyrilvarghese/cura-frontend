@@ -1,11 +1,14 @@
 <script lang="ts">
     import Edit from "lucide-svelte/icons/edit";
     import { Button } from "$lib/components/ui/button";
-    import type { TabularData } from "$lib/types";
+    import type { TabularData } from "$lib/types/index";
     import * as Dialog from "$lib/components/ui/dialog";
     import * as Table from "$lib/components/ui/table";
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
     import { Trash2 } from "lucide-svelte";
+    import { getContext } from "svelte";
+
+    const caseType = getContext<"new" | "edit">("case-type");
 
     const {
         data: propData,
@@ -97,13 +100,14 @@
 
 <div class="flex justify-between items-center mb-4">
     <h4 class="ml-4 font-medium leading-none text-blue-900">Results</h4>
-
-    <button
-        class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-        onclick={handleAddRow}
-    >
-        Add Row
-    </button>
+    {#if caseType === "edit" || caseType === "new"}
+        <button
+            class="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            onclick={handleAddRow}
+        >
+            Add Row
+        </button>
+    {/if}
 </div>
 
 <Table.Root>
@@ -121,24 +125,26 @@
                     <Table.Cell>{cell}</Table.Cell>
                 {/each}
                 <Table.Cell>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onclick={() => handleEdit(row, index)}
-                        class="h-8 w-8 p-0 ml-2"
-                    >
-                        <Edit class="h-4 w-4" />
-                        <span class="sr-only">Edit row</span>
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onclick={() => handleDelete(index)}
-                        class="h-8 w-8 p-0 ml-2 text-red-500 hover:text-red-700 hover:bg-red-100"
-                    >
-                        <Trash2 class="h-4 w-4" />
-                        <span class="sr-only">Delete row</span>
-                    </Button>
+                    {#if caseType === "edit" || caseType === "new"}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onclick={() => handleEdit(row, index)}
+                            class="h-8 w-8 p-0 ml-2"
+                        >
+                            <Edit class="h-4 w-4" />
+                            <span class="sr-only">Edit row</span>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onclick={() => handleDelete(index)}
+                            class="h-8 w-8 p-0 ml-2 text-red-500 hover:text-red-700 hover:bg-red-100"
+                        >
+                            <Trash2 class="h-4 w-4" />
+                            <span class="sr-only">Delete row</span>
+                        </Button>
+                    {/if}
                 </Table.Cell>
             </Table.Row>
         {/each}

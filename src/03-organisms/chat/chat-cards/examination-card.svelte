@@ -20,7 +20,6 @@
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
-
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":
@@ -54,15 +53,14 @@
                 </Card.Title>
             </div>
             <div class="flex items-center gap-2">
-                {#if caseType === "edit"}
-                    <CommentButton
-                        {caseId}
-                        testName={result.name}
-                        testType="physical_exam"
-                        initialCommentCount={result.comments?.length ?? 0}
-                        initialComments={result.comments ?? []}
-                    />
-                {/if}
+                <CommentButton
+                    {caseId}
+                    testName={result.name}
+                    testType="physical_exam"
+                    initialCommentCount={result.comments?.length ?? 0}
+                    initialComments={result.comments ?? []}
+                />
+
                 <Badge
                     variant="secondary"
                     class="bg-blue-500/10 text-blue-700 hover:bg-blue-500/20"
@@ -71,7 +69,7 @@
                 </Badge>
             </div>
         </div>
-        {#if caseType === "edit"}
+        {#if caseType === "edit" || caseType === "new"}
             <Card.Description class="mt-2">{result.purpose}</Card.Description>
         {/if}
     </Card.Header>
