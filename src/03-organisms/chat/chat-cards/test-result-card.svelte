@@ -9,7 +9,6 @@
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    import getFullImageUrl from "$lib/utils/getFullURl";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { getContext } from "svelte";
 

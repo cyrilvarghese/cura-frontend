@@ -9,31 +9,42 @@
     import * as Tabs from "$lib/components/ui/tabs";
     import { FileCheck, Pencil } from "lucide-svelte";
     import type { CaseListItem } from "$lib/services/caseDataService";
-
-    let cases: CaseListItem[] = [];
-    let searchQuery = "";
-    let activeTab = "published";
-
+    import { authStore } from "$lib/stores/authStore";
+    import type { AuthState } from "$lib/stores/authStore";
+    let cases: CaseListItem[] = $state([]);
+    let searchQuery = $state("");
+    let activeTab = $state("published");
+    let user: AuthState["user"] | undefined = $state();
+    authStore.subscribe((state) => {
+        user = state.user;
+        if (user) {
+            console.log("Current user role:", user.role);
+        }
+    });
     onMount(async () => {
         await fetchCases();
         cases = $casesListStore || [];
     });
 
     //filter cases based on department and published status
-    $: filteredCases = cases.length
-        ? cases.filter(
-              (c) =>
-                  $currentDepartment?.name === c.department &&
-                  (activeTab === "published" ? c.published : !c.published) &&
-                  (!searchQuery ||
-                      c.title
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase()) ||
-                      c.quote
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase())),
-          )
-        : [];
+    let filteredCases = $derived(
+        cases.length
+            ? cases.filter(
+                  (c) =>
+                      $currentDepartment?.name === c.department &&
+                      (activeTab === "published"
+                          ? c.published
+                          : !c.published) &&
+                      (!searchQuery ||
+                          c.title
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase()) ||
+                          c.quote
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())),
+              )
+            : [],
+    );
 </script>
 
 <PageLayout
@@ -60,11 +71,14 @@
         class="mb-8"
         onValueChange={(value) => (activeTab = value)}
     >
-        <Tabs.List>
-            <Tabs.Trigger value="published">Published Cases</Tabs.Trigger>
-            <Tabs.Trigger value="drafts">Drafts</Tabs.Trigger>
-        </Tabs.List>
-        <hr class="my-4 border-gray-200" />
+        {#if user?.role === "admin"}
+            <Tabs.List class="mb-4">
+                <Tabs.Trigger value="published">Published Cases</Tabs.Trigger>
+                <Tabs.Trigger value="drafts">Drafts</Tabs.Trigger>
+            </Tabs.List>
+        {/if}
+        <hr class="border-gray-200" />
+
         <div class="mt-6">
             <Tabs.Content
                 value="published"

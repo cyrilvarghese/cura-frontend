@@ -2,13 +2,13 @@ import { writable, get, derived } from 'svelte/store';
 import { authService } from '../services/authService';
 import mixpanel from "mixpanel-browser";
 
-interface AuthState {
+export interface AuthState {
     user: {
         id: string;
         email: string;
         username: string;
         role: string;
-    } | null;
+    };
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -16,7 +16,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    user: null,
+    user: {},
     token: null,
     isAuthenticated: false,
     isLoading: false,

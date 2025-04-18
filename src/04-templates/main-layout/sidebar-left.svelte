@@ -27,6 +27,14 @@
 	import { authStore } from "$lib/stores/authStore";
 	import { navigate } from "svelte-routing";
 
+	let user;
+	authStore.subscribe((state) => {
+		user = state.user;
+		if (user) {
+			console.log("Current user role:", user.role);
+		}
+	});
+
 	async function handleLogout() {
 		console.log("Logging out");
 		try {
@@ -61,6 +69,7 @@
 				url: "/curriculum",
 				icon: BookOpen,
 				isActive: true,
+				role: ["admin"],
 			},
 			{
 				title: "Case Library",
@@ -71,6 +80,7 @@
 				title: "Master Document Review",
 				url: "/master-document-review",
 				icon: ClipboardCheck,
+				role: ["admin"],
 			},
 			{
 				title: "Class",
@@ -111,11 +121,6 @@
 				title: "Knowledge Base",
 				url: "/knowledge-base",
 				icon: BookOpen,
-			},
-			{
-				title: "Tools",
-				url: "/tools/case-data-creator",
-				icon: Wrench,
 			},
 		],
 		navSecondary: [
