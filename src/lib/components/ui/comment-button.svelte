@@ -91,7 +91,7 @@
         <Popover.Content class="w-80">
             <!-- add a list of comments -->
             <div class="space-y-2">
-                <Label for="comments">Flad This Result As Incorrect</Label>
+                <Label for="comments">Report This Result As Incorrect</Label>
                 <div class="flex flex-wrap gap-2">
                     {#each comments as comment, index}
                         <div
