@@ -31,6 +31,7 @@
     function renderResult(
         result: TestResultContent,
     ): string | TestResultContent {
+        $inspect(result);
         switch (result.type) {
             case "text":
                 return result.content;

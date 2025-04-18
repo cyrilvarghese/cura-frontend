@@ -140,7 +140,7 @@ export async function searchMedicalImages(query: string) {
 }
 
 
-export async function generatePersona(selectedDocumentName: string, caseId?: string) {
+export async function generatePersona(selectedDocumentName: string, caseId?: string, googleDocLink?: string) {
     caseStore.update(state => ({
         ...state,
         generating: true,
@@ -158,7 +158,7 @@ export async function generatePersona(selectedDocumentName: string, caseId?: str
         department = currentDepartmentValue.name;
     }
     try {
-        const response = await patientPersonaService.createPatientPersonaFromUrl(selectedDocumentName, caseId || null, department);
+        const response = await patientPersonaService.createPatientPersonaFromUrl(selectedDocumentName, caseId || null, department, googleDocLink);
         caseStore.update(state => ({
             ...state,
             persona: {
@@ -254,11 +254,12 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
 
 const caseDataService = new CaseDataService();
 
+// Load existing case by id for edit more for docotrs before publishing
 export async function loadExistingCase(id: string) {
     try {
         caseStore.update(state => ({ ...state, loading: true }));
         const caseData = await caseDataService.getCaseById(id);
-        console.log(caseData + "caseData");
+        console.log(caseData);
         caseStore.update((state) => ({
             ...state,
             caseId: id,

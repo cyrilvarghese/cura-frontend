@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import type { FormattedPersonaResponse } from '$lib/types';
+import type { FormattedPersonaResponse } from '$lib/types/index';
 
 export class PatientPersonaService {
     private baseUrl = API_BASE_URL;
@@ -24,8 +24,9 @@ export class PatientPersonaService {
         return await response.json();
     }
 
-    async createPatientPersonaFromUrl(selectedDocumentName: string, caseId: string | null, department: string): Promise<FormattedPersonaResponse> {
-
+    async createPatientPersonaFromUrl(selectedDocumentName: string, caseId: string | null, department: string, googleDocLink: string | null): Promise<FormattedPersonaResponse> {
+        debugger;
+        console.log(googleDocLink);
         const response = await fetch(
             `${this.baseUrl}/patient_persona/create`,
             {
@@ -36,7 +37,8 @@ export class PatientPersonaService {
                 body: JSON.stringify({
                     file_name: selectedDocumentName,
                     case_id: caseId,
-                    department: department
+                    department: department,
+                    google_doc_link: googleDocLink
                 })
             }
         );

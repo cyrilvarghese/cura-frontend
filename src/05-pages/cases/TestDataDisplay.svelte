@@ -33,7 +33,7 @@
             <TestResultCard
                 {caseId}
                 result={{
-                    testName: testDetails.testName,
+                    testName: testName,
                     purpose: testDetails.purpose,
                     results: testDetails.results,
                     status: testDetails.status,
