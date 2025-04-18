@@ -114,7 +114,7 @@
     <Textarea
         bind:ref={textareaRef}
         bind:value={textValue}
-        class="flex-1 pl-[440px] pt-8 pr-12  focus-visible:ring-black/30"
+        class="flex-1 pl-[440px] pt-8 pr-12  focus-visible:ring-black/20"
         placeholder="Type your message... (Ctrl+Enter to send)"
         disabled={isLoading}
         onkeydown={handleKeyDown}

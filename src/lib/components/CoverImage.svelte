@@ -25,7 +25,6 @@
     async function generateCoverImage() {
         isLoading.set(false);
         try {
-            debugger;
             if (imageUrl && prompt && title && quote) {
                 coverImageData = {
                     image_url: API_BASE_URL + imageUrl,

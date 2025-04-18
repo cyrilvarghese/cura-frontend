@@ -73,6 +73,9 @@
                     ...evaluationInProgress,
                     [point]: false,
                 };
+                if (evaluationResponse) {
+                    handleSubmit(); // refresh the evaluation
+                }
             }
         }
     }
@@ -179,57 +182,45 @@
                         {#each relevantPoints as point, index}
                             <div class="flex items-center gap-2">
                                 <div
-                                    class="flex-1 flex-start rounded-md border p-2 bg-gray-50 flex items-center gap-2"
+                                    class="flex-1 flex-start rounded-md border p-3 bg-gray-50"
                                 >
-                                    <p>{point}</p>
+                                    <div class="flex items-center gap-3">
+                                        <p class="text-base">{point}</p>
 
-                                    {#if evaluationInProgress[point]}
-                                        <div
-                                            class="w-5 h-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
-                                        ></div>
-                                    {:else if point in pointEvaluations}
-                                        <Tooltip.Provider>
-                                            <Tooltip.Root>
-                                                <Tooltip.Trigger class="pt-2">
-                                                    {#if pointEvaluations[point]}
-                                                        <Tooltip.Trigger>
-                                                            <CheckCircle
-                                                                class="h-5 w-5 text-green-500 flex-shrink-0"
-                                                            />
-                                                        </Tooltip.Trigger>
-                                                    {:else}
-                                                        <Tooltip.Trigger>
-                                                            <XCircle
-                                                                class="h-5 w-5 text-red-500 flex-shrink-0"
-                                                            />
-                                                        </Tooltip.Trigger>
-                                                    {/if}
-                                                </Tooltip.Trigger>
-                                                <Tooltip.Content>
-                                                    <p>
-                                                        {evaluationMessages[
-                                                            point
-                                                        ] ||
-                                                            (pointEvaluations[
-                                                                point
-                                                            ]
-                                                                ? "Correct finding"
-                                                                : "Incorrect finding")}
-                                                    </p>
-                                                </Tooltip.Content>
-                                            </Tooltip.Root>
-                                        </Tooltip.Provider>
-                                    {/if}
+                                        {#if evaluationInProgress[point]}
+                                            <div
+                                                class="w-5 h-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"
+                                            ></div>
+                                        {:else if point in pointEvaluations}
+                                            {#if pointEvaluations[point]}
+                                                <CheckCircle
+                                                    class="h-5 w-5 text-green-500 flex-shrink-0"
+                                                />
+                                            {:else}
+                                                <XCircle
+                                                    class="h-5 w-5 text-red-500 flex-shrink-0"
+                                                />
+                                            {/if}
+                                            <p
+                                                class="text-sm italic text-gray-600"
+                                            >
+                                                {evaluationMessages[point] ||
+                                                    (pointEvaluations[point]
+                                                        ? "Correct finding"
+                                                        : "Incorrect finding")}
+                                            </p>
+                                        {/if}
+                                    </div>
                                 </div>
 
-                                <Button
+                                <!-- <Button
                                     variant="ghost"
                                     size="icon"
                                     onclick={() => removePoint(index)}
                                     class="text-gray-500 hover:text-gray-700"
                                 >
                                     <X class="h-4 w-4" />
-                                </Button>
+                                </Button> -->
                             </div>
                         {/each}
                     </div>
@@ -263,7 +254,6 @@
             </div>
 
             {#if evaluationResponse}
-                {@debug evaluationResponse}
                 <EvaluationFeedback
                     evaluation={evaluationResponse}
                     onContinue={handleContinue}

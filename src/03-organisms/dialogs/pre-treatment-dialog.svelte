@@ -59,7 +59,7 @@
                     newInvestigation.name.split(","),
                 );
                 feedbackResults = { ...feedbackResults, ...response.feedback };
-                debugger;
+
                 console.log(feedbackResults);
                 investigations = [
                     ...investigations,

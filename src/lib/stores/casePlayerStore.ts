@@ -28,7 +28,7 @@ export const casesListStore = writable<CaseListItem[]>([]);
 
 // Existing fetch case data function
 export const fetchCaseData = async (caseId: string) => {
-    debugger;
+
     try {
         const caseData = await caseDataService.getCaseData(caseId);
         caseDataStore.set(caseData);

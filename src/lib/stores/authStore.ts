@@ -8,7 +8,7 @@ export interface AuthState {
         email: string;
         username: string;
         role: string;
-    };
+    } | null;
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -16,7 +16,7 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-    user: {},
+    user: null,
     token: null,
     isAuthenticated: false,
     isLoading: false,

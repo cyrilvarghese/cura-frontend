@@ -2,6 +2,7 @@ import { API_BASE_URL } from '$lib/config/api';
 import type { CaseStoreState } from '$lib/stores/caseCreatorStore';
 import type { CaseData } from '$lib/stores/casePlayerStore';
 import type { FormattedPersonaResponse } from '$lib/types/index';
+import { handleApiResponse } from '$lib/utils/auth-handler';
 
 export interface CaseListItem {
     case_id: number;
@@ -52,7 +53,7 @@ export class CaseDataService {
     async getCaseData(caseId: string): Promise<CaseData> {
         const response = await fetch(`${this.baseUrl}/cases/${caseId}`);
         const data = await response.json();
-
+        await handleApiResponse(response);
         return {
             physicalExamReports: data.content.physical_exam,
             labTestReports: data.content.lab_test,
@@ -92,7 +93,6 @@ export class CaseDataService {
                 },
                 body: JSON.stringify(params),
             });
-
             if (!response.ok) {
                 throw new Error('Failed to publish case');
             }

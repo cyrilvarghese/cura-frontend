@@ -24,7 +24,6 @@
     import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
     import { Pill } from "lucide-svelte";
     import mixpanel from "mixpanel-browser";
-    import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -43,7 +42,7 @@
     let treatmentProtocolDialogOpen = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("pre-treatment"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
