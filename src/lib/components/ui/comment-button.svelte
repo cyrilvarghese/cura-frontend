@@ -50,6 +50,7 @@
         if (success) {
             comment = ""; // Reset comment after saving
         }
+        isPopoverOpen = false;
     }
 
     async function handleRemoveComment(commentIndex: number) {
@@ -90,7 +91,7 @@
         <Popover.Content class="w-80">
             <!-- add a list of comments -->
             <div class="space-y-2">
-                <Label for="comments">Comments</Label>
+                <Label for="comments">Flad This Result As Incorrect</Label>
                 <div class="flex flex-wrap gap-2">
                     {#each comments as comment, index}
                         <div
@@ -117,14 +118,21 @@
                         class="min-h-[100px]"
                     />
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-start gap-2">
                     <Button
                         type="submit"
                         size="sm"
                         disabled={!comment}
                         onclick={handleSaveComment}
                     >
-                        Save Comment
+                        Flag
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => (isPopoverOpen = false)}
+                    >
+                        Cancel
                     </Button>
                 </div>
             </div>
