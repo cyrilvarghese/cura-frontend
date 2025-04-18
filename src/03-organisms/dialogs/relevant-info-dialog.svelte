@@ -6,6 +6,7 @@
     import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { evaluationStore } from "$lib/stores/evaluationStore";
+    import { clinicalFindingsStore } from "$lib/stores/clinicalFindingsStore";
     import { toast } from "svelte-sonner";
     import { get } from "svelte/store";
     import EvaluationFeedback from "../../02-molecules/evaluation-feedback.svelte";
@@ -120,15 +121,34 @@
     }
 
     async function handleContinue() {
-        const messageContent = relevantPoints.join("\n");
-        await sendMessage(
-            messageContent,
-            "student",
-            "relevant-info",
-            "relevant-info",
-        );
-        onSubmit();
-        closeDialog();
+        try {
+            const caseId = get(currentCaseId);
+            if (!caseId) {
+                throw new Error("No case ID found");
+            }
+
+            // Record the findings using our new store
+            await clinicalFindingsStore.recordFindings(caseId, relevantPoints);
+
+            // Send the message as before
+            const messageContent = relevantPoints.join("\n");
+            await sendMessage(
+                messageContent,
+                "student",
+                "relevant-info",
+                "relevant-info",
+            );
+
+            onSubmit();
+            closeDialog();
+        } catch (error) {
+            toast.error("Failed to record findings", {
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Unknown error occurred",
+            });
+        }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -164,6 +184,12 @@
 
         <div class="grid gap-4 py-4 max-h-[500px] overflow-y-auto">
             <div class="grid gap-4 py-4">
+                {#if evaluationResponse}
+                    <EvaluationFeedback
+                        evaluation={evaluationResponse}
+                        onContinue={handleContinue}
+                    />
+                {/if}
                 <div class="space-y-4">
                     <div class="flex gap-2">
                         <input
@@ -226,39 +252,28 @@
                     </div>
                 </div>
             </div>
-
-            <div class="mt-4 flex justify-between gap-2">
-                <div class="flex flex-row gap-2"></div>
-                <div class="flex flex-row gap-2">
-                    <Button variant="outline" onclick={closeDialog}>
-                        <ArrowLeft class="h-4 w-4" />
-                        Back to conversation
-                    </Button>
-                    <Button onclick={handleSubmit} disabled={isEvaluating}>
-                        {#if evaluationResponse}
-                            <Button
-                                disabled={isEvaluating ||
-                                    relevantPoints.length === 0}
-                                onclick={handleContinue}
-                            >
-                                Submit Current Findings
-                            </Button>
-                        {:else if isEvaluating}
-                            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-                            Submitting...
-                        {:else}
-                            Submit
-                        {/if}
-                    </Button>
-                </div>
-            </div>
-
-            {#if evaluationResponse}
-                <EvaluationFeedback
-                    evaluation={evaluationResponse}
-                    onContinue={handleContinue}
-                />
-            {/if}
         </div>
+
+        <Dialog.Footer>
+            <Button variant="outline" onclick={closeDialog}>
+                <ArrowLeft class="h-4 w-4" />
+                Back to conversation
+            </Button>
+            <Button onclick={handleSubmit} disabled={isEvaluating}>
+                {#if evaluationResponse}
+                    <Button
+                        disabled={isEvaluating || relevantPoints.length === 0}
+                        onclick={handleContinue}
+                    >
+                        Submit Current Findings
+                    </Button>
+                {:else if isEvaluating}
+                    <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                {:else}
+                    Submit
+                {/if}
+            </Button>
+        </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>

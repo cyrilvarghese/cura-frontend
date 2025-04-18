@@ -28,7 +28,7 @@
 
     let emoji = $derived(
         evaluation.feedback.missing_findings.length === 0
-            ? "🌟"
+            ? "🌟🌟🌟 Awesome! You got all the findings! 🌟🌟🌟 "
             : evaluation.feedback.missing_findings.length === 1
               ? "💪"
               : "🤔",
@@ -42,25 +42,30 @@
 </script>
 
 <div>
-    <Alert.Root class="mt-4 bg-blue-50">
+    <Alert.Root
+        class={`mt-4 ${evaluation.feedback.missing_findings.length === 0 ? "bg-green-50" : "bg-blue-50"}`}
+    >
         <Alert.Description>
             <div class="flex flex-col gap-4">
                 <p class="flex flex-row justify-between items-center gap-2">
                     <button
-                        class="mt-2 text-sm flex flex-row text-left text-blue-600 hover:text-blue-800 flex items-start gap-1"
+                        class={`text-sm flex flex-row text-left ${evaluation.feedback.missing_findings.length === 0 ? "text-green-600 hover:text-green-800" : "text-blue-600 hover:text-blue-800"} flex items-start gap-1`}
                         onclick={() => {
                             // Toggle showing the missing findings section
                             showMissingFindings = !showMissingFindings;
                         }}
                     >
                         {emoji}
-
-                        <span class="text-base text-left">
-                            {@html formatMessage(evaluation.feedback.message)}
-                        </span>
-                        <ChevronDown
-                            class="hover:bg-gray-200/50 size-6 mt-1 ml-2 text-gray-500"
-                        />
+                        {#if evaluation.feedback.missing_findings.length > 0}
+                            <span class="text-base text-left">
+                                {@html formatMessage(
+                                    evaluation.feedback.message,
+                                )}
+                            </span>
+                            <ChevronDown
+                                class="hover:bg-gray-200/50 size-6 mt-1 ml-2 text-gray-500"
+                            />
+                        {/if}
                     </button>
                 </p>
 

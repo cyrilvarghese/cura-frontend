@@ -65,6 +65,7 @@ export class CaseDataService {
         try {
             const response = await fetch(`${this.baseUrl}/cases`);
             if (!response.ok) {
+                await handleApiResponse(response);
                 throw new Error('Failed to fetch cases');
             }
             const data = await response.json();

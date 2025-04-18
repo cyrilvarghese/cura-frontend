@@ -5,6 +5,10 @@
     import Loader2 from "lucide-svelte/icons/loader-2";
     import DiagnosisList from "$lib/components/DiagnosisList.svelte";
     import { sendMessage } from "$lib/stores/apiStore";
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { diagnosisStore } from "$lib/stores/diagnosisStore";
+    import { toast } from "svelte-sonner";
+    import { get } from "svelte/store";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
     export let open = false;
@@ -38,6 +42,15 @@
 
         try {
             isSubmitting = true;
+            const caseId = get(currentCaseId);
+
+            if (!caseId) {
+                throw new Error("No case ID found");
+            }
+
+            // Record the diagnosis using our new store
+            await diagnosisStore.recordDiagnosis(caseId, diagnoses);
+
             const differentialDiagnoses = diagnoses.filter(
                 (d) => d.status === "differential",
             );
@@ -55,7 +68,12 @@
             open = false;
         } catch (error) {
             console.error("Error submitting diagnosis:", error);
-            // You might want to show an error toast here
+            toast.error("Failed to submit diagnosis", {
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Unknown error occurred",
+            });
         } finally {
             isSubmitting = false;
         }
@@ -66,7 +84,12 @@
     );
 
     function handleKeyDown(event: KeyboardEvent) {
-        if (event.key === 'Enter' && event.ctrlKey && isValid && !isSubmitting) {
+        if (
+            event.key === "Enter" &&
+            event.ctrlKey &&
+            isValid &&
+            !isSubmitting
+        ) {
             event.preventDefault();
             handleSubmit(false);
         }
@@ -74,10 +97,7 @@
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content 
-        class="sm:max-w-[800px]"
-        onkeydown={handleKeyDown}
-    >
+    <Dialog.Content class="sm:max-w-[800px]" onkeydown={handleKeyDown}>
         <Dialog.Header>
             <Dialog.Title>Submit Initial Diagnosis</Dialog.Title>
             <Dialog.Description>
