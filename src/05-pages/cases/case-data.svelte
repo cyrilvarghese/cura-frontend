@@ -227,7 +227,6 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.testData}
-                        {@debug uploadState}
                         <TestDataDisplay
                             testData={uploadState.testData}
                             caseId={uploadState.caseId}

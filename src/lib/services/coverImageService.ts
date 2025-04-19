@@ -8,7 +8,7 @@ export class CoverImageService {
     // Create a cover image for a case
 
     async createCoverImage(caseId: string | null): Promise<CoverImageResponse> {
-
+        debugger;
         const response = await fetch(
             `${this.baseUrl}/cover_image/create?case_id=${caseId}`,
             {
@@ -23,16 +23,16 @@ export class CoverImageService {
         return await response.json();
     }
 
-    async generateWithPrompt(caseId: string, prompt: string, title: string, quote: string): Promise<CoverImageResponse> {
+    async generateWithPrompt(case_id: string, prompt: string, title: string, quote: string): Promise<CoverImageResponse> {
         try {
-
-            const response = await fetch(`${this.baseUrl}/cover_image/create?case_id=${caseId}`, {
+            debugger;
+            const response = await fetch(`${this.baseUrl}/cover_image/generate`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    caseId,
+                    case_id,
                     prompt,
                     title,
                     quote

@@ -54,6 +54,7 @@
     }
 
     async function generateWithPrompt() {
+        debugger;
         if (!currentPrompt.trim() || !coverImageData)
             return generateCoverImage();
         try {
@@ -103,6 +104,13 @@
                     src={coverImageData.image_url}
                     alt="Generated cover"
                 />
+                {#if $isLoading}
+                    <div
+                        class="absolute inset-0 bg-black/20 rounded-lg flex items-center justify-center"
+                    >
+                        <RefreshCw class="h-8 w-8 text-white animate-spin" />
+                    </div>
+                {/if}
             </div>
 
             <!-- Text Overlay (Green Box) -->
@@ -120,13 +128,14 @@
                     "{coverImageData.quote}"
                 </blockquote>
                 <Textarea
-                    bind:value={coverImageData.prompt}
-                    class="h-[150px] overflow-y-auto w-full text-sm text-muted-foreground bg-transparent resize-none"
+                    bind:value={currentPrompt}
+                    disabled={$isLoading}
+                    class="h-[150px] overflow-y-auto w-full text-sm text-muted-foreground bg-transparent resize-none disabled:opacity-50"
                 />
                 <Button
                     variant="outline"
                     onclick={generateWithPrompt}
-                    disabled={$isLoading || !coverImageData.prompt.trim()}
+                    disabled={$isLoading || !currentPrompt.trim()}
                     class="bg-white/90 mt-4 backdrop-blur-sm hover:bg-white"
                 >
                     <RefreshCw
