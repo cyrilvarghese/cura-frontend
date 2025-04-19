@@ -150,7 +150,7 @@
             await generatePersona(
                 uploadState.selectedDocumentName,
                 uploadState.caseId || "",
-                uploadState.googleDocLink,
+                uploadState.googleDocLink || "",
             );
         } catch (error) {
             uploadState.error =

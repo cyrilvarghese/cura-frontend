@@ -5,15 +5,26 @@
         testAssetService,
         type UploadTestAssetResponse,
     } from "$lib/services/testAssetService";
-    import MedicalImageSearch from "./medical-image-search.svelte";
+    import { authStore, type AuthState } from "$lib/stores/authStore";
 
-    const { caseId, testName, testType, onStart, onSuccess, onError } = $props<{
+    const {
+        caseId,
+        testName,
+        testType,
+        onStart,
+        onSuccess,
+        onError,
+        showHeader = true,
+    } = $props<{
         caseId: string;
         testName: string;
         testType: "physical_exam" | "lab_test";
         onStart: () => void;
         onSuccess: (response: UploadTestAssetResponse) => void;
         onError: (error: string) => void;
+        onRemove?: () => void;
+        uploadedImages?: { url: string; id?: string }[];
+        showHeader?: boolean;
     }>();
 
     let searchDialogOpen = $state(false);
@@ -79,9 +90,29 @@
         }
     }
 
-    function handleSearchSuccess(imageUrl: string) {
-        searchDialogOpen = false;
-        uploadImageFromUrl(imageUrl);
+    function handlePaste(event: ClipboardEvent) {
+        const items = event.clipboardData?.items;
+        if (!items) return;
+
+        const imageFiles: File[] = [];
+
+        for (const item of items) {
+            if (item.type.startsWith("image")) {
+                const file = item.getAsFile();
+                if (file) {
+                    imageFiles.push(file);
+                }
+            }
+        }
+
+        if (imageFiles.length > 0) {
+            // Handle each image file individually
+            imageFiles.forEach((file) => {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                handleFilesUpload(dt.files);
+            });
+        }
     }
 </script>
 
@@ -89,7 +120,24 @@
     class="w-full h-full min-h-[200px] flex items-center justify-start bg-muted rounded-md"
 >
     <div class="w-full space-y-4 p-4 border rounded-md">
-        <h3 class="text-lg font-medium mb-4">Add Images</h3>
+        {#if showHeader}
+            <h3 class="text-lg font-medium mb-4">Add Images</h3>
+        {/if}
+
+        <!-- Paste Area -->
+        <div class="space-y-2">
+            <label for="paste-area" class="block text-sm font-medium">
+                Paste image
+            </label>
+            <textarea
+                id="paste-area"
+                class="min-h-[100px] w-full border-2 border-dashed rounded-lg p-4 resize-none cursor-text hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                onpaste={handlePaste}
+                placeholder="Click here and paste an image (Ctrl+V)"
+                aria-label="Paste image area"
+                rows="3"
+            ></textarea>
+        </div>
 
         <!-- File Upload Option -->
         <div class="space-y-2">
@@ -137,7 +185,7 @@
             {/if}
         </div>
 
-        <!-- URL Input Option -->
+        <!-- URL Input Option
         <div class="space-y-2">
             <label for="image-url" class="block text-sm font-medium">
                 Enter image URL
@@ -164,25 +212,25 @@
                 >
                     Add
                 </Button>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
 
         <!-- Search Images Button -->
-        <div class="space-y-2">
+        <!-- <div class="space-y-2">
             <Button
                 variant="outline"
                 class="gap-2 w-full"
-                onclick={() => (searchDialogOpen = true)}
+                onclick={() => openSearchDialog()}
             >
                 <Search class="h-4 w-4" />
                 Search Medical Images
             </Button>
-        </div>
+        </div> -->
     </div>
 </div>
-
+<!-- 
 <MedicalImageSearch
     bind:open={searchDialogOpen}
     onSelectImage={handleSearchSuccess}
     {caseId}
-/>
+/> -->

@@ -10,9 +10,16 @@ export class CoverImageService {
     async createCoverImage(caseId: string | null): Promise<CoverImageResponse> {
         debugger;
         const response = await fetch(
-            `${this.baseUrl}/cover_image/create?case_id=${caseId}`,
+            `${this.baseUrl}/cover_image/generate`,
             {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    case_id: caseId,
+
+                })
             }
         );
 

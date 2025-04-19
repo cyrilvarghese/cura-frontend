@@ -4,7 +4,32 @@
     import { type UploadTestAssetResponse } from "$lib/services/testAssetService";
     import { API_BASE_URL } from "$lib/config/api";
     import MedicalImageUploader from "./medical-image-uploader.svelte";
+    import { X, ChevronLeft, ChevronRight } from "lucide-svelte";
+    import { testAssetService } from "$lib/services/testAssetService";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { getContext } from "svelte";
+    import { authStore, type AuthState } from "$lib/stores/authStore";
+    import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
+    const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
+    let user: AuthState["user"] | undefined = $state();
 
+    async function handleNoImagesAvailable() {
+        // Your function logic here
+        console.log("No images available for this test");
+        const success = await editPhysicalExamTableStore.addComment(
+            caseId,
+            testName,
+            testType,
+            "Student: No images available for this test",
+        );
+        return null; // Return value is optional
+    }
+    authStore.subscribe((state) => {
+        user = state.user;
+        if (user) {
+            console.log("Current user role:", user.role);
+        }
+    });
     const {
         imageUrls: initialImageUrls = [],
         altText,
@@ -36,6 +61,7 @@
     let isUploading = $state(false);
     let uploadError = $state<string | null>(null);
     let viewerDialogOpen = $state(false);
+    let deleteConfirmOpen = $state(false);
 
     // Check for example.com URLs on initialization
     let imageError = $state(
@@ -116,28 +142,84 @@
         currentImageUrl = imageUrls[index];
         viewerDialogOpen = true;
     }
+
+    function openDeleteConfirm() {
+        deleteConfirmOpen = true;
+    }
+
+    async function confirmDelete() {
+        try {
+            // Call the delete endpoint
+            const response = await testAssetService.deleteTestAsset(
+                caseId,
+                testType,
+                testName,
+            );
+
+            console.log("Delete response:", response);
+
+            // Clear the image URLs after successful deletion
+            imageUrls = [];
+            imageError = true;
+            deleteConfirmOpen = false;
+        } catch (error) {
+            console.error("Failed to delete images:", error);
+            uploadError = "Failed to delete images";
+            deleteConfirmOpen = false;
+        }
+    }
 </script>
 
+{@debug user}
 {#if !imageError && imageUrls.length > 0}
-    <!-- Image Gallery Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {#each imageUrls as imageUrl, index}
-            <div
-                class="relative overflow-hidden rounded-md cursor-pointer aspect-square"
-                onclick={() => selectImage(index)}
-                onkeydown={(e) => e.key === "Enter" && selectImage(index)}
-                tabindex="0"
-                role="button"
-                aria-label={`View image ${index + 1}`}
+    <!-- Image Gallery with Delete All button -->
+    <div class="space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium">Uploaded Images</h3>
+            <button
+                class="text-xs text-destructive hover:underline flex items-center gap-1"
+                onclick={openDeleteConfirm}
+                aria-label="Delete all images"
             >
-                <img
-                    src={getFullImageUrl(imageUrl)}
-                    alt={`${altText} ${index + 1}`}
-                    class="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.05]"
-                    onerror={() => handleImageError(index)}
-                />
-            </div>
-        {/each}
+                <X class="h-3 w-3" />
+                Delete All Images
+            </button>
+        </div>
+
+        <!-- Image Gallery Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {#each imageUrls as imageUrl, index}
+                <div
+                    class="relative overflow-hidden rounded-md cursor-pointer aspect-square"
+                    onclick={() => selectImage(index)}
+                    onkeydown={(e) => e.key === "Enter" && selectImage(index)}
+                    tabindex="0"
+                    role="button"
+                    aria-label={`View image ${index + 1}`}
+                >
+                    <img
+                        src={getFullImageUrl(imageUrl)}
+                        alt={`${altText} ${index + 1}`}
+                        class="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.05]"
+                        onerror={() => handleImageError(index)}
+                    />
+                </div>
+            {/each}
+        </div>
+
+        <!-- Add uploader for additional images -->
+        <div class="mt-4 border-t pt-4">
+            <h3 class="text-sm font-medium mb-2">Add More Images</h3>
+            <MedicalImageUploader
+                {caseId}
+                {testName}
+                {testType}
+                onStart={handleUploadStart}
+                onSuccess={handleUploadSuccess}
+                onError={handleUploadError}
+                showHeader={false}
+            />
+        </div>
     </div>
 
     <!-- Caption and Timestamp -->
@@ -150,7 +232,7 @@
             {/if}
         </div>
     {/if}
-{:else}
+{:else if user?.role !== "student"}
     <MedicalImageUploader
         {caseId}
         {testName}
@@ -159,6 +241,11 @@
         onSuccess={handleUploadSuccess}
         onError={handleUploadError}
     />
+{:else}
+    {@const _ = handleNoImagesAvailable()}
+    <div class="text-sm text-muted-foreground">
+        Images are not available for this test.
+    </div>
 {/if}
 
 <!-- Image Viewer Dialog -->
@@ -211,30 +298,34 @@
         {/if}
 
         <Dialog.Footer class="flex justify-between items-center">
-            <div class="flex gap-2">
-                {#if selectedImageIndex > 0}
-                    <Button
-                        variant="outline"
-                        onclick={() => {
-                            selectedImageIndex--;
-                            currentImageUrl = imageUrls[selectedImageIndex];
-                        }}
-                    >
-                        Previous
-                    </Button>
-                {/if}
+            <div class="flex gap-2 pr-8">
+                <Button
+                    disabled={selectedImageIndex <= 0}
+                    variant="outline"
+                    size="icon"
+                    class="bg-blue-500 text-white"
+                    onclick={() => {
+                        selectedImageIndex--;
+                        currentImageUrl = imageUrls[selectedImageIndex];
+                    }}
+                    aria-label="Previous image"
+                >
+                    <ChevronLeft class="h-4 w-4 " />
+                </Button>
 
-                {#if selectedImageIndex < imageUrls.length - 1}
-                    <Button
-                        variant="outline"
-                        onclick={() => {
-                            selectedImageIndex++;
-                            currentImageUrl = imageUrls[selectedImageIndex];
-                        }}
-                    >
-                        Next
-                    </Button>
-                {/if}
+                <Button
+                    disabled={selectedImageIndex >= imageUrls.length - 1}
+                    variant="outline"
+                    size="icon"
+                    class="bg-blue-500 text-white"
+                    onclick={() => {
+                        selectedImageIndex++;
+                        currentImageUrl = imageUrls[selectedImageIndex];
+                    }}
+                    aria-label="Next image"
+                >
+                    <ChevronRight class="h-4 w-4" />
+                </Button>
             </div>
 
             <Dialog.Close>
@@ -254,3 +345,22 @@
         {uploadError}
     </div>
 {/if}
+
+<!-- Delete Confirmation Dialog -->
+<AlertDialog.Root bind:open={deleteConfirmOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete all images?</AlertDialog.Title>
+            <AlertDialog.Description>
+                This will remove all images from this test. This action cannot
+                be undone.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action class="bg-destructive" onclick={confirmDelete}>
+                Delete
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>

@@ -98,6 +98,29 @@ export class TestAssetService {
 
         return await response.json();
     }
+
+    async deleteTestAsset(
+        caseId: string,
+        testType: 'physical_exam' | 'lab_test',
+        testName: string
+    ): Promise<{ success: boolean; message: string }> {
+        const encodedTestName = encodeURIComponent(testName);
+        const response = await fetch(
+            `${this.baseUrl}/test-image/delete/${caseId}/${testType}/${encodedTestName}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to delete test asset');
+        }
+
+        return await response.json();
+    }
 }
 
 export const testAssetService = new TestAssetService();
