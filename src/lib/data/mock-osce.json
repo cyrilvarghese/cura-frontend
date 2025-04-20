@@ -1,0 +1,196 @@
+{
+    "case_id": "1",
+    "student_id": "fa19f495-35e7-48cf-87c0-eabd94c7a05f",
+    "department": "General Medicine",
+    "timestamp": "2025-04-19T17:47:20.712625",
+    "osce_questions": [
+        {
+            "station_title": "Complement Levels and Disease Activity",
+            "question_format": "MCQ",
+            "prompt": "Following the diagnosis of urticarial vasculitis, the patient's complement C3 and C4 levels remain low despite treatment with antihistamines. Which of the following is the MOST appropriate next step in management?",
+            "options": {
+                "A": "Increase the dose of antihistamines.",
+                "B": "Initiate a short course of oral corticosteroids.",
+                "C": "Prescribe a leukotriene receptor antagonist.",
+                "D": "Reassure the patient that low complement levels are expected and require no further intervention."
+            },
+            "expected_answer": null,
+            "image_placeholder_url": null,
+            "explanation": "B is correct. Persistent low complement levels despite antihistamine therapy suggest ongoing disease activity and may warrant immunosuppressive treatment such as corticosteroids. A is incorrect as antihistamines primarily target histamine-mediated urticaria, not the underlying vasculitis. C is incorrect as leukotriene receptor antagonists are more commonly used for asthma and allergic rhinitis. D is incorrect as persistent low complement levels can indicate active disease and potential for systemic complications.",
+            "concept_modal": {
+                "specific": "In urticarial vasculitis, persistently low complement levels indicate ongoing immune complex deposition and inflammation, necessitating escalation of therapy.",
+                "general": "Complement levels are acute phase reactants and can be used to monitor disease activity in autoimmune and inflammatory conditions.",
+                "lateral": "Monitoring complement levels is also important in conditions like lupus nephritis and membranoproliferative glomerulonephritis."
+            }
+        },
+        {
+            "station_title": "Skin Biopsy Interpretation",
+            "question_format": "image-based",
+            "prompt": "A skin biopsy was performed on one of the patient's lesions. Examine the provided histopathology image (image_placeholder_url: www.example.com/images/urticarial_vasculitis_biopsy.png). Describe the key histopathological findings that support the diagnosis of urticarial vasculitis.",
+            "options": null,
+            "expected_answer": "The biopsy should show evidence of leukocytoclastic vasculitis, including neutrophilic infiltration of vessel walls, fibrinoid necrosis, extravasation of red blood cells, and potentially immunoglobulin and complement deposition on direct immunofluorescence.",
+            "image_placeholder_url": "www.example.com/images/urticarial_vasculitis_biopsy.png",
+            "explanation": "Leukocytoclastic vasculitis is the hallmark histological finding in urticarial vasculitis. The presence of neutrophils, fibrinoid necrosis, and red blood cell extravasation indicates damage to the small blood vessels. Immunofluorescence may reveal immune complex deposition, further supporting the diagnosis.",
+            "concept_modal": {
+                "specific": "Skin biopsy is crucial for confirming the diagnosis of urticarial vasculitis and differentiating it from other urticarial conditions.",
+                "general": "Histopathological examination is essential for diagnosing many dermatological conditions and can provide valuable information about disease pathogenesis.",
+                "lateral": "Skin biopsies are used to diagnose various conditions, including skin cancers, infections, and inflammatory dermatoses."
+            }
+        },
+        {
+            "station_title": "Managing Joint Pain",
+            "question_format": "written",
+            "prompt": "The patient continues to experience significant joint pain despite treatment with antihistamines and a short course of corticosteroids. What non-pharmacological and pharmacological strategies could you recommend to manage her joint pain, considering potential long-term side effects?",
+            "options": null,
+            "expected_answer": "Non-pharmacological strategies include physical therapy, low-impact exercise, and heat/cold application. Pharmacological options include NSAIDs (with caution due to potential GI side effects), hydroxychloroquine (monitoring for retinal toxicity), or methotrexate (monitoring for liver and bone marrow toxicity). Opioids should be avoided due to the risk of dependence.",
+            "image_placeholder_url": null,
+            "explanation": "A multi-modal approach is essential for managing chronic pain. Non-pharmacological strategies can improve function and reduce reliance on medications. When pharmacological options are considered, it's important to weigh the benefits against the potential risks and monitor for side effects.",
+            "concept_modal": {
+                "specific": "Managing joint pain in urticarial vasculitis requires a balance between pain relief and minimizing long-term side effects of medications.",
+                "general": "Chronic pain management often requires a multi-disciplinary approach involving both pharmacological and non-pharmacological interventions.",
+                "lateral": "This approach is also applicable in managing pain associated with rheumatoid arthritis, osteoarthritis, and fibromyalgia."
+            }
+        },
+        {
+            "station_title": "Systemic Lupus Erythematosus (SLE) Considerations",
+            "question_format": "MCQ",
+            "prompt": "The patient's ANA test is positive, and she reports increasing fatigue. Which of the following findings would MOST strongly suggest a diagnosis of Systemic Lupus Erythematosus (SLE) rather than isolated Urticarial Vasculitis?",
+            "options": {
+                "A": "Elevated ESR.",
+                "B": "Positive Anti-dsDNA antibody.",
+                "C": "Low C4 complement level.",
+                "D": "Mild proteinuria."
+            },
+            "expected_answer": null,
+            "image_placeholder_url": null,
+            "explanation": "B is correct. A positive Anti-dsDNA antibody is highly specific for SLE. While elevated ESR and low C4 can be seen in both conditions, they are not specific for SLE. Mild proteinuria could be seen in both, but with SLE, more significant renal involvement is common. The presence of Anti-dsDNA strongly suggests SLE.",
+            "concept_modal": {
+                "specific": "Differentiating urticarial vasculitis from SLE is crucial due to different management strategies and potential for systemic complications in SLE.",
+                "general": "Specific autoantibodies are valuable tools for diagnosing and classifying autoimmune diseases.",
+                "lateral": "Anti-Sm antibodies are also highly specific for SLE."
+            }
+        },
+        {
+            "station_title": "Patient Education on Sun Protection",
+            "question_format": "written",
+            "prompt": "Describe the key counseling points you would provide to the patient regarding sun protection, considering her diagnosis of urticarial vasculitis and the potential for photosensitivity.",
+            "options": null,
+            "expected_answer": "Advise the patient to avoid prolonged sun exposure, especially during peak hours. Recommend using a broad-spectrum sunscreen with an SPF of 30 or higher daily, even on cloudy days. Suggest wearing protective clothing, such as long sleeves and a wide-brimmed hat. Emphasize the importance of reapplication of sunscreen every two hours, especially after swimming or sweating. Explain that sun exposure can exacerbate skin lesions and systemic symptoms.",
+            "image_placeholder_url": null,
+            "explanation": "Sun protection is crucial for patients with photosensitivity. Providing clear and concise instructions can help patients adhere to sun protection measures and minimize disease exacerbations.",
+            "concept_modal": {
+                "specific": "Photosensitivity can worsen urticarial vasculitis and trigger flares, making sun protection a key component of management.",
+                "general": "Patient education is essential for empowering patients to manage their chronic conditions effectively.",
+                "lateral": "Sun protection is also important for patients with lupus, polymorphous light eruption, and other photosensitive conditions."
+            }
+        },
+        {
+            "station_title": "Impact of Comorbidities",
+            "question_format": "MCQ",
+            "prompt": "The patient has a history of hypertension and is currently taking propranolol. How might propranolol potentially impact the management of her urticarial vasculitis?",
+            "options": {
+                "A": "Propranolol may worsen the urticaria by blocking beta-2 adrenergic receptors.",
+                "B": "Propranolol may improve the urticaria by reducing anxiety-related flares.",
+                "C": "Propranolol has no known interaction with urticarial vasculitis.",
+                "D": "Propranolol may interfere with the action of antihistamines."
+            },
+            "expected_answer": null,
+            "image_placeholder_url": null,
+            "explanation": "A is correct. Beta-blockers like propranolol can sometimes exacerbate urticaria by blocking beta-2 adrenergic receptors, which normally inhibit mast cell degranulation. This is a less common, but important consideration. B is incorrect because while anxiety can worsen some skin conditions, propranolol's primary effect on urticaria is through beta-receptor blockade. C is incorrect because there is a potential interaction. D is incorrect; propranolol does not directly interfere with antihistamine action.",
+            "concept_modal": {
+                "specific": "Understanding potential drug interactions is crucial in managing patients with multiple comorbidities.",
+                "general": "Beta-blockers can have various effects on the skin, including exacerbating or triggering certain dermatological conditions.",
+                "lateral": "Beta-blockers can also affect psoriasis and other skin conditions."
+            }
+        },
+        {
+            "station_title": "Assessing for Systemic Involvement",
+            "question_format": "written",
+            "prompt": "Beyond the skin and joints, what other organ systems should be monitored for potential involvement in urticarial vasculitis, and what specific signs or symptoms would raise concern?",
+            "options": null,
+            "expected_answer": "Kidneys (proteinuria, hematuria, elevated creatinine), lungs (cough, shortness of breath, chest pain), and gastrointestinal tract (abdominal pain, bleeding).",
+            "image_placeholder_url": null,
+            "explanation": "While urticarial vasculitis primarily affects the skin, systemic involvement can occur. Monitoring these organ systems allows for early detection and management of potentially serious complications.",
+            "concept_modal": {
+                "specific": "Urticarial vasculitis can be a manifestation of a systemic vasculitis, requiring careful assessment for involvement of other organs.",
+                "general": "Systemic vasculitides can affect multiple organ systems, leading to a wide range of clinical manifestations.",
+                "lateral": "Other systemic vasculitides include granulomatosis with polyangiitis (GPA) and microscopic polyangiitis (MPA)."
+            }
+        },
+        {
+            "station_title": "Role of Skin Biopsy",
+            "question_format": "MCQ",
+            "prompt": "A patient presents with persistent hives lasting longer than 24 hours, resolving with bruising. Initial lab tests, including CBC and ESR, are normal. What is the MOST appropriate next step in confirming a diagnosis of urticarial vasculitis?",
+            "options": {
+                "A": "Initiate a trial of high-dose antihistamines.",
+                "B": "Order an allergy panel.",
+                "C": "Perform a skin biopsy.",
+                "D": "Order a CT scan of the abdomen."
+            },
+            "expected_answer": null,
+            "image_placeholder_url": null,
+            "explanation": "C is correct. A skin biopsy is essential for confirming the diagnosis of urticarial vasculitis by demonstrating leukocytoclastic vasculitis. A is incorrect as a trial of antihistamines may alleviate symptoms but does not confirm the diagnosis. B is incorrect as allergy testing is not typically indicated in urticarial vasculitis. D is incorrect as abdominal imaging is not relevant unless there are specific abdominal symptoms.",
+            "concept_modal": {
+                "specific": "A skin biopsy is the gold standard for diagnosing urticarial vasculitis.",
+                "general": "Biopsy is often required for definitive diagnosis of dermatological conditions.",
+                "lateral": "Biopsy is also important for diagnosing skin cancers and infections."
+            }
+        },
+        {
+            "station_title": "Long-term Management Considerations",
+            "question_format": "written",
+            "prompt": "If the patient's urticarial vasculitis is refractory to initial treatments, what are some potential second-line immunosuppressive agents that could be considered, and what monitoring would be required for each?",
+            "options": null,
+            "expected_answer": "Potential second-line agents include dapsone (monitoring for hemolysis and methemoglobinemia), colchicine (monitoring for bone marrow suppression and GI side effects), and hydroxychloroquine (monitoring for retinal toxicity). More potent immunosuppressants like methotrexate or azathioprine may also be considered in severe cases, with appropriate monitoring for liver and bone marrow toxicity.",
+            "image_placeholder_url": null,
+            "explanation": "Refractory urticarial vasculitis may require more aggressive immunosuppressive therapy. Careful monitoring is essential to detect and manage potential side effects of these medications.",
+            "concept_modal": {
+                "specific": "Managing refractory urticarial vasculitis requires a thorough understanding of the risks and benefits of various immunosuppressive agents.",
+                "general": "Immunosuppressive medications are used to treat a variety of autoimmune and inflammatory conditions, but they can also cause significant side effects.",
+                "lateral": "These medications are also used in rheumatoid arthritis, lupus, and inflammatory bowel disease."
+            }
+        },
+        {
+            "station_title": "Differentiating Urticaria",
+            "question_format": "MCQ",
+            "prompt": "Which of the following features BEST differentiates urticarial vasculitis from chronic idiopathic urticaria?",
+            "options": {
+                "A": "Presence of pruritus.",
+                "B": "Duration of individual lesions.",
+                "C": "Response to antihistamines.",
+                "D": "Presence of wheals."
+            },
+            "expected_answer": null,
+            "image_placeholder_url": null,
+            "explanation": "B is correct. Urticarial vasculitis lesions typically last longer than 24 hours, whereas chronic idiopathic urticaria lesions resolve within 24 hours. A, C, and D can be present in both conditions.",
+            "concept_modal": {
+                "specific": "Differentiating urticarial vasculitis from chronic idiopathic urticaria is crucial for appropriate management and prognosis.",
+                "general": "The duration of individual lesions is an important differentiating feature in many dermatological conditions.",
+                "lateral": "The duration of lesions is also important in differentiating between different types of eczema."
+            }
+        },
+        {
+            "station_title": "Managing Fatigue",
+            "question_format": "written",
+            "prompt": "The patient reports persistent fatigue despite adequate treatment of her skin and joint symptoms. What are some potential causes of fatigue in this patient, and how would you approach investigating and managing this symptom?",
+            "options": null,
+            "expected_answer": "Potential causes include underlying inflammation, anemia, medication side effects, depression, and sleep disturbances. Investigate with CBC, iron studies, thyroid function tests, and consider screening for depression. Management includes addressing underlying causes, optimizing sleep hygiene, encouraging regular exercise, and considering referral to a fatigue management program.",
+            "image_placeholder_url": null,
+            "explanation": "Fatigue is a common and debilitating symptom in patients with chronic inflammatory conditions. A thorough evaluation is essential to identify and address potential contributing factors.",
+            "concept_modal": {
+                "specific": "Fatigue can significantly impact quality of life in patients with urticarial vasculitis and requires a comprehensive management approach.",
+                "general": "Fatigue is a common symptom in many medical conditions and can have a variety of underlying causes.",
+                "lateral": "Fatigue is also a common symptom in patients with chronic fatigue syndrome, fibromyalgia, and multiple sclerosis."
+            }
+        }
+    ],
+    "metadata": {
+        "processing_time_seconds": 19.788174,
+        "model_version": "models/gemini-2.0-flash",
+        "generation_config": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 40
+        }
+    }
+}

@@ -7,6 +7,7 @@
     import { Checkbox } from "$lib/components/ui/checkbox";
     import { treatmentProtocolStore } from "$lib/stores/treatmentProtocolStore";
     import MedicationItem from "../../02-molecules/medication-item.svelte";
+    import type { TreatmentFeedback } from "$lib/services/treatmentProtocolService";
 
     let { open = $bindable(), onSubmit } = $props<{
         open: boolean;
@@ -18,11 +19,7 @@
         dosage: string;
         indication: string;
         isPrimary: boolean;
-        feedback: {
-            match: boolean;
-            classification_correct: boolean;
-            reason: string;
-        };
+        feedback: TreatmentFeedback;
     };
 
     let { medications } = $state({ medications: [] as MedicationProtocol[] });
@@ -39,11 +36,7 @@
         newIndication: "",
         newMedicationIsPrimary: false,
         isSubmitting: false,
-        feedback: {
-            match: false,
-            classification_correct: false,
-            reason: "",
-        },
+        feedback: null as TreatmentFeedback | null,
     });
 
     let dosageInput: HTMLInputElement;
@@ -88,11 +81,7 @@
                 newMedicationIsPrimary = false;
                 drugNameInput.focus();
             } catch (error) {
-                feedback = {
-                    match: false,
-                    classification_correct: false,
-                    reason: "",
-                };
+                feedback = null;
                 showSuccess = false;
                 successMessage = "";
                 console.error("Error:", error);
@@ -134,12 +123,26 @@
 
         try {
             isSubmitting = true;
-            const treatmentData = {
-                treatmentProtocol: medications,
-            };
+
+            // Format medications into treatment plan strings
+            const treatmentPlan = medications.map(
+                (med) =>
+                    `Drugs - ${med.drugName} ${med.dosage}${med.indication ? `| Notes -  ${med.indication}` : ""}`,
+            );
+
+            // Call the API
+            const response =
+                await treatmentProtocolStore.recordTreatmentPlan(treatmentPlan);
 
             await sendMessage(
-                JSON.stringify(treatmentData, null, 2),
+                JSON.stringify(
+                    {
+                        treatmentProtocol: medications,
+                        treatmentPlan: treatmentPlan,
+                    },
+                    null,
+                    2,
+                ),
                 "student",
                 "treatment-protocol",
                 "treatment-protocol",
@@ -227,7 +230,7 @@
                         <label
                             for="indication"
                             class="text-sm font-medium text-gray-700"
-                            >Indication</label
+                            >Additional Notes</label
                         >
                         <div class="flex gap-2">
                             <input

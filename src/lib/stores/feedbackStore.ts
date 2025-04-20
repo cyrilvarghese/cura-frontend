@@ -1,9 +1,18 @@
 import { writable, get } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
-import type { FeedbackState, StudentMessage } from '$lib/types/index';
+import type { FeedbackResponse, StudentMessage } from '$lib/types/index';
+import type { OsceGenerationResponse } from '$lib/services/feedbackService';
 import { currentCaseId } from "$lib/stores/casePlayerStore";
 
-
+interface FeedbackState {
+    annotations: null | any;
+    feedback: null | any;
+    total_score: null | number;
+    suggestions: null | any;
+    isLoading: boolean;
+    error: null | string;
+    osceData: null | OsceGenerationResponse;
+}
 
 const initialState: FeedbackState = {
     annotations: null,
@@ -11,7 +20,8 @@ const initialState: FeedbackState = {
     total_score: null,
     suggestions: null,
     isLoading: false,
-    error: null
+    error: null,
+    osceData: null
 };
 
 function createFeedbackStore() {
@@ -49,9 +59,32 @@ function createFeedbackStore() {
         set(initialState);
     }
 
+    async function generateFinalOsce(caseId: string) {
+        update(state => ({ ...state, isLoading: true, error: null }));
+
+        try {
+            const response = await feedbackService.generateFinalOsce(caseId);
+            update(state => ({
+                ...state,
+                osceData: response,
+                isLoading: false
+            }));
+            return response;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to generate OSCE';
+            update(state => ({
+                ...state,
+                error: errorMessage,
+                isLoading: false
+            }));
+            throw error;
+        }
+    }
+
     return {
         subscribe,
         getFeedback,
+        generateFinalOsce,
         reset
     };
 }

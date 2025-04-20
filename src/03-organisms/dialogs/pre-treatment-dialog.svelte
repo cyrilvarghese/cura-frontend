@@ -10,6 +10,7 @@
     import type { TestFeedback } from "$lib/services/preTreatmentService";
     import { Input } from "$lib/components/ui/input";
     import TestFeedbackPopover from "../../03-molecules/test-feedback-popover.svelte";
+    import { treatmentMonitoringStore } from "$lib/stores/treatmentMonitoringStore";
 
     let { open = $bindable(false), onSubmit } = $props<{
         open?: boolean;
@@ -146,6 +147,13 @@
             const monitoringInputs = monitoring.map(
                 (m) => `${m.timePoint} - ${m.test}`,
             );
+
+            //call the api
+            const response =
+                await treatmentMonitoringStore.recordTreatmentMonitoring(
+                    preTreatmentInputs,
+                    monitoringInputs,
+                );
 
             await sendMessage(
                 JSON.stringify(

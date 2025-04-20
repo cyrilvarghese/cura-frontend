@@ -45,6 +45,21 @@ export interface TreatmentFeedback {
     reason: string;
 }
 
+export interface TreatmentPlanRequest {
+    case_id: string;
+    treatment_plan: string[];
+}
+
+export interface TreatmentPlanResponse {
+    success: boolean;
+    message?: string;
+    data?: {
+        case_id: string;
+        treatment_plan: string[];
+        timestamp: string;
+    };
+}
+
 export interface TreatmentProtocolResponse {
     case_id: string;
     timestamp: string;
@@ -92,6 +107,34 @@ export class TreatmentProtocolService {
             return response.json();
         } catch (error) {
             console.error('Error evaluating treatment protocol:', error);
+            throw error;
+        }
+    }
+
+    async recordTreatmentPlan(
+        caseId: string,
+        treatmentPlan: string[]
+    ): Promise<TreatmentPlanResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/treatment-plan`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`
+                },
+                body: JSON.stringify({
+                    case_id: caseId,
+                    treatment_plan: treatmentPlan
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to record treatment plan');
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('Error recording treatment plan:', error);
             throw error;
         }
     }

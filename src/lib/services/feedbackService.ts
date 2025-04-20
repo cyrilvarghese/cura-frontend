@@ -2,6 +2,44 @@ import type { FeedbackResponse, StudentMessage } from "$lib/types/index";
 import { API_BASE_URL } from '$lib/config/api';
 import mockFeedback from "$lib/data/mock-feedback.json";
 import mockFeedback2 from "$lib/data/mock-feedback2.json";
+import { handleApiResponse } from "$lib/utils/auth-handler";
+
+interface OsceQuestion {
+    station_title: string;
+    question_format: "MCQ" | "image-based" | "written";
+    prompt: string;
+    options?: {
+        A: string;
+        B: string;
+        C: string;
+        D: string;
+    };
+    expected_answer?: string;
+    image_placeholder_url?: string;
+    explanation: string;
+    concept_modal: {
+        specific: string;
+        general: string;
+        lateral: string;
+    };
+}
+
+interface OsceGenerationResponse {
+    case_id: string;
+    student_id: string;
+    department: string;
+    timestamp: string;
+    osce_questions: OsceQuestion[];
+    metadata: {
+        processing_time_seconds: number;
+        model_version: string;
+        generation_config: {
+            temperature: number;
+            top_p: number;
+            top_k: number;
+        };
+    };
+}
 
 export class FeedbackService {
     private baseUrl = API_BASE_URL;
@@ -40,6 +78,32 @@ export class FeedbackService {
         }
         */
     }
+
+    async generateFinalOsce(caseId: string): Promise<OsceGenerationResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/osce/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    case_id: caseId
+                })
+            });
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to generate OSCE');
+            }
+
+            const data: OsceGenerationResponse = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error generating OSCE:', error);
+            throw error;
+        }
+    }
 }
 
-export const feedbackService = new FeedbackService(); 
+export const feedbackService = new FeedbackService();
+export type { OsceGenerationResponse, OsceQuestion }; 

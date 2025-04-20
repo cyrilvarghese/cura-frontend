@@ -24,6 +24,9 @@
     import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
     import { Pill } from "lucide-svelte";
     import mixpanel from "mixpanel-browser";
+    import { feedbackStore } from "$lib/stores/feedbackStore";
+    import OSCEPopup from "../../components/OSCEPopup.svelte";
+    import mockOsceData from "$lib/data/mock-osce.json";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -40,9 +43,12 @@
     let endCaseDialogOpen = $state(false);
     let investigationDialogOpen = $state(false);
     let treatmentProtocolDialogOpen = $state(false);
+    let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("pre-treatment"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("end-case"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+
+    let isEndCaseLoading = $state(false);
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -116,14 +122,29 @@
         currentStep = "pre-treatment";
     }
 
-    function handleEndCase() {
+    async function handleEndCase() {
         console.log("Case ended");
-        mixpanel.track("end case", {
-            "case ID": id,
-            "current step": currentStep,
-            "end time": new Date().toISOString(),
-        });
-        endCaseDialogOpen = false;
+        isEndCaseLoading = true;
+
+        try {
+            const response = await feedbackStore.generateFinalOsce(id);
+            console.log("OSCE generated", response);
+
+            mixpanel.track("end case", {
+                "case ID": id,
+                "current step": currentStep,
+                "end time": new Date().toISOString(),
+            });
+            endCaseDialogOpen = false;
+
+            // Call triggerOSCE here to show the OSCE popup
+            triggerOSCE();
+        } catch (error) {
+            console.error("Error generating OSCE:", error);
+            // You might want to show an error message to the user here
+        } finally {
+            isEndCaseLoading = false;
+        }
     }
 
     function handleInvestigationSubmit() {
@@ -136,6 +157,10 @@
         console.log("Treatment protocol submitted");
         treatmentProtocolDialogOpen = false;
         currentStep = "end";
+    }
+
+    function triggerOSCE() {
+        showOSCE = true;
     }
 
     const stepButtons = {
@@ -176,6 +201,17 @@
             variant: "destructive" as const,
         },
     };
+
+    let osceData = $state<any>(null);
+    const unsubscribeOsceData = feedbackStore.subscribe((state) => {
+        osceData = state.osceData;
+    });
+
+    // Add this to your onDestroy cleanup
+    onDestroy(() => {
+        unsubscribe(); // existing unsubscribe
+        unsubscribeOsceData(); // new unsubscribe for osceData
+    });
 </script>
 
 <PageLayout
@@ -288,5 +324,16 @@
         onSubmit={handleTreatmentProtocolSubmit}
     />
 
-    <EndCaseDialog bind:open={endCaseDialogOpen} onSubmit={handleEndCase} />
+    <EndCaseDialog
+        bind:open={endCaseDialogOpen}
+        onSubmit={handleEndCase}
+        isLoading={isEndCaseLoading}
+    />
+
+    <!-- Add the OSCE popup component -->
+    <OSCEPopup
+        isOpen={showOSCE}
+        onClose={() => (showOSCE = false)}
+        caseData={osceData}
+    />
 </PageLayout>

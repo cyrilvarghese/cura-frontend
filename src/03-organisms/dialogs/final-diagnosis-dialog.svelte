@@ -3,6 +3,10 @@
     import { Button } from "$lib/components/ui/button";
     import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
     import { feedbackStore } from "$lib/stores/feedbackStore";
+    import { finalDiagnosisStore } from "$lib/stores/finalDiagnosisStore";
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { get } from "svelte/store";
+    import { toast } from "svelte-sonner";
     import Loader2 from "lucide-svelte/icons/loader-2";
 
     export let open = false;
@@ -16,6 +20,18 @@
         onSubmit();
         isSubmitting = true;
         try {
+            const caseId = get(currentCaseId);
+            if (!caseId) {
+                throw new Error("No case ID found");
+            }
+
+            // Record the final diagnosis using our new store
+            await finalDiagnosisStore.recordFinalDiagnosis(
+                caseId,
+                finalDiagnosis,
+                justification,
+            );
+
             const messageContent = `Primary Diagnosis: ${finalDiagnosis}\nJustification: ${justification}\nDifferential Diagnoses: `;
 
             // Send message to chat
@@ -33,7 +49,7 @@
 
             // Send feedback directly
             await sendMessage(
-                feedbackResponse, // Send the feedback response object directly
+                feedbackResponse,
                 "assistant",
                 "feedback",
                 "feedback",
@@ -43,6 +59,12 @@
             open = false;
         } catch (error) {
             console.error("Error submitting diagnosis:", error);
+            toast.error("Failed to submit final diagnosis", {
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : "Unknown error occurred",
+            });
         } finally {
             isSubmitting = false;
         }
