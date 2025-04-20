@@ -38,6 +38,7 @@ export class AuthService {
 
             if (!response.ok) {
                 const errorData = await response.json();
+                toast.dismiss();
                 toast.error('Signup failed', {
                     description: errorData.message || 'Please try again later'
                 });
@@ -77,6 +78,7 @@ export class AuthService {
             }
 
             const result = await response.json();
+            toast.dismiss();
             toast.success('Login successful', {
                 description: 'Welcome back!'
             });
