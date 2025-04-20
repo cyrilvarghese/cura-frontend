@@ -1,5 +1,18 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
+    import { osceFeedbackStore } from "$lib/stores/osceFeedbackStore";
+    import type {
+        StudentResponse,
+        OSCEFeedbackResponse,
+    } from "$lib/services/osceFeedbackService";
+    import { Button } from "$lib/components/ui/button";
+    import * as Popover from "$lib/components/ui/popover";
+    import CheckCircle from "lucide-svelte/icons/check-circle";
+    import XCircle from "lucide-svelte/icons/x-circle";
+    import ChevronDown from "lucide-svelte/icons/chevron-down";
+    import ChevronUp from "lucide-svelte/icons/chevron-up";
+    import Loader2 from "lucide-svelte/icons/loader-2";
+    import Info from "lucide-svelte/icons/info";
 
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
@@ -7,28 +20,155 @@
     let showExplanation = $state(false);
     let selectedAnswer = $state<string | null>(null);
     let writtenAnswer = $state("");
+    let feedbackResponse = $state<OSCEFeedbackResponse | null>(null);
+    let isSubmitting = $state(false);
+    let explanationExpanded = $state(false);
+
+    // Track student responses for all questions
+    let studentResponses = $state<
+        Array<{
+            student_mcq_choice_key: string | null;
+            student_written_answer: string | null;
+        }>
+    >([]);
+
+    // Initialize student responses array based on number of questions
+    $effect(() => {
+        if (caseData?.osce_questions) {
+            studentResponses = caseData.osce_questions.map(() => ({
+                student_mcq_choice_key: null,
+                student_written_answer: null,
+            }));
+        }
+    });
 
     $effect(() => {
         // Reset state when question changes
         showExplanation = false;
         selectedAnswer = null;
         writtenAnswer = "";
+        feedbackResponse = null;
+        explanationExpanded = false;
     });
 
     function nextQuestion() {
         if (currentQuestionIndex < caseData.osce_questions.length - 1) {
+            // Save current response before moving to next question
+            saveCurrentResponse();
+
+            // Move to next question
             currentQuestionIndex = currentQuestionIndex + 1;
+
+            // Reset UI state for the new question
+            showExplanation = false;
+            selectedAnswer = null;
+            writtenAnswer = "";
         }
     }
 
     function prevQuestion() {
         if (currentQuestionIndex > 0) {
+            // Save current response before moving to previous question
+            saveCurrentResponse();
+
+            // Move to previous question
             currentQuestionIndex = currentQuestionIndex - 1;
+
+            // Reset UI state for the new question
+            showExplanation = false;
+            selectedAnswer = null;
+            writtenAnswer = "";
         }
     }
 
-    function submitAnswer() {
-        showExplanation = true;
+    function saveCurrentResponse() {
+        const currentQuestion = getCurrentQuestion();
+        if (currentQuestion.question_format === "MCQ") {
+            studentResponses[currentQuestionIndex].student_mcq_choice_key =
+                selectedAnswer;
+            studentResponses[currentQuestionIndex].student_written_answer =
+                null;
+        } else if (currentQuestion.question_format === "written") {
+            studentResponses[currentQuestionIndex].student_written_answer =
+                writtenAnswer;
+            studentResponses[currentQuestionIndex].student_mcq_choice_key =
+                null;
+        }
+    }
+
+    async function submitAnswer() {
+        // Get the current question
+        const currentQuestion = getCurrentQuestion();
+        let studentResponse: StudentResponse;
+
+        // Save the appropriate response based on question type
+        if (currentQuestion.question_format === "MCQ") {
+            // For MCQ questions
+            if (!selectedAnswer) {
+                // Handle case where user hasn't selected an answer
+                alert("Please select an answer before submitting.");
+                return;
+            }
+
+            studentResponse = {
+                student_mcq_choice_key: selectedAnswer,
+                student_written_answer: null,
+            };
+        } else if (currentQuestion.question_format === "written") {
+            // For written questions
+            if (!writtenAnswer.trim()) {
+                // Handle case where user hasn't written an answer
+                alert("Please provide an answer before submitting.");
+                return;
+            }
+
+            studentResponse = {
+                student_mcq_choice_key: null,
+                student_written_answer: writtenAnswer,
+            };
+        } else {
+            // Handle other question types if needed
+            console.error(
+                "Unsupported question format:",
+                currentQuestion.question_format,
+            );
+            return;
+        }
+
+        // Log the response data
+        console.log("Question details:", currentQuestion);
+        console.log("Student response:", studentResponse);
+
+        // Submit the response to the API
+        isSubmitting = true;
+        try {
+            const feedback = await osceFeedbackStore.submitOSCEResponse(
+                currentQuestion,
+                studentResponse,
+            );
+            console.log("OSCE feedback received:", feedback);
+            feedbackResponse = feedback;
+            showExplanation = true;
+        } catch (error) {
+            console.error("Error submitting OSCE response:", error);
+            // Show error to the user
+        } finally {
+            isSubmitting = false;
+        }
+    }
+
+    function toggleExplanation() {
+        explanationExpanded = !explanationExpanded;
+    }
+
+    function getScoreColor(score: number) {
+        if (score >= 1.0) return "text-green-600";
+        if (score >= 0.5) return "text-yellow-600";
+        return "text-red-600";
+    }
+
+    function getScoreIcon(isCorrect: boolean) {
+        return isCorrect ? CheckCircle : XCircle;
     }
 
     function getCurrentQuestion() {
@@ -36,6 +176,8 @@
     }
 
     function closePopup() {
+        // You might want to save all responses before closing
+        console.log("All student responses:", studentResponses);
         onClose();
     }
 </script>
@@ -139,34 +281,98 @@
 
                         <!-- MCQ question -->
                         {#if getCurrentQuestion().question_format === "MCQ" && getCurrentQuestion().options}
-                            <div class="space-y-3 mb-6">
-                                {#each Object.entries(getCurrentQuestion().options) as [key, value]}
-                                    <button
-                                        type="button"
-                                        class="p-3 border rounded-lg cursor-pointer transition-colors w-full text-left {selectedAnswer ===
-                                        key
-                                            ? 'bg-blue-100 border-blue-500'
-                                            : 'hover:bg-gray-50'}"
-                                        onclick={() => (selectedAnswer = key)}
+                            <div class="space-y-3 mt-4">
+                                {#each Object.entries(getCurrentQuestion().options) as [key, text]}
+                                    <div
+                                        class="border rounded-lg p-4 transition-colors {showExplanation &&
+                                        key ===
+                                            getCurrentQuestion()
+                                                .mcq_correct_answer_key
+                                            ? 'border-green-500 bg-green-50'
+                                            : showExplanation &&
+                                                selectedAnswer === key &&
+                                                key !==
+                                                    getCurrentQuestion()
+                                                        .mcq_correct_answer_key
+                                              ? 'border-red-500 bg-red-50'
+                                              : selectedAnswer === key
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-gray-200'}"
+                                        onclick={() => {
+                                            if (!showExplanation) {
+                                                selectedAnswer = key;
+                                            }
+                                        }}
+                                        onkeydown={(e) => {
+                                            if (
+                                                (e.key === "Enter" ||
+                                                    e.key === " ") &&
+                                                !showExplanation
+                                            ) {
+                                                selectedAnswer = key;
+                                            }
+                                        }}
+                                        tabindex="0"
+                                        role="radio"
+                                        aria-checked={selectedAnswer === key}
                                     >
-                                        <label
-                                            class="flex items-start cursor-pointer"
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="mcq-answer"
-                                                value={key}
-                                                checked={selectedAnswer === key}
-                                                class="mt-1 mr-3"
-                                            />
-                                            <span
-                                                ><span class="font-bold"
-                                                    >{key}:</span
+                                        <div class="flex items-start">
+                                            <div class="mt-1 mr-3">
+                                                <input
+                                                    type="radio"
+                                                    name="mcq-option"
+                                                    id={`option-${key}`}
+                                                    value={key}
+                                                    checked={selectedAnswer ===
+                                                        key}
+                                                    disabled={showExplanation}
+                                                    class="h-4 w-4 text-blue-600"
+                                                />
+                                            </div>
+                                            <div class="flex-grow">
+                                                <label
+                                                    for={`option-${key}`}
+                                                    class="flex items-center cursor-pointer"
                                                 >
-                                                {value}</span
-                                            >
-                                        </label>
-                                    </button>
+                                                    <span
+                                                        class="font-medium mr-2"
+                                                        >{key}:</span
+                                                    >
+                                                    <span>{text}</span>
+
+                                                    {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
+                                                        <span
+                                                            class="ml-2 text-green-600"
+                                                            >✓</span
+                                                        >
+                                                    {/if}
+
+                                                    {#if showExplanation && selectedAnswer === key && key !== getCurrentQuestion().mcq_correct_answer_key}
+                                                        <span
+                                                            class="ml-2 text-red-600"
+                                                            >✗</span
+                                                        >
+                                                    {/if}
+                                                </label>
+
+                                                {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
+                                                    <div
+                                                        class="mt-2 text-sm text-green-700"
+                                                    >
+                                                        {#if feedbackResponse?.feedback.feedback}
+                                                            <p
+                                                                class="mt-2 pl-6"
+                                                            >
+                                                                {feedbackResponse
+                                                                    .feedback
+                                                                    .feedback}
+                                                            </p>
+                                                        {/if}
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </div>
                                 {/each}
                             </div>
                         {/if}
@@ -187,80 +393,302 @@
                             </div>
                         {/if}
 
-                        <!-- Submit button -->
-                        <button
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onclick={submitAnswer}
-                            disabled={showExplanation ||
-                                (getCurrentQuestion().question_format ===
-                                    "MCQ" &&
-                                    !selectedAnswer) ||
-                                (getCurrentQuestion().question_format ===
-                                    "written" &&
-                                    !writtenAnswer)}
-                        >
-                            Submit Answer
-                        </button>
+                        <!-- Footer with action buttons -->
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center space-x-3">
+                                <Button
+                                    onclick={submitAnswer}
+                                    disabled={showExplanation ||
+                                        isSubmitting ||
+                                        (getCurrentQuestion()
+                                            .question_format === "MCQ" &&
+                                            !selectedAnswer) ||
+                                        (getCurrentQuestion()
+                                            .question_format === "written" &&
+                                            !writtenAnswer)}
+                                >
+                                    {#if isSubmitting}
+                                        <Loader2
+                                            class="mr-2 h-4 w-4 animate-spin"
+                                        />
+                                        Submitting...
+                                    {:else}
+                                        Submit Answer
+                                    {/if}
+                                </Button>
 
-                        <!-- Explanation section -->
-                        {#if showExplanation}
-                            <div
-                                class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
-                            >
-                                <h3 class="text-lg font-bold mb-2">
-                                    Explanation
-                                </h3>
-                                <p class="text-gray-800">
-                                    {getCurrentQuestion().explanation}
-                                </p>
+                                {#if showExplanation}
+                                    <Popover.Root>
+                                        <Popover.Trigger>
+                                            <Button variant="link" size="sm">
+                                                <Info class="h-4 w-4" />
+                                                Explanation
+                                            </Button>
+                                        </Popover.Trigger>
+                                        <Popover.Content
+                                            class="w-[calc(100vw-4rem)] max-w-3xl max-h-[80vh] overflow-y-auto"
+                                            sideOffset={5}
+                                        >
+                                            <div class="p-4 bg-white">
+                                                <!-- Explanation card -->
+                                                <div
+                                                    class="bg-amber-50 rounded-lg shadow-sm border border-amber-200 overflow-hidden mb-4"
+                                                >
+                                                    <div
+                                                        class="bg-amber-100 px-4 py-3 border-b border-amber-200"
+                                                    >
+                                                        <h4
+                                                            class="font-bold text-amber-800 flex items-center"
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-5 w-5 mr-2"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                                />
+                                                            </svg>
+                                                            Explanation
+                                                        </h4>
+                                                    </div>
+                                                    <div class="p-4">
+                                                        <p
+                                                            class="text-gray-800"
+                                                        >
+                                                            {getCurrentQuestion()
+                                                                .explanation ||
+                                                                "No explanation available"}
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                {#if getCurrentQuestion().expected_answer}
-                                    <div class="mt-4">
-                                        <h4 class="font-bold">
-                                            Expected Answer:
-                                        </h4>
-                                        <p class="text-gray-800">
-                                            {getCurrentQuestion()
-                                                .expected_answer}
-                                        </p>
-                                    </div>
-                                {/if}
+                                                <!-- Key Concepts section -->
+                                                {#if getCurrentQuestion().concept_modal}
+                                                    <div class="mb-2">
+                                                        <h4
+                                                            class="font-bold text-gray-700 flex items-center"
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-5 w-5 mr-2"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                                                />
+                                                            </svg>
+                                                            Key Concepts
+                                                        </h4>
+                                                    </div>
 
-                                <!-- Concept modal -->
-                                {#if getCurrentQuestion().concept_modal}
-                                    <div
-                                        class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
-                                    >
-                                        <h4 class="font-bold mb-2">
-                                            Key Concepts
-                                        </h4>
-                                        <div class="space-y-2">
-                                            <p>
-                                                <span class="font-semibold"
-                                                    >Specific:</span
-                                                >
-                                                {getCurrentQuestion()
-                                                    .concept_modal.specific}
-                                            </p>
-                                            <p>
-                                                <span class="font-semibold"
-                                                    >General:</span
-                                                >
-                                                {getCurrentQuestion()
-                                                    .concept_modal.general}
-                                            </p>
-                                            <p>
-                                                <span class="font-semibold"
-                                                    >Lateral:</span
-                                                >
-                                                {getCurrentQuestion()
-                                                    .concept_modal.lateral}
-                                            </p>
-                                        </div>
-                                    </div>
+                                                    <div
+                                                        class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                                                    >
+                                                        <!-- Specific card -->
+                                                        <div
+                                                            class="bg-blue-50 rounded-lg shadow-sm border border-blue-200 overflow-hidden hover:shadow-md transition-shadow"
+                                                        >
+                                                            <div
+                                                                class="bg-blue-100 px-4 py-2 border-b border-blue-200"
+                                                            >
+                                                                <h5
+                                                                    class="font-semibold text-blue-800 flex items-center"
+                                                                >
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        class="h-4 w-4 mr-1"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <path
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                                                        />
+                                                                    </svg>
+                                                                    Specific
+                                                                </h5>
+                                                            </div>
+                                                            <div class="p-4">
+                                                                <p
+                                                                    class="text-gray-800"
+                                                                >
+                                                                    {getCurrentQuestion()
+                                                                        .concept_modal
+                                                                        .specific}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- General card -->
+                                                        <div
+                                                            class="bg-purple-50 rounded-lg shadow-sm border border-purple-200 overflow-hidden hover:shadow-md transition-shadow"
+                                                        >
+                                                            <div
+                                                                class="bg-purple-100 px-4 py-2 border-b border-purple-200"
+                                                            >
+                                                                <h5
+                                                                    class="font-semibold text-purple-800 flex items-center"
+                                                                >
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        class="h-4 w-4 mr-1"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <path
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                                        />
+                                                                    </svg>
+                                                                    General
+                                                                </h5>
+                                                            </div>
+                                                            <div class="p-4">
+                                                                <p
+                                                                    class="text-gray-800"
+                                                                >
+                                                                    {getCurrentQuestion()
+                                                                        .concept_modal
+                                                                        .general}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Lateral card -->
+                                                        <div
+                                                            class="bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden hover:shadow-md transition-shadow"
+                                                        >
+                                                            <div
+                                                                class="bg-green-100 px-4 py-2 border-b border-green-200"
+                                                            >
+                                                                <h5
+                                                                    class="font-semibold text-green-800 flex items-center"
+                                                                >
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        class="h-4 w-4 mr-1"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        stroke="currentColor"
+                                                                    >
+                                                                        <path
+                                                                            stroke-linecap="round"
+                                                                            stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                                                                        />
+                                                                    </svg>
+                                                                    Lateral
+                                                                </h5>
+                                                            </div>
+                                                            <div class="p-4">
+                                                                <p
+                                                                    class="text-gray-800"
+                                                                >
+                                                                    {getCurrentQuestion()
+                                                                        .concept_modal
+                                                                        .lateral}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {/if}
+
+                                                <!-- Expected answer card (if available) -->
+                                                {#if getCurrentQuestion().expected_answer}
+                                                    <div
+                                                        class="mt-4 bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden"
+                                                    >
+                                                        <div
+                                                            class="bg-green-100 px-4 py-3 border-b border-green-200"
+                                                        >
+                                                            <h4
+                                                                class="font-bold text-green-800 flex items-center"
+                                                            >
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    class="h-5 w-5 mr-2"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                    stroke="currentColor"
+                                                                >
+                                                                    <path
+                                                                        stroke-linecap="round"
+                                                                        stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                                    />
+                                                                </svg>
+                                                                Expected Answer
+                                                            </h4>
+                                                        </div>
+                                                        <div class="p-4">
+                                                            <p
+                                                                class="text-gray-800"
+                                                            >
+                                                                {getCurrentQuestion()
+                                                                    .expected_answer}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                            <Popover.Arrow />
+                                        </Popover.Content>
+                                    </Popover.Root>
                                 {/if}
                             </div>
-                        {/if}
+
+                            <!-- Feedback display -->
+                            {#if feedbackResponse}
+                                <div class="flex items-center">
+                                    {#if feedbackResponse.feedback.evaluation_result === "Correct"}
+                                        <CheckCircle
+                                            class="h-5 w-5 text-green-500 mr-2"
+                                        />
+                                        <span class="font-medium text-green-700"
+                                            >Correct</span
+                                        >
+                                        <span
+                                            class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded"
+                                        >
+                                            Score: {feedbackResponse.feedback
+                                                .score}
+                                        </span>
+                                    {:else}
+                                        <XCircle
+                                            class="h-5 w-5 text-red-500 mr-2"
+                                        />
+                                        <span class="font-medium text-red-700"
+                                            >Incorrect</span
+                                        >
+                                        <span
+                                            class="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded"
+                                        >
+                                            Score: {feedbackResponse.feedback
+                                                .score}
+                                        </span>
+                                    {/if}
+                                </div>
+                            {/if}
+                        </div>
                     </div>
                 {/if}
             </div>
