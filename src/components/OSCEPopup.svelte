@@ -16,15 +16,30 @@
 
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
+    // Current question being displayed to the user
     let currentQuestionIndex = $state(0);
+    // Controls whether to show the explanation for the current question
     let showExplanation = $state(false);
+    // Stores the selected MCQ answer key for the current question
     let selectedAnswer = $state<string | null>(null);
+    // Stores the written answer for the current question
     let writtenAnswer = $state("");
+    // Stores the feedback response from the API for the current question
     let feedbackResponse = $state<OSCEFeedbackResponse | null>(null);
+    // Indicates whether an answer is currently being submitted to the API
     let isSubmitting = $state(false);
+    // Controls whether the explanation section is expanded or collapsed
     let explanationExpanded = $state(false);
+    // Tracks the cumulative score across all answered questions
+    let totalScore = $state(0);
+    // Tracks how many questions have been answered so far
+    let questionsAnswered = $state(0);
+    // Stores score information for each answered question
+    let questionScores = $state<
+        Array<{ questionIndex: number; score: number; isCorrect: boolean }>
+    >([]);
 
-    // Track student responses for all questions
+    // Tracks student responses for all questions in the OSCE case
     let studentResponses = $state<
         Array<{
             student_mcq_choice_key: string | null;
@@ -60,9 +75,7 @@
             currentQuestionIndex = currentQuestionIndex + 1;
 
             // Reset UI state for the new question
-            showExplanation = false;
-            selectedAnswer = null;
-            writtenAnswer = "";
+            resetQuestionState();
         }
     }
 
@@ -75,9 +88,27 @@
             currentQuestionIndex = currentQuestionIndex - 1;
 
             // Reset UI state for the new question
-            showExplanation = false;
-            selectedAnswer = null;
-            writtenAnswer = "";
+            resetQuestionState();
+        }
+    }
+
+    // Helper function to reset question state when navigating
+    function resetQuestionState() {
+        showExplanation = false;
+        selectedAnswer = null;
+        writtenAnswer = "";
+        feedbackResponse = null;
+        explanationExpanded = false;
+
+        // Load any previously saved responses for this question
+        const currentResponse = studentResponses[currentQuestionIndex];
+        if (currentResponse) {
+            if (currentResponse.student_mcq_choice_key) {
+                selectedAnswer = currentResponse.student_mcq_choice_key;
+            }
+            if (currentResponse.student_written_answer) {
+                writtenAnswer = currentResponse.student_written_answer;
+            }
         }
     }
 
@@ -149,6 +180,37 @@
             console.log("OSCE feedback received:", feedback);
             feedbackResponse = feedback;
             showExplanation = true;
+
+            // Track the score for this question
+            const score = feedback.feedback.score || 0;
+            const isCorrect = feedback.feedback.evaluation_result === "Correct";
+
+            // Update the question scores array
+            const existingScoreIndex = questionScores.findIndex(
+                (q) => q.questionIndex === currentQuestionIndex,
+            );
+            if (existingScoreIndex >= 0) {
+                // Update existing score
+                questionScores[existingScoreIndex] = {
+                    questionIndex: currentQuestionIndex,
+                    score,
+                    isCorrect,
+                };
+            } else {
+                // Add new score
+                questionScores = [
+                    ...questionScores,
+                    {
+                        questionIndex: currentQuestionIndex,
+                        score,
+                        isCorrect,
+                    },
+                ];
+                questionsAnswered++;
+            }
+
+            // Recalculate total score
+            totalScore = questionScores.reduce((sum, q) => sum + q.score, 0);
         } catch (error) {
             console.error("Error submitting OSCE response:", error);
             // Show error to the user
@@ -389,7 +451,78 @@
                                             e.target as HTMLTextAreaElement;
                                         writtenAnswer = target.value;
                                     }}
+                                    disabled={showExplanation}
                                 ></textarea>
+
+                                <!-- Show feedback first -->
+                                {#if showExplanation && feedbackResponse?.feedback}
+                                    <div
+                                        class="mt-4 p-4 rounded-lg {feedbackResponse
+                                            .feedback.evaluation_result ===
+                                        'Correct'
+                                            ? 'bg-green-50 border border-green-200'
+                                            : 'bg-amber-50 border border-amber-200'}"
+                                    >
+                                        <div class="flex items-center">
+                                            <span class="text-gray-700"
+                                                >{feedbackResponse.feedback
+                                                    .feedback}</span
+                                            >
+                                        </div>
+                                    </div>
+                                {/if}
+
+                                <!-- Collapsible expected answer section -->
+                                {#if showExplanation && getCurrentQuestion().expected_answer}
+                                    <div
+                                        class="mt-4 bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden"
+                                    >
+                                        <button
+                                            class="w-full bg-green-100 px-4 py-3 border-b border-green-200 text-left flex items-center justify-between"
+                                            onclick={() =>
+                                                (explanationExpanded =
+                                                    !explanationExpanded)}
+                                        >
+                                            <h4
+                                                class="font-bold text-green-800 flex items-center"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-5 w-5 mr-2"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                    />
+                                                </svg>
+                                                Expected Answer
+                                            </h4>
+                                            {#if explanationExpanded}
+                                                <ChevronUp
+                                                    class="h-5 w-5 text-green-700"
+                                                />
+                                            {:else}
+                                                <ChevronDown
+                                                    class="h-5 w-5 text-green-700"
+                                                />
+                                            {/if}
+                                        </button>
+
+                                        {#if explanationExpanded}
+                                            <div class="p-4">
+                                                <p class="text-gray-800">
+                                                    {getCurrentQuestion()
+                                                        .expected_answer}
+                                                </p>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                {/if}
                             </div>
                         {/if}
 
@@ -650,44 +783,10 @@
                                                     </div>
                                                 {/if}
                                             </div>
-                                            <Popover.Arrow />
                                         </Popover.Content>
                                     </Popover.Root>
                                 {/if}
                             </div>
-
-                            <!-- Feedback display -->
-                            {#if feedbackResponse}
-                                <div class="flex items-center">
-                                    {#if feedbackResponse.feedback.evaluation_result === "Correct"}
-                                        <CheckCircle
-                                            class="h-5 w-5 text-green-500 mr-2"
-                                        />
-                                        <span class="font-medium text-green-700"
-                                            >Correct</span
-                                        >
-                                        <span
-                                            class="ml-2 bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded"
-                                        >
-                                            Score: {feedbackResponse.feedback
-                                                .score}
-                                        </span>
-                                    {:else}
-                                        <XCircle
-                                            class="h-5 w-5 text-red-500 mr-2"
-                                        />
-                                        <span class="font-medium text-red-700"
-                                            >Incorrect</span
-                                        >
-                                        <span
-                                            class="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded"
-                                        >
-                                            Score: {feedbackResponse.feedback
-                                                .score}
-                                        </span>
-                                    {/if}
-                                </div>
-                            {/if}
                         </div>
                     </div>
                 {/if}
@@ -695,18 +794,51 @@
 
             <!-- Footer with progress indicator -->
             <div class="bg-gray-100 p-3 border-t">
-                <div class="flex justify-center">
-                    {#each Array(caseData.osce_questions.length) as _, i}
-                        <button
-                            type="button"
-                            class="w-3 h-3 mx-1 rounded-full cursor-pointer {i ===
-                            currentQuestionIndex
-                                ? 'bg-blue-600'
-                                : 'bg-gray-300 hover:bg-gray-400'}"
-                            onclick={() => (currentQuestionIndex = i)}
-                            aria-label={`Go to question ${i + 1}`}
-                        ></button>
-                    {/each}
+                <div class="flex justify-between items-center">
+                    <!-- Progress indicators -->
+                    <div class="flex justify-center">
+                        {#each Array(caseData.osce_questions.length) as _, i}
+                            <button
+                                type="button"
+                                class="w-3 h-3 mx-1 rounded-full cursor-pointer {i ===
+                                currentQuestionIndex
+                                    ? 'bg-blue-600'
+                                    : questionScores.some(
+                                            (q) =>
+                                                q.questionIndex === i &&
+                                                q.isCorrect,
+                                        )
+                                      ? 'bg-green-500'
+                                      : questionScores.some(
+                                              (q) =>
+                                                  q.questionIndex === i &&
+                                                  !q.isCorrect,
+                                          )
+                                        ? 'bg-red-500'
+                                        : 'bg-gray-300 hover:bg-gray-400'}"
+                                onclick={() => {
+                                    saveCurrentResponse();
+                                    currentQuestionIndex = i;
+                                    resetQuestionState();
+                                }}
+                                aria-label={`Go to question ${i + 1}`}
+                            ></button>
+                        {/each}
+                    </div>
+
+                    <!-- Score summary -->
+                    <div class="flex items-center">
+                        <div class="text-sm font-medium mr-2">
+                            Score: {totalScore.toFixed(1)} / {caseData
+                                .osce_questions.length}
+                        </div>
+                        <div
+                            class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
+                        >
+                            {questionsAnswered} of {caseData.osce_questions
+                                .length} answered
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
