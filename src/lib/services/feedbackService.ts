@@ -41,6 +41,44 @@ interface OsceGenerationResponse {
     };
 }
 
+interface HistoryFeedbackResponse {
+    case_id: string;
+    student_id: string;
+    timestamp: string;
+    feedback: {
+        question_analysis: Array<{
+            expected_question: string;
+            status: "bang_on" | "missed";
+            score: number;
+            why_important?: string;
+            suggested_question?: string;
+        }>;
+        domain_scores: {
+            [key: string]: {
+                score: number;
+                level: string;
+                comments: string;
+            };
+        };
+        total_score: number;
+        final_feedback: {
+            strengths: string;
+            areas_to_improve: string;
+            actionable_suggestions: string;
+        };
+    };
+    metadata: {
+        processing_time_seconds: number;
+        model_version: string;
+        generation_config: {
+            temperature: number;
+            top_p: number;
+            top_k: number;
+        };
+        total_questions_analyzed: number;
+    };
+}
+
 export class FeedbackService {
     private baseUrl = API_BASE_URL;
 
@@ -103,7 +141,29 @@ export class FeedbackService {
             throw error;
         }
     }
+
+    async getHistoryFeedback(): Promise<HistoryFeedbackResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/feedback/history-taking`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to get history feedback');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting history feedback:', error);
+            throw error;
+        }
+    }
 }
 
 export const feedbackService = new FeedbackService();
-export type { OsceGenerationResponse, OsceQuestion }; 
+export type { OsceGenerationResponse, OsceQuestion, HistoryFeedbackResponse }; 

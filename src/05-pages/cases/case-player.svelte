@@ -46,7 +46,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("end-case"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("final-diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -231,7 +231,7 @@
                     <h2 class="text-2xl font-semibold text-gray-800">
                         Patient Consultation
                     </h2>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-gray-500 capitalize">
                         {#if $apiStore.messages.length > 0}
                             {$apiStore.messages[0].title}
                         {/if}

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { osceFeedbackStore } from "$lib/stores/osceFeedbackStore";
+    import { onMount } from "svelte";
     import type {
         StudentResponse,
         OSCEFeedbackResponse,
@@ -13,6 +14,8 @@
     import ChevronUp from "lucide-svelte/icons/chevron-up";
     import Loader2 from "lucide-svelte/icons/loader-2";
     import Info from "lucide-svelte/icons/info";
+    import OSCEExplanationPopover from "./OSCEExplanationPopover.svelte";
+    import OSCEProgressIndicator from "./OSCEProgressIndicator.svelte";
 
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
@@ -47,23 +50,51 @@
         }>
     >([]);
 
-    // Initialize student responses array based on number of questions
-    $effect(() => {
+    // Add this new state variable to track if all questions have been completed
+    let showEndScreen = $state(false);
+
+    // Add a new state variable to track which questions have been attempted
+    let attemptedQuestions = $state<Set<number>>(new Set());
+
+    // Add a derived value for sorted scores
+    let sortedQuestionScores = $derived(
+        [...questionScores].sort((a, b) => a.questionIndex - b.questionIndex),
+    );
+
+    // Function to reset all state to initial values
+    function resetState() {
+        currentQuestionIndex = 0;
+        showExplanation = false;
+        selectedAnswer = null;
+        writtenAnswer = "";
+        feedbackResponse = null;
+        isSubmitting = false;
+        explanationExpanded = false;
+        totalScore = 0;
+        questionsAnswered = 0;
+        questionScores = [];
+        showEndScreen = false;
+        attemptedQuestions = new Set();
+
+        // Initialize student responses array based on number of questions
         if (caseData?.osce_questions) {
             studentResponses = caseData.osce_questions.map(() => ({
                 student_mcq_choice_key: null,
                 student_written_answer: null,
             }));
         }
+    }
+
+    // Reset state when component mounts
+    onMount(() => {
+        resetState();
     });
 
+    // Also reset state when caseData changes
     $effect(() => {
-        // Reset state when question changes
-        showExplanation = false;
-        selectedAnswer = null;
-        writtenAnswer = "";
-        feedbackResponse = null;
-        explanationExpanded = false;
+        if (caseData) {
+            resetState();
+        }
     });
 
     function nextQuestion() {
@@ -124,6 +155,15 @@
                 writtenAnswer;
             studentResponses[currentQuestionIndex].student_mcq_choice_key =
                 null;
+        }
+    }
+
+    // Add this function to check and update the end screen state
+    function checkAndUpdateEndScreen() {
+        if (questionsAnswered === caseData.osce_questions.length) {
+            setTimeout(() => {
+                showEndScreen = true;
+            }, 0);
         }
     }
 
@@ -189,28 +229,40 @@
             const existingScoreIndex = questionScores.findIndex(
                 (q) => q.questionIndex === currentQuestionIndex,
             );
+
+            let newQuestionScores = [...questionScores];
             if (existingScoreIndex >= 0) {
                 // Update existing score
-                questionScores[existingScoreIndex] = {
+                newQuestionScores[existingScoreIndex] = {
                     questionIndex: currentQuestionIndex,
                     score,
                     isCorrect,
                 };
             } else {
                 // Add new score
-                questionScores = [
-                    ...questionScores,
-                    {
-                        questionIndex: currentQuestionIndex,
-                        score,
-                        isCorrect,
-                    },
-                ];
+                newQuestionScores.push({
+                    questionIndex: currentQuestionIndex,
+                    score,
+                    isCorrect,
+                });
+
+                // Increment questions answered counter
                 questionsAnswered++;
+
+                // Call the separate function to check and update end screen
+                checkAndUpdateEndScreen();
             }
+
+            questionScores = newQuestionScores;
 
             // Recalculate total score
             totalScore = questionScores.reduce((sum, q) => sum + q.score, 0);
+
+            // Mark this question as attempted
+            attemptedQuestions = new Set([
+                ...attemptedQuestions,
+                currentQuestionIndex,
+            ]);
         } catch (error) {
             console.error("Error submitting OSCE response:", error);
             // Show error to the user
@@ -237,10 +289,39 @@
         return caseData.osce_questions[currentQuestionIndex];
     }
 
+    // Modify this function to allow retaking the test
+    function returnToQuestions() {
+        // Hide end screen
+        showEndScreen = false;
+
+        // Reset state to allow retaking the test
+        resetState();
+
+        // Initialize student responses array based on number of questions
+        if (caseData?.osce_questions) {
+            studentResponses = caseData.osce_questions.map(() => ({
+                student_mcq_choice_key: null,
+                student_written_answer: null,
+            }));
+        }
+    }
+
     function closePopup() {
         // You might want to save all responses before closing
         console.log("All student responses:", studentResponses);
+        showEndScreen = false; // Reset end screen state when closing
         onClose();
+    }
+
+    // Add a helper function to check if a question has been attempted
+    function isQuestionAttempted(index: number) {
+        return attemptedQuestions.has(index);
+    }
+
+    function handleQuestionSelect(index: number) {
+        saveCurrentResponse();
+        currentQuestionIndex = index;
+        resetQuestionState();
     }
 </script>
 
@@ -262,9 +343,9 @@
                         <p class="text-sm">Department: {caseData.department}</p>
                     </div>
                     <div class="text-right flex items-center">
-                        <p class="text-sm mr-4">
+                        <!-- <p class="text-sm mr-4">
                             Student ID: {caseData.student_id}
-                        </p>
+                        </p> -->
                         <button
                             class="p-1 rounded-full hover:bg-blue-500 focus:outline-none"
                             onclick={closePopup}
@@ -289,558 +370,410 @@
                 </div>
             </div>
 
-            <!-- Question navigation -->
-            <div class="bg-gray-200 p-2 flex items-center justify-between">
-                <div class="text-sm font-medium">
-                    Question {currentQuestionIndex + 1} of {caseData
-                        .osce_questions.length}
-                </div>
-                <div class="flex space-x-2">
-                    <button
-                        class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={currentQuestionIndex === 0}
-                        onclick={prevQuestion}
-                    >
-                        Previous
-                    </button>
-                    <button
-                        class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={currentQuestionIndex ===
-                            caseData.osce_questions.length - 1}
-                        onclick={nextQuestion}
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-
-            <!-- Question content -->
-            <div class="p-6 overflow-y-auto flex-grow">
-                {#if getCurrentQuestion()}
+            {#if showEndScreen}
+                <!-- End Screen -->
+                <div
+                    class="flex-grow flex flex-col items-center justify-center p-8 text-center"
+                >
                     <div class="mb-6">
-                        <h2 class="text-xl font-bold mb-2">
-                            {getCurrentQuestion().station_title}
-                        </h2>
-                        <p class="text-gray-700 mb-4">
-                            {getCurrentQuestion().prompt}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-24 w-24 text-green-500 mx-auto"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                    </div>
+
+                    <h2 class="text-3xl font-bold mb-4">Congratulations!</h2>
+                    <p class="text-xl mb-6">
+                        You've completed all questions in this OSCE case.
+                    </p>
+
+                    <div class="bg-blue-50 rounded-lg p-6 mb-8 w-full max-w-md">
+                        <h3 class="text-xl font-semibold mb-4">
+                            Your Final Score
+                        </h3>
+                        <div
+                            class="text-4xl font-bold mb-2 {getScoreColor(
+                                totalScore / caseData.osce_questions.length,
+                            )}"
+                        >
+                            {totalScore.toFixed(1)} / {caseData.osce_questions
+                                .length}
+                        </div>
+                        <p class="text-gray-600">
+                            {Math.round(
+                                (totalScore / caseData.osce_questions.length) *
+                                    100,
+                            )}% correct
                         </p>
 
-                        <!-- Image-based question -->
-                        {#if getCurrentQuestion().question_format === "image-based" && getCurrentQuestion().image_placeholder_url}
-                            <div
-                                class="mb-4 border border-gray-300 rounded-lg p-4 bg-gray-100"
-                            >
-                                <div
-                                    class="aspect-w-16 aspect-h-9 bg-gray-200 flex items-center justify-center"
-                                >
-                                    <p class="text-gray-500">
-                                        Image placeholder: {getCurrentQuestion()
-                                            .image_placeholder_url}
-                                    </p>
-                                </div>
-                            </div>
-                        {/if}
-
-                        <!-- MCQ question -->
-                        {#if getCurrentQuestion().question_format === "MCQ" && getCurrentQuestion().options}
-                            <div class="space-y-3 mt-4">
-                                {#each Object.entries(getCurrentQuestion().options) as [key, text]}
-                                    <div
-                                        class="border rounded-lg p-4 transition-colors {showExplanation &&
-                                        key ===
-                                            getCurrentQuestion()
-                                                .mcq_correct_answer_key
-                                            ? 'border-green-500 bg-green-50'
-                                            : showExplanation &&
-                                                selectedAnswer === key &&
-                                                key !==
-                                                    getCurrentQuestion()
-                                                        .mcq_correct_answer_key
-                                              ? 'border-red-500 bg-red-50'
-                                              : selectedAnswer === key
-                                                ? 'border-blue-500 bg-blue-50'
-                                                : 'border-gray-200'}"
-                                        onclick={() => {
-                                            if (!showExplanation) {
-                                                selectedAnswer = key;
-                                            }
-                                        }}
-                                        onkeydown={(e) => {
-                                            if (
-                                                (e.key === "Enter" ||
-                                                    e.key === " ") &&
-                                                !showExplanation
-                                            ) {
-                                                selectedAnswer = key;
-                                            }
-                                        }}
-                                        tabindex="0"
-                                        role="radio"
-                                        aria-checked={selectedAnswer === key}
-                                    >
-                                        <div class="flex items-start">
-                                            <div class="mt-1 mr-3">
-                                                <input
-                                                    type="radio"
-                                                    name="mcq-option"
-                                                    id={`option-${key}`}
-                                                    value={key}
-                                                    checked={selectedAnswer ===
-                                                        key}
-                                                    disabled={showExplanation}
-                                                    class="h-4 w-4 text-blue-600"
-                                                />
-                                            </div>
-                                            <div class="flex-grow">
-                                                <label
-                                                    for={`option-${key}`}
-                                                    class="flex items-center cursor-pointer"
-                                                >
-                                                    <span
-                                                        class="font-medium mr-2"
-                                                        >{key}:</span
-                                                    >
-                                                    <span>{text}</span>
-
-                                                    {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
-                                                        <span
-                                                            class="ml-2 text-green-600"
-                                                            >✓</span
-                                                        >
-                                                    {/if}
-
-                                                    {#if showExplanation && selectedAnswer === key && key !== getCurrentQuestion().mcq_correct_answer_key}
-                                                        <span
-                                                            class="ml-2 text-red-600"
-                                                            >✗</span
-                                                        >
-                                                    {/if}
-                                                </label>
-
-                                                {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
-                                                    <div
-                                                        class="mt-2 text-sm text-green-700"
-                                                    >
-                                                        {#if feedbackResponse?.feedback.feedback}
-                                                            <p
-                                                                class="mt-2 pl-6"
-                                                            >
-                                                                {feedbackResponse
-                                                                    .feedback
-                                                                    .feedback}
-                                                            </p>
-                                                        {/if}
-                                                    </div>
-                                                {/if}
-                                            </div>
-                                        </div>
+                        <!-- Score breakdown -->
+                        <div class="mt-6 text-left">
+                            <h4 class="font-medium mb-2">
+                                Question Breakdown:
+                            </h4>
+                            <div class="space-y-2">
+                                {#each sortedQuestionScores as score}
+                                    <div class="flex items-center">
+                                        {#if score.isCorrect}
+                                            <CheckCircle
+                                                class="h-5 w-5 mr-2 text-green-500"
+                                            />
+                                        {:else}
+                                            <XCircle
+                                                class="h-5 w-5 mr-2 text-red-500"
+                                            />
+                                        {/if}
+                                        <span
+                                            >Question {score.questionIndex + 1}: {score.score.toFixed(
+                                                1,
+                                            )} points</span
+                                        >
                                     </div>
                                 {/each}
                             </div>
-                        {/if}
-
-                        <!-- Written question -->
-                        {#if getCurrentQuestion().question_format === "written"}
-                            <div class="mb-6">
-                                <textarea
-                                    class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="Type your answer here..."
-                                    value={writtenAnswer}
-                                    oninput={(e) => {
-                                        const target =
-                                            e.target as HTMLTextAreaElement;
-                                        writtenAnswer = target.value;
-                                    }}
-                                    disabled={showExplanation}
-                                ></textarea>
-
-                                <!-- Show feedback first -->
-                                {#if showExplanation && feedbackResponse?.feedback}
-                                    <div
-                                        class="mt-4 p-4 rounded-lg {feedbackResponse
-                                            .feedback.evaluation_result ===
-                                        'Correct'
-                                            ? 'bg-green-50 border border-green-200'
-                                            : 'bg-amber-50 border border-amber-200'}"
-                                    >
-                                        <div class="flex items-center">
-                                            <span class="text-gray-700"
-                                                >{feedbackResponse.feedback
-                                                    .feedback}</span
-                                            >
-                                        </div>
-                                    </div>
-                                {/if}
-
-                                <!-- Collapsible expected answer section -->
-                                {#if showExplanation && getCurrentQuestion().expected_answer}
-                                    <div
-                                        class="mt-4 bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden"
-                                    >
-                                        <button
-                                            class="w-full bg-green-100 px-4 py-3 border-b border-green-200 text-left flex items-center justify-between"
-                                            onclick={() =>
-                                                (explanationExpanded =
-                                                    !explanationExpanded)}
-                                        >
-                                            <h4
-                                                class="font-bold text-green-800 flex items-center"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    class="h-5 w-5 mr-2"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                    />
-                                                </svg>
-                                                Expected Answer
-                                            </h4>
-                                            {#if explanationExpanded}
-                                                <ChevronUp
-                                                    class="h-5 w-5 text-green-700"
-                                                />
-                                            {:else}
-                                                <ChevronDown
-                                                    class="h-5 w-5 text-green-700"
-                                                />
-                                            {/if}
-                                        </button>
-
-                                        {#if explanationExpanded}
-                                            <div class="p-4">
-                                                <p class="text-gray-800">
-                                                    {getCurrentQuestion()
-                                                        .expected_answer}
-                                                </p>
-                                            </div>
-                                        {/if}
-                                    </div>
-                                {/if}
-                            </div>
-                        {/if}
-
-                        <!-- Footer with action buttons -->
-                        <div class="flex items-center justify-between mt-4">
-                            <div class="flex items-center space-x-3">
-                                <Button
-                                    onclick={submitAnswer}
-                                    disabled={showExplanation ||
-                                        isSubmitting ||
-                                        (getCurrentQuestion()
-                                            .question_format === "MCQ" &&
-                                            !selectedAnswer) ||
-                                        (getCurrentQuestion()
-                                            .question_format === "written" &&
-                                            !writtenAnswer)}
-                                >
-                                    {#if isSubmitting}
-                                        <Loader2
-                                            class="mr-2 h-4 w-4 animate-spin"
-                                        />
-                                        Submitting...
-                                    {:else}
-                                        Submit Answer
-                                    {/if}
-                                </Button>
-
-                                {#if showExplanation}
-                                    <Popover.Root>
-                                        <Popover.Trigger>
-                                            <Button variant="link" size="sm">
-                                                <Info class="h-4 w-4" />
-                                                Explanation
-                                            </Button>
-                                        </Popover.Trigger>
-                                        <Popover.Content
-                                            class="w-[calc(100vw-4rem)] max-w-3xl max-h-[80vh] overflow-y-auto"
-                                            sideOffset={5}
-                                        >
-                                            <div class="p-4 bg-white">
-                                                <!-- Explanation card -->
-                                                <div
-                                                    class="bg-amber-50 rounded-lg shadow-sm border border-amber-200 overflow-hidden mb-4"
-                                                >
-                                                    <div
-                                                        class="bg-amber-100 px-4 py-3 border-b border-amber-200"
-                                                    >
-                                                        <h4
-                                                            class="font-bold text-amber-800 flex items-center"
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-5 w-5 mr-2"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                            >
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                                />
-                                                            </svg>
-                                                            Explanation
-                                                        </h4>
-                                                    </div>
-                                                    <div class="p-4">
-                                                        <p
-                                                            class="text-gray-800"
-                                                        >
-                                                            {getCurrentQuestion()
-                                                                .explanation ||
-                                                                "No explanation available"}
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Key Concepts section -->
-                                                {#if getCurrentQuestion().concept_modal}
-                                                    <div class="mb-2">
-                                                        <h4
-                                                            class="font-bold text-gray-700 flex items-center"
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-5 w-5 mr-2"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke="currentColor"
-                                                            >
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                                                                />
-                                                            </svg>
-                                                            Key Concepts
-                                                        </h4>
-                                                    </div>
-
-                                                    <div
-                                                        class="grid grid-cols-1 md:grid-cols-3 gap-4"
-                                                    >
-                                                        <!-- Specific card -->
-                                                        <div
-                                                            class="bg-blue-50 rounded-lg shadow-sm border border-blue-200 overflow-hidden hover:shadow-md transition-shadow"
-                                                        >
-                                                            <div
-                                                                class="bg-blue-100 px-4 py-2 border-b border-blue-200"
-                                                            >
-                                                                <h5
-                                                                    class="font-semibold text-blue-800 flex items-center"
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        class="h-4 w-4 mr-1"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        stroke="currentColor"
-                                                                    >
-                                                                        <path
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"
-                                                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                                                        />
-                                                                    </svg>
-                                                                    Specific
-                                                                </h5>
-                                                            </div>
-                                                            <div class="p-4">
-                                                                <p
-                                                                    class="text-gray-800"
-                                                                >
-                                                                    {getCurrentQuestion()
-                                                                        .concept_modal
-                                                                        .specific}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- General card -->
-                                                        <div
-                                                            class="bg-purple-50 rounded-lg shadow-sm border border-purple-200 overflow-hidden hover:shadow-md transition-shadow"
-                                                        >
-                                                            <div
-                                                                class="bg-purple-100 px-4 py-2 border-b border-purple-200"
-                                                            >
-                                                                <h5
-                                                                    class="font-semibold text-purple-800 flex items-center"
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        class="h-4 w-4 mr-1"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        stroke="currentColor"
-                                                                    >
-                                                                        <path
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"
-                                                                            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                                        />
-                                                                    </svg>
-                                                                    General
-                                                                </h5>
-                                                            </div>
-                                                            <div class="p-4">
-                                                                <p
-                                                                    class="text-gray-800"
-                                                                >
-                                                                    {getCurrentQuestion()
-                                                                        .concept_modal
-                                                                        .general}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Lateral card -->
-                                                        <div
-                                                            class="bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden hover:shadow-md transition-shadow"
-                                                        >
-                                                            <div
-                                                                class="bg-green-100 px-4 py-2 border-b border-green-200"
-                                                            >
-                                                                <h5
-                                                                    class="font-semibold text-green-800 flex items-center"
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        class="h-4 w-4 mr-1"
-                                                                        fill="none"
-                                                                        viewBox="0 0 24 24"
-                                                                        stroke="currentColor"
-                                                                    >
-                                                                        <path
-                                                                            stroke-linecap="round"
-                                                                            stroke-linejoin="round"
-                                                                            stroke-width="2"
-                                                                            d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                                                                        />
-                                                                    </svg>
-                                                                    Lateral
-                                                                </h5>
-                                                            </div>
-                                                            <div class="p-4">
-                                                                <p
-                                                                    class="text-gray-800"
-                                                                >
-                                                                    {getCurrentQuestion()
-                                                                        .concept_modal
-                                                                        .lateral}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                {/if}
-
-                                                <!-- Expected answer card (if available) -->
-                                                {#if getCurrentQuestion().expected_answer}
-                                                    <div
-                                                        class="mt-4 bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden"
-                                                    >
-                                                        <div
-                                                            class="bg-green-100 px-4 py-3 border-b border-green-200"
-                                                        >
-                                                            <h4
-                                                                class="font-bold text-green-800 flex items-center"
-                                                            >
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    class="h-5 w-5 mr-2"
-                                                                    fill="none"
-                                                                    viewBox="0 0 24 24"
-                                                                    stroke="currentColor"
-                                                                >
-                                                                    <path
-                                                                        stroke-linecap="round"
-                                                                        stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                                    />
-                                                                </svg>
-                                                                Expected Answer
-                                                            </h4>
-                                                        </div>
-                                                        <div class="p-4">
-                                                            <p
-                                                                class="text-gray-800"
-                                                            >
-                                                                {getCurrentQuestion()
-                                                                    .expected_answer}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                {/if}
-                                            </div>
-                                        </Popover.Content>
-                                    </Popover.Root>
-                                {/if}
-                            </div>
                         </div>
                     </div>
-                {/if}
-            </div>
 
-            <!-- Footer with progress indicator -->
-            <div class="bg-gray-100 p-3 border-t">
-                <div class="flex justify-between items-center">
-                    <!-- Progress indicators -->
-                    <div class="flex justify-center">
-                        {#each Array(caseData.osce_questions.length) as _, i}
-                            <button
-                                type="button"
-                                class="w-3 h-3 mx-1 rounded-full cursor-pointer {i ===
-                                currentQuestionIndex
-                                    ? 'bg-blue-600'
-                                    : questionScores.some(
-                                            (q) =>
-                                                q.questionIndex === i &&
-                                                q.isCorrect,
-                                        )
-                                      ? 'bg-green-500'
-                                      : questionScores.some(
-                                              (q) =>
-                                                  q.questionIndex === i &&
-                                                  !q.isCorrect,
-                                          )
-                                        ? 'bg-red-500'
-                                        : 'bg-gray-300 hover:bg-gray-400'}"
-                                onclick={() => {
-                                    saveCurrentResponse();
-                                    currentQuestionIndex = i;
-                                    resetQuestionState();
-                                }}
-                                aria-label={`Go to question ${i + 1}`}
-                            ></button>
-                        {/each}
-                    </div>
-
-                    <!-- Score summary -->
-                    <div class="flex items-center">
-                        <div class="text-sm font-medium mr-2">
-                            Score: {totalScore.toFixed(1)} / {caseData
-                                .osce_questions.length}
-                        </div>
-                        <div
-                            class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded"
-                        >
-                            {questionsAnswered} of {caseData.osce_questions
-                                .length} answered
-                        </div>
+                    <div class="flex space-x-4">
+                        <Button onclick={returnToQuestions} variant="outline">
+                            Review Questions
+                        </Button>
+                        <Button onclick={closePopup}>Close</Button>
                     </div>
                 </div>
-            </div>
+            {:else}
+                <!-- Question navigation -->
+                <div class="bg-gray-200 p-2 flex items-center justify-between">
+                    <div class="text-sm font-medium">
+                        Question {currentQuestionIndex + 1} of {caseData
+                            .osce_questions.length}
+                    </div>
+                    <div class="flex space-x-2">
+                        <button
+                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={currentQuestionIndex === 0}
+                            onclick={prevQuestion}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={currentQuestionIndex ===
+                                caseData.osce_questions.length - 1}
+                            onclick={nextQuestion}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question content -->
+                <div class="p-6 overflow-y-auto flex-grow">
+                    {#if getCurrentQuestion()}
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-2">
+                                {getCurrentQuestion().station_title}
+                            </h2>
+                            <p class="text-gray-700 mb-4">
+                                {getCurrentQuestion().prompt}
+                            </p>
+
+                            <!-- Image-based question -->
+                            {#if getCurrentQuestion().question_format === "image-based" && getCurrentQuestion().image_placeholder_url}
+                                <div
+                                    class="mb-4 border border-gray-300 rounded-lg p-4 bg-gray-100"
+                                >
+                                    <div
+                                        class="aspect-w-16 aspect-h-9 bg-gray-200 flex items-center justify-center"
+                                    >
+                                        <p class="text-gray-500">
+                                            Image placeholder: {getCurrentQuestion()
+                                                .image_placeholder_url}
+                                        </p>
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <!-- MCQ question -->
+                            {#if getCurrentQuestion().question_format === "MCQ" && getCurrentQuestion().options}
+                                <div class="space-y-3 mt-4">
+                                    {#each Object.entries(getCurrentQuestion().options) as [key, text]}
+                                        <div
+                                            class="border rounded-lg p-4 transition-colors {showExplanation &&
+                                            key ===
+                                                getCurrentQuestion()
+                                                    .mcq_correct_answer_key
+                                                ? 'border-green-500 bg-green-50'
+                                                : showExplanation &&
+                                                    selectedAnswer === key &&
+                                                    key !==
+                                                        getCurrentQuestion()
+                                                            .mcq_correct_answer_key
+                                                  ? 'border-red-500 bg-red-50'
+                                                  : selectedAnswer === key
+                                                    ? 'border-blue-500 bg-blue-50'
+                                                    : 'border-gray-200'} {isQuestionAttempted(
+                                                currentQuestionIndex,
+                                            )
+                                                ? 'cursor-not-allowed opacity-80'
+                                                : 'cursor-pointer'}"
+                                            onclick={() => {
+                                                if (
+                                                    !showExplanation &&
+                                                    !isQuestionAttempted(
+                                                        currentQuestionIndex,
+                                                    )
+                                                ) {
+                                                    selectedAnswer = key;
+                                                }
+                                            }}
+                                            onkeydown={(e) => {
+                                                if (
+                                                    (e.key === "Enter" ||
+                                                        e.key === " ") &&
+                                                    !showExplanation &&
+                                                    !isQuestionAttempted(
+                                                        currentQuestionIndex,
+                                                    )
+                                                ) {
+                                                    selectedAnswer = key;
+                                                }
+                                            }}
+                                            tabindex={isQuestionAttempted(
+                                                currentQuestionIndex,
+                                            )
+                                                ? -1
+                                                : 0}
+                                            role="radio"
+                                            aria-checked={selectedAnswer ===
+                                                key}
+                                        >
+                                            <div class="flex items-start">
+                                                <div class="mt-1 mr-3">
+                                                    <input
+                                                        type="radio"
+                                                        name="mcq-option"
+                                                        id={`option-${key}`}
+                                                        value={key}
+                                                        checked={selectedAnswer ===
+                                                            key}
+                                                        disabled={showExplanation ||
+                                                            isQuestionAttempted(
+                                                                currentQuestionIndex,
+                                                            )}
+                                                        class="h-4 w-4 text-blue-600"
+                                                    />
+                                                </div>
+                                                <div class="flex-grow">
+                                                    <label
+                                                        for={`option-${key}`}
+                                                        class="flex items-center cursor-pointer"
+                                                    >
+                                                        <span
+                                                            class="font-medium mr-2"
+                                                            >{key}:</span
+                                                        >
+                                                        <span>{text}</span>
+
+                                                        {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
+                                                            <span
+                                                                class="ml-2 text-green-600"
+                                                                >✓</span
+                                                            >
+                                                        {/if}
+
+                                                        {#if showExplanation && selectedAnswer === key && key !== getCurrentQuestion().mcq_correct_answer_key}
+                                                            <span
+                                                                class="ml-2 text-red-600"
+                                                                >✗</span
+                                                            >
+                                                        {/if}
+                                                    </label>
+
+                                                    {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
+                                                        <div
+                                                            class="mt-2 text-sm text-green-700"
+                                                        >
+                                                            {#if feedbackResponse?.feedback.feedback}
+                                                                <p
+                                                                    class="mt-2 pl-6"
+                                                                >
+                                                                    {feedbackResponse
+                                                                        .feedback
+                                                                        .feedback}
+                                                                </p>
+                                                            {/if}
+                                                        </div>
+                                                    {/if}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+
+                            <!-- Written question -->
+                            {#if getCurrentQuestion().question_format === "written"}
+                                <div class="mb-6">
+                                    <textarea
+                                        class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {isQuestionAttempted(
+                                            currentQuestionIndex,
+                                        )
+                                            ? 'opacity-80'
+                                            : ''}"
+                                        placeholder="Type your answer here..."
+                                        value={writtenAnswer}
+                                        oninput={(e) => {
+                                            if (
+                                                !isQuestionAttempted(
+                                                    currentQuestionIndex,
+                                                )
+                                            ) {
+                                                const target =
+                                                    e.target as HTMLTextAreaElement;
+                                                writtenAnswer = target.value;
+                                            }
+                                        }}
+                                        disabled={showExplanation ||
+                                            isQuestionAttempted(
+                                                currentQuestionIndex,
+                                            )}
+                                    ></textarea>
+
+                                    <!-- Show feedback first -->
+                                    {#if showExplanation && feedbackResponse?.feedback}
+                                        <div
+                                            class="mt-4 p-4 rounded-lg {feedbackResponse
+                                                .feedback.evaluation_result ===
+                                            'Correct'
+                                                ? 'bg-green-50 border border-green-200'
+                                                : 'bg-amber-50 border border-amber-200'}"
+                                        >
+                                            <div class="flex items-center">
+                                                <span class="text-gray-700"
+                                                    >{feedbackResponse.feedback
+                                                        .feedback}</span
+                                                >
+                                            </div>
+                                        </div>
+                                    {/if}
+
+                                    <!-- Collapsible expected answer section -->
+                                    {#if showExplanation && getCurrentQuestion().expected_answer}
+                                        <div
+                                            class="mt-4 bg-green-50 rounded-lg shadow-sm border border-green-200 overflow-hidden"
+                                        >
+                                            <button
+                                                class="w-full bg-green-100 px-4 py-3 border-b border-green-200 text-left flex items-center justify-between"
+                                                onclick={() =>
+                                                    (explanationExpanded =
+                                                        !explanationExpanded)}
+                                            >
+                                                <h4
+                                                    class="font-bold text-green-800 flex items-center"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 mr-2"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                        />
+                                                    </svg>
+                                                    Expected Answer
+                                                </h4>
+                                                {#if explanationExpanded}
+                                                    <ChevronUp
+                                                        class="h-5 w-5 text-green-700"
+                                                    />
+                                                {:else}
+                                                    <ChevronDown
+                                                        class="h-5 w-5 text-green-700"
+                                                    />
+                                                {/if}
+                                            </button>
+
+                                            {#if explanationExpanded}
+                                                <div class="p-4">
+                                                    <p class="text-gray-800">
+                                                        {getCurrentQuestion()
+                                                            .expected_answer}
+                                                    </p>
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/if}
+                                </div>
+                            {/if}
+
+                            <!-- Footer with action buttons -->
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex items-center space-x-3">
+                                    <Button
+                                        onclick={submitAnswer}
+                                        disabled={showExplanation ||
+                                            isSubmitting ||
+                                            isQuestionAttempted(
+                                                currentQuestionIndex,
+                                            ) ||
+                                            (getCurrentQuestion()
+                                                .question_format === "MCQ" &&
+                                                !selectedAnswer) ||
+                                            (getCurrentQuestion()
+                                                .question_format ===
+                                                "written" &&
+                                                !writtenAnswer)}
+                                    >
+                                        {#if isSubmitting}
+                                            <Loader2
+                                                class="mr-2 h-4 w-4 animate-spin"
+                                            />
+                                            Submitting...
+                                        {:else if isQuestionAttempted(currentQuestionIndex)}
+                                            Already Submitted
+                                        {:else}
+                                            Submit Answer
+                                        {/if}
+                                    </Button>
+
+                                    {#if showExplanation}
+                                        <OSCEExplanationPopover
+                                            currentQuestion={getCurrentQuestion()}
+                                        />
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- Footer with progress indicator -->
+                <OSCEProgressIndicator
+                    {currentQuestionIndex}
+                    totalQuestions={caseData.osce_questions.length}
+                    {questionScores}
+                    {totalScore}
+                    {questionsAnswered}
+                    {isQuestionAttempted}
+                    onQuestionSelect={handleQuestionSelect}
+                />
+            {/if}
         </div>
     </div>
 {/if}

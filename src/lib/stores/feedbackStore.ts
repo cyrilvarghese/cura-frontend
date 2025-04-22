@@ -12,6 +12,7 @@ interface FeedbackState {
     isLoading: boolean;
     error: null | string;
     osceData: null | OsceGenerationResponse;
+    historyFeedback: null | any;
 }
 
 const initialState: FeedbackState = {
@@ -21,7 +22,8 @@ const initialState: FeedbackState = {
     suggestions: null,
     isLoading: false,
     error: null,
-    osceData: null
+    osceData: null,
+    historyFeedback: null
 };
 
 function createFeedbackStore() {
@@ -81,10 +83,36 @@ function createFeedbackStore() {
         }
     }
 
+    async function getHistoryFeedback() {
+        update(state => ({ ...state, isLoading: true, error: null }));
+
+        try {
+            const response = await feedbackService.getHistoryFeedback();
+
+            // Update store with the feedback
+            update(state => ({
+                ...state,
+                historyFeedback: response.feedback,
+                isLoading: false
+            }));
+
+            return response.feedback.final_feedback.actionable_suggestions;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to get history feedback';
+            update(state => ({
+                ...state,
+                error: errorMessage,
+                isLoading: false
+            }));
+            throw error;
+        }
+    }
+
     return {
         subscribe,
         getFeedback,
         generateFinalOsce,
+        getHistoryFeedback,
         reset
     };
 }

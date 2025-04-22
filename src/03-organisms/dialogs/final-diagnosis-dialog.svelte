@@ -43,9 +43,11 @@
             );
 
             // Get feedback
-            const feedbackResponse = await feedbackStore.getFeedback(
-                $studentMessageHistory,
-            );
+            // const feedbackResponse = await feedbackStore.getFeedback(
+            //     $studentMessageHistory,
+            // );
+            debugger;
+            const feedbackResponse = await feedbackStore.getHistoryFeedback();
 
             // Send feedback directly
             await sendMessage(
