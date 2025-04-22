@@ -43,12 +43,12 @@ export interface Message {
     title?: string;
 }
 
-export interface StudentMessage {
+export type StudentMessage = {
     content: string;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback';
-}
+    type?: 'examination' | 'test-result' | 'text' | 'image' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-buttons' | 'feedback-steps';
+};
 
 export interface ExaminationResult {
     name: string;

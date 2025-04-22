@@ -36,10 +36,16 @@
                 {:else}
                     <CheckCircle class="h-5 w-5 {iconColor}" />
                 {/if}
-                <Card.Title class="text-blue-900">
-                    <div class="px-2 py-1.5 rounded-md">
-                        {diagnosis.primaryDiagnosis.text}
-                    </div>
+                <Card.Title>
+                    {#if type === "initial"}
+                        <div class="px-2 py-1.5 rounded-md">
+                            {diagnosis.primaryDiagnosis.text}
+                        </div>
+                    {:else}
+                        <div class="px-2 py-1.5 text-red-600 rounded-md">
+                            {diagnosis.primaryDiagnosis.text}
+                        </div>
+                    {/if}
                 </Card.Title>
             </div>
             <Badge

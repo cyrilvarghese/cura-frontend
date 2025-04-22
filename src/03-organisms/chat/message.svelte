@@ -16,6 +16,7 @@
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
     import PreTreatmentCard from "./chat-cards/pre-treatment-card.svelte";
     import TreatmentProtocolCard from "./chat-cards/treatment-protocol-card.svelte";
+    import FeedbackStepsCard from "./chat-cards/feedback-steps-card.svelte";
     import { onMount, onDestroy } from "svelte";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
@@ -139,6 +140,7 @@
         feedback: () => FeedbackCard,
         "pre-treatment": () => PreTreatmentCard,
         "treatment-protocol": () => TreatmentProtocolCard,
+        "feedback-steps": () => FeedbackStepsCard,
     } as const;
 
     function getComponentProps(msg: Message) {
@@ -181,6 +183,12 @@
                 return {
                     treatment: JSON.parse(msg.content as string),
                 };
+            case "feedback-steps":
+                return {
+                    historyFeedback: msg.content.historyFeedback,
+                    aetcomFeedback: msg.content.aetcomFeedback,
+                    diagnosisFeedback: msg.content.diagnosisFeedback,
+                };
             default:
                 return {};
         }
@@ -201,7 +209,9 @@
             </Avatar>
         {/if}
 
-        <div class="max-w-[80%]">
+        <div
+            class={message.type === "feedback-steps" ? "w-full" : "max-w-[80%]"}
+        >
             {#if message.type === "image"}
                 <div
                     class="bg-card w-[260px] rounded-lg overflow-hidden shadow-sm border"

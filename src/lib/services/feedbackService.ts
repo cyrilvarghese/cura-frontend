@@ -24,6 +24,24 @@ interface OsceQuestion {
     };
 }
 
+interface DiagnosisFeedbackResponse {
+    case_id: string;
+    student_id: string;
+    timestamp: string;
+    feedback_result: {
+        diagnosis_feedback: {
+            communication: string;
+            empathy_patient_centeredness: string;
+            professionalism_ethics: string;
+            information_gathering: string;
+        };
+    };
+    metadata: {
+        processing_time_seconds: number;
+        model_version: string;
+    };
+}
+
 interface OsceGenerationResponse {
     case_id: string;
     student_id: string;
@@ -41,41 +59,88 @@ interface OsceGenerationResponse {
     };
 }
 
+
 interface HistoryFeedbackResponse {
     case_id: string;
     student_id: string;
     timestamp: string;
-    feedback: {
-        question_analysis: Array<{
-            expected_question: string;
-            status: "bang_on" | "missed";
-            score: number;
-            why_important?: string;
-            suggested_question?: string;
+    analysis_result: {
+        missed_highlights: Array<{
+            missed_question: string;
+            why_important: string;
         }>;
-        domain_scores: {
-            [key: string]: {
+        improvement_highlights: Array<{
+            area: string;
+            suggestion: string;
+        }>;
+        domain_score_summary: {
+            chief_complaint: {
                 score: number;
-                level: string;
-                comments: string;
+                reason_for_score: string;
             };
-        };
-        total_score: number;
-        final_feedback: {
-            strengths: string;
-            areas_to_improve: string;
-            actionable_suggestions: string;
+            associated_symptoms: {
+                score: number;
+                reason_for_score: string;
+            };
+            past_medical_history: {
+                score: number;
+                reason_for_score: string;
+            };
+            family_history: {
+                score: number;
+                reason_for_score: string;
+            };
+            medications: {
+                score: number;
+                reason_for_score: string;
+            };
+            social_exposure: {
+                score: number;
+                reason_for_score: string;
+            };
+            red_flag_symptoms: {
+                score: number;
+                reason_for_score: string;
+            };
+            differential_diagnoses: {
+                score: number;
+                reason_for_score: string;
+            };
         };
     };
     metadata: {
         processing_time_seconds: number;
         model_version: string;
-        generation_config: {
-            temperature: number;
-            top_p: number;
-            top_k: number;
+    };
+}
+
+interface AETCOMFeedbackResponse {
+    case_id: string;
+    student_id: string;
+    timestamp: string;
+    feedback_result: {
+        aetcom_evaluation: {
+            communication: {
+                performance_level: string;
+                feedback: string;
+            };
+            empathy_patient_centeredness: {
+                performance_level: string;
+                feedback: string;
+            };
+            professionalism_ethics: {
+                performance_level: string;
+                feedback: string;
+            };
+            information_gathering: {
+                performance_level: string;
+                feedback: string;
+            };
         };
-        total_questions_analyzed: number;
+    };
+    metadata: {
+        processing_time_seconds: number;
+        model_version: string;
     };
 }
 
@@ -142,9 +207,31 @@ export class FeedbackService {
         }
     }
 
+    // async getHistoryFeedback(): Promise<HistoryFeedbackResponse> {
+    //     try {
+    //         const response = await fetch(`${this.baseUrl}/feedback/history-taking`, {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             }
+    //         });
+
+    //         await handleApiResponse(response);
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to get history feedback');
+    //         }
+
+    //         return await response.json();
+    //     } catch (error) {
+    //         console.error('Error getting history feedback:', error);
+    //         throw error;
+    //     }
+    // }
+
     async getHistoryFeedback(): Promise<HistoryFeedbackResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/history-taking`, {
+            const response = await fetch(`${this.baseUrl}/feedback/history-taking/analysis`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,16 +241,56 @@ export class FeedbackService {
             await handleApiResponse(response);
 
             if (!response.ok) {
-                throw new Error('Failed to get history feedback');
+                throw new Error('Failed to get history analysis');
             }
 
             return await response.json();
         } catch (error) {
-            console.error('Error getting history feedback:', error);
+            console.error('Error getting history analysis:', error);
             throw error;
         }
+    }
+
+    async getAETCOMFeedback(): Promise<AETCOMFeedbackResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/feedback/history-taking/aetcom`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to get AETCOM feedback');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting AETCOM feedback:', error);
+            throw error;
+        }
+    }
+
+    async getDiagnosisFeedback(): Promise<any> {
+        // Mock response
+        return Promise.resolve({
+            feedback: "Your diagnosis of Rheumatoid Arthritis is accurate. The key symptoms of joint pain, morning stiffness, and symmetrical joint involvement were correctly identified. Consider including more details about the chronicity and progression of symptoms in future cases.",
+            score: 85,
+            areas_for_improvement: [
+                "Include temporal progression of symptoms",
+                "Document more specific joint involvement patterns"
+            ]
+        });
     }
 }
 
 export const feedbackService = new FeedbackService();
-export type { OsceGenerationResponse, OsceQuestion, HistoryFeedbackResponse }; 
+export type {
+    OsceGenerationResponse,
+    OsceQuestion,
+    HistoryFeedbackResponse,
+    AETCOMFeedbackResponse,
+    DiagnosisFeedbackResponse
+}; 

@@ -5,6 +5,8 @@ import { caseDataStore } from '$lib/stores/casePlayerStore';
 import { API_BASE_URL } from '$lib/config/api';
 
 import type { CaseData } from './casePlayerStore';
+import type { HistoryAnalysisResponse, HistoryDomainResponse } from '$lib/services/feedbackService';
+import type { FeedbackButtonsState } from '$lib/types/feedback';
 interface ApiState {
     messages: Message[];
     error: string | null;
@@ -131,29 +133,44 @@ function updatePatientFile(content: TestResult | ExaminationResult, type: 'exami
     }
 }
 
-export async function sendMessage(content: string | TestResult | ExaminationResult | FeedbackResponse,
+// Add this function to update an existing message
+export function updateMessage(messageId: string, newContent: any) {
+    apiStore.update(state => ({
+        ...state,
+        messages: state.messages.map(message =>
+            message.id === messageId
+                ? {
+                    ...message,
+                    content: {
+                        ...(typeof message.content === 'object' ? message.content : {}),
+                        ...newContent,
+                        loadingStates: newContent.loadingStates,
+                        completedStates: newContent.completedStates
+                    }
+                }
+                : message
+        )
+    }));
+}
+
+// Modify sendMessage to return the message ID
+export async function sendMessage(
+    content: string | TestResult | ExaminationResult | FeedbackResponse | HistoryAnalysisResponse | HistoryDomainResponse | FeedbackButtonsState,
     role: 'student' | 'assistant' | 'patient',
     step: string,
-    type: 'text' | 'image' | 'test-result'
-        | 'examination'
-        | 'diagnosis'
-        | 'relevant-info'
-        | 'final-diagnosis'
-        | 'pre-treatment'
-        | 'treatment-protocol'
-        | 'feedback' = 'text'
+    type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'pre-treatment' | 'treatment-protocol' | 'feedback-buttons' | 'feedback' | 'feedback-steps' = 'text'
+): Promise<string> {
+    const messageId = crypto.randomUUID();
 
-) {
-
-
-    let messageContent = typeof content === 'object' && content !== null
-        ? ('testName' in content
-            ? `Test: ${content.testName} `
-            : 'name' in content
-                ? `Examination: ${content.name} `
-                : String(content))
-        : String(content);
-
+    let messageContent = type === 'feedback-steps'
+        ? content
+        : typeof content === 'object' && content !== null
+            ? ('testName' in content
+                ? `Test: ${content.testName} `
+                : 'name' in content
+                    ? `Examination: ${content.name} `
+                    : String(content))
+            : String(content);
 
     // Store all student messages in the history except for feedback
     if (step !== 'feedback') {
@@ -161,7 +178,7 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             content: messageContent,
             step,
             timestamp: new Date(),
-            type: type
+            type: type as any
         },
         ]);
     }
@@ -172,10 +189,10 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             apiStore.update(state => ({
                 ...state,
                 messages: [...state.messages, {
-                    id: crypto.randomUUID(),
+                    id: messageId,
                     sender: role,
                     step: step,
-                    type: type,
+                    type: type as any,
                     content: messageContent,
                     timestamp: new Date()
                 },
@@ -242,14 +259,16 @@ export async function sendMessage(content: string | TestResult | ExaminationResu
             apiStore.update(state => ({
                 ...state,
                 messages: [...state.messages, {
-                    id: crypto.randomUUID(),
+                    id: messageId,
                     sender: role,
                     step: step,
-                    type: type,
+                    type: type as any,
                     content: content,
                     timestamp: new Date()
                 }]
             }));
             break;
     }
+
+    return messageId;  // Return the message ID
 } 

@@ -26,7 +26,6 @@
     import mixpanel from "mixpanel-browser";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import OSCEPopup from "../../components/OSCEPopup.svelte";
-    import mockOsceData from "$lib/data/mock-osce.json";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);

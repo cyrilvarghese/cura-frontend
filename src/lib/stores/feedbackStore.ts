@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
 import type { FeedbackResponse, StudentMessage } from '$lib/types/index';
-import type { OsceGenerationResponse } from '$lib/services/feedbackService';
+import type { OsceGenerationResponse, HistoryFeedbackResponse, AETCOMFeedbackResponse } from '$lib/services/feedbackService';
 import { currentCaseId } from "$lib/stores/casePlayerStore";
 
 interface FeedbackState {
@@ -12,7 +12,11 @@ interface FeedbackState {
     isLoading: boolean;
     error: null | string;
     osceData: null | OsceGenerationResponse;
-    historyFeedback: null | any;
+    historyFeedback: null | HistoryFeedbackResponse;
+    AETCOMFeedback: null | AETCOMFeedbackResponse;
+    historyFeedbackLoading: boolean;
+    AETCOMFeedbackLoading: boolean;
+    diagnosisFeedbackLoading: boolean;
 }
 
 const initialState: FeedbackState = {
@@ -23,7 +27,11 @@ const initialState: FeedbackState = {
     isLoading: false,
     error: null,
     osceData: null,
-    historyFeedback: null
+    historyFeedback: null,
+    AETCOMFeedback: null,
+    historyFeedbackLoading: false,
+    AETCOMFeedbackLoading: false,
+    diagnosisFeedbackLoading: false
 };
 
 function createFeedbackStore() {
@@ -84,28 +92,62 @@ function createFeedbackStore() {
     }
 
     async function getHistoryFeedback() {
-        update(state => ({ ...state, isLoading: true, error: null }));
+        update(state => ({ ...state, historyFeedbackLoading: true, error: null }));
 
         try {
             const response = await feedbackService.getHistoryFeedback();
 
-            // Update store with the feedback
             update(state => ({
                 ...state,
-                historyFeedback: response.feedback,
-                isLoading: false
+                historyFeedback: response,
+                historyFeedbackLoading: false
             }));
 
-            return response.feedback.final_feedback.actionable_suggestions;
+            return response;
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to get history feedback';
+            const errorMessage = error instanceof Error ? error.message : 'Failed to get history analysis';
             update(state => ({
                 ...state,
                 error: errorMessage,
-                isLoading: false
+                historyFeedbackLoading: false
             }));
             throw error;
         }
+    }
+
+    async function getAETCOMFeedback() {
+        update(state => ({ ...state, AETCOMFeedbackLoading: true, error: null }));
+
+        try {
+            const response = await feedbackService.getAETCOMFeedback();
+
+            update(state => ({
+                ...state,
+                AETCOMFeedback: response,
+                AETCOMFeedbackLoading: false
+            }));
+
+            return response;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to get domain feedback';
+            update(state => ({
+                ...state,
+                error: errorMessage,
+                AETCOMFeedbackLoading: false
+            }));
+            throw error;
+        }
+    }
+
+    async function getDiagnosisFeedback() {
+        update(state => ({ ...state, diagnosisFeedbackLoading: true, error: null }));
+        let response = null;
+        try {
+            response = await feedbackService.getDiagnosisFeedback();
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to get diagnosis feedback';
+        }
+        return response;
     }
 
     return {
@@ -113,6 +155,8 @@ function createFeedbackStore() {
         getFeedback,
         generateFinalOsce,
         getHistoryFeedback,
+        getDiagnosisFeedback,
+        getAETCOMFeedback,
         reset
     };
 }

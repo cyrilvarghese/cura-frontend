@@ -1,13 +1,20 @@
 <script lang="ts">
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
-    import { sendMessage, studentMessageHistory } from "$lib/stores/apiStore";
+    import {
+        sendMessage,
+        studentMessageHistory,
+        updateMessage,
+    } from "$lib/stores/apiStore";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import { finalDiagnosisStore } from "$lib/stores/finalDiagnosisStore";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
     import { toast } from "svelte-sonner";
     import Loader2 from "lucide-svelte/icons/loader-2";
+    import HistoryFeedbackReport from "$lib/components/HistoryFeedbackReport.svelte";
+    import { X } from "lucide-svelte";
+    import * as Popover from "$lib/components/ui/popover";
 
     export let open = false;
     export let onSubmit: () => void;
@@ -15,6 +22,7 @@
     let finalDiagnosis = "";
     let justification = "";
     let isSubmitting = false;
+    let showFeedbackReport = false;
 
     async function handleSubmit() {
         onSubmit();
@@ -42,22 +50,9 @@
                 "final-diagnosis",
             );
 
-            // Get feedback
-            // const feedbackResponse = await feedbackStore.getFeedback(
-            //     $studentMessageHistory,
-            // );
-            debugger;
-            const feedbackResponse = await feedbackStore.getHistoryFeedback();
+            // First send the feedback steps card and store its ID
+            await sendMessage({}, "assistant", "feedback", "feedback-steps");
 
-            // Send feedback directly
-            await sendMessage(
-                feedbackResponse,
-                "assistant",
-                "feedback",
-                "feedback",
-            );
-
-            // Close dialog
             open = false;
         } catch (error) {
             console.error("Error submitting diagnosis:", error);
@@ -137,3 +132,8 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
+
+<!-- <HistoryFeedbackReport
+    isOpen={showFeedbackReport}
+    onClose={() => (showFeedbackReport = false)}
+/> -->
