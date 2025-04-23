@@ -126,11 +126,14 @@
 
         <!-- Paste Area -->
         <div class="space-y-2">
-            <label for="paste-area" class="block text-sm font-medium">
+            <label
+                for={`paste-area-${testName}`}
+                class="block text-sm font-medium"
+            >
                 Paste image
             </label>
             <textarea
-                id="paste-area"
+                id={`paste-area-${testName}`}
                 class="min-h-[100px] w-full border-2 border-dashed rounded-lg p-4 resize-none cursor-text hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 onpaste={handlePaste}
                 placeholder="Click here and paste an image (Ctrl+V)"
@@ -141,13 +144,16 @@
 
         <!-- File Upload Option -->
         <div class="space-y-2">
-            <label for="file-upload" class="block text-sm font-medium">
+            <label
+                for={`file-upload-${testName}`}
+                class="block text-sm font-medium"
+            >
                 Upload from device
             </label>
             <div class="flex items-center gap-2">
                 <input
                     type="file"
-                    id="file-upload"
+                    id={`file-upload-${testName}`}
                     accept="image/*"
                     multiple
                     class="hidden"
@@ -162,7 +168,9 @@
                     variant="outline"
                     class="gap-2"
                     onclick={() => {
-                        document.getElementById("file-upload")?.click();
+                        document
+                            .getElementById(`file-upload-${testName}`)
+                            ?.click();
                     }}
                 >
                     <Upload class="h-4 w-4" />
