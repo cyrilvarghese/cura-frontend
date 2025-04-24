@@ -176,12 +176,6 @@
                                                 >
                                                     {caseItem.case_name}
                                                 </span>
-                                            {:else}
-                                                <p
-                                                    class="text-gray-500 text-sm"
-                                                >
-                                                    {caseItem.case_name}
-                                                </p>
                                             {/if}
                                             <h3
                                                 class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
