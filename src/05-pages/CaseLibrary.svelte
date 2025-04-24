@@ -145,7 +145,9 @@
                             class="w-12 h-12 text-gray-400 mx-auto mb-3"
                         />
                         <p class="text-gray-500 text-lg">
-                            All cases are currently published.
+                            {activeTab === "drafts"
+                                ? "All cases are currently published."
+                                : "No cases are published."}
                         </p>
                     </div>
                 {:else}
