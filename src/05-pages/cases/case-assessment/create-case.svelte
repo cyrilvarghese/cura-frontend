@@ -19,6 +19,7 @@
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
     import GoogleDocLink from "$lib/components/ui/google-doc-link.svelte";
     import { setContext } from "svelte";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
 
     const caseDataService = new CaseDataService();
 
@@ -250,22 +251,7 @@
     </h1>
 </div>
 
-{#if isLoading}
-    <div
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
-    >
-        <div
-            class="bg-white rounded-lg p-8 shadow-xl flex flex-col items-center space-y-4"
-        >
-            <div
-                class="w-12 h-12 border-4 border-t-blue-500 border-b-blue-500 border-l-transparent border-r-transparent rounded-full animate-spin"
-            ></div>
-            <p class="text-lg font-medium text-gray-700">
-                Loading case data...
-            </p>
-        </div>
-    </div>
-{/if}
+<LoadingOverlay isVisible={isLoading} message="Loading case data..." />
 
 <p class="text-gray-500 mb-8">
     {#if isEditMode}

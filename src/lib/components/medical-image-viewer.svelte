@@ -10,6 +10,7 @@
     import { getContext } from "svelte";
     import { authStore, type AuthState } from "$lib/stores/authStore";
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
     let user: AuthState["user"] | undefined = $state();
 
@@ -59,6 +60,7 @@
     );
     let selectedImageIndex = $state(0);
     let isUploading = $state(false);
+    let isDeleting = $state(false);
     let uploadError = $state<string | null>(null);
     let viewerDialogOpen = $state(false);
     let deleteConfirmOpen = $state(false);
@@ -149,6 +151,9 @@
 
     async function confirmDelete() {
         try {
+            isDeleting = true;
+            deleteConfirmOpen = false;
+
             // Call the delete endpoint
             const response = await testAssetService.deleteTestAsset(
                 caseId,
@@ -161,14 +166,18 @@
             // Clear the image URLs after successful deletion
             imageUrls = [];
             imageError = true;
-            deleteConfirmOpen = false;
         } catch (error) {
             console.error("Failed to delete images:", error);
             uploadError = "Failed to delete images";
-            deleteConfirmOpen = false;
+        } finally {
+            isDeleting = false;
         }
     }
 </script>
+
+<!-- Loading Overlays -->
+<LoadingOverlay isVisible={isUploading} message="Uploading images..." />
+<LoadingOverlay isVisible={isDeleting} message="Deleting images..." />
 
 {@debug user}
 {#if !imageError && imageUrls.length > 0}
