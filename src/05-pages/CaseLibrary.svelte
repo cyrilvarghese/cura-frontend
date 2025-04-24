@@ -107,6 +107,18 @@
                                         />
                                     </div>
                                     <div class="p-4">
+                                        {#if user?.role === "admin"}
+                                            <span
+                                                class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
+                                            >
+                                                {caseItem.case_name}
+                                            </span>
+                                        {:else}
+                                            <p class="text-gray-500 text-sm">
+                                                {caseItem.case_name}
+                                            </p>
+                                        {/if}
+
                                         <h3
                                             class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
                                         >
@@ -162,6 +174,19 @@
                                             />
                                         </div>
                                         <div class="p-4">
+                                            {#if user?.role === "admin"}
+                                                <span
+                                                    class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
+                                                >
+                                                    {caseItem.case_name}
+                                                </span>
+                                            {:else}
+                                                <p
+                                                    class="text-gray-500 text-sm"
+                                                >
+                                                    {caseItem.case_name}
+                                                </p>
+                                            {/if}
                                             <h3
                                                 class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
                                             >
