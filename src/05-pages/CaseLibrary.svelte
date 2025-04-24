@@ -13,12 +13,13 @@
     import type { AuthState } from "$lib/stores/authStore";
     let cases: CaseListItem[] = $state([]);
     let searchQuery = $state("");
-    let activeTab = $state("drafts");
+    let activeTab = $state("published");
     let user: AuthState["user"] | undefined = $state();
     authStore.subscribe((state) => {
         user = state.user;
         if (user) {
             console.log("Current user role:", user.role);
+            activeTab = user.role === "admin" ? "drafts" : "published";
         }
     });
     onMount(async () => {
