@@ -13,7 +13,7 @@
     import type { AuthState } from "$lib/stores/authStore";
     let cases: CaseListItem[] = $state([]);
     let searchQuery = $state("");
-    let activeTab = $state("published");
+    let activeTab = $state("drafts");
     let user: AuthState["user"] | undefined = $state();
     authStore.subscribe((state) => {
         user = state.user;
@@ -35,6 +35,7 @@
                       (activeTab === "published"
                           ? c.published
                           : !c.published) &&
+                      !c.deleted &&
                       (!searchQuery ||
                           c.title
                               .toLowerCase()
