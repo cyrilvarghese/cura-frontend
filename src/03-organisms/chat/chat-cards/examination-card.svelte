@@ -14,9 +14,12 @@
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { convertAsteriskToBold } from "$lib/utils/text";
 
-    const caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
-    const { result } = $props<{
+    const {
+        result,
+        caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "",
+    } = $props<{
         result: ExaminationResult;
+        caseId?: string;
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
