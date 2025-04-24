@@ -113,10 +113,6 @@
                                             >
                                                 {caseItem.case_name}
                                             </span>
-                                        {:else}
-                                            <p class="text-gray-500 text-sm">
-                                                {caseItem.case_name}
-                                            </p>
                                         {/if}
 
                                         <h3
