@@ -12,6 +12,7 @@ export interface CaseListItem {
     image_url: string;
     department: string;
     published: boolean;
+    deleted: boolean;
 }
 
 export interface PublishCaseParams {

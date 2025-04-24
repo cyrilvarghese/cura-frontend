@@ -29,6 +29,7 @@
     }>();
     onMount(() => {
         console.log(uploadState.caseId);
+        showCoverImageSection = false;
     });
     $effect(() => {
         console.log("caseId changed:", uploadState.caseId);
