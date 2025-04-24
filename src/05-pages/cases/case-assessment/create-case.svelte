@@ -28,6 +28,7 @@
     let publishSuccess = $state(false);
     let isEditMode = $state(false);
     let caseId = $state<string | null>(null);
+    let isLoading = $state(false);
 
     const { type = "new" } = $props<{ type?: "new" | "edit" }>();
 
@@ -89,9 +90,10 @@
         caseId = urlParams.get("caseId");
         console.log("Case ID:", caseId);
 
+        // Clear state for all cases initially
+        caseStore.set(initialValue);
+
         if (type === "new") {
-            // Clear state for new cases
-            caseStore.set(initialValue);
             isEditMode = false;
             const fileName = urlParams.get("fileName");
             uploadState.selectedDocumentName = fileName;
@@ -100,8 +102,19 @@
         } else if (caseId) {
             // Load existing case for edit mode
             isEditMode = true;
+            isLoading = true;
             lastCaseIdStore.set(caseId);
-            await loadExistingCase(caseId);
+            try {
+                await loadExistingCase(caseId);
+            } catch (error) {
+                console.error("Error loading case:", error);
+                uploadState.error =
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to load case";
+            } finally {
+                isLoading = false;
+            }
         }
     });
 
@@ -236,6 +249,24 @@
         {isEditMode ? "Edit Case" : "Create Case"}
     </h1>
 </div>
+
+{#if isLoading}
+    <div
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center"
+    >
+        <div
+            class="bg-white rounded-lg p-8 shadow-xl flex flex-col items-center space-y-4"
+        >
+            <div
+                class="w-12 h-12 border-4 border-t-blue-500 border-b-blue-500 border-l-transparent border-r-transparent rounded-full animate-spin"
+            ></div>
+            <p class="text-lg font-medium text-gray-700">
+                Loading case data...
+            </p>
+        </div>
+    </div>
+{/if}
+
 <p class="text-gray-500 mb-8">
     {#if isEditMode}
         Edit an existing case for
