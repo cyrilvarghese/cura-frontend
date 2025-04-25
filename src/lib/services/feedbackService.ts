@@ -77,34 +77,42 @@ interface HistoryFeedbackResponse {
             chief_complaint: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             associated_symptoms: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             past_medical_history: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             family_history: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             medications: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             social_exposure: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             red_flag_symptoms: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
             differential_diagnoses: {
                 score: number;
                 reason_for_score: string;
+                example: string;
             };
         };
     };

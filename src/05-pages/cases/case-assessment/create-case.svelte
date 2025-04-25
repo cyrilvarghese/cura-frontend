@@ -6,6 +6,7 @@
         generatePersona,
         generatePhysicalExam,
         generateDifferentialDiagnosis,
+        generateHistoryContext,
         type CaseStoreState,
         lastCaseIdStore,
         loadExistingCase,
@@ -51,11 +52,13 @@
         },
         caseId: null,
         differentialDiagnosis: [],
+        historyContext: null,
         uploadedFile: null,
         uploadedFileName: null,
         isGeneratingPersona: false,
         isGeneratingPhysicalExam: false,
         isGeneratingDifferential: false,
+        isGeneratingHistoryContext: false,
         isSearchingImages: false,
         searchedImages: {
             images: [],
@@ -74,6 +77,7 @@
         | "cover-image"
         | "examination-editor"
         | "differential-diagnosis"
+        | "history-summary"
     >("patient-persona");
 
     const unsubscribeDepartment = currentDepartment.subscribe((value) => {
@@ -203,6 +207,24 @@
         }
     }
 
+    async function handleGenerateHistorySummary() {
+        if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
+        currentTab = "history-summary";
+        uploadState.isGeneratingHistoryContext = true;
+
+        try {
+            await generateHistoryContext(
+                uploadState.selectedDocumentName,
+                uploadState.caseId,
+            );
+        } catch (error) {
+            console.error("Error generating history summary:", error);
+            throw error;
+        } finally {
+            uploadState.isGeneratingHistoryContext = false;
+        }
+    }
+
     async function handlePublishCase() {
         if (!department) return;
 
@@ -315,6 +337,20 @@
                     Extracting Differential Diagnosis...
                 {:else}
                     Generate Differential Diagnosis
+                {/if}
+            </Button>
+        </div>
+        <div class="flex flex-col justify-start mt-4">
+            <Button
+                variant="secondary"
+                onclick={handleGenerateHistorySummary}
+                disabled={uploadState.generating ||
+                    (!uploadState.selectedDocumentName && !isEditMode)}
+            >
+                {#if uploadState.isGeneratingHistoryContext}
+                    Generating Case History Summary...
+                {:else}
+                    Generate Case History Summary
                 {/if}
             </Button>
         </div>

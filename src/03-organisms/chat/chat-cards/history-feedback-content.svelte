@@ -1,13 +1,59 @@
 <script lang="ts">
     import type { HistoryFeedbackResponse } from "$lib/services/feedbackService";
+    import * as Tooltip from "$lib/components/ui/tooltip";
 
     export let feedback: HistoryFeedbackResponse;
 </script>
 
 <div class="p-4 pl-0 space-y-6">
+    <!-- Domain Scores -->
+    <div class="space-y-2 mt-6">
+        <h3 class="font-semibold text-base mb-6 underline">Score Breakdown</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 items-start">
+            {#each Object.entries(feedback.analysis_result.domain_score_summary) as [domain, data]}
+                <Tooltip.Provider>
+                    <Tooltip.Root>
+                        <Tooltip.Trigger>
+                            <div
+                                class="p-4 border rounded-lg bg-white transition-shadow hover:shadow-md cursor-help h-full text-left"
+                            >
+                                <div
+                                    class="flex items-start justify-between gap-2"
+                                >
+                                    <h4
+                                        class="font-medium capitalize flex-1 text-left"
+                                    >
+                                        {domain.replace(/_/g, " ")}
+                                    </h4>
+                                    <div
+                                        class={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${Number(data.score) >= 2 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+                                    >
+                                        {data.score}
+                                    </div>
+                                </div>
+                                <p
+                                    class="text-sm text-muted-foreground mt-2 text-left"
+                                >
+                                    {data.reason_for_score}
+                                </p>
+                            </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="max-w-xs bg-blue-50 p-3 rounded-md shadow-md text-left"
+                        >
+                            <div class="font-medium mb-1">for eg.,</div>
+                            <p class="italic text-gray-700">
+                                {data.example || "No example provided"}
+                            </p>
+                        </Tooltip.Content>
+                    </Tooltip.Root>
+                </Tooltip.Provider>
+            {/each}
+        </div>
+    </div>
     <!-- Missed Highlights Table -->
     <div class="space-y-2">
-        <h3 class="font-semibold text-sm">Missed Questions</h3>
+        <h3 class="font-semibold text-base mb-6 underline">Missed Questions</h3>
         <div class="border rounded-lg overflow-hidden">
             <table class="w-full text-sm">
                 <thead class="bg-red-50 border-b border-red-200">
@@ -35,7 +81,9 @@
     <!-- Improvement Highlights Table -->
     {#if feedback.analysis_result.improvement_highlights.length > 0}
         <div class="space-y-2">
-            <h3 class="font-semibold text-sm">Areas for Improvement</h3>
+            <h3 class="font-semibold text-base mb-6 underline">
+                Areas for Improvement
+            </h3>
             <div class="border rounded-lg overflow-hidden">
                 <table class="w-full text-sm">
                     <thead class="bg-muted/50">
@@ -57,30 +105,4 @@
             </div>
         </div>
     {/if}
-
-    <!-- Domain Scores -->
-    <div class="space-y-2 mt-6">
-        <h3 class="font-semibold text-sm">Score Breakdown</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {#each Object.entries(feedback.analysis_result.domain_score_summary) as [domain, data]}
-                <div
-                    class="p-4 border rounded-lg bg-white transition-shadow hover:shadow-md"
-                >
-                    <div class="flex items-start justify-between gap-2">
-                        <h4 class="font-medium capitalize flex-1">
-                            {domain.replace(/_/g, " ")}
-                        </h4>
-                        <div
-                            class={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${Number(data.score) >= 2 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
-                        >
-                            {data.score}
-                        </div>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-2">
-                        {data.reason_for_score}
-                    </p>
-                </div>
-            {/each}
-        </div>
-    </div>
 </div>

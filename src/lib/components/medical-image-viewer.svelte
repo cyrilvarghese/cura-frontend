@@ -170,7 +170,6 @@
     }
 </script>
 
-{@debug user}
 {#if !imageError && imageUrls.length > 0}
     <!-- Image Gallery with Delete All button -->
     <div class="space-y-4">

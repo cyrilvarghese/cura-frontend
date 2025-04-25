@@ -8,6 +8,7 @@ import { imageSearchService, type ImageSearchResponse } from '$lib/services/imag
 import { currentDepartment } from './teamStore';
 import { CaseDataService } from '$lib/services/caseDataService';
 import type { FormattedPersonaResponse, CoverImageResponse } from '$lib/types/index';
+import { historyContextService, type HistoryContextResponse } from '$lib/services/historyContextService';
 
 
 
@@ -25,11 +26,13 @@ export interface CaseStoreState {
     } | null; // Allow null if no data is available
     coverImage: CoverImageResponse | null;
     differentialDiagnosis: any | null;
+    historyContext: HistoryContextResponse | null;
     uploadedFile: File | null;
     uploadedFileName: string | null;
     isGeneratingPersona: boolean;
     isGeneratingPhysicalExam: boolean;
     isGeneratingDifferential: boolean;
+    isGeneratingHistoryContext: boolean;
     searchedImages: ImageSearchResponse | null;
     isSearchingImages: boolean;
     selectedDocumentName: string | null;
@@ -47,12 +50,14 @@ const initialState: CaseStoreState = {
     testData: null,
     coverImage: null,
     differentialDiagnosis: null,
+    historyContext: null,
     caseId: null,
     uploadedFile: null,
     uploadedFileName: null,
     isGeneratingPersona: false,
     isGeneratingPhysicalExam: false,
     isGeneratingDifferential: false,
+    isGeneratingHistoryContext: false,
     searchedImages: null,
     isSearchingImages: false,
     selectedDocumentName: null,
@@ -264,6 +269,7 @@ export async function loadExistingCase(id: string) {
             ...state,
             caseId: id,
             persona: caseData.persona,
+            historyContext: caseData.historyContext,
             testData: {
                 physical_exam: caseData.testData?.physical_exam,
                 lab_test: caseData.testData?.lab_test,
@@ -286,5 +292,39 @@ export async function loadExistingCase(id: string) {
         }));
     } finally {
         caseStore.update(state => ({ ...state, loading: false }));
+    }
+}
+
+// Function to generate history context summary
+export async function generateHistoryContext(selectedDocumentName: string, caseId: string | null = null) {
+    caseStore.update(state => ({
+        ...state,
+        generating: true,
+        error: null,
+        isGeneratingHistoryContext: true,
+        caseId: caseId,
+        selectedDocumentName: selectedDocumentName || null
+    }));
+
+    try {
+        if (!selectedDocumentName) {
+            throw new Error("Selected document name is required");
+        }
+        const response = await historyContextService.createHistoryContext(selectedDocumentName, caseId || "");
+        caseStore.update(state => ({
+            ...state,
+            historyContext: response.content,
+            generating: false,
+            isGeneratingHistoryContext: false,
+            caseId: response.case_id,
+        }));
+        updateCaseId(response.case_id);
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "History context generation failed",
+            generating: false,
+            isGeneratingHistoryContext: false,
+        }));
     }
 }

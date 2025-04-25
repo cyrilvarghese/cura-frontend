@@ -15,6 +15,7 @@
     import { Textarea } from "$lib/components/ui/textarea";
     import { phrasesToAvoidStore } from "$lib/stores/phrasesToAvoidStore";
     import { Maximize2, X } from "lucide-svelte";
+    import HistorySummary from "$lib/components/HistorySummary.svelte";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -25,7 +26,8 @@
             | "case-summary"
             | "cover-image"
             | "examination-editor"
-            | "differential-diagnosis";
+            | "differential-diagnosis"
+            | "history-summary";
     }>();
     onMount(() => {
         console.log(uploadState.caseId);
@@ -108,6 +110,18 @@
                         variant="ghost"
                         size="icon"
                         onclick={() => openFullscreen("differential-diagnosis")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="history-summary"
+                        >History Summary</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() => openFullscreen("history-summary")}
                     >
                         <Maximize2 class="h-4 w-4" />
                     </Button>
@@ -276,6 +290,30 @@
                         </div>
                     {/if}
                 </Tabs.Content>
+
+                <Tabs.Content value="history-summary">
+                    {#if uploadState.isGeneratingHistoryContext}
+                        <LoadingMessage
+                            message="Generating case history summary"
+                        />
+                    {:else if uploadState.error}
+                        <Alert variant="destructive">
+                            <AlertDescription>
+                                {uploadState.error}
+                            </AlertDescription>
+                        </Alert>
+                    {:else if uploadState.historyContext}
+                        <div class="rounded-lg pt-4">
+                            <HistorySummary
+                                historyContext={uploadState.historyContext}
+                            />
+                        </div>
+                    {:else}
+                        <div class="text-center text-muted-foreground py-8">
+                            <p>Case history summary is not available yet</p>
+                        </div>
+                    {/if}
+                </Tabs.Content>
             </div>
         </Tabs.Root>
     </Card.Content>
@@ -322,6 +360,8 @@
                     Physical Examination & Lab Tests
                 {:else if activeTabContent === "differential-diagnosis"}
                     Differential Diagnosis
+                {:else if activeTabContent === "history-summary"}
+                    History Summary
                 {/if}
             </Dialog.Title>
         </div>
@@ -418,6 +458,13 @@
                             {/each}
                         </ul>
                     </div>
+                {/if}
+            {:else if activeTabContent === "history-summary"}
+                <!-- History Summary Content -->
+                {#if uploadState.historyContext}
+                    <HistorySummary
+                        historyContext={uploadState.historyContext}
+                    />
                 {/if}
             {/if}
         </div>

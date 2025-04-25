@@ -3,6 +3,7 @@ import type { CaseStoreState } from '$lib/stores/caseCreatorStore';
 import type { CaseData } from '$lib/stores/casePlayerStore';
 import type { FormattedPersonaResponse } from '$lib/types/index';
 import { handleApiResponse } from '$lib/utils/auth-handler';
+import type { HistoryContextResponse } from '$lib/services/historyContextService';
 
 export interface CaseListItem {
     case_id: number;
@@ -34,13 +35,13 @@ interface CaseDetailsResponse {
             published: boolean;
             google_doc_link: string;
             doc_has_changed: boolean;
-
         };
         test_data: {
             physical_exam: any;
             lab_test: any;
         };
         patient_persona: FormattedPersonaResponse;
+        history_context?: HistoryContextResponse;
     };
 }
 
@@ -129,6 +130,7 @@ export class CaseDataService {
                 quote: data.content.case_cover.quote
             },
             differentialDiagnosis: data.content.case_cover.differentials,
+            historyContext: data.content.history_context,
             generating: false,
             error: null,
             loading: false,
@@ -137,6 +139,7 @@ export class CaseDataService {
             isGeneratingPersona: false,
             isGeneratingPhysicalExam: false,
             isGeneratingDifferential: false,
+            isGeneratingHistoryContext: false,
             isSearchingImages: false,
             searchedImages: null,
             selectedDocumentName: data.content.case_cover.case_name,
