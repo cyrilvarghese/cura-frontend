@@ -19,15 +19,20 @@
     }>();
 
     const bgColor = $derived(
-        Boolean(medication.feedback.match) && medication.feedback.match !== "NA"
-            ? "bg-gray-50"
-            : "bg-red-50",
+        medication.feedback.match === "NA"
+            ? "bg-yellow-50"
+            : Boolean(medication.feedback.match) &&
+                medication.feedback.match !== "NA"
+              ? "bg-gray-50"
+              : "bg-red-50",
     );
 
     const isMatch = $derived(
         Boolean(medication.feedback.match) &&
             medication.feedback.match !== "NA",
     );
+
+    const isInvalidEntry = $derived(medication.feedback.match === "NA");
 </script>
 
 <div class="flex items-center justify-between {bgColor} p-3 rounded-md">
@@ -39,24 +44,33 @@
             {#if medication.indication}
                 <span class="text-gray-600">- {medication.indication}</span>
             {/if}
-            <span
-                class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full"
-            >
-                {medication.feedback.details.class}
-            </span>
-            {#if medication.feedback.classification_correct}
+            {#if !isInvalidEntry}
                 <span
-                    class="text-green-600 cursor-help"
-                    title="Well done - you identified the first line of treatment!"
+                    class="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full"
                 >
-                    ⭐
+                    {medication.feedback.details.class}
                 </span>
+                {#if medication.feedback.classification_correct}
+                    <span
+                        class="text-green-600 cursor-help"
+                        title="Well done - you identified the first line of treatment!"
+                    >
+                        ⭐
+                    </span>
+                {/if}
             {/if}
         </div>
 
         <!-- Feedback section -->
         <div class="flex items-center gap-4">
-            {#if isMatch}
+            {#if isInvalidEntry}
+                <div class="flex items-start justify-start gap-2">
+                    <span class="text-yellow-600">⚠️</span>
+                    <span class="text-sm text-gray-600 w-[600px]">
+                        {medication.feedback.reason}
+                    </span>
+                </div>
+            {:else if isMatch}
                 <div class="flex items-start justify-start flex-row gap-2">
                     <span class="text-green-600">✅</span>
                     <span class="text-sm text-gray-600 w-[600px]">

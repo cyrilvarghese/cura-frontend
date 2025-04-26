@@ -130,7 +130,7 @@ export class CaseDataService {
                 quote: data.content.case_cover.quote
             },
             differentialDiagnosis: data.content.case_cover.differentials,
-            historyContext: data.content.history_context,
+            historyContext: data.content.history_context || null,
             generating: false,
             error: null,
             loading: false,

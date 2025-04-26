@@ -313,7 +313,7 @@ export async function generateHistoryContext(selectedDocumentName: string, caseI
         const response = await historyContextService.createHistoryContext(selectedDocumentName, caseId || "");
         caseStore.update(state => ({
             ...state,
-            historyContext: response.content,
+            historyContext: response,
             generating: false,
             isGeneratingHistoryContext: false,
             caseId: response.case_id,

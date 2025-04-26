@@ -45,7 +45,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("final-diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("treatment-protocol"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -221,7 +221,7 @@
     ]}
 >
     <div class="flex gap-4 w-full h-full">
-        <div class="w-[70%] h-full flex flex-col">
+        <div class="w-[100%] h-full flex flex-col">
             <!-- Title Section with Action Buttons -->
             <div
                 class="p-4 pl-0 border-b border-gray-300 flex justify-between items-end"
@@ -292,10 +292,11 @@
                 <!-- <TestAutocomplete /> -->
             </div>
         </div>
-
+        <!-- 
         <div class="bg-muted/10 rounded-xl w-[30%] h-full">
-            <!-- <CaseSidebar /> -->
+            <CaseSidebar />
         </div>
+        -->
     </div>
 
     <RelevantInfoDialog
