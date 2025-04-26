@@ -602,7 +602,7 @@
 
                                                     {#if showExplanation && key === getCurrentQuestion().mcq_correct_answer_key}
                                                         <div
-                                                            class="mt-2 text-sm text-green-700"
+                                                            class="mt-2 text-sm font-semibold text-gray-900"
                                                         >
                                                             {#if feedbackResponse?.feedback.feedback}
                                                                 <p

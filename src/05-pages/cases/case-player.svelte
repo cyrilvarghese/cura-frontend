@@ -45,7 +45,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("treatment-protocol"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -155,7 +155,7 @@
     function handleTreatmentProtocolSubmit() {
         console.log("Treatment protocol submitted");
         treatmentProtocolDialogOpen = false;
-        currentStep = "end";
+        currentStep = "end-case";
     }
 
     function triggerOSCE() {
