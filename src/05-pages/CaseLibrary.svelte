@@ -86,53 +86,65 @@
                 value="published"
                 class="animate-in fade-in duration-500"
             >
-                <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-                >
-                    {#each filteredCases as caseItem}
-                        <div class="animate-in fade-in duration-500">
-                            <Link
-                                to={`/case-library/${caseItem.case_id}`}
-                                class="group"
-                            >
-                                <div
-                                    class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                {#if filteredCases.length === 0}
+                    <div class="col-span-full text-center py-16">
+                        <FileCheck
+                            class="w-12 h-12 text-gray-400 mx-auto mb-3"
+                        />
+                        <p class="text-gray-500 text-lg">
+                            No published cases available for this department.
+                        </p>
+                    </div>
+                {:else}
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                    >
+                        {#each filteredCases as caseItem}
+                            <div class="animate-in fade-in duration-500">
+                                <Link
+                                    to={`/case-library/${caseItem.case_id}`}
+                                    class="group"
                                 >
-                                    <div class="relative aspect-square">
-                                        <img
-                                            src={API_BASE_URL +
-                                                caseItem.image_url ||
-                                                "/placeholder-image.jpg"}
-                                            alt={caseItem.title}
-                                            class="object-cover absolute inset-0 w-full h-full"
-                                        />
-                                    </div>
-                                    <div class="p-4">
-                                        {#if user?.role === "admin"}
-                                            <span
-                                                class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
-                                            >
-                                                {caseItem.case_name}
-                                            </span>
-                                        {/if}
+                                    <div
+                                        class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <div class="relative aspect-square">
+                                            <img
+                                                src={API_BASE_URL +
+                                                    caseItem.image_url ||
+                                                    "/placeholder-image.jpg"}
+                                                alt={caseItem.title}
+                                                class="object-cover absolute inset-0 w-full h-full"
+                                            />
+                                        </div>
+                                        <div class="p-4">
+                                            {#if user?.role === "admin"}
+                                                <span
+                                                    class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
+                                                >
+                                                    {caseItem.case_name}
+                                                </span>
+                                            {/if}
 
-                                        <h3
-                                            class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
-                                        >
-                                            {caseItem.title || "Untitled Case"}
-                                        </h3>
-                                        <p
-                                            class="text-gray-600 text-sm mt-1 line-clamp-2"
-                                        >
-                                            {caseItem.quote ||
-                                                "No description available"}
-                                        </p>
+                                            <h3
+                                                class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
+                                            >
+                                                {caseItem.title ||
+                                                    "Untitled Case"}
+                                            </h3>
+                                            <p
+                                                class="text-gray-600 text-sm mt-1 line-clamp-2"
+                                            >
+                                                {caseItem.quote ||
+                                                    "No description available"}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </Link>
-                        </div>
-                    {/each}
-                </div>
+                                </Link>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
             </Tabs.Content>
 
             <Tabs.Content

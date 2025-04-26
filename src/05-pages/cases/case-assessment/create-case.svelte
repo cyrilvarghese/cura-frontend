@@ -20,6 +20,7 @@
     import { currentDepartment, type Department } from "$lib/stores/teamStore";
     import GoogleDocLink from "$lib/components/ui/google-doc-link.svelte";
     import { setContext } from "svelte";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
 
     const caseDataService = new CaseDataService();
 
@@ -29,6 +30,7 @@
     let publishSuccess = $state(false);
     let isEditMode = $state(false);
     let caseId = $state<string | null>(null);
+    let isLoading = $state(false);
 
     const { type = "new" } = $props<{ type?: "new" | "edit" }>();
 
@@ -93,9 +95,10 @@
         caseId = urlParams.get("caseId");
         console.log("Case ID:", caseId);
 
+        // Clear state for all cases initially
+        caseStore.set(initialValue);
+
         if (type === "new") {
-            // Clear state for new cases
-            caseStore.set(initialValue);
             isEditMode = false;
             const fileName = urlParams.get("fileName");
             uploadState.selectedDocumentName = fileName;
@@ -104,8 +107,19 @@
         } else if (caseId) {
             // Load existing case for edit mode
             isEditMode = true;
+            isLoading = true;
             lastCaseIdStore.set(caseId);
-            await loadExistingCase(caseId);
+            try {
+                await loadExistingCase(caseId);
+            } catch (error) {
+                console.error("Error loading case:", error);
+                uploadState.error =
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to load case";
+            } finally {
+                isLoading = false;
+            }
         }
     });
 
@@ -258,6 +272,9 @@
         {isEditMode ? "Edit Case" : "Create Case"}
     </h1>
 </div>
+
+<LoadingOverlay isVisible={isLoading} message="Loading case data..." />
+
 <p class="text-gray-500 mb-8">
     {#if isEditMode}
         Edit an existing case for

@@ -13,6 +13,7 @@
         <h3 class="text-xl pb-4 pt-4 font-semibold">Physical Examinations</h3>
         {#each Object.entries(testData.physical_exam) as [examName, examDetails]}
             <ExaminationCard
+                {caseId}
                 result={{
                     name: examName,
                     purpose: examDetails.purpose,
