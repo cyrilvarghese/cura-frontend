@@ -9,6 +9,7 @@ import { currentDepartment } from './teamStore';
 import { CaseDataService } from '$lib/services/caseDataService';
 import type { FormattedPersonaResponse, CoverImageResponse } from '$lib/types/index';
 import { historyContextService, type HistoryContextResponse } from '$lib/services/historyContextService';
+import { treatmentContextService, type TreatmentContextResponse } from '$lib/services/treatmentContextService';
 
 
 
@@ -27,12 +28,14 @@ export interface CaseStoreState {
     coverImage: CoverImageResponse | null;
     differentialDiagnosis: any | null;
     historyContext: HistoryContextResponse | null;
+    treatmentContext: TreatmentContextResponse | null;
     uploadedFile: File | null;
     uploadedFileName: string | null;
     isGeneratingPersona: boolean;
     isGeneratingPhysicalExam: boolean;
     isGeneratingDifferential: boolean;
     isGeneratingHistoryContext: boolean;
+    isGeneratingTreatmentContext: boolean;
     searchedImages: ImageSearchResponse | null;
     isSearchingImages: boolean;
     selectedDocumentName: string | null;
@@ -51,6 +54,7 @@ const initialState: CaseStoreState = {
     coverImage: null,
     differentialDiagnosis: null,
     historyContext: null,
+    treatmentContext: null,
     caseId: null,
     uploadedFile: null,
     uploadedFileName: null,
@@ -58,6 +62,7 @@ const initialState: CaseStoreState = {
     isGeneratingPhysicalExam: false,
     isGeneratingDifferential: false,
     isGeneratingHistoryContext: false,
+    isGeneratingTreatmentContext: false,
     searchedImages: null,
     isSearchingImages: false,
     selectedDocumentName: null,
@@ -145,7 +150,7 @@ export async function searchMedicalImages(query: string) {
 }
 
 
-export async function generatePersona(selectedDocumentName: string, caseId?: string, googleDocLink?: string) {
+export async function generatePersona(selectedDocumentName: string, caseId?: string, googleDocLink?: string | null) {
     caseStore.update(state => ({
         ...state,
         generating: true,
@@ -163,7 +168,7 @@ export async function generatePersona(selectedDocumentName: string, caseId?: str
         department = currentDepartmentValue.name;
     }
     try {
-        const response = await patientPersonaService.createPatientPersonaFromUrl(selectedDocumentName, caseId || null, department, googleDocLink);
+        const response = await patientPersonaService.createPatientPersonaFromUrl(selectedDocumentName, caseId || null, department, googleDocLink || null);
         caseStore.update(state => ({
             ...state,
             persona: {
@@ -270,6 +275,7 @@ export async function loadExistingCase(id: string) {
             caseId: id,
             persona: caseData.persona,
             historyContext: caseData.historyContext,
+            treatmentContext: caseData.treatmentContext,
             testData: {
                 physical_exam: caseData.testData?.physical_exam,
                 lab_test: caseData.testData?.lab_test,
@@ -325,6 +331,40 @@ export async function generateHistoryContext(selectedDocumentName: string, caseI
             error: error instanceof Error ? error.message : "History context generation failed",
             generating: false,
             isGeneratingHistoryContext: false,
+        }));
+    }
+}
+
+// Function to generate treatment context
+export async function generateTreatmentContext(selectedDocumentName: string, caseId: string | null = null) {
+    caseStore.update(state => ({
+        ...state,
+        generating: true,
+        error: null,
+        isGeneratingTreatmentContext: true,
+        caseId: caseId,
+        selectedDocumentName: selectedDocumentName || null
+    }));
+
+    try {
+        if (!selectedDocumentName) {
+            throw new Error("Selected document name is required");
+        }
+        const response = await treatmentContextService.createTreatmentContext(selectedDocumentName, caseId || "");
+        caseStore.update(state => ({
+            ...state,
+            treatmentContext: response,
+            generating: false,
+            isGeneratingTreatmentContext: false,
+            caseId: response.case_id.toString(),
+        }));
+        updateCaseId(response.case_id.toString());
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Treatment context generation failed",
+            generating: false,
+            isGeneratingTreatmentContext: false,
         }));
     }
 }

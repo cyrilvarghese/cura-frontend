@@ -16,6 +16,7 @@
     import { phrasesToAvoidStore } from "$lib/stores/phrasesToAvoidStore";
     import { Maximize2, X } from "lucide-svelte";
     import HistorySummary from "$lib/components/HistorySummary.svelte";
+    import TreatmentContext from "$lib/components/TreatmentContext.svelte";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -27,7 +28,8 @@
             | "cover-image"
             | "examination-editor"
             | "differential-diagnosis"
-            | "history-summary";
+            | "history-summary"
+            | "treatment-context";
     }>();
     onMount(() => {
         console.log(uploadState.caseId);
@@ -122,6 +124,18 @@
                         variant="ghost"
                         size="icon"
                         onclick={() => openFullscreen("history-summary")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="treatment-context"
+                        >Treatment Context</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() => openFullscreen("treatment-context")}
                     >
                         <Maximize2 class="h-4 w-4" />
                     </Button>
@@ -314,6 +328,28 @@
                         </div>
                     {/if}
                 </Tabs.Content>
+
+                <Tabs.Content value="treatment-context">
+                    {#if uploadState.isGeneratingTreatmentContext}
+                        <LoadingMessage
+                            message="Generating treatment context"
+                        />
+                    {:else if uploadState.error}
+                        <Alert variant="destructive">
+                            <AlertDescription>
+                                {uploadState.error}
+                            </AlertDescription>
+                        </Alert>
+                    {:else if uploadState.treatmentContext}
+                        <TreatmentContext
+                            treatmentContext={uploadState.treatmentContext}
+                        />
+                    {:else}
+                        <div class="text-center text-muted-foreground py-8">
+                            <p>Treatment context is not available yet</p>
+                        </div>
+                    {/if}
+                </Tabs.Content>
             </div>
         </Tabs.Root>
     </Card.Content>
@@ -362,6 +398,8 @@
                     Differential Diagnosis
                 {:else if activeTabContent === "history-summary"}
                     History Summary
+                {:else if activeTabContent === "treatment-context"}
+                    Treatment Context
                 {/if}
             </Dialog.Title>
         </div>
@@ -464,6 +502,13 @@
                 {#if uploadState.historyContext}
                     <HistorySummary
                         historyContext={uploadState.historyContext}
+                    />
+                {/if}
+            {:else if activeTabContent === "treatment-context"}
+                <!-- Treatment Context Content -->
+                {#if uploadState.treatmentContext}
+                    <TreatmentContext
+                        treatmentContext={uploadState.treatmentContext}
                     />
                 {/if}
             {/if}

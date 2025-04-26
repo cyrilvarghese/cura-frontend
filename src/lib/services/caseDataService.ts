@@ -4,6 +4,7 @@ import type { CaseData } from '$lib/stores/casePlayerStore';
 import type { FormattedPersonaResponse } from '$lib/types/index';
 import { handleApiResponse } from '$lib/utils/auth-handler';
 import type { HistoryContextResponse } from '$lib/services/historyContextService';
+import type { TreatmentContextResponse } from './treatmentContextService';
 
 export interface CaseListItem {
     case_id: number;
@@ -42,6 +43,8 @@ interface CaseDetailsResponse {
         };
         patient_persona: FormattedPersonaResponse;
         history_context?: HistoryContextResponse;
+        treatment_context: TreatmentContextResponse;
+
     };
 }
 
@@ -145,6 +148,8 @@ export class CaseDataService {
             selectedDocumentName: data.content.case_cover.case_name,
             googleDocLink: data.content.case_cover.google_doc_link,
             doc_has_changed: data.content.case_cover.doc_has_changed,
+            treatmentContext: data.content.treatment_context,
+            isGeneratingTreatmentContext: false,
         };
     }
 } 

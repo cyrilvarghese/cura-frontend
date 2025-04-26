@@ -7,6 +7,7 @@
         generatePhysicalExam,
         generateDifferentialDiagnosis,
         generateHistoryContext,
+        generateTreatmentContext,
         type CaseStoreState,
         lastCaseIdStore,
         loadExistingCase,
@@ -55,12 +56,14 @@
         caseId: null,
         differentialDiagnosis: [],
         historyContext: null,
+        treatmentContext: null,
         uploadedFile: null,
         uploadedFileName: null,
         isGeneratingPersona: false,
         isGeneratingPhysicalExam: false,
         isGeneratingDifferential: false,
         isGeneratingHistoryContext: false,
+        isGeneratingTreatmentContext: false,
         isSearchingImages: false,
         searchedImages: {
             images: [],
@@ -80,6 +83,7 @@
         | "examination-editor"
         | "differential-diagnosis"
         | "history-summary"
+        | "treatment-context"
     >("patient-persona");
 
     const unsubscribeDepartment = currentDepartment.subscribe((value) => {
@@ -239,6 +243,24 @@
         }
     }
 
+    async function handleTreatmentContext() {
+        if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
+        currentTab = "treatment-context";
+        uploadState.isGeneratingTreatmentContext = true;
+
+        try {
+            await generateTreatmentContext(
+                uploadState.selectedDocumentName,
+                uploadState.caseId,
+            );
+        } catch (error) {
+            console.error("Error generating treatment context:", error);
+            throw error;
+        } finally {
+            uploadState.isGeneratingTreatmentContext = false;
+        }
+    }
+
     async function handlePublishCase() {
         if (!department) return;
 
@@ -368,6 +390,20 @@
                     Generating Case History Summary...
                 {:else}
                     Generate Case History Summary
+                {/if}
+            </Button>
+        </div>
+        <div class="flex flex-col justify-start mt-4">
+            <Button
+                variant="secondary"
+                onclick={handleTreatmentContext}
+                disabled={uploadState.generating ||
+                    (!uploadState.selectedDocumentName && !isEditMode)}
+            >
+                {#if uploadState.isGeneratingTreatmentContext}
+                    Generating Treatment Context...
+                {:else}
+                    Generate Treatment Context
                 {/if}
             </Button>
         </div>
