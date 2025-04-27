@@ -173,8 +173,14 @@
 <PageLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Review" }]}
 >
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold">Master Document Review</h1>
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="text-2xl font-bold">Master Document Review</h1>
+            <p class="text-gray-500 text-sm">
+                Review and manage submitted master documents from your
+                department.
+            </p>
+        </div>
         <div class="flex items-center gap-4">
             <div class="relative">
                 <Search
@@ -196,10 +202,7 @@
         </div>
     </div>
 
-    <div class="mb-6 flex items-center justify-between">
-        <p class="text-gray-500">
-            Review and manage submitted master documents from your department.
-        </p>
+    <div class="mb-4 flex justify-end">
         <div class="flex items-center space-x-2">
             <Checkbox
                 id="pendingFilter"
@@ -216,7 +219,7 @@
         </div>
     </div>
 
-    <div class="mt-6">
+    <div class="mt-4">
         <div class="overflow-x-auto">
             {#if isLoading}
                 <div class="w-full">

@@ -8,6 +8,7 @@
         generateDifferentialDiagnosis,
         generateHistoryContext,
         generateTreatmentContext,
+        generateClinicalFindingsContext,
         type CaseStoreState,
         lastCaseIdStore,
         loadExistingCase,
@@ -57,6 +58,7 @@
         differentialDiagnosis: [],
         historyContext: null,
         treatmentContext: null,
+        clinicalFindingsContext: null,
         uploadedFile: null,
         uploadedFileName: null,
         isGeneratingPersona: false,
@@ -64,6 +66,7 @@
         isGeneratingDifferential: false,
         isGeneratingHistoryContext: false,
         isGeneratingTreatmentContext: false,
+        isGeneratingClinicalFindingsContext: false,
         isSearchingImages: false,
         searchedImages: {
             images: [],
@@ -84,6 +87,7 @@
         | "differential-diagnosis"
         | "history-summary"
         | "treatment-context"
+        | "clinical-findings-context"
     >("patient-persona");
 
     const unsubscribeDepartment = currentDepartment.subscribe((value) => {
@@ -114,6 +118,7 @@
             isLoading = true;
             lastCaseIdStore.set(caseId);
             try {
+                debugger;
                 await loadExistingCase(caseId);
             } catch (error) {
                 console.error("Error loading case:", error);
@@ -261,6 +266,24 @@
         }
     }
 
+    async function handleClinicalFindingsContext() {
+        if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
+        currentTab = "clinical-findings-context";
+        uploadState.isGeneratingClinicalFindingsContext = true;
+
+        try {
+            await generateClinicalFindingsContext(
+                uploadState.selectedDocumentName,
+                uploadState.caseId,
+            );
+        } catch (error) {
+            console.error("Error generating clinical findings context:", error);
+            throw error;
+        } finally {
+            uploadState.isGeneratingClinicalFindingsContext = false;
+        }
+    }
+
     async function handlePublishCase() {
         if (!department) return;
 
@@ -404,6 +427,20 @@
                     Generating Treatment Context...
                 {:else}
                     Generate Treatment Context
+                {/if}
+            </Button>
+        </div>
+        <div class="flex flex-col justify-start mt-4">
+            <Button
+                variant="secondary"
+                onclick={handleClinicalFindingsContext}
+                disabled={uploadState.generating ||
+                    (!uploadState.selectedDocumentName && !isEditMode)}
+            >
+                {#if uploadState.isGeneratingClinicalFindingsContext}
+                    Generating Clinical Findings Context...
+                {:else}
+                    Generate Clinical Findings Context
                 {/if}
             </Button>
         </div>

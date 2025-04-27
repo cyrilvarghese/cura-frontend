@@ -224,7 +224,7 @@
         <div class="w-[100%] h-full flex flex-col">
             <!-- Title Section with Action Buttons -->
             <div
-                class="p-4 pl-0 border-b border-gray-300 flex justify-between items-end"
+                class="p-4 px-0 border-b border-gray-300 flex justify-between items-end"
             >
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-800">

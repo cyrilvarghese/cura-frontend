@@ -193,7 +193,7 @@
     <!-- Expected Questions -->
     {#if historyContext.content.expected_questions.length > 0}
         <div
-            class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border-l-2 border-teal-200"
+            class="bg-white dark:bg-gray-800 p-5 pt-0 rounded-lg shadow-sm border-l-2 border-teal-200"
         >
             <div class="flex justify-between items-center mb-3">
                 <h3

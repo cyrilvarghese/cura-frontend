@@ -52,8 +52,13 @@
 <PageLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Library" }]}
 >
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold">Case Library</h1>
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="text-2xl font-bold">Case Library</h1>
+            <p class="text-gray-500 text-sm">
+                A collection of cases for you to learn from.
+            </p>
+        </div>
         <div class="relative">
             <input
                 type="search"
@@ -64,13 +69,9 @@
         </div>
     </div>
 
-    <p class="text-gray-500 mb-8">
-        A collection of cases for you to learn from.
-    </p>
-
     <Tabs.Root
         value={activeTab}
-        class="mb-8"
+        class="mb-6"
         onValueChange={(value) => (activeTab = value)}
     >
         {#if user?.role === "admin"}
@@ -114,7 +115,7 @@
                                                     caseItem.image_url ||
                                                     "/placeholder-image.jpg"}
                                                 alt={caseItem.title}
-                                                class="object-cover absolute inset-0 w-full h-full"
+                                                class="object-cover absolute inset-0 w-full h-full transition-transform duration-300 hover:scale-[1.05]"
                                             />
                                         </div>
                                         <div class="p-4">
@@ -181,7 +182,7 @@
                                                     caseItem.image_url ||
                                                     "/placeholder-image.jpg"}
                                                 alt={caseItem.title}
-                                                class="object-cover absolute inset-0 w-full h-full"
+                                                class="object-cover absolute inset-0 w-full h-full transition-transform duration-300 hover:scale-[1.05]"
                                             />
                                         </div>
                                         <div class="p-4">

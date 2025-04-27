@@ -179,7 +179,6 @@
 <LoadingOverlay isVisible={isUploading} message="Uploading images..." />
 <LoadingOverlay isVisible={isDeleting} message="Deleting images..." />
 
-{@debug user}
 {#if !imageError && imageUrls.length > 0}
     <!-- Image Gallery with Delete All button -->
     <div class="space-y-4">
@@ -215,10 +214,18 @@
                 </div>
             {/each}
         </div>
-
+        <!-- Caption and Timestamp -->
+        {#if caption || subtitle}
+            <div class="flex flex-col flex-start mt-2">
+                {#if caption}
+                    <p class="text-sm font-semibold text-muted-foreground">
+                        {caption}
+                    </p>
+                {/if}
+            </div>
+        {/if}
         <!-- Add uploader for additional images -->
-        <div class="mt-4 border-t pt-4">
-            <h3 class="text-sm font-medium mb-2">Add More Images</h3>
+        <div class="mt-4 pt-4">
             <MedicalImageUploader
                 {caseId}
                 {testName}
@@ -230,17 +237,6 @@
             />
         </div>
     </div>
-
-    <!-- Caption and Timestamp -->
-    {#if caption || subtitle}
-        <div class="flex flex-col flex-start mt-2">
-            {#if caption}
-                <p class="text-sm font-semibold text-muted-foreground">
-                    {caption}
-                </p>
-            {/if}
-        </div>
-    {/if}
 {:else if user?.role !== "student"}
     <MedicalImageUploader
         {caseId}

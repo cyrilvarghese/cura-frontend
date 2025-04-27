@@ -32,7 +32,11 @@
     let uploadProgress = $state(0);
     let totalFiles = $state(0);
     let completedFiles = $state(0);
+    let user: AuthState["user"] | undefined = $state();
 
+    authStore.subscribe((state) => {
+        user = state.user;
+    });
     async function handleFilesUpload(files: FileList) {
         if (!files.length) return;
 
@@ -116,84 +120,87 @@
     }
 </script>
 
-<div
-    class="w-full h-full min-h-[200px] flex items-center justify-start bg-muted rounded-md"
->
-    <div class="w-full space-y-4 p-4 border rounded-md">
-        {#if showHeader}
-            <h3 class="text-lg font-medium mb-4">Add Images</h3>
-        {/if}
+{#if user?.role === "admin"}
+    <h3 class="text-sm font-medium mb-2 border-t pt-6">Add More Images</h3>
 
-        <!-- Paste Area -->
-        <div class="space-y-2">
-            <label
-                for={`paste-area-${testName}`}
-                class="block text-sm font-medium"
-            >
-                Paste image
-            </label>
-            <textarea
-                id={`paste-area-${testName}`}
-                class="min-h-[100px] w-full border-2 border-dashed rounded-lg p-4 resize-none cursor-text hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                onpaste={handlePaste}
-                placeholder="Click here and paste an image (Ctrl+V)"
-                aria-label="Paste image area"
-                rows="3"
-            ></textarea>
-        </div>
+    <div
+        class="w-full h-full min-h-[200px] flex items-center justify-start bg-muted rounded-md"
+    >
+        <div class="w-full space-y-4 p-4 border rounded-md">
+            {#if showHeader}
+                <h3 class="text-lg font-medium mb-4">Add Images</h3>
+            {/if}
 
-        <!-- File Upload Option -->
-        <div class="space-y-2">
-            <label
-                for={`file-upload-${testName}`}
-                class="block text-sm font-medium"
-            >
-                Upload from device
-            </label>
-            <div class="flex items-center gap-2">
-                <input
-                    type="file"
-                    id={`file-upload-${testName}`}
-                    accept="image/*"
-                    multiple
-                    class="hidden"
-                    onchange={(e) => {
-                        const files = e.currentTarget.files;
-                        if (files && files.length > 0) {
-                            handleFilesUpload(files);
-                        }
-                    }}
-                />
-                <Button
-                    variant="outline"
-                    class="gap-2"
-                    onclick={() => {
-                        document
-                            .getElementById(`file-upload-${testName}`)
-                            ?.click();
-                    }}
+            <!-- Paste Area -->
+            <div class="space-y-2">
+                <label
+                    for={`paste-area-${testName}`}
+                    class="block text-sm font-medium"
                 >
-                    <Upload class="h-4 w-4" />
-                    Choose Files
-                </Button>
+                    Paste image
+                </label>
+                <textarea
+                    id={`paste-area-${testName}`}
+                    class="min-h-[100px] w-full border-2 border-dashed rounded-lg p-4 resize-none cursor-text hover:border-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    onpaste={handlePaste}
+                    placeholder="Click here and paste an image (Ctrl+V)"
+                    aria-label="Paste image area"
+                    rows="3"
+                ></textarea>
             </div>
 
-            {#if isUploading}
-                <div class="w-full mt-2">
-                    <div class="text-xs text-muted-foreground mb-1">
-                        Uploading {completedFiles} of {totalFiles} files ({uploadProgress}%)
-                    </div>
-                    <div class="w-full bg-muted rounded-full h-2">
-                        <div
-                            class="bg-primary h-2 rounded-full"
-                            style="width: {uploadProgress}%"
-                        ></div>
-                    </div>
+            <!-- File Upload Option -->
+            <div class="space-y-2">
+                <label
+                    for={`file-upload-${testName}`}
+                    class="block text-sm font-medium"
+                >
+                    Upload from device
+                </label>
+                <div class="flex items-center gap-2">
+                    <input
+                        type="file"
+                        id={`file-upload-${testName}`}
+                        accept="image/*"
+                        multiple
+                        class="hidden"
+                        onchange={(e) => {
+                            const files = e.currentTarget.files;
+                            if (files && files.length > 0) {
+                                handleFilesUpload(files);
+                            }
+                        }}
+                    />
+                    <Button
+                        variant="outline"
+                        class="gap-2"
+                        onclick={() => {
+                            document
+                                .getElementById(`file-upload-${testName}`)
+                                ?.click();
+                        }}
+                    >
+                        <Upload class="h-4 w-4" />
+                        Choose Files
+                    </Button>
                 </div>
-            {/if}
-        </div>
 
-        <!-- URL Input Option
+                {#if isUploading}
+                    <div class="w-full mt-2">
+                        <div class="text-xs text-muted-foreground mb-1">
+                            Uploading {completedFiles} of {totalFiles} files ({uploadProgress}%)
+                        </div>
+                        <div class="w-full bg-muted rounded-full h-2">
+                            <div
+                                class="bg-primary h-2 rounded-full"
+                                style="width: {uploadProgress}%"
+                            ></div>
+                        </div>
+                    </div>
+                {/if}
+            </div>
+
+            <!-- URL Input Option
         <div class="space-y-2">
             <label for="image-url" class="block text-sm font-medium">
                 Enter image URL
@@ -221,10 +228,10 @@
                     Add
                 </Button>
             </div> -->
-        <!-- </div> -->
+            <!-- </div> -->
 
-        <!-- Search Images Button -->
-        <!-- <div class="space-y-2">
+            <!-- Search Images Button -->
+            <!-- <div class="space-y-2">
             <Button
                 variant="outline"
                 class="gap-2 w-full"
@@ -234,8 +241,9 @@
                 Search Medical Images
             </Button>
         </div> -->
+        </div>
     </div>
-</div>
+{/if}
 <!-- 
 <MedicalImageSearch
     bind:open={searchDialogOpen}

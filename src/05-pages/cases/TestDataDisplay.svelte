@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { TestTube } from "lucide-svelte";
     import ExaminationCard from "../../03-organisms/chat/chat-cards/examination-card.svelte";
     import TestResultCard from "../../03-organisms/chat/chat-cards/test-result-card.svelte";
     export let testData: {
@@ -8,9 +9,14 @@
     export let caseId: string;
 </script>
 
-<div class="space-y-6">
+<div class="space-y-8">
     <section class="space-y-4">
-        <h3 class="text-xl pb-4 pt-4 font-semibold">Physical Examinations</h3>
+        <h2
+            class="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100 border-b pb-2 border-gray-200 dark:border-gray-700 flex items-center gap-2"
+        >
+            <TestTube class="h-6 w-6 text-primary" />
+            Physical Examinations and Lab Tests
+        </h2>
         {#each Object.entries(testData.physical_exam) as [examName, examDetails]}
             <ExaminationCard
                 {caseId}

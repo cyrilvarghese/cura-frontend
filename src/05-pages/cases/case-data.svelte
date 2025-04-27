@@ -5,18 +5,18 @@
     import LoadingMessage from "$lib/components/LoadingMessage.svelte";
     import { marked } from "marked";
     import MarkdownContent from "$lib/components/MarkdownContent.svelte";
-    import type { CaseStoreState } from "$lib/stores/caseCreatorStore";
+    import type { CaseStoreState } from "$lib/types/caseTypes";
     import TestDataDisplay from "./TestDataDisplay.svelte";
     import CoverImage from "$lib/components/CoverImage.svelte";
     import { onMount } from "svelte";
-    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     import { Button } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
     import { Textarea } from "$lib/components/ui/textarea";
     import { phrasesToAvoidStore } from "$lib/stores/phrasesToAvoidStore";
-    import { Maximize2, X } from "lucide-svelte";
+    import { List, Maximize2, User, X } from "lucide-svelte";
     import HistorySummary from "$lib/components/HistorySummary.svelte";
     import TreatmentContext from "$lib/components/TreatmentContext.svelte";
+    import ClinicalFindings from "$lib/components/ClinicalFindings.svelte";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -29,7 +29,8 @@
             | "examination-editor"
             | "differential-diagnosis"
             | "history-summary"
-            | "treatment-context";
+            | "treatment-context"
+            | "clinical-findings-context";
     }>();
     onMount(() => {
         console.log(uploadState.caseId);
@@ -79,10 +80,13 @@
 <Card.Root class="flex-1 rounded-none border-none">
     <Card.Content>
         <Tabs.Root value={currentTab} class="w-full">
-            <Tabs.List class="border-b w-full flex justify-start gap-8">
-                <div class="flex items-center gap-2">
-                    <Tabs.Trigger value="patient-persona"
-                        >Patient Persona</Tabs.Trigger
+            <Tabs.List
+                class="border-b w-full flex justify-start flex-wrap gap-x-10 gap-y-2 pb-2 h-[100px]"
+            >
+                <div class="flex items-center gap-2 w-[183px]">
+                    <Tabs.Trigger
+                        class="hover:bg-blue-500"
+                        value="patient-persona">Patient Persona</Tabs.Trigger
                     >
                     <Button
                         variant="ghost"
@@ -92,7 +96,7 @@
                         <Maximize2 class="h-4 w-4" />
                     </Button>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-[280px]">
                     <Tabs.Trigger value="physical-exams"
                         >Physical Examination & Lab Tests</Tabs.Trigger
                     >
@@ -128,7 +132,7 @@
                         <Maximize2 class="h-4 w-4" />
                     </Button>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 w-[280px]">
                     <Tabs.Trigger value="treatment-context"
                         >Treatment Context</Tabs.Trigger
                     >
@@ -136,6 +140,19 @@
                         variant="ghost"
                         size="icon"
                         onclick={() => openFullscreen("treatment-context")}
+                    >
+                        <Maximize2 class="h-4 w-4" />
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Tabs.Trigger value="clinical-findings-context"
+                        >Clinical Findings</Tabs.Trigger
+                    >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onclick={() =>
+                            openFullscreen("clinical-findings-context")}
                     >
                         <Maximize2 class="h-4 w-4" />
                     </Button>
@@ -148,6 +165,12 @@
                 <Tabs.Content value="patient-persona">
                     <!-- Cover Image Section -->
                     <div class="mb-6">
+                        <h2
+                            class="text-2xl mb-6 font-bold text-gray-800 dark:text-gray-100 border-b pb-2 border-gray-200 dark:border-gray-700 flex items-center gap-2"
+                        >
+                            <User class="h-6 w-6 text-primary" />
+                            Patient Persona
+                        </h2>
                         <div class="flex items-center gap-2 mb-4">
                             <Button
                                 variant="outline"
@@ -279,6 +302,12 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.differentialDiagnosis}
+                        <h2
+                            class="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100 border-b pb-2 border-gray-200 dark:border-gray-700 flex items-center gap-2"
+                        >
+                            <List class="h-6 w-6 text-primary" />
+                            Differential Diagnosis
+                        </h2>
                         <div class="rounded-lg pt-4">
                             <ul class="space-y-2">
                                 {#each uploadState.differentialDiagnosis as diagnosis, index}
@@ -317,11 +346,9 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.historyContext}
-                        <div class="rounded-lg pt-4">
-                            <HistorySummary
-                                historyContext={uploadState.historyContext}
-                            />
-                        </div>
+                        <HistorySummary
+                            historyContext={uploadState.historyContext}
+                        />
                     {:else}
                         <div class="text-center text-muted-foreground py-8">
                             <p>Case history summary is not available yet</p>
@@ -347,6 +374,30 @@
                     {:else}
                         <div class="text-center text-muted-foreground py-8">
                             <p>Treatment context is not available yet</p>
+                        </div>
+                    {/if}
+                </Tabs.Content>
+
+                <Tabs.Content value="clinical-findings-context">
+                    {#if uploadState.isGeneratingClinicalFindingsContext}
+                        <LoadingMessage
+                            message="Generating clinical findings context"
+                        />
+                    {:else if uploadState.error}
+                        <Alert variant="destructive">
+                            <AlertDescription>
+                                {uploadState.error}
+                            </AlertDescription>
+                        </Alert>
+                    {:else if uploadState.clinicalFindingsContext}
+                        <ClinicalFindings
+                            clinicalFindingsContext={uploadState.clinicalFindingsContext}
+                        />
+                    {:else}
+                        <div class="text-center text-muted-foreground py-8">
+                            <p>
+                                Clinical findings context is not available yet
+                            </p>
                         </div>
                     {/if}
                 </Tabs.Content>
@@ -400,6 +451,8 @@
                     History Summary
                 {:else if activeTabContent === "treatment-context"}
                     Treatment Context
+                {:else if activeTabContent === "clinical-findings-context"}
+                    Clinical Findings Context
                 {/if}
             </Dialog.Title>
         </div>
@@ -499,10 +552,14 @@
                 {/if}
             {:else if activeTabContent === "history-summary"}
                 <!-- History Summary Content -->
-                {#if uploadState.historyContext}
+                {#if uploadState.historyContext && Object.keys(uploadState.historyContext.content || {}).length > 0}
                     <HistorySummary
                         historyContext={uploadState.historyContext}
                     />
+                {:else}
+                    <div class="text-center text-muted-foreground py-8">
+                        <p>Case history summary is not available yet</p>
+                    </div>
                 {/if}
             {:else if activeTabContent === "treatment-context"}
                 <!-- Treatment Context Content -->
@@ -510,6 +567,16 @@
                     <TreatmentContext
                         treatmentContext={uploadState.treatmentContext}
                     />
+                {/if}
+            {:else if activeTabContent === "clinical-findings-context"}
+                <!-- Clinical Findings Context Content -->
+                {@debug uploadState}
+                {#if uploadState.clinicalFindingsContext}
+                    <div class="rounded-lg pt-4">
+                        <ClinicalFindings
+                            clinicalFindingsContext={uploadState.clinicalFindingsContext}
+                        />
+                    </div>
                 {/if}
             {/if}
         </div>

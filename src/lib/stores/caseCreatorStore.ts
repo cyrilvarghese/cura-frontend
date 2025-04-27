@@ -4,49 +4,35 @@ import { testDataService } from '$lib/services/testDataService'; // Adjust the i
 
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
-import { imageSearchService, type ImageSearchResponse } from '$lib/services/imageSearchService';
+import { imageSearchService } from '$lib/services/imageSearchService';
 import { currentDepartment } from './teamStore';
 import { CaseDataService } from '$lib/services/caseDataService';
-import type { FormattedPersonaResponse, CoverImageResponse } from '$lib/types/index';
-import { historyContextService, type HistoryContextResponse } from '$lib/services/historyContextService';
-import { treatmentContextService, type TreatmentContextResponse } from '$lib/services/treatmentContextService';
+import { historyContextService } from '$lib/services/historyContextService';
+import { treatmentContextService } from '$lib/services/treatmentContextService';
+import type { CaseStoreState } from '$lib/types/caseTypes';
+import { ClinicalFindingsService } from '$lib/services/clinicalFindingsService';
 
+// Use a lazy initialization pattern instead of immediate initialization
+let _caseDataService: CaseDataService | null = null;
+function getCaseDataService(): CaseDataService {
+    if (!_caseDataService) {
+        _caseDataService = new CaseDataService();
+    }
+    return _caseDataService;
+}
 
-
-// Define the store state interface
-export interface CaseStoreState {
-    caseId: string | null;
-    loading: boolean;
-    // fileUploaded: boolean;
-    generating: boolean;
-    error: string | null;
-    persona: FormattedPersonaResponse | null; // Adjust the type based on your response structure
-    testData: { // Updated type to match the response structure
-        physical_exam: any; // Define the structure of physical_exam as needed
-        lab_test: any; // Define the structure of lab_test as needed
-    } | null; // Allow null if no data is available
-    coverImage: CoverImageResponse | null;
-    differentialDiagnosis: any | null;
-    historyContext: HistoryContextResponse | null;
-    treatmentContext: TreatmentContextResponse | null;
-    uploadedFile: File | null;
-    uploadedFileName: string | null;
-    isGeneratingPersona: boolean;
-    isGeneratingPhysicalExam: boolean;
-    isGeneratingDifferential: boolean;
-    isGeneratingHistoryContext: boolean;
-    isGeneratingTreatmentContext: boolean;
-    searchedImages: ImageSearchResponse | null;
-    isSearchingImages: boolean;
-    selectedDocumentName: string | null;
-    googleDocLink: string | null;
-    doc_has_changed: boolean;
+// After lazy initialization of CaseDataService
+let _clinicalFindingsService: ClinicalFindingsService | null = null;
+function getClinicalFindingsService(): ClinicalFindingsService {
+    if (!_clinicalFindingsService) {
+        _clinicalFindingsService = new ClinicalFindingsService();
+    }
+    return _clinicalFindingsService;
 }
 
 // Create a writable store with initial state
 const initialState: CaseStoreState = {
     loading: false,
-    // fileUploaded: false,
     generating: false,
     error: null,
     persona: null,
@@ -55,6 +41,7 @@ const initialState: CaseStoreState = {
     differentialDiagnosis: null,
     historyContext: null,
     treatmentContext: null,
+    clinicalFindingsContext: null,
     caseId: null,
     uploadedFile: null,
     uploadedFileName: null,
@@ -63,6 +50,7 @@ const initialState: CaseStoreState = {
     isGeneratingDifferential: false,
     isGeneratingHistoryContext: false,
     isGeneratingTreatmentContext: false,
+    isGeneratingClinicalFindingsContext: false,
     searchedImages: null,
     isSearchingImages: false,
     selectedDocumentName: null,
@@ -84,7 +72,6 @@ export function updateCaseId(caseId: string) {
     lastCaseIdStore.set(caseId);
 }
 
-
 // Function to update uploaded file
 export function updateUploadedFile(file: File) {
     caseStore.update(state => ({
@@ -100,9 +87,6 @@ export function resetStore() {
     caseStore.set(initialState);
     lastCaseIdStore.set(null);
 }
-
-
-
 
 export async function generateCoverImage(caseId: string) {
     caseStore.update(state => ({ ...state, generating: true, error: null }));
@@ -145,10 +129,8 @@ export async function searchMedicalImages(query: string) {
         return response;
     } catch (error) {
         console.error('Image search failed:', error);
-
     }
 }
-
 
 export async function generatePersona(selectedDocumentName: string, caseId?: string, googleDocLink?: string | null) {
     caseStore.update(state => ({
@@ -194,9 +176,9 @@ export async function generatePersona(selectedDocumentName: string, caseId?: str
         }));
     }
 }
+
 // Function to generate a physical exam
 export async function generatePhysicalExam(selectedDocumentName: string, caseId?: string, department?: string) {
-
     caseStore.update(state => ({
         ...state,
         generating: true, error: null, isGeneratingPhysicalExam: true,
@@ -217,7 +199,6 @@ export async function generatePhysicalExam(selectedDocumentName: string, caseId?
             caseId: response.case_id,
         }));
         updateCaseId(response.case_id);
-
     } catch (error) {
         caseStore.update(state => ({
             ...state,
@@ -257,18 +238,15 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
             error: error instanceof Error ? error.message : "Differential diagnosis generation failed",
             generating: false,
             isGeneratingDifferential: false,
-
         }));
     }
 }
-
-const caseDataService = new CaseDataService();
 
 // Load existing case by id for edit more for docotrs before publishing
 export async function loadExistingCase(id: string) {
     try {
         caseStore.update(state => ({ ...state, loading: true }));
-        const caseData = await caseDataService.getCaseById(id);
+        const caseData = await getCaseDataService().getCaseById(id);
         console.log(caseData);
         caseStore.update((state) => ({
             ...state,
@@ -276,6 +254,7 @@ export async function loadExistingCase(id: string) {
             persona: caseData.persona,
             historyContext: caseData.historyContext,
             treatmentContext: caseData.treatmentContext,
+            clinicalFindingsContext: caseData.clinicalFindingsContext,
             testData: {
                 physical_exam: caseData.testData?.physical_exam,
                 lab_test: caseData.testData?.lab_test,
@@ -365,6 +344,40 @@ export async function generateTreatmentContext(selectedDocumentName: string, cas
             error: error instanceof Error ? error.message : "Treatment context generation failed",
             generating: false,
             isGeneratingTreatmentContext: false,
+        }));
+    }
+}
+
+// Function to generate clinical findings context
+export async function generateClinicalFindingsContext(selectedDocumentName: string, caseId: string | null = null) {
+    caseStore.update(state => ({
+        ...state,
+        generating: true,
+        error: null,
+        isGeneratingClinicalFindingsContext: true,
+        caseId: caseId,
+        selectedDocumentName: selectedDocumentName || null
+    }));
+
+    try {
+        if (!selectedDocumentName) {
+            throw new Error("Selected document name is required");
+        }
+        const response = await getClinicalFindingsService().createClinicalFindingsContext(selectedDocumentName, caseId || "");
+        caseStore.update(state => ({
+            ...state,
+            clinicalFindingsContext: response,
+            generating: false,
+            isGeneratingClinicalFindingsContext: false,
+            caseId: response.case_id.toString(),
+        }));
+        updateCaseId(response.case_id.toString());
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Clinical findings context generation failed",
+            generating: false,
+            isGeneratingClinicalFindingsContext: false,
         }));
     }
 }
