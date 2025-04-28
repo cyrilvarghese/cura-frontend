@@ -5,6 +5,7 @@ import type { FormattedPersonaResponse } from '$lib/types/index';
 import { handleApiResponse } from '$lib/utils/auth-handler';
 import type { HistoryContextResponse } from '$lib/services/historyContextService';
 import type { TreatmentContextResponse } from './treatmentContextService';
+import type { DiagnosisContextResponse } from './diagnosisContextService';
 
 export interface CaseListItem {
     case_id: number;
@@ -45,6 +46,7 @@ interface CaseDetailsResponse {
         history_context?: HistoryContextResponse;
         treatment_context: TreatmentContextResponse;
         clinical_findings_context?: ClinicalFindingsContextResponse;
+        diagnosis_context?: DiagnosisContextResponse;
     };
 }
 
@@ -134,6 +136,7 @@ export class CaseDataService {
             },
             differentialDiagnosis: data.content.case_cover.differentials,
             historyContext: data.content.history_context || null,
+            diagnosisContext: data.content.diagnosis_context || null,
             generating: false,
             error: null,
             loading: false,

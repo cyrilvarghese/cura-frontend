@@ -4,6 +4,7 @@ import { testDataService } from '$lib/services/testDataService'; // Adjust the i
 
 import { coverImageService } from '$lib/services/coverImageService';
 import { differentialDiagnosisService } from '$lib/services/differentialDiagnosisService';
+import { diagnosisContextService } from '$lib/services/diagnosisContextService';
 import { imageSearchService } from '$lib/services/imageSearchService';
 import { currentDepartment } from './teamStore';
 import { CaseDataService } from '$lib/services/caseDataService';
@@ -39,6 +40,7 @@ const initialState: CaseStoreState = {
     testData: null,
     coverImage: null,
     differentialDiagnosis: null,
+    diagnosisContext: null,
     historyContext: null,
     treatmentContext: null,
     clinicalFindingsContext: null,
@@ -223,15 +225,16 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
         if (!selectedDocumentName) {
             throw new Error("Selected document name is required");
         }
-        const response = await differentialDiagnosisService.createDifferentialDiagnosis(selectedDocumentName, caseId || null);
+        const response = await diagnosisContextService.createDiagnosisContext(selectedDocumentName, caseId || "");
         caseStore.update(state => ({
             ...state,
-            differentialDiagnosis: response.content,
+            diagnosisContext: response,
+            differentialDiagnosis: response.content.keyDifferentials.map(diff => diff.name),
             generating: false,
             isGeneratingDifferential: false,
-            caseId: response.case_id,
+            caseId: response.case_id.toString(),
         }));
-        updateCaseId(response.case_id);
+        updateCaseId(response.case_id.toString());
     } catch (error) {
         caseStore.update(state => ({
             ...state,
@@ -255,6 +258,7 @@ export async function loadExistingCase(id: string) {
             historyContext: caseData.historyContext,
             treatmentContext: caseData.treatmentContext,
             clinicalFindingsContext: caseData.clinicalFindingsContext,
+            diagnosisContext: caseData.diagnosisContext,
             testData: {
                 physical_exam: caseData.testData?.physical_exam,
                 lab_test: caseData.testData?.lab_test,
@@ -267,7 +271,7 @@ export async function loadExistingCase(id: string) {
             },
             googleDocLink: caseData.googleDocLink || null,
             doc_has_changed: caseData.doc_has_changed || false,
-            differentialDiagnosis: caseData.differentialDiagnosis,
+            differentialDiagnosis: caseData.diagnosisContext?.content.keyDifferentials.map(diff => diff.name) || caseData.differentialDiagnosis,
             selectedDocumentName: caseData.selectedDocumentName,
         }));
     } catch (error) {

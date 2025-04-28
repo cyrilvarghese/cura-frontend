@@ -9,10 +9,10 @@
         generateHistoryContext,
         generateTreatmentContext,
         generateClinicalFindingsContext,
-        type CaseStoreState,
         lastCaseIdStore,
         loadExistingCase,
     } from "$lib/stores/caseCreatorStore";
+    import type { CaseStoreState } from "$lib/types/caseTypes";
     import { onDestroy, onMount } from "svelte";
     import type { DocumentUploadResponse } from "$lib/services/documentService";
     import {
@@ -57,6 +57,7 @@
         },
         caseId: null,
         differentialDiagnosis: [],
+        diagnosisContext: null,
         historyContext: null,
         treatmentContext: null,
         clinicalFindingsContext: null,
@@ -234,7 +235,7 @@
 
         try {
             await generatePhysicalExam(
-                uploadState.selectedDocumentName,
+                uploadState.selectedDocumentName || "",
                 uploadState.caseId || "",
             );
         } catch (error) {
@@ -429,9 +430,9 @@
                     (!uploadState.selectedDocumentName && !isEditMode)}
             >
                 {#if uploadState.isGeneratingDifferential}
-                    Extracting Differential Diagnosis...
+                    Generating Diagnosis Context...
                 {:else}
-                    Generate Differential Diagnosis
+                    Generate Diagnosis Context
                 {/if}
             </Button>
         </div>

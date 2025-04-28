@@ -29,11 +29,49 @@ interface DiagnosisFeedbackResponse {
     student_id: string;
     timestamp: string;
     feedback_result: {
-        diagnosis_feedback: {
-            communication: string;
-            empathy_patient_centeredness: string;
-            professionalism_ethics: string;
-            information_gathering: string;
+        evaluationSummary: {
+            physicalExamPerformance: number;
+            testOrderingPerformance: number;
+            primaryDiagnosisAccuracy: number;
+            reasoningQuality: number;
+            differentialListMatch: number;
+        };
+        scoreBreakdown: {
+            physicalExams: {
+                score: number;
+                explanation: string;
+                missedItems: Array<{
+                    name: string;
+                    specificRelevance: string;
+                    generalDescription: string;
+                    educationalTip: string | null;
+                }>;
+            };
+            testsOrdered: {
+                score: number;
+                explanation: string;
+                missedItems: Array<{
+                    name: string;
+                    specificRelevance: string;
+                    generalDescription: string;
+                    educationalTip: string | null;
+                }>;
+            };
+            diagnosisAccuracy: {
+                score: number;
+                explanation: string;
+                educationalTip: string;
+            };
+            reasoningQuality: {
+                score: number;
+                explanation: string;
+                educationalTip: string;
+            };
+            differentials: {
+                score: number;
+                explanation: string;
+                educationalTip: string;
+            };
         };
     };
     metadata: {
@@ -281,16 +319,26 @@ export class FeedbackService {
         }
     }
 
-    async getDiagnosisFeedback(): Promise<any> {
-        // Mock response
-        return Promise.resolve({
-            feedback: "Your diagnosis of Rheumatoid Arthritis is accurate. The key symptoms of joint pain, morning stiffness, and symmetrical joint involvement were correctly identified. Consider including more details about the chronicity and progression of symptoms in future cases.",
-            score: 85,
-            areas_for_improvement: [
-                "Include temporal progression of symptoms",
-                "Document more specific joint involvement patterns"
-            ]
-        });
+    async getDiagnosisFeedback(): Promise<DiagnosisFeedbackResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/feedback/diagnosis/feedback`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to get diagnosis feedback');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting diagnosis feedback:', error);
+            throw error;
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 // Define shared types used across multiple modules
+import type { DiagnosisContextResponse } from '$lib/services/diagnosisContextService';
 
 export interface ClinicalFindingsContextResponse {
     id?: string;
@@ -26,6 +27,7 @@ export interface CaseStoreState {
     } | null;
     coverImage: any; // Adjust to use proper type
     differentialDiagnosis: any | null;
+    diagnosisContext: DiagnosisContextResponse | null;
     historyContext: any | null; // Adjust to use proper type
     treatmentContext: any | null; // Adjust to use proper type
     clinicalFindingsContext: ClinicalFindingsContextResponse | null;

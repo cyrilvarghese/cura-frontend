@@ -15,6 +15,7 @@
     } from "$lib/services/feedbackService";
     import HistoryFeedbackContent from "./history-feedback-content.svelte";
     import AETCOMFeedbackContent from "./aetcom-feedback-content.svelte";
+    import DiagnosisFeedbackContent from "./diagnosis-feedback-content.svelte";
 
     let feedback = $state({
         history: {} as HistoryFeedbackResponse | null,
@@ -128,6 +129,10 @@
                                 {:else if step === "aetcom" && feedback.aetcom?.feedback_result}
                                     <AETCOMFeedbackContent
                                         feedback={feedback.aetcom}
+                                    />
+                                {:else if step === "diagnosis" && feedback.diagnosis?.feedback_result}
+                                    <DiagnosisFeedbackContent
+                                        feedback={feedback.diagnosis}
                                     />
                                 {:else}
                                     <p class="text-sm">

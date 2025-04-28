@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
 import type { FeedbackResponse, StudentMessage } from '$lib/types/index';
-import type { OsceGenerationResponse, HistoryFeedbackResponse, AETCOMFeedbackResponse } from '$lib/services/feedbackService';
+import type { OsceGenerationResponse, HistoryFeedbackResponse, AETCOMFeedbackResponse, DiagnosisFeedbackResponse } from '$lib/services/feedbackService';
 import { currentCaseId } from "$lib/stores/casePlayerStore";
 
 interface FeedbackState {
@@ -14,6 +14,7 @@ interface FeedbackState {
     osceData: null | OsceGenerationResponse;
     historyFeedback: null | HistoryFeedbackResponse;
     AETCOMFeedback: null | AETCOMFeedbackResponse;
+    diagnosisFeedback: null | DiagnosisFeedbackResponse;
     historyFeedbackLoading: boolean;
     AETCOMFeedbackLoading: boolean;
     diagnosisFeedbackLoading: boolean;
@@ -29,6 +30,7 @@ const initialState: FeedbackState = {
     osceData: null,
     historyFeedback: null,
     AETCOMFeedback: null,
+    diagnosisFeedback: null,
     historyFeedbackLoading: false,
     AETCOMFeedbackLoading: false,
     diagnosisFeedbackLoading: false
@@ -141,13 +143,26 @@ function createFeedbackStore() {
 
     async function getDiagnosisFeedback() {
         update(state => ({ ...state, diagnosisFeedbackLoading: true, error: null }));
-        let response = null;
+
         try {
-            response = await feedbackService.getDiagnosisFeedback();
+            const response = await feedbackService.getDiagnosisFeedback();
+
+            update(state => ({
+                ...state,
+                diagnosisFeedback: response,
+                diagnosisFeedbackLoading: false
+            }));
+
+            return response;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to get diagnosis feedback';
+            update(state => ({
+                ...state,
+                error: errorMessage,
+                diagnosisFeedbackLoading: false
+            }));
+            throw error;
         }
-        return response;
     }
 
     return {

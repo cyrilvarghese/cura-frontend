@@ -17,6 +17,7 @@
     import HistorySummary from "$lib/components/HistorySummary.svelte";
     import TreatmentContext from "$lib/components/TreatmentContext.svelte";
     import ClinicalFindings from "$lib/components/ClinicalFindings.svelte";
+    import DiagnosisContext from "$lib/components/DiagnosisContext.svelte";
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
@@ -318,32 +319,10 @@
                                 {uploadState.error}
                             </AlertDescription>
                         </Alert>
-                    {:else if uploadState.differentialDiagnosis}
-                        <h2
-                            class="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-100 border-b pb-2 border-gray-200 dark:border-gray-700 flex items-center gap-2"
-                        >
-                            <List class="h-6 w-6 text-primary" />
-                            Differential Diagnosis
-                        </h2>
-                        <div class="rounded-lg pt-4">
-                            <ul class="space-y-2">
-                                {#each uploadState.differentialDiagnosis as diagnosis, index}
-                                    <li
-                                        class="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                    >
-                                        <span
-                                            class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-medium mr-3"
-                                        >
-                                            {index + 1}
-                                        </span>
-                                        <span
-                                            class="text-gray-700 dark:text-gray-200"
-                                            >{diagnosis}</span
-                                        >
-                                    </li>
-                                {/each}
-                            </ul>
-                        </div>
+                    {:else if uploadState.diagnosisContext}
+                        <DiagnosisContext
+                            diagnosisContext={uploadState.diagnosisContext}
+                        />
                     {:else}
                         <div class="text-center text-muted-foreground py-8">
                             <p>Differential diagnosis is not available yet</p>
@@ -357,6 +336,7 @@
                             message="Generating case history summary"
                         />
                     {:else if uploadState.error}
+                        {@debug uploadState}
                         <Alert variant="destructive">
                             <AlertDescription>
                                 {uploadState.error}
@@ -546,7 +526,11 @@
                 {/if}
             {:else if activeTabContent === "differential-diagnosis"}
                 <!-- Differential Diagnosis Content -->
-                {#if uploadState.differentialDiagnosis}
+                {#if uploadState.diagnosisContext}
+                    <DiagnosisContext
+                        diagnosisContext={uploadState.diagnosisContext}
+                    />
+                {:else if uploadState.differentialDiagnosis}
                     <div class="rounded-lg pt-4">
                         <ul class="space-y-2">
                             {#each uploadState.differentialDiagnosis as diagnosis, index}
