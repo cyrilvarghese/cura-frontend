@@ -23,6 +23,7 @@
     import GoogleDocLink from "$lib/components/ui/google-doc-link.svelte";
     import { setContext } from "svelte";
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
+    import ConfirmationDialog from "$lib/components/ui/confirmation-dialog.svelte";
 
     const caseDataService = new CaseDataService();
 
@@ -137,7 +138,20 @@
         unsubscribeDepartment();
     });
 
+    // Add state variables for the alert dialogs
+    let generateAllConfirmOpen = $state(false);
+    let generatePhysicalExamConfirmOpen = $state(false);
+
     async function handleGenerateAll() {
+        if (isEditMode) {
+            generateAllConfirmOpen = true;
+            return;
+        }
+
+        executeGenerateAll();
+    }
+
+    async function executeGenerateAll() {
         if (!uploadState.selectedDocumentName) return;
 
         uploadState.generating = true;
@@ -155,6 +169,18 @@
             uploadState.isGeneratingDifferential = true;
             await handleGenerateDifferentialDiagnosis();
             uploadState.isGeneratingDifferential = false;
+
+            uploadState.isGeneratingHistoryContext = true;
+            await handleGenerateHistorySummary();
+            uploadState.isGeneratingHistoryContext = false;
+
+            uploadState.isGeneratingTreatmentContext = true;
+            await handleTreatmentContext();
+            uploadState.isGeneratingTreatmentContext = false;
+
+            uploadState.isGeneratingClinicalFindingsContext = true;
+            await handleClinicalFindingsContext();
+            uploadState.isGeneratingClinicalFindingsContext = false;
         } catch (error) {
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
@@ -164,6 +190,9 @@
             uploadState.isGeneratingPersona = false;
             uploadState.isGeneratingPhysicalExam = false;
             uploadState.isGeneratingDifferential = false;
+            uploadState.isGeneratingHistoryContext = false;
+            uploadState.isGeneratingTreatmentContext = false;
+            uploadState.isGeneratingClinicalFindingsContext = false;
         }
     }
 
@@ -189,16 +218,20 @@
     }
 
     async function handleGenerateCaseData() {
-        console.log(
-            "uploadState.selectedDocument",
-            uploadState.selectedDocumentName,
-        );
-        console.log("uploadState.caseId", uploadState.caseId);
         if (!uploadState.selectedDocumentName || !uploadState.caseId) return;
+
+        if (isEditMode) {
+            generatePhysicalExamConfirmOpen = true;
+            return;
+        }
+
+        executeGenerateCaseData();
+    }
+
+    async function executeGenerateCaseData() {
         currentTab = "physical-exams";
         uploadState.isGeneratingPhysicalExam = true;
 
-        console.log("uploadState.caseId", uploadState.caseId);
         try {
             await generatePhysicalExam(
                 uploadState.selectedDocumentName,
@@ -491,3 +524,28 @@
 
     <CaseData {uploadState} {currentTab} />
 </div>
+
+<!-- Add the confirmation dialogs at the end of the file -->
+<ConfirmationDialog
+    bind:open={generateAllConfirmOpen}
+    title="Regenerate All Case Data?"
+    description="This will erase all the edits and images uploaded by you. Are you sure you want to continue?"
+    confirmText="Create Data From Scratch"
+    onConfirm={executeGenerateAll}
+/>
+
+<ConfirmationDialog
+    bind:open={generatePhysicalExamConfirmOpen}
+    title="Erase All Data?"
+    description="This will erase all the edits and images uploaded by you. Are you sure you want to continue?"
+    confirmText="Create Data From Scratch"
+    onConfirm={executeGenerateCaseData}
+/>
+
+<ConfirmationDialog
+    bind:open={generatePhysicalExamConfirmOpen}
+    title="Erase All Data?"
+    description="This will erase all the edits and images uploaded by you. Are you sure you want to continue?"
+    confirmText="Create Data From Scratch"
+    onConfirm={executeGenerateCaseData}
+/>
