@@ -85,9 +85,11 @@
             >
                 <div class="flex items-center gap-2 w-[183px]">
                     <Tabs.Trigger
-                        class="hover:bg-blue-500"
-                        value="patient-persona">Patient Persona</Tabs.Trigger
+                        class="hover:underline hover:text-blue-500"
+                        value="patient-persona"
                     >
+                        Patient Persona
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -97,9 +99,12 @@
                     </Button>
                 </div>
                 <div class="flex items-center gap-2 w-[280px]">
-                    <Tabs.Trigger value="physical-exams"
-                        >Physical Examination & Lab Tests</Tabs.Trigger
+                    <Tabs.Trigger
+                        value="physical-exams"
+                        class="hover:underline hover:text-blue-500"
                     >
+                        Physical Examination & Lab Tests
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -109,9 +114,12 @@
                     </Button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <Tabs.Trigger value="differential-diagnosis"
-                        >Differential Diagnosis</Tabs.Trigger
+                    <Tabs.Trigger
+                        class="hover:underline hover:text-blue-500"
+                        value="differential-diagnosis"
                     >
+                        Differential Diagnosis
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -121,9 +129,12 @@
                     </Button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <Tabs.Trigger value="history-summary"
-                        >History Summary</Tabs.Trigger
+                    <Tabs.Trigger
+                        class="hover:underline hover:text-blue-500"
+                        value="history-summary"
                     >
+                        History Summary
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -133,9 +144,12 @@
                     </Button>
                 </div>
                 <div class="flex items-center gap-2 w-[280px]">
-                    <Tabs.Trigger value="treatment-context"
-                        >Treatment Context</Tabs.Trigger
+                    <Tabs.Trigger
+                        class="hover:underline hover:text-blue-500"
+                        value="treatment-context"
                     >
+                        Treatment Context
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"
@@ -145,9 +159,12 @@
                     </Button>
                 </div>
                 <div class="flex items-center gap-2">
-                    <Tabs.Trigger value="clinical-findings-context"
-                        >Clinical Findings</Tabs.Trigger
+                    <Tabs.Trigger
+                        class="hover:underline hover:text-blue-500"
+                        value="clinical-findings-context"
                     >
+                        Clinical Findings
+                    </Tabs.Trigger>
                     <Button
                         variant="ghost"
                         size="icon"

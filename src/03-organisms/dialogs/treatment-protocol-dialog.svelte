@@ -328,10 +328,3 @@
         </Dialog.Footer>
     </Dialog.Content>
 </Dialog.Root>
-
-{#if showSuccess}
-    <div class="flex items-center gap-2 text-green-600">
-        <Flag class="h-4 w-4" />
-        <span class="text-sm">{successMessage}</span>
-    </div>
-{/if}

@@ -28,7 +28,7 @@
                                     <div
                                         class={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full ${Number(data.score) >= 2 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
                                     >
-                                        {data.score}
+                                        {Number(data.score).toFixed(1)}
                                     </div>
                                 </div>
                                 <p
