@@ -688,7 +688,7 @@
                                     >
                                         <Badge
                                             variant="outline"
-                                            class="mr-2 text-[10px] px-1.5 py-0"
+                                            class="mr-2 text-[10px] px-1.5 py-0  "
                                         >
                                             {concept.type}
                                         </Badge>

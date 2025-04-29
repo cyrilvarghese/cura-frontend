@@ -66,13 +66,13 @@
 			},
 		],
 		navMain: [
-			{
-				title: "Home",
-				url: "/",
-				icon: Home,
-				isActive: true,
-				role: ["student"],
-			},
+			// {
+			// 	title: "Home",
+			// 	url: "/",
+			// 	icon: Home,
+			// 	isActive: true,
+			// 	role: ["student"],
+			// },
 			{
 				title: "Curriculum",
 				url: "/curriculum",

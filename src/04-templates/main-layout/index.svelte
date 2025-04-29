@@ -59,7 +59,8 @@
 					</header>
 					<main>
 						<Route path="/">
-							<StudentDashboardPage />
+							<!-- <StudentDashboardPage /> -->
+							<CaseLibraryPage />
 						</Route>
 
 						<Route path="/curriculum">
