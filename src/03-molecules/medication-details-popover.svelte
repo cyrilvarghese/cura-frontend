@@ -25,7 +25,11 @@
             Read more
         </Button>
     </Popover.Trigger>
-    <Popover.Content class="w-[36rem] p-0 shadow-lg border-0">
+    <Popover.Content
+        class="w-[48rem] p-0 shadow-lg border-0"
+        side="right"
+        align="start"
+    >
         <div class="bg-white rounded-lg overflow-hidden">
             <!-- Header -->
             <div class="p-4 border-b bg-blue-50">
@@ -39,9 +43,9 @@
                 </div>
             </div>
 
-            <!-- Main content grid -->
-            <div class={`${isMatch ? "grid grid-cols-2" : ""} gap-3 p-4`}>
-                <!-- Left column (or single column when not a match) -->
+            <!-- Main content grid - always use grid with 2 columns -->
+            <div class="grid grid-cols-2 gap-3 p-4">
+                <!-- Left column -->
                 <div class="space-y-3">
                     <!-- Primary info card -->
                     <div
@@ -85,48 +89,21 @@
                         <p class="text-sm">
                             {medication.feedback.details.mechanism.how_it_works}
                         </p>
-                        {#if medication.feedback.details.mechanism.memory_tip}
-                            <div
-                                class="mt-2 p-2 bg-yellow-50 rounded-md text-sm"
-                            >
-                                <span class="font-medium">Memory tip:</span>
-                                {medication.feedback.details.mechanism
-                                    .memory_tip}
-                            </div>
-                        {/if}
                     </div>
-
-                    <!-- Other drugs in class (shown here if not a match) -->
-                    {#if !isMatch && medication.feedback.details.other_drugs_in_class && medication.feedback.details.other_drugs_in_class.length > 0}
-                        <div class="bg-gray-50 p-3 rounded-md">
-                            <h4 class="font-medium text-sm mb-3">
-                                Other drugs in class
-                            </h4>
-                            <table class="w-full text-sm border-collapse">
-                                <tbody>
-                                    {#each medication.feedback.details.other_drugs_in_class as drug}
-                                        <tr
-                                            class="border-b border-gray-200 last:border-0"
-                                        >
-                                            <td
-                                                class="py-2.5 pr-4 font-medium w-1/3"
-                                                >{drug.name}</td
-                                            >
-                                            <td class="py-2.5 text-gray-600"
-                                                >{drug.note || ""}</td
-                                            >
-                                        </tr>
-                                    {/each}
-                                </tbody>
-                            </table>
-                        </div>
-                    {/if}
                 </div>
 
-                <!-- Right column (only shown for matching medications) -->
-                {#if isMatch}
-                    <div class="space-y-3">
-                        <!-- Dosing -->
+                <!-- Right column -->
+                <div class="space-y-3">
+                    <!-- Memory tip (moved to right column) -->
+                    {#if medication.feedback.details.mechanism.memory_tip}
+                        <div class="p-2 bg-yellow-50 rounded-md text-sm">
+                            <span class="font-medium">Memory tip:</span>
+                            {medication.feedback.details.mechanism.memory_tip}
+                        </div>
+                    {/if}
+
+                    <!-- Dosing (shown for all medications) -->
+                    {#if medication.feedback.details.standard_dose}
                         <div class="bg-gray-50 p-3 rounded-md">
                             <h4 class="font-medium text-sm mb-1">Dosing</h4>
                             <p class="text-sm font-medium flex items-start">
@@ -157,13 +134,15 @@
                                 </p>
                             {/if}
                         </div>
+                    {/if}
 
-                        <!-- Other drugs in class (shown in right column if is a match) -->
-                        {#if medication.feedback.details.other_drugs_in_class && medication.feedback.details.other_drugs_in_class.length > 0}
-                            <div class="bg-gray-50 p-3 rounded-md">
-                                <h4 class="font-medium text-sm mb-3">
-                                    Other drugs in class
-                                </h4>
+                    <!-- Other drugs in class -->
+                    {#if medication.feedback.details.other_drugs_in_class && medication.feedback.details.other_drugs_in_class.length > 0}
+                        <div class="bg-gray-50 p-3 rounded-md">
+                            <h4 class="font-medium text-sm mb-2">
+                                Other drugs in class
+                            </h4>
+                            <div class="max-h-[180px] overflow-y-auto pr-1">
                                 <table class="w-full text-sm border-collapse">
                                     <tbody>
                                         {#each medication.feedback.details.other_drugs_in_class as drug}
@@ -171,10 +150,10 @@
                                                 class="border-b border-gray-200 last:border-0"
                                             >
                                                 <td
-                                                    class="py-2.5 pr-4 font-medium w-1/3"
+                                                    class="py-2 pr-4 font-medium w-1/3"
                                                     >{drug.name}</td
                                                 >
-                                                <td class="py-2.5 text-gray-600"
+                                                <td class="py-2 text-gray-600"
                                                     >{drug.note || ""}</td
                                                 >
                                             </tr>
@@ -182,9 +161,9 @@
                                     </tbody>
                                 </table>
                             </div>
-                        {/if}
-                    </div>
-                {/if}
+                        </div>
+                    {/if}
+                </div>
             </div>
         </div>
     </Popover.Content>

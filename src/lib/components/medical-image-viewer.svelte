@@ -184,14 +184,16 @@
     <div class="space-y-4">
         <div class="flex justify-between items-center">
             <h3 class="text-sm font-medium">Uploaded Images</h3>
-            <button
-                class="text-xs text-destructive hover:underline flex items-center gap-1"
-                onclick={openDeleteConfirm}
-                aria-label="Delete all images"
-            >
-                <X class="h-3 w-3" />
-                Delete All Images
-            </button>
+            {#if user?.role === "admin"}
+                <button
+                    class="text-xs text-destructive hover:underline flex items-center gap-1"
+                    onclick={openDeleteConfirm}
+                    aria-label="Delete all images"
+                >
+                    <X class="h-3 w-3" />
+                    Delete All Images
+                </button>
+            {/if}
         </div>
 
         <!-- Image Gallery Grid -->
@@ -215,13 +217,16 @@
             {/each}
         </div>
         <!-- Caption and Timestamp -->
-        {#if caption || subtitle}
+        {#if caption || subtitle || altText}
             <div class="flex flex-col flex-start mt-2">
-                {#if caption}
+                <!-- {#if caption}
                     <p class="text-sm font-semibold text-muted-foreground">
                         {caption}
                     </p>
-                {/if}
+                {/if} -->
+                <p class="text-sm font-semibold text-muted-foreground">
+                    {altText}
+                </p>
             </div>
         {/if}
         <!-- Add uploader for additional images -->
@@ -257,8 +262,8 @@
 <Dialog.Root bind:open={viewerDialogOpen}>
     <Dialog.Content class="max-w-4xl">
         <Dialog.Header>
-            {#if caption}
-                <Dialog.Title>{caption}</Dialog.Title>
+            {#if altText}
+                <Dialog.Title>{altText}</Dialog.Title>
                 <Dialog.Description
                     >{#if subtitle}
                         <p class="text-sm text-muted-foreground">
