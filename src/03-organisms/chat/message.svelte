@@ -4,7 +4,7 @@
         Message,
         TestResult,
         FeedbackResponse,
-    } from "$lib/types";
+    } from "$lib/types/index";
     import { Avatar } from "$lib/components/ui/avatar";
     import User from "lucide-svelte/icons/user";
     import Bot from "lucide-svelte/icons/bot";
@@ -18,10 +18,6 @@
     import TreatmentProtocolCard from "./chat-cards/treatment-protocol-card.svelte";
     import FeedbackStepsCard from "./chat-cards/feedback-steps-card.svelte";
     import { onMount, onDestroy } from "svelte";
-    import { currentCaseId } from "$lib/stores/casePlayerStore";
-    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
-    import { get } from "svelte/store";
-    let caseId: string = get(currentCaseId) ?? get(lastCaseIdStore) ?? "";
     const { message } = $props<{ message: Message }>();
 
     function getRelativeTime(date: Date): string {
