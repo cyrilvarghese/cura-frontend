@@ -22,6 +22,7 @@
 	import { Toaster } from "svelte-sonner";
 	import CaseEditPage from "../../05-pages/cases/case-edit.svelte";
 	import mixpanel from "mixpanel-browser";
+	import StudentDashboardPage from "../../05-pages/StudentDashboardPage.svelte";
 
 	// Get the current URL for Router
 	export let url = "";
@@ -58,7 +59,7 @@
 					</header>
 					<main>
 						<Route path="/">
-							<CaseLibraryPage />
+							<StudentDashboardPage />
 						</Route>
 
 						<Route path="/curriculum">

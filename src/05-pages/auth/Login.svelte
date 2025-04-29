@@ -1,13 +1,19 @@
 <script lang="ts">
   import { navigate, Link } from "svelte-routing";
-  import { authStore } from "$lib/stores/authStore";
+  import { authStore, type AuthState } from "$lib/stores/authStore";
   import bg1 from "$lib/assets/bg1.png";
 
   let email = $state("");
   let password = $state("");
   let isLoading = $state(false);
   let error = $state<string | null>(null);
-
+  let user: AuthState["user"] | undefined = $state();
+  authStore.subscribe((state) => {
+    user = state.user;
+    if (user) {
+      console.log("Current user role:", user.role);
+    }
+  });
   async function handleLogin(e: SubmitEvent) {
     e.preventDefault();
     isLoading = true;
@@ -15,7 +21,11 @@
 
     try {
       await authStore.login(email, password);
-      navigate("/case-library", { replace: true });
+      if (user?.role === "student") {
+        navigate("/", { replace: true });
+      } else {
+        navigate("/case-library", { replace: true });
+      }
     } catch (err) {
       error = err instanceof Error ? err.message : "Login failed";
     } finally {
@@ -23,8 +33,6 @@
     }
   }
 </script>
-
- 
 
 <div class="flex min-h-screen">
   <!-- Left side with image and testimonial -->
@@ -112,7 +120,7 @@
           {#if isLoading}
             <span class="mr-2">Loading...</span>
           {:else}
-            Sign In 
+            Sign In
           {/if}
         </button>
       </form>

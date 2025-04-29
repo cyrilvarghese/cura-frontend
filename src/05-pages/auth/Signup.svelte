@@ -17,7 +17,7 @@
 
     try {
       await authStore.signup(email, password, username, role);
-      navigate("/case-library", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       error = err instanceof Error ? err.message : "Signup failed";
     } finally {
@@ -26,7 +26,6 @@
   }
 </script>
 
- 
 <div class="flex min-h-screen">
   <!-- Left side with image and testimonial -->
   <div class="hidden md:flex md:w-1/2 bg-black text-white relative">

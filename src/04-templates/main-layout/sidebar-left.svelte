@@ -18,6 +18,8 @@
 		Calendar,
 		LogOut,
 		ClipboardCheck,
+		LayoutDashboard,
+		Home,
 	} from "lucide-svelte";
 	import NavMain from "./nav-main.svelte";
 	import NavSecondary from "./nav-secondary.svelte";
@@ -64,6 +66,13 @@
 			},
 		],
 		navMain: [
+			{
+				title: "Home",
+				url: "/",
+				icon: Home,
+				isActive: true,
+				role: ["student"],
+			},
 			{
 				title: "Curriculum",
 				url: "/curriculum",
