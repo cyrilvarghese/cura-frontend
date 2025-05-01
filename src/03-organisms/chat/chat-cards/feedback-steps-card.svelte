@@ -5,9 +5,12 @@
     import { Button } from "$lib/components/ui/button";
     import ClipboardCheck from "lucide-svelte/icons/clipboard-check";
     import Loader2 from "lucide-svelte/icons/loader-2";
-    import { CheckCircle, ChevronDown } from "lucide-svelte";
+    import { ArrowRight, CheckCircle, ChevronDown } from "lucide-svelte";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import { toast } from "svelte-sonner";
+    import { tweened } from "svelte/motion";
+    import { cubicOut } from "svelte/easing";
+    import { fade, slide } from "svelte/transition";
     import type {
         HistoryFeedbackResponse,
         AETCOMFeedbackResponse,
@@ -36,6 +39,10 @@
     });
 
     let selectedStep = $state<"history" | "aetcom" | "diagnosis" | null>(null);
+    let openAccordion = $state<string[]>([]);
+
+    // Double the delay between accordion transitions for a more gradual experience
+    const transitionDelay = 800; // milliseconds
 
     async function loadFeedback() {
         try {
@@ -44,6 +51,10 @@
             feedback.history = historyFeedback;
             loadingStates.history = false;
             completedStates.history = true;
+            // Add history to open accordions
+            setTimeout(() => {
+                openAccordion = [...openAccordion, "history"];
+            }, transitionDelay);
             loadingStates.aetcom = true;
 
             // AETCOM feedback
@@ -51,6 +62,10 @@
             feedback.aetcom = aetcomFeedback;
             loadingStates.aetcom = false;
             completedStates.aetcom = true;
+            // Add aetcom to open accordions
+            setTimeout(() => {
+                openAccordion = [...openAccordion, "aetcom"];
+            }, transitionDelay);
             loadingStates.diagnosis = true;
 
             // Diagnosis feedback
@@ -59,6 +74,10 @@
             feedback.diagnosis = diagnosisFeedback;
             loadingStates.diagnosis = false;
             completedStates.diagnosis = true;
+            // Add diagnosis to open accordions
+            setTimeout(() => {
+                openAccordion = [...openAccordion, "diagnosis"];
+            }, transitionDelay);
         } catch (error) {
             console.error("Error loading feedback:", error);
             toast.error("Failed to load feedback", {
@@ -67,6 +86,14 @@
                         ? error.message
                         : "Unknown error occurred",
             });
+        }
+    }
+
+    function handleTreatmentPlanClick() {
+        // Find the pre-treatment button by ID and click it
+        const button = document.getElementById("pre-treatment");
+        if (button) {
+            button.click();
         }
     }
 
@@ -92,7 +119,11 @@
 
     <Card.Content>
         <div class="space-y-4">
-            <Accordion.Root class="space-y-2" type="single">
+            <Accordion.Root
+                class="space-y-2"
+                type="multiple"
+                value={openAccordion}
+            >
                 {#each ["history", "aetcom", "diagnosis"] as step}
                     <Accordion.Item value={step}>
                         <Accordion.Trigger
@@ -119,9 +150,17 @@
                             </div>
                         </Accordion.Trigger>
                         <Accordion.Content
-                            class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden"
+                            class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden transition-all duration-500 ease-out"
                         >
-                            <div class="p-4 space-y-6">
+                            <div
+                                class="p-4 space-y-6"
+                                in:slide={{
+                                    duration: 800,
+                                    delay: 100,
+                                    easing: cubicOut,
+                                }}
+                                out:slide={{ duration: 600, easing: cubicOut }}
+                            >
                                 {#if step === "history" && feedback.history?.analysis_result}
                                     <HistoryFeedbackContent
                                         feedback={feedback.history}
@@ -147,8 +186,13 @@
                 {/each}
             </Accordion.Root>
 
-            <Button variant="default" disabled={!completedStates.diagnosis}>
+            <Button
+                variant="default"
+                disabled={!completedStates.diagnosis}
+                onclick={handleTreatmentPlanClick}
+            >
                 Ready for Treatment Plan
+                <ArrowRight class="h-4 w-4" />
             </Button>
         </div>
     </Card.Content>

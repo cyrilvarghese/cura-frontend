@@ -84,7 +84,7 @@
             <Tabs.List
                 class="border-b w-full flex justify-start flex-wrap gap-x-10 gap-y-2 pb-2 h-[100px]"
             >
-                <div class="flex items-center gap-2 w-[183px]">
+                <div class="flex items-center gap-2 w-[190px]">
                     <Tabs.Trigger
                         class="hover:underline hover:text-blue-500"
                         value="patient-persona"
@@ -144,7 +144,7 @@
                         <Maximize2 class="h-4 w-4" />
                     </Button>
                 </div>
-                <div class="flex items-center gap-2 w-[280px]">
+                <div class="flex items-center gap-2 w-[190px]">
                     <Tabs.Trigger
                         class="hover:underline hover:text-blue-500"
                         value="treatment-context"

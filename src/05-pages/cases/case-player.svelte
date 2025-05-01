@@ -45,7 +45,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("final-diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -168,36 +168,42 @@
             icon: InfoIcon,
             action: () => (relevantInfoDialogOpen = true),
             variant: "outline" as const,
+            id: "relevant-info",
         },
         diagnosis: {
             label: "Submit Diagnosis",
             icon: Stethoscope,
             action: () => (diagnosisDialogOpen = true),
             variant: "outline" as const,
+            id: "diagnosis",
         },
         "final-diagnosis": {
             label: "Submit Final Diagnosis",
             icon: CheckCircle2,
             action: () => (finalDiagnosisDialogOpen = true),
             variant: "outline" as const,
+            id: "final-diagnosis",
         },
         "pre-treatment": {
             label: "Submit Pre-Treatment Investigations",
             icon: Stethoscope,
             action: () => (investigationDialogOpen = true),
             variant: "outline" as const,
+            id: "pre-treatment",
         },
         "treatment-protocol": {
             label: "Submit Treatment Protocol",
             icon: Pill,
             action: () => (treatmentProtocolDialogOpen = true),
             variant: "outline" as const,
+            id: "treatment-protocol",
         },
         "end-case": {
             label: "End Case",
             icon: XCircle,
             action: () => (endCaseDialogOpen = true),
             variant: "destructive" as const,
+            id: "end-case",
         },
     };
 
@@ -244,6 +250,7 @@
                                 currentStep as keyof typeof stepButtons
                             ]}
                         <Button
+                            id={button.id}
                             variant={button.variant || "outline"}
                             class="gap-2"
                             onclick={button.action}

@@ -12,7 +12,6 @@
     import { get } from "svelte/store";
     import { toast } from "svelte-sonner";
     import Loader2 from "lucide-svelte/icons/loader-2";
-    import HistoryFeedbackReport from "$lib/components/HistoryFeedbackReport.svelte";
     import { X } from "lucide-svelte";
     import * as Popover from "$lib/components/ui/popover";
 

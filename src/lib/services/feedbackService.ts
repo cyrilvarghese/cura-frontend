@@ -3,6 +3,7 @@ import { API_BASE_URL } from '$lib/config/api';
 import mockFeedback from "$lib/data/mock-feedback.json";
 import mockFeedback2 from "$lib/data/mock-feedback2.json";
 import { handleApiResponse } from "$lib/utils/auth-handler";
+import mockOsce2 from "$lib/data/mock-osce2.json";
 
 interface OsceQuestion {
     station_title: string;
@@ -103,55 +104,17 @@ interface HistoryFeedbackResponse {
     student_id: string;
     timestamp: string;
     analysis_result: {
-        missed_highlights: Array<{
-            missed_question: string;
-            why_important: string;
+        student_question_evaluation: Array<any>; // This appears to be empty in the example
+        critical_missed_areas: Array<{
+            domain: string;
+            importance_reason: string;
+            example_missed_question: string;
         }>;
-        improvement_highlights: Array<{
-            area: string;
-            suggestion: string;
-        }>;
-        domain_score_summary: {
-            chief_complaint: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            associated_symptoms: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            past_medical_history: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            family_history: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            medications: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            social_exposure: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            red_flag_symptoms: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
-            differential_diagnoses: {
-                score: number;
-                reason_for_score: string;
-                example: string;
-            };
+        summary_feedback: {
+            key_strength: string;
+            key_weakness: string;
+            cumulative_score: number;
+            score_reason: string;
         };
     };
     metadata: {
@@ -195,14 +158,13 @@ export class FeedbackService {
 
     async getFeedback(studentMessageHistory: StudentMessage[], caseId: string): Promise<FeedbackResponse> {
         // Return different mock data based on caseId
-        if (caseId === '11') {
-            return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
-        }
-        else {
-            return Promise.resolve(mockFeedback as unknown as FeedbackResponse);
-        }
+        // if (caseId === '11') {
+        //     return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
+        // }
+        // else {
+        //     return Promise.resolve(mockFeedback as unknown as FeedbackResponse);
+        // }
 
-        /* Commented out API call for now
         try {
             const url = caseId
                 ? `${this.baseUrl}/get-feedback?case_id=${encodeURIComponent(caseId)}`
@@ -225,10 +187,13 @@ export class FeedbackService {
             console.error('Error getting feedback:', error);
             throw error;
         }
-        */
+
     }
 
     async generateFinalOsce(caseId: string): Promise<OsceGenerationResponse> {
+        // Return mock data instead of making an API call
+        // return Promise.resolve(mockOsce2 as unknown as OsceGenerationResponse);
+
         try {
             const response = await fetch(`${this.baseUrl}/osce/generate`, {
                 method: 'POST',
@@ -251,6 +216,7 @@ export class FeedbackService {
             console.error('Error generating OSCE:', error);
             throw error;
         }
+
     }
 
     // async getHistoryFeedback(): Promise<HistoryFeedbackResponse> {

@@ -16,6 +16,10 @@
     import Info from "lucide-svelte/icons/info";
     import OSCEExplanationPopover from "./OSCEExplanationPopover.svelte";
     import OSCEProgressIndicator from "./OSCEProgressIndicator.svelte";
+    import CheckCheck from "lucide-svelte/icons/check-check";
+    import { Progress } from "$lib/components/ui/progress";
+    import { Eye, RefreshCw, Library } from "lucide-svelte";
+    import { Link } from "svelte-routing";
 
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
@@ -59,6 +63,56 @@
     // Add a derived value for sorted scores
     let sortedQuestionScores = $derived(
         [...questionScores].sort((a, b) => a.questionIndex - b.questionIndex),
+    );
+
+    // Add these derived values for score calculations
+    let mcqQuestions = $derived(
+        sortedQuestionScores.filter(
+            (q) =>
+                caseData.osce_questions[q.questionIndex].question_format ===
+                "MCQ",
+        ),
+    );
+    let writtenQuestions = $derived(
+        sortedQuestionScores.filter(
+            (q) =>
+                caseData.osce_questions[q.questionIndex].question_format ===
+                "written",
+        ),
+    );
+    let imageQuestions = $derived(
+        sortedQuestionScores.filter(
+            (q) =>
+                caseData.osce_questions[q.questionIndex].question_format ===
+                "image-based",
+        ),
+    );
+
+    let mcqScore = $derived(mcqQuestions.reduce((sum, q) => sum + q.score, 0));
+    let writtenScore = $derived(
+        writtenQuestions.reduce((sum, q) => sum + q.score, 0),
+    );
+    let imageScore = $derived(
+        imageQuestions.reduce((sum, q) => sum + q.score, 0),
+    );
+
+    let mcqMaxScore = $derived(mcqQuestions.length);
+    let writtenMaxScore = $derived(writtenQuestions.length);
+    let imageMaxScore = $derived(imageQuestions.length);
+
+    let mcqPercentage = $derived(
+        mcqQuestions.length > 0 ? (mcqScore / mcqMaxScore) * 100 : 0,
+    );
+    let writtenPercentage = $derived(
+        writtenQuestions.length > 0
+            ? (writtenScore / writtenMaxScore) * 100
+            : 0,
+    );
+    let imagePercentage = $derived(
+        imageQuestions.length > 0 ? (imageScore / imageMaxScore) * 100 : 0,
+    );
+    let totalPercentage = $derived(
+        (totalScore / caseData.osce_questions.length) * 100,
     );
 
     // Function to reset all state to initial values
@@ -334,7 +388,7 @@
             class="w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-xl overflow-hidden flex flex-col"
         >
             <!-- Header with student and case info -->
-            <div class="bg-blue-600 text-white p-4">
+            <div class="bg-gray-900 text-white p-4">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-xl font-bold">
@@ -375,80 +429,192 @@
                 <div
                     class="flex-grow flex flex-col items-center justify-center p-8 text-center"
                 >
-                    <div class="mb-6">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-24 w-24 text-green-500 mx-auto"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
+                    <div class="flex items-center justify-center mb-4">
+                        <h2 class="text-3xl font-bold mr-2">Well Done!</h2>
+                        <div
+                            class="rounded-full p-1 border-2 border-green-500 inline-flex"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                        </svg>
+                            <CheckCheck class="h-5 w-5 text-green-500" />
+                        </div>
                     </div>
 
-                    <h2 class="text-3xl font-bold mb-4">Congratulations!</h2>
-                    <p class="text-xl mb-6">
-                        You've completed all questions in this OSCE case.
+                    <p class="text-base mb-8 text-gray-600">
+                        You've completed all questions in this OSCE case. 🎉
                     </p>
 
-                    <div class="bg-blue-50 rounded-lg p-6 mb-8 w-full max-w-md">
-                        <h3 class="text-xl font-semibold mb-4">
-                            Your Final Score
-                        </h3>
-                        <div
-                            class="text-4xl font-bold mb-2 {getScoreColor(
-                                totalScore / caseData.osce_questions.length,
-                            )}"
+                    <div
+                        class="bg-gray-50 rounded-lg p-6 mb-8 w-full max-w-md shadow-md"
+                    >
+                        <h3
+                            class="text-xl font-semibold mb-6 text-center text-black"
                         >
-                            {totalScore.toFixed(1)} / {caseData.osce_questions
-                                .length}
-                        </div>
-                        <p class="text-gray-600">
-                            {Math.round(
-                                (totalScore / caseData.osce_questions.length) *
-                                    100,
-                            )}% correct
-                        </p>
+                            Your Final Score 🩺
+                        </h3>
 
-                        <!-- Score breakdown -->
-                        <div class="mt-6 text-left">
-                            <h4 class="font-medium mb-2">
-                                Question Breakdown:
-                            </h4>
-                            <div class="space-y-2">
-                                {#each sortedQuestionScores as score}
-                                    <div class="flex items-center">
-                                        {#if score.isCorrect}
-                                            <CheckCircle
-                                                class="h-5 w-5 mr-2 text-green-500"
-                                            />
-                                        {:else}
-                                            <XCircle
-                                                class="h-5 w-5 mr-2 text-red-500"
-                                            />
-                                        {/if}
-                                        <span
-                                            >Question {score.questionIndex + 1}: {score.score.toFixed(
-                                                1,
-                                            )} points</span
-                                        >
-                                    </div>
-                                {/each}
+                        <!-- Overall score with progress bar -->
+                        <div class="mb-10">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-5xl font-bold text-black">
+                                    {totalScore.toFixed(1)} / {caseData
+                                        .osce_questions.length}
+                                </div>
+                                <div class="text-black text-lg">
+                                    {Math.round(totalPercentage)}% correct
+                                    {#if totalPercentage >= 80}
+                                        🏆
+                                    {:else if totalPercentage >= 60}
+                                        👍
+                                    {:else if totalPercentage >= 40}
+                                        🤔
+                                    {:else}
+                                        📚
+                                    {/if}
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 h-4 rounded-full">
+                                <div
+                                    class="h-full bg-blue-500 rounded-full"
+                                    style="width: {totalPercentage}%"
+                                />
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex space-x-4">
-                        <Button onclick={returnToQuestions} variant="outline">
-                            Review Questions
-                        </Button>
-                        <Button onclick={closePopup}>Close</Button>
+                        <!-- Score breakdown by question type -->
+                        <div class="mt-6 text-left">
+                            <!-- MCQ Questions -->
+                            {#if mcqQuestions.length > 0}
+                                <div class="mb-8">
+                                    <div
+                                        class="flex justify-between items-center mb-1"
+                                    >
+                                        <h5
+                                            class="font-medium text-black text-lg"
+                                        >
+                                            Multiple Choice Questions 🔍
+                                        </h5>
+                                        <div class="text-black font-medium">
+                                            {mcqScore.toFixed(1)} / {mcqMaxScore}
+                                            {#if mcqPercentage >= 80}
+                                                ✅
+                                            {:else if mcqPercentage >= 40}
+                                                ⚠️
+                                            {:else}
+                                                ❌
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 h-4 rounded-full"
+                                    >
+                                        <div
+                                            class="h-full bg-blue-500 rounded-full"
+                                            style="width: {mcqPercentage}%"
+                                        />
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <!-- Written Questions -->
+                            {#if writtenQuestions.length > 0}
+                                <div class="mb-8">
+                                    <div
+                                        class="flex justify-between items-center mb-1"
+                                    >
+                                        <h5
+                                            class="font-medium text-black text-lg"
+                                        >
+                                            Written Questions 📝
+                                        </h5>
+                                        <div class="text-black font-medium">
+                                            {writtenScore.toFixed(1)} / {writtenMaxScore}
+                                            {#if writtenPercentage >= 80}
+                                                ✅
+                                            {:else if writtenPercentage >= 40}
+                                                ⚠️
+                                            {:else}
+                                                ❌
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 h-4 rounded-full"
+                                    >
+                                        <div
+                                            class="h-full bg-blue-500 rounded-full"
+                                            style="width: {writtenPercentage}%"
+                                        />
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <!-- Image-Based Questions -->
+                            {#if imageQuestions.length > 0}
+                                <div class="mb-8">
+                                    <div
+                                        class="flex justify-between items-center mb-1"
+                                    >
+                                        <h5
+                                            class="font-medium text-black text-lg"
+                                        >
+                                            Image-Based Questions 🔬
+                                        </h5>
+                                        <div class="text-black font-medium">
+                                            {imageScore.toFixed(1)} / {imageMaxScore}
+                                            {#if imagePercentage >= 80}
+                                                ✅
+                                            {:else if imagePercentage >= 40}
+                                                ⚠️
+                                            {:else}
+                                                ❌
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-200 h-4 rounded-full"
+                                    >
+                                        <div
+                                            class="h-full bg-blue-500 rounded-full"
+                                            style="width: {imagePercentage}%"
+                                        />
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
+
+                        <!-- After the fun fact section -->
+                        <div class="mt-4 flex flex-col space-y-3">
+                            <!-- See what others scored button -->
+                            <Button
+                                variant="outline"
+                                class="w-full bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
+                            >
+                                <Eye class="mr-2 h-4 w-4" />
+                                See what others scored
+                            </Button>
+                            <div class="flex space-x-2">
+                                <Button
+                                    variant="outline"
+                                    onclick={returnToQuestions}
+                                    class="w-full bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
+                                >
+                                    <RefreshCw class="mr-2 h-4 w-4" />
+                                    Replay Case
+                                </Button>
+
+                                <!-- Go to Case Library button -->
+                                <Link to="/case-library">
+                                    <Button
+                                        variant="outline"
+                                        onclick={closePopup}
+                                        class="w-full bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                                    >
+                                        <Library class="mr-2 h-4 w-4" />
+                                        Go to Case Library
+                                    </Button>
+                                </Link>
+                            </div>
+                            <!-- Replay Case button -->
+                        </div>
                     </div>
                 </div>
             {:else}

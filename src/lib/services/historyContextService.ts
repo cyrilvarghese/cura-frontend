@@ -1,27 +1,38 @@
 import { API_BASE_URL } from '$lib/config/api';
 
 export interface HistoryContextResponse {
-    id: string;
+    case_id: number;
     content: {
         case_summary_history: {
             chief_complaint: string;
+            history_of_present_illness?: string;
             demographics_risk: {
-                age: number;
+                age: number | null;
                 gender: string;
-                sexual_orientation: string;
-                risk_factors: string;
+                occupation?: string;
+                sexual_orientation?: string;
+                hiv_status?: string;
+                art_status?: string;
+                risk_factors?: string | string[];
             };
-            history_timeline: Record<string, string>;
-            associated_symptoms: string[];
-            pertinent_positives: string[];
-            pertinent_negatives_from_history: string[];
+            history_timeline?: Record<string, string>;
+            associated_symptoms: Record<string, string> | string[] | null;
+            pertinent_positives: string[] | null;
+            pertinent_positives_from_history?: string[];
+            pertinent_negatives_from_history: string[] | null;
+            social_history?: Record<string, string> | string;
+            past_medical_history?: string | null;
+            family_history?: string | null;
+            medications_allergies?: string | null;
         };
-        expected_questions: string[];
+        expected_questions_with_domains: Array<{
+            question: string;
+            domain: string;
+        }>;
     };
-    case_id: string;
-    file_path?: string;
-    timestamp?: string;
-    type?: string;
+    file_path: string;
+    timestamp: string;
+    type: string;
 }
 
 export class HistoryContextService {

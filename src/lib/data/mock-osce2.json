@@ -1,0 +1,72 @@
+{
+    "case_id": "1",
+    "student_id": "fa19f495-35e7-48cf-87c0-eabd94c7a05f",
+    "department": "Dermatology",
+    "timestamp": "2025-04-30T12:17:33.335938",
+    "osce_questions": [
+        {
+            "station_title": "Urticarial Vasculitis vs. Angioedema",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Differentiating urticarial vasculitis from angioedema, particularly when swelling is present.",
+            "prompt": "A 40-year-old woman presents with recurrent episodes of swelling involving her lips and tongue, along with itchy, raised welts on her arms and legs that last approximately 36 hours. She also reports mild abdominal cramping. Which of the following features would be MOST suggestive of urticarial vasculitis rather than angioedema?",
+            "options": {
+                "A": "Presence of lip and tongue swelling.",
+                "B": "Itchy, raised welts on the skin.",
+                "C": "Welts resolving with residual bruising.",
+                "D": "Mild abdominal cramping."
+            },
+            "mcq_correct_answer_key": "C",
+            "expected_answer": null,
+            "explanation": "While angioedema can present with lip and tongue swelling (A), itchy welts (B), and even abdominal symptoms (D), the presence of residual bruising after the welts resolve is a key differentiating feature of urticarial vasculitis (C).",
+            "concept_modal": {
+                "specific": "Bruising is a crucial clinical sign of vascular inflammation and damage, distinguishing urticarial vasculitis from other urticarial conditions and angioedema.",
+                "general": "Careful observation of skin lesion morphology and evolution is essential for accurate dermatologic diagnosis.",
+                "lateral": "This principle applies to differentiating other vasculitides based on cutaneous findings, such as palpable purpura in Henoch-Schönlein purpura."
+            }
+        },
+        {
+            "station_title": "Interpreting Skin Biopsy Results",
+            "question_format": "written",
+            "addressed_gap": "Gap: Understanding the significance of different findings on skin biopsy in the context of suspected urticarial vasculitis.",
+            "prompt": "A skin biopsy is performed on a patient with suspected urticarial vasculitis. Describe the key histopathological findings that would confirm the diagnosis and differentiate it from chronic idiopathic urticaria. Also, explain what negative findings (if any) would argue against the diagnosis of urticarial vasculitis.",
+            "options": null,
+            "mcq_correct_answer_key": null,
+            "expected_answer": "Key findings confirming urticarial vasculitis include leukocytoclastic vasculitis (inflammation of small blood vessels with neutrophil infiltration), fibrinoid necrosis of vessel walls, and extravasation of red blood cells. Immunofluorescence may show deposition of immunoglobulins (IgG, IgM) and complement components (C3) in the vessel walls. The absence of these findings, particularly leukocytoclastic vasculitis, would strongly argue against the diagnosis of urticarial vasculitis and favor chronic idiopathic urticaria, where dermal edema and mast cell degranulation are more prominent.",
+            "explanation": "The histopathology of urticarial vasculitis reflects the underlying vascular inflammation and immune complex deposition, differentiating it from the mast cell-driven process of chronic idiopathic urticaria. The absence of vasculitic changes would necessitate reconsideration of the diagnosis.",
+            "concept_modal": {
+                "specific": "Skin biopsy is crucial for confirming urticarial vasculitis and excluding other conditions with similar clinical presentations. Recognizing the specific histopathological features is essential for accurate diagnosis.",
+                "general": "Histopathology plays a vital role in confirming diagnoses and guiding treatment in dermatology.",
+                "lateral": "This principle applies to diagnosing other skin conditions, such as melanoma, where specific histopathological features determine prognosis and management."
+            }
+        },
+        {
+            "station_title": "Managing Urticarial Vasculitis with Renal Involvement",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Understanding the importance of monitoring for and managing potential systemic complications of urticarial vasculitis, specifically renal involvement.",
+            "prompt": "A 35-year-old woman diagnosed with urticarial vasculitis presents with new-onset lower extremity edema and elevated blood pressure. Urinalysis reveals proteinuria. Which of the following is the MOST appropriate next step in management?",
+            "options": {
+                "A": "Initiate antihistamine therapy to control the urticaria.",
+                "B": "Prescribe a short course of oral corticosteroids and monitor renal function.",
+                "C": "Order a renal biopsy to assess the extent of kidney damage.",
+                "D": "Refer to nephrology for further evaluation and management."
+            },
+            "mcq_correct_answer_key": "D",
+            "expected_answer": null,
+            "explanation": "New-onset edema, hypertension, and proteinuria in a patient with urticarial vasculitis raise suspicion for renal involvement, such as glomerulonephritis. While corticosteroids (B) may be considered, the immediate priority is to refer to nephrology (D) for a thorough evaluation, including a possible renal biopsy (C), and specialized management. Antihistamines (A) are insufficient to address potential renal complications.",
+            "concept_modal": {
+                "specific": "Urticarial vasculitis can be associated with systemic complications, particularly renal involvement, requiring prompt recognition and referral for specialized management.",
+                "general": "Systemic diseases can manifest with cutaneous findings, highlighting the importance of considering underlying medical conditions in dermatologic patients.",
+                "lateral": "This principle applies to other dermatologic conditions with potential systemic associations, such as dermatomyositis and lupus erythematosus."
+            }
+        }
+    ],
+    "metadata": {
+        "processing_time_seconds": 8.76376,
+        "model_version": "models/gemini-2.0-flash",
+        "generation_config": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 40
+        }
+    }
+}
