@@ -1,10 +1,24 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { handleApiResponse } from '$lib/utils/auth-handler';
-import type { ClinicalFindingsContextResponse } from '$lib/types/caseTypes';
 
 export interface ClinicalFindingsRequest {
     case_id: string;
     findings: string[];
+}
+
+export interface ClinicalFinding {
+    finding: string;
+    relevance: string;
+}
+
+export interface ClinicalFindingsContextResponse {
+    case_id: number;
+    content: {
+        critical_findings_with_relevance: ClinicalFinding[];
+    };
+    file_path: string;
+    timestamp: string;
+    type: string;
 }
 
 export class ClinicalFindingsService {

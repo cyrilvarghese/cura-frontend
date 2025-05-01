@@ -30,7 +30,6 @@
     let isSubmitting = $state(false);
     let evaluationResponse = $state<EvaluationResponse | null>(null);
     let isEvaluating = $state(false);
-
     // Add this to track evaluation results for each point
     let pointEvaluations = $state<Record<string, boolean>>({});
     let evaluationInProgress = $state<Record<string, boolean>>({});
@@ -126,7 +125,7 @@
             if (!caseId) {
                 throw new Error("No case ID found");
             }
-
+            isSubmitting = true;
             // Record the findings using our new store
             await clinicalFindingsStore.recordFindings(caseId, relevantPoints);
 
@@ -138,7 +137,7 @@
                 "relevant-info",
                 "relevant-info",
             );
-
+            isSubmitting = false;
             onSubmit();
             closeDialog();
         } catch (error) {
@@ -159,7 +158,7 @@
             !isSubmitting
         ) {
             event.preventDefault();
-            handleSubmit();
+            handleContinue();
         }
     }
 
@@ -259,8 +258,8 @@
                 <ArrowLeft class="h-4 w-4" />
                 Back to conversation
             </Button>
-            <Button onclick={handleSubmit} disabled={isEvaluating}>
-                {#if evaluationResponse}
+            <Button onclick={handleContinue} disabled={isEvaluating}>
+                <!-- {#if evaluationResponse}
                     <Button
                         disabled={isEvaluating || relevantPoints.length === 0}
                         onclick={handleContinue}
@@ -268,6 +267,12 @@
                         Submit Current Findings
                     </Button>
                 {:else if isEvaluating}
+                    <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                {:else}
+                    Submit
+                {/if} -->
+                {#if isSubmitting}
                     <Loader2 class="mr-2 h-4 w-4 animate-spin" />
                     Submitting...
                 {:else}
