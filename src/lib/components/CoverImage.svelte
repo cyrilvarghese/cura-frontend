@@ -166,7 +166,7 @@
                                 {#snippet child({ props })}
                                     <Button
                                         variant="ghost"
-                                        title="Edit Quote"
+                                        title="Edit Title"
                                         size="icon"
                                         class="h-8 w-8 text-blue-500"
                                         {...props}

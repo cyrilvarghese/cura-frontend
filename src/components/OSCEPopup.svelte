@@ -626,7 +626,7 @@
                                     class="w-full bg-green-100 text-green-700 border-green-200 hover:bg-green-200"
                                 >
                                     <RefreshCw class="mr-2 h-4 w-4" />
-                                    Replay Case
+                                    Replay OSCE
                                 </Button>
 
                                 <!-- Go to Case Library button -->
