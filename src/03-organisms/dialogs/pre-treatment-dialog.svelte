@@ -93,7 +93,7 @@
                     ...monitoring,
                     {
                         timePoint: newMonitoring.timePoint.trim(),
-                        test: newMonitoring.test.trim(),
+                        test: newMonitoring.test.trim().toUpperCase(),
                         fullText: monitoringText,
                     },
                 ];
@@ -274,8 +274,10 @@
                                 <TestFeedbackPopover
                                     name={monitor.fullText}
                                     timePoint={monitor.timePoint}
-                                    test={monitor.test}
-                                    feedback={feedbackResults[monitor.fullText]}
+                                    test={monitor.test.toUpperCase()}
+                                    feedback={feedbackResults[
+                                        monitor.fullText.toUpperCase()
+                                    ]}
                                     onRemove={() => removeMonitoring(index)}
                                 />
                             {/each}

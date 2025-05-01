@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { OSCEFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse } from '$lib/services/osceFeedbackService';
+import { OSCEFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse, type OSCEScoreRecord } from '$lib/services/osceFeedbackService';
 import { currentCaseId } from './casePlayerStore';
 import { get } from 'svelte/store';
 
@@ -43,6 +43,23 @@ function createOSCEFeedbackStore() {
                 return feedback;
             } catch (error) {
                 const errorMessage = error instanceof Error ? error.message : 'Failed to submit OSCE response';
+                update(state => ({
+                    ...state,
+                    error: errorMessage,
+                    isLoading: false
+                }));
+                throw error;
+            }
+        },
+
+        recordOsceFeedback: async (scoreData: OSCEScoreRecord) => {
+            update(state => ({ ...state, isLoading: true, error: null }));
+            try {
+                const response = await osceFeedbackService.recordOsceFeedback(scoreData);
+                update(state => ({ ...state, isLoading: false }));
+                return response;
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to record OSCE score';
                 update(state => ({
                     ...state,
                     error: errorMessage,

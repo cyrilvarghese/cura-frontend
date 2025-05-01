@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { handleApiResponse } from '$lib/utils/auth-handler';
 
 export interface OSCEQuestion {
     station_title: string;
@@ -46,6 +47,20 @@ export interface OSCEFeedbackResponse {
     };
 }
 
+export interface OSCEScoreRecord {
+    case_id: string;
+    overallPerformance: {
+        totalPointsEarned: number;
+        totalPossiblePoints: number;
+        overallPercentage: number;
+    };
+    performanceByQuestionType: {
+        multipleChoicePercentage: number;
+        writtenResponsePercentage: number;
+        imageBasedPercentage: number;
+    };
+}
+
 export class OSCEFeedbackService {
     private baseUrl = API_BASE_URL;
 
@@ -68,6 +83,7 @@ export class OSCEFeedbackService {
             });
 
             if (!response.ok) {
+                handleApiResponse(response);
                 const errorData = await response.json().catch(() => null);
                 throw new Error(errorData?.detail || 'Failed to submit OSCE response');
             }
@@ -75,6 +91,30 @@ export class OSCEFeedbackService {
             return response.json();
         } catch (error) {
             console.error('Error submitting OSCE response:', error);
+            throw error;
+        }
+    }
+
+    async recordOsceFeedback(scoreData: OSCEScoreRecord): Promise<any> {
+        try {
+            const response = await fetch(`${this.baseUrl}/record-osce-score`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(scoreData)
+            });
+
+            if (!response.ok) {
+                handleApiResponse(response);
+
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.detail || 'Failed to record OSCE score');
+            }
+
+            return response.json();
+        } catch (error) {
+            console.error('Error recording OSCE score:', error);
             throw error;
         }
     }

@@ -217,6 +217,34 @@
         if (questionsAnswered === caseData.osce_questions.length) {
             setTimeout(() => {
                 showEndScreen = true;
+
+                // Create score data object
+                const scoreData = {
+                    case_id: caseData.case_id,
+                    overallPerformance: {
+                        totalPointsEarned: totalScore,
+                        totalPossiblePoints: caseData.osce_questions.length,
+                        overallPercentage: totalPercentage,
+                    },
+                    performanceByQuestionType: {
+                        multipleChoicePercentage: mcqPercentage,
+                        writtenResponsePercentage: writtenPercentage,
+                        imageBasedPercentage: imagePercentage,
+                    },
+                };
+
+                // Log to console
+                console.log("OSCE Score Summary:", scoreData);
+
+                // Send to server
+                osceFeedbackStore
+                    .recordOsceFeedback(scoreData)
+                    .then((response) =>
+                        console.log("Score recorded successfully:", response),
+                    )
+                    .catch((error) =>
+                        console.error("Failed to record score:", error),
+                    );
             }, 0);
         }
     }

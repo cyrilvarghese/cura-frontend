@@ -1,295 +1,132 @@
 {
-    "annotations": [
+    "case_id": "1",
+    "student_id": "fa19f495-35e7-48cf-87c0-eabd94c7a05f",
+    "department": "Dermatology",
+    "timestamp": "2025-05-01T14:17:54.109821",
+    "osce_questions": [
         {
-            "action": "Did you notice the skin changes yourself or were they pointed out to you?",
-            "step": "history_taking",
-            "relevance": "relevant",
-            "correctness": "correct",
-            "justification": "This helps determine awareness and progression of cutaneous symptoms — crucial in leprosy where sensory loss is common."
+            "station_title": "Interpreting Skin Biopsy Results",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Understanding the significance of specific histopathological findings in diagnosing urticarial vasculitis.",
+            "prompt": "A skin biopsy is performed on a patient suspected of having urticarial vasculitis. Which of the following histopathological findings is MOST specific for this condition?",
+            "options": {
+                "A": "Superficial perivascular lymphocytic infiltrate",
+                "B": "Increased mast cells in the dermis",
+                "C": "Leukocytoclastic vasculitis with fibrinoid necrosis and perivascular neutrophilic infiltrate",
+                "D": "Spongiosis and intraepidermal vesicles"
+            },
+            "mcq_correct_answer_key": "C",
+            "expected_answer": null,
+            "explanation": "Leukocytoclastic vasculitis (C) is the hallmark histopathological finding in urticarial vasculitis. It involves inflammation of small blood vessels with neutrophil infiltration, fibrinoid necrosis, and fragmented neutrophils (leukocytoclasia). The other options are associated with other skin conditions: lymphocytic infiltrate (A) is non-specific, increased mast cells (B) suggest urticaria, and spongiosis (D) is seen in eczema.",
+            "concept_modal": {
+                "specific": "Recognizing the specific histopathological features of urticarial vasculitis is crucial for confirming the diagnosis and differentiating it from other urticarial conditions.",
+                "general": "Histopathology plays a vital role in diagnosing various dermatological conditions by examining tissue samples under a microscope.",
+                "lateral": "Similar principles apply to diagnosing other vasculitides (e.g., ANCA-associated vasculitis) based on biopsy findings."
+            }
         },
         {
-            "action": "Examination: Sensory testing of lesions and extremities",
-            "step": "examination",
-            "relevance": "relevant",
-            "correctness": "correct",
-            "justification": "Essential for confirming nerve involvement, which is a hallmark of multibacillary leprosy."
+            "station_title": "Differentiating from Chronic Idiopathic Urticaria",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Difficulty differentiating urticarial vasculitis from chronic idiopathic urticaria based on clinical presentation and lab findings.",
+            "prompt": "A 40-year-old woman presents with recurrent itchy wheals that have been present for over six weeks. She denies any joint pain, fatigue, or bruising. The wheals typically resolve within 6-8 hours. ANA and complement levels are normal. Which of the following is the MOST likely diagnosis?",
+            "options": {
+                "A": "Urticarial vasculitis",
+                "B": "Chronic idiopathic urticaria",
+                "C": "Systemic lupus erythematosus",
+                "D": "Hypocomplementemic urticarial vasculitis syndrome"
+            },
+            "mcq_correct_answer_key": "B",
+            "expected_answer": null,
+            "explanation": "The key differentiating features are the short duration of the wheals (6-8 hours, resolving within 24 hours) and the absence of systemic symptoms (joint pain, fatigue, bruising) or abnormal lab findings (ANA, complement levels). This presentation is most consistent with chronic idiopathic urticaria (B). Urticarial vasculitis (A) typically involves wheals lasting >24 hours with bruising and systemic symptoms. SLE (C) is less likely without more systemic involvement and abnormal ANA. HUVS (D) would present with low complement levels.",
+            "concept_modal": {
+                "specific": "Understanding the temporal characteristics and systemic involvement helps differentiate between urticarial vasculitis and chronic idiopathic urticaria.",
+                "general": "A thorough history and physical examination are essential for accurate diagnosis in dermatology.",
+                "lateral": "Similar principles apply to differentiating between various types of headaches (e.g., migraine vs. tension headache)."
+            }
         },
         {
-            "action": "Test: Slit-skin smear",
-            "step": "tests_ordered",
-            "relevance": "relevant",
-            "correctness": "correct",
-            "justification": "Confirms multibacillary disease and is part of WHO diagnostic criteria."
+            "station_title": "Initial Management of Urticarial Vasculitis",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Knowledge of appropriate first-line treatment options for urticarial vasculitis.",
+            "prompt": "A 35-year-old woman is diagnosed with urticarial vasculitis. Her symptoms include itchy wheals, joint pain, and fatigue. Lab results show mildly elevated ESR and low C4 levels. What is the MOST appropriate initial treatment?",
+            "options": {
+                "A": "Topical corticosteroids",
+                "B": "Oral antihistamines",
+                "C": "Oral corticosteroids",
+                "D": "Intravenous immunoglobulin (IVIG)"
+            },
+            "mcq_correct_answer_key": "B",
+            "expected_answer": null,
+            "explanation": "Oral antihistamines (B) are often used as a first-line treatment to alleviate the pruritus associated with the urticarial lesions. While oral corticosteroids (C) or other immunosuppressants may be needed for more severe or refractory cases, antihistamines are a reasonable starting point, particularly if systemic symptoms are mild. Topical corticosteroids (A) are unlikely to provide significant relief. IVIG (D) is generally reserved for severe or refractory cases.",
+            "concept_modal": {
+                "specific": "Knowing the stepwise approach to managing urticarial vasculitis, starting with symptomatic relief and escalating as needed, is important.",
+                "general": "Treatment strategies in dermatology often involve a stepwise approach, starting with less aggressive therapies and escalating based on response.",
+                "lateral": "This principle applies to managing other chronic skin conditions like psoriasis or eczema."
+            }
         },
         {
-            "action": "Primary Diagnosis: Vitiligo",
-            "step": "diagnosis",
-            "relevance": "irrelevant",
-            "correctness": "incorrect",
-            "justification": "Vitiligo lacks nerve involvement and systemic features — does not explain neuropathy or plaques with anesthesia."
+            "station_title": "When to Suspect Systemic Lupus Erythematosus",
+            "question_format": "written",
+            "addressed_gap": "Gap: Difficulty recognizing the need for further investigation for SLE in patients presenting with urticarial vasculitis-like symptoms.",
+            "prompt": "A patient presents with urticarial lesions, arthralgias, and fatigue. ANA is positive (1:320), and C3/C4 are borderline low. What additional signs or symptoms should raise your suspicion for underlying SLE rather than isolated urticarial vasculitis, warranting further specific testing (anti-dsDNA, anti-Sm)?",
+            "options": null,
+            "mcq_correct_answer_key": null,
+            "expected_answer": "Fever, weight loss, malar rash, photosensitivity, renal involvement, cytopenias, serositis.",
+            "explanation": "While UV can be associated with SLE, specific SLE features (malar rash, photosensitivity, renal issues, serositis, cytopenias) warrant further SLE-specific testing. The question probes the student's ability to recognize when to broaden the differential and pursue further investigation.",
+            "concept_modal": {
+                "specific": "Understanding that urticarial vasculitis can be a manifestation of systemic diseases like SLE and knowing when to suspect such associations is crucial for comprehensive patient care.",
+                "general": "Recognizing the potential for cutaneous manifestations of systemic diseases is a key aspect of dermatological practice.",
+                "lateral": "This principle applies to other skin conditions associated with systemic diseases, such as dermatomyositis or scleroderma."
+            }
         },
         {
-            "action": "Final Diagnosis: Multibacillary Leprosy (Lepromatous Type)",
-            "step": "final-diagnosis",
-            "relevance": "relevant",
-            "correctness": "correct",
-            "justification": "Consistent with skin lesions, sensory loss, systemic findings, and positive smear."
+            "station_title": "Impact of Negative ANA",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Over-reliance on a positive ANA for diagnosing urticarial vasculitis and failure to consider ANA-negative variants.",
+            "prompt": "A 50-year-old patient presents with urticarial lesions lasting >24 hours with post-inflammatory hyperpigmentation, arthralgias, and fatigue. Skin biopsy confirms leukocytoclastic vasculitis. Complement levels are normal. The ANA test is negative. Which of the following is the MOST appropriate next step?",
+            "options": {
+                "A": "Reassure the patient that the diagnosis is unlikely to be urticarial vasculitis due to the negative ANA.",
+                "B": "Order an allergy panel to investigate potential allergic triggers.",
+                "C": "Consider a diagnosis of normocomplementemic urticarial vasculitis and manage accordingly.",
+                "D": "Perform a liver biopsy to rule out underlying liver disease."
+            },
+            "mcq_correct_answer_key": "C",
+            "expected_answer": null,
+            "explanation": "A negative ANA does not rule out urticarial vasculitis. Normocomplementemic urticarial vasculitis (C) is a recognized variant. Reassurance (A) is incorrect. Allergy testing (B) is not indicated given the biopsy result. Liver biopsy (D) is not relevant in this clinical scenario.",
+            "concept_modal": {
+                "specific": "Recognizing that urticarial vasculitis can occur with a negative ANA is crucial for avoiding misdiagnosis and ensuring appropriate management.",
+                "general": "Understanding the limitations of diagnostic tests and considering atypical presentations is essential in clinical practice.",
+                "lateral": "This principle applies to other conditions where diagnostic tests may have limited sensitivity or specificity."
+            }
+        },
+        {
+            "station_title": "Importance of ESR",
+            "question_format": "MCQ",
+            "addressed_gap": "Gap: Overlooking the utility of ESR in the diagnostic workup of urticarial vasculitis, particularly in assessing the degree of inflammation.",
+            "prompt": "A 42-year-old female presents with a two-week history of painful, raised, red patches on her legs that last for 2-3 days before resolving with residual bruising. She also reports mild joint pain and fatigue. A skin examination confirms palpable purpura. Which of the following laboratory tests, if elevated, would MOST strongly support a diagnosis of urticarial vasculitis and help assess disease activity?",
+            "options": {
+                "A": "Serum Creatinine",
+                "B": "Erythrocyte Sedimentation Rate (ESR)",
+                "C": "Liver Function Tests (LFTs)",
+                "D": "Thyroid Stimulating Hormone (TSH)"
+            },
+            "mcq_correct_answer_key": "B",
+            "expected_answer": null,
+            "explanation": "The Erythrocyte Sedimentation Rate (ESR) (B) is a non-specific but useful marker of inflammation. In the context of urticarial vasculitis, an elevated ESR supports the diagnosis by indicating systemic inflammation. While other tests might be relevant in a broader workup, ESR directly reflects the inflammatory process driving the vasculitis. Serum creatinine (A) assesses kidney function, LFTs (C) assess liver function, and TSH (D) assesses thyroid function; none of these are as directly relevant to the inflammatory process in urticarial vasculitis.",
+            "concept_modal": {
+                "specific": "ESR is a readily available and cost-effective test to assess the degree of inflammation in urticarial vasculitis and monitor disease activity.",
+                "general": "Inflammatory markers like ESR and CRP are valuable tools in evaluating and monitoring various inflammatory conditions.",
+                "lateral": "ESR is also used in the diagnosis and monitoring of conditions such as temporal arteritis and polymyalgia rheumatica."
+            }
         }
     ],
-    "feedback": {
-        "history_taking": {
-            "score": 7,
-            "comments": "The student asked about symptom duration and distribution but missed targeted questions on nasal symptoms, foot injuries, and reproductive health.",
-            "missed": [
-                "Slipping of footwear",
-                "Nasal stuffiness or crusting",
-                "Sexual function or testicular changes"
-            ],
-            "relevance": [
-                "Suggests sensory loss and motor weakness",
-                "Helps detect nasal mucosa involvement",
-                "Indicates systemic disease progression"
-            ],
-            "readMore": "https://www.medicaleducation.com/history-taking-leprosy"
-        },
-        "examinations_performed": {
-            "score": 9,
-            "comments": "Most relevant physical exams were performed including skin, sensory, and VMT. Missed reflexes and lymph node palpation.",
-            "missed": [
-                "Reflex testing",
-                "Lymph node examination"
-            ],
-            "relevance": [
-                "Reflexes help assess motor neuron integrity",
-                "Lymphadenopathy may suggest secondary infections"
-            ],
-            "readMore": "https://www.medicaleducation.com/leprosy-physical-exam"
-        },
-        "tests_ordered": {
-            "score": 9,
-            "comments": "Core diagnostic tests were ordered appropriately. Addition of AFB nasal smear or nerve conduction studies would improve completeness.",
-            "missed": [
-                "AFB nasal smear",
-                "Nerve conduction studies"
-            ],
-            "relevance": [
-                "Nasal smear helps in highly bacillary cases",
-                "Nerve studies assess severity of neural damage"
-            ],
-            "readMore": "https://www.medicaleducation.com/diagnostics-leprosy"
-        },
-        "diagnostic_reasoning": {
-            "score": 8,
-            "comments": "Correct primary diagnosis identified. Student included some non-relevant differentials like Vitiligo but covered borderline leprosy variants well.",
-            "missed": [
-                "Ruling out fungal infections (e.g., Tinea)",
-                "Correlation with endemic exposure history"
-            ],
-            "relevance": [
-                "Superficial fungal diseases can mimic skin lesions",
-                "Environmental exposure supports clinical reasoning"
-            ],
-            "readMore": "https://www.medicaleducation.com/leprosy-differential"
-        },
-        "synthesis_organization": {
-            "score": 7,
-            "comments": "Good information collection but could improve sequencing — especially relating neural findings to skin lesion distribution.",
-            "missed": [
-                "Link between nerve thickening and sensory loss",
-                "Temporal progression of deformities"
-            ],
-            "relevance": [
-                "Improves diagnostic confidence",
-                "Helps predict long-term disability risk"
-            ],
-            "readMore": "https://www.medicaleducation.com/clinical-synthesis"
-        },
-        "pre_treatment_investigations": {
-            "score": 6,
-            "comments": "Student captured CBC and G6PD but missed drug-specific safety screens for Clofazimine and Thalidomide.",
-            "missed": {
-                "table_headers": [
-                    "Investigation",
-                    "Missed",
-                    "Purpose",
-                    "Drugs Involved"
-                ],
-                "rows": [
-                    [
-                        "G6PD screening",
-                        true,
-                        "Prevent hemolysis",
-                        "Dapsone"
-                    ],
-                    [
-                        "LFTs",
-                        true,
-                        "Hepatotoxicity monitoring",
-                        "Rifampicin, Clofazimine, Prednisolone"
-                    ],
-                    [
-                        "RFTs",
-                        true,
-                        "Renal safety",
-                        "Thalidomide"
-                    ],
-                    [
-                        "Blood Glucose",
-                        true,
-                        "Steroid-induced hyperglycemia",
-                        "Prednisolone"
-                    ],
-                    [
-                        "Pregnancy test",
-                        true,
-                        "Teratogenic risk",
-                        "Thalidomide"
-                    ],
-                    [
-                        "Eye exam",
-                        true,
-                        "Pigmentation monitoring",
-                        "Clofazimine"
-                    ]
-                ]
-            },
-            "relevance": [
-                "Ensures safe initiation of MDT",
-                "Prevents avoidable complications"
-            ],
-            "readMore": "https://www.medicaleducation.com/leprosy-drug-screening"
-        },
-        "prescription_writing": {
-            "score": 8,
-            "comments": "Correctly prescribed MDT with dosage but missed taper guidance for steroids in ENL management.",
-            "missed": {
-                "table_headers": [
-                    "Drug",
-                    "Missed",
-                    "Dose",
-                    "Route",
-                    "Frequency",
-                    "Notes"
-                ],
-                "sections": [
-                    {
-                        "title": "🟢 First-Line: WHO MDT Regimen",
-                        "rows": [
-                            [
-                                "Rifampicin",
-                                false,
-                                "600 mg",
-                                "Oral",
-                                "Monthly (supervised)",
-                                "Bactericidal"
-                            ],
-                            [
-                                "Clofazimine",
-                                false,
-                                "300 mg + 50 mg daily",
-                                "Oral",
-                                "Monthly + Daily",
-                                "Anti-inflammatory and anti-mycobacterial"
-                            ],
-                            [
-                                "Dapsone",
-                                false,
-                                "100 mg",
-                                "Oral",
-                                "Daily",
-                                "Bacteriostatic"
-                            ]
-                        ]
-                    },
-                    {
-                        "title": "🟡 Second-Line: ENL Reaction",
-                        "rows": [
-                            [
-                                "Prednisolone",
-                                true,
-                                "40-60 mg/day",
-                                "Oral",
-                                "Daily",
-                                "Taper required"
-                            ],
-                            [
-                                "Thalidomide",
-                                true,
-                                "100-300 mg/day",
-                                "Oral",
-                                "Daily",
-                                "Men only — teratogenic"
-                            ]
-                        ]
-                    }
-                ],
-                "tips": [
-                    "Always taper steroids slowly to avoid adrenal suppression",
-                    "Never prescribe Thalidomide in women of reproductive age without strict precautions"
-                ]
-            },
-            "relevance": [
-                "Accurate dosage essential for cure and resistance prevention",
-                "Steroid management impacts complication control"
-            ],
-            "readMore": "https://www.medicaleducation.com/leprosy-treatment"
-        },
-        "post_treatment_monitoring": {
-            "score": 7,
-            "comments": "Monitoring plan included clinical exams and slit-skin smear but missed some drug toxicity screens.",
-            "missed": {
-                "table_headers": [
-                    "Time Point",
-                    "Missed",
-                    "Investigation",
-                    "Purpose",
-                    "Applicable Drug(s)"
-                ],
-                "rows": [
-                    [
-                        "Monthly",
-                        false,
-                        "Clinical exam (skin, nerves, ulcers)",
-                        "Track disease activity, detect neuritis",
-                        "General"
-                    ],
-                    [
-                        "Every 3 months",
-                        true,
-                        "CBC, LFTs",
-                        "Monitor anemia, hepatotoxicity",
-                        "Dapsone, Rifampicin"
-                    ],
-                    [
-                        "Every 3 months",
-                        true,
-                        "RFTs",
-                        "Renal monitoring if Thalidomide used",
-                        "Thalidomide"
-                    ],
-                    [
-                        "6 & 12 months",
-                        false,
-                        "Slit-skin smear",
-                        "Monitor bacillary load",
-                        "—"
-                    ],
-                    [
-                        "If symptomatic",
-                        true,
-                        "Eye exam",
-                        "Detect Clofazimine-related pigmentation",
-                        "Clofazimine"
-                    ]
-                ]
-            },
-            "relevance": [
-                "Ensures drug safety and effectiveness",
-                "Allows early detection of relapse"
-            ],
-            "readMore": "https://www.medicaleducation.com/leprosy-followup"
+    "metadata": {
+        "processing_time_seconds": 17.261891,
+        "model_version": "models/gemini-2.0-flash",
+        "generation_config": {
+            "temperature": 0.7,
+            "top_p": 0.8,
+            "top_k": 40
         }
-    },
-    "total_score": 7.4,
-    "suggestions": "Improve by linking symptom history to neural involvement, completing pre-treatment drug screenings, and reinforcing reaction management (ENL) including safe steroid tapering and Thalidomide use monitoring."
+    }
 }
