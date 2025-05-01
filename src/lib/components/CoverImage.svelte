@@ -104,8 +104,8 @@
             coverImageData = {
                 image_url: coverImageData.image_url,
                 prompt: coverImageData.prompt,
-                title: coverImageData.title,
-                quote: editQuoteText,
+                title: editQuoteText,
+                quote: coverImageData.quote,
             };
 
             isEditPopoverOpen = false;
@@ -147,13 +147,12 @@
 
             <!-- Text Overlay (Green Box) -->
             <div class="w-full bg-white/90 backdrop-blur-sm p-4 pt-0">
-                <h3 class="text-lg text-muted-foreground font-medium mb-2">
-                    Image Description (prompt)
-                </h3>
+                <h2
+                    class="text-lg capitalize pt-3 text-muted-foreground font-medium mb-2"
+                >
+                    {coverImageData?.title}
+                </h2>
 
-                <!-- <h4 class="text-sm text-muted-foreground font-medium mb-2">
-                    {$coverImageData.title}
-                </h4> -->
                 <div class="flex items-center justify-between">
                     <blockquote
                         class="text-sm text-muted-foreground font-medium mb-2"
