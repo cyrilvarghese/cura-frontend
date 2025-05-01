@@ -113,10 +113,7 @@
                 Use the dropdown to mark a diagnosis as primary, differential,
                 or ruled out.
             </p>
-            <DiagnosisList
-                bind:diagnoses
-                class="max-h-[80vh] overflow-y-auto"
-            />
+            <DiagnosisList bind:diagnoses />
         </div>
 
         <Dialog.Footer>

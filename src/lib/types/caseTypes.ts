@@ -1,19 +1,19 @@
 // Define shared types used across multiple modules
 import type { DiagnosisContextResponse } from '$lib/services/diagnosisContextService';
 
-export interface ClinicalFindingsContextResponse {
-    id?: string;
-    content: {
-        critical_findings: string[];
-        additional_observations?: string[];
-        recommended_actions?: string[];
-        clinical_significance?: string;
-    };
-    case_id: string | number;
-    file_path?: string;
-    timestamp?: string;
-    type?: string;
-}
+// export interface ClinicalFindingsContextResponse {
+//     id?: string;
+//     content: {
+//         critical_findings: string[];
+//         additional_observations?: string[];
+//         recommended_actions?: string[];
+//         clinical_significance?: string;
+//     };
+//     case_id: string | number;
+//     file_path?: string;
+//     timestamp?: string;
+//     type?: string;
+// }
 
 export interface CaseStoreState {
     caseId: string | null;
