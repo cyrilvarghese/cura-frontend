@@ -135,8 +135,6 @@
     }
 
     async function handleSubmit() {
-        if (investigations.length === 0 && monitoring.length === 0) return;
-
         try {
             isSubmitting = true;
 
@@ -148,7 +146,19 @@
                 (m) => `${m.timePoint} - ${m.test}`,
             );
 
-            //call the api
+            // Create message object with appropriate flags for empty sections
+            const messageObject = {
+                preTreatmentInvestigations:
+                    preTreatmentInputs.length > 0
+                        ? preTreatmentInputs
+                        : ["No pre-treatment investigations ordered"],
+                postTreatmentMonitoring:
+                    monitoringInputs.length > 0
+                        ? monitoringInputs
+                        : ["No monitoring plan ordered"],
+            };
+
+            // Call the API with the actual inputs (which may be empty arrays)
             const response =
                 await treatmentMonitoringStore.recordTreatmentMonitoring(
                     preTreatmentInputs,
@@ -156,14 +166,7 @@
                 );
 
             await sendMessage(
-                JSON.stringify(
-                    {
-                        preTreatmentInvestigations: preTreatmentInputs,
-                        postTreatmentMonitoring: monitoringInputs,
-                    },
-                    null,
-                    2,
-                ),
+                JSON.stringify(messageObject, null, 2),
                 "student",
                 "pre-treatment",
                 "pre-treatment",
@@ -282,25 +285,29 @@
             </div>
 
             <Dialog.Footer>
-                <Dialog.Close>
-                    <Button variant="outline" disabled={isSubmitting}
-                        >Cancel</Button
+                <div class="flex gap-2 justify-end">
+                    <Button
+                        variant="outline"
+                        onclick={handleSubmit}
+                        disabled={isSubmitting}
                     >
-                </Dialog.Close>
-                <Button
-                    variant="default"
-                    onclick={handleSubmit}
-                    disabled={(investigations.length === 0 &&
-                        monitoring.length === 0) ||
-                        isSubmitting}
-                >
-                    {#if isSubmitting}
-                        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-                        Submitting...
-                    {:else}
-                        Submit Information
-                    {/if}
-                </Button>
+                        Skip
+                    </Button>
+                    <Button
+                        variant="default"
+                        onclick={handleSubmit}
+                        disabled={isSubmitting ||
+                            (investigations.length === 0 &&
+                                monitoring.length === 0)}
+                    >
+                        {#if isSubmitting}
+                            <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                            Submitting...
+                        {:else}
+                            Submit Information
+                        {/if}
+                    </Button>
+                </div>
             </Dialog.Footer>
         </div></Dialog.Content
     >
