@@ -438,7 +438,7 @@
                         </div>
                     </div>
 
-                    <p class="text-base mb-8 text-gray-600">
+                    <p class="text-base mb-2 text-gray-600">
                         You've completed all questions in this OSCE case. 🎉
                     </p>
 
@@ -620,26 +620,9 @@
             {:else}
                 <!-- Question navigation -->
                 <div class="bg-gray-200 p-2 flex items-center justify-between">
-                    <div class="text-sm font-medium">
+                    <div class="text-lg font-medium ml-4">
                         Question {currentQuestionIndex + 1} of {caseData
                             .osce_questions.length}
-                    </div>
-                    <div class="flex space-x-2">
-                        <button
-                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={currentQuestionIndex === 0}
-                            onclick={prevQuestion}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={currentQuestionIndex ===
-                                caseData.osce_questions.length - 1}
-                            onclick={nextQuestion}
-                        >
-                            Next
-                        </button>
                     </div>
                 </div>
 
@@ -647,9 +630,6 @@
                 <div class="p-6 overflow-y-auto flex-grow">
                     {#if getCurrentQuestion()}
                         <div class="mb-6">
-                            <h2 class="text-xl font-bold mb-2">
-                                {getCurrentQuestion().station_title}
-                            </h2>
                             <p class="text-gray-700 mb-4">
                                 {getCurrentQuestion().prompt}
                             </p>
@@ -673,6 +653,15 @@
                             <!-- MCQ question -->
                             {#if getCurrentQuestion().question_format === "MCQ" && getCurrentQuestion().options}
                                 <div class="space-y-3 mt-4">
+                                    <!-- Add explanation popover above the first option when explanation is shown -->
+                                    {#if showExplanation}
+                                        <div class="mb-3 flex justify-start">
+                                            <OSCEExplanationPopover
+                                                currentQuestion={getCurrentQuestion()}
+                                            />
+                                        </div>
+                                    {/if}
+
                                     {#each Object.entries(getCurrentQuestion().options) as [key, text]}
                                         <div
                                             class="border rounded-lg p-4 transition-colors {showExplanation &&
@@ -791,6 +780,15 @@
                             <!-- Written question -->
                             {#if getCurrentQuestion().question_format === "written"}
                                 <div class="mb-6">
+                                    <!-- Add explanation popover above the textarea when explanation is shown -->
+                                    {#if showExplanation}
+                                        <div class="mb-3 flex justify-start">
+                                            <OSCEExplanationPopover
+                                                currentQuestion={getCurrentQuestion()}
+                                            />
+                                        </div>
+                                    {/if}
+
                                     <textarea
                                         class="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {isQuestionAttempted(
                                             currentQuestionIndex,
@@ -917,12 +915,6 @@
                                             Submit Answer
                                         {/if}
                                     </Button>
-
-                                    {#if showExplanation}
-                                        <OSCEExplanationPopover
-                                            currentQuestion={getCurrentQuestion()}
-                                        />
-                                    {/if}
                                 </div>
                             </div>
                         </div>
@@ -938,6 +930,8 @@
                     {questionsAnswered}
                     {isQuestionAttempted}
                     onQuestionSelect={handleQuestionSelect}
+                    {prevQuestion}
+                    {nextQuestion}
                 />
             {/if}
         </div>

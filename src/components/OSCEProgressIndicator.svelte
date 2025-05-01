@@ -9,13 +9,33 @@
         questionsAnswered,
         isQuestionAttempted,
         onQuestionSelect,
+        prevQuestion,
+        nextQuestion,
     } = $props();
 </script>
 
 <div class="bg-gray-100 p-3 py-4 border-t">
     <div class="flex justify-between items-center">
-        <!-- Progress indicators -->
-        <div class="flex justify-center">
+        <!-- Previous/Next buttons (moved from OSCEPopup) -->
+        <div class="flex space-x-2">
+            <button
+                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentQuestionIndex === 0}
+                onclick={prevQuestion}
+            >
+                Previous
+            </button>
+            <button
+                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentQuestionIndex === totalQuestions - 1}
+                onclick={nextQuestion}
+            >
+                Next
+            </button>
+        </div>
+
+        <!-- Progress indicators (centered) -->
+        <div class="flex-1 flex justify-center">
             {#each Array(totalQuestions) as _, i}
                 <button
                     type="button"

@@ -16,12 +16,13 @@
 
 <Popover.Root>
     <Popover.Trigger>
-        <Button variant="link" size="sm">
+        <Button variant="ghost" class="text-red-500 underline" size="sm">
             <Info class="h-4 w-4" />
             Explanation
         </Button>
     </Popover.Trigger>
     <Popover.Content
+        side="right"
         class="w-[calc(100vw-4rem)] max-w-3xl max-h-[80vh] overflow-y-auto"
         sideOffset={5}
     >

@@ -121,7 +121,7 @@
         <div
             class="relative pl-8 space-y-6 before:absolute before:left-3 before:top-2 before:bottom-0 before:w-0.5 before:bg-green-100 dark:before:bg-green-900/50"
         >
-            {#each Object.entries(historyContext.content.case_summary_history.history_timeline) as [timepoint, event], i}
+            {#each Object.entries(historyContext.content.case_summary_history.history_timeline || {}) as [timepoint, event], i}
                 <div class="relative">
                     <div
                         class="absolute left-[-28px] top-1 w-5 h-5 rounded-full bg-green-400 border-2 border-white dark:border-gray-800 shadow"
