@@ -30,6 +30,9 @@ export class CoverImageService {
         return await response.json();
     }
 
+
+
+
     async generateWithPrompt(case_id: string, prompt: string, title: string, quote: string): Promise<CoverImageResponse> {
         try {
             debugger;
@@ -60,6 +63,38 @@ export class CoverImageService {
             };
         } catch (error) {
             console.error('Error in generateWithPrompt:', error);
+            throw error;
+        }
+    }
+
+    async updateQuote(caseId: string, quoteText: string): Promise<CoverImageResponse> {
+        try {
+            const response = await fetch(`${this.baseUrl}/case_quote/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    case_id: caseId,
+                    quote_text: quoteText
+
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return {
+                image_url: data.image_url,
+                prompt: data.prompt,
+                title: data.title,
+                quote: data.quote,
+                timestamp: data.timestamp,
+            };
+        } catch (error) {
+            console.error('Error in updateQuote:', error);
             throw error;
         }
     }

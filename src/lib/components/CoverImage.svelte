@@ -10,6 +10,9 @@
     import cover2 from "../../assets/cover2.webp";
     import cover3 from "../../assets/cover3.webp";
     import { API_BASE_URL } from "$lib/config/api";
+    import * as Popover from "$lib/components/ui/popover";
+    import { Label } from "$lib/components/ui/label";
+    import Edit from "lucide-svelte/icons/edit";
 
     const coverImageService = new CoverImageService();
     let coverImageData = $state<{
@@ -22,6 +25,9 @@
     const isError = writable(false);
     let currentPrompt = $state("");
     let { caseId, imageUrl, prompt, title, quote } = $props();
+    let editQuoteText = $state("");
+    let isEditPopoverOpen = $state(false);
+
     async function generateCoverImage() {
         isLoading.set(false);
         try {
@@ -85,6 +91,32 @@
         }
     }
 
+    async function updateQuote() {
+        if (!editQuoteText.trim() || !coverImageData) return;
+
+        try {
+            isLoading.set(true);
+            const response = await coverImageService.updateQuote(
+                caseId,
+                editQuoteText,
+            );
+
+            coverImageData = {
+                image_url: coverImageData.image_url,
+                prompt: coverImageData.prompt,
+                title: coverImageData.title,
+                quote: editQuoteText,
+            };
+
+            isEditPopoverOpen = false;
+        } catch (error) {
+            console.error("Error updating quote:", error);
+            isError.set(true);
+        } finally {
+            isLoading.set(false);
+        }
+    }
+
     $effect(() => {
         if (caseId) {
             isLoading.set(false);
@@ -122,11 +154,65 @@
                 <!-- <h4 class="text-sm text-muted-foreground font-medium mb-2">
                     {$coverImageData.title}
                 </h4> -->
-                <blockquote
-                    class="text-sm text-muted-foreground font-medium mb-2"
-                >
-                    "{coverImageData.quote}"
-                </blockquote>
+                <div class="flex items-center justify-between">
+                    <blockquote
+                        class="text-sm text-muted-foreground font-medium mb-2"
+                    >
+                        "{coverImageData.quote}"
+                    </blockquote>
+
+                    <div class="relative">
+                        <Popover.Root bind:open={isEditPopoverOpen}>
+                            <Popover.Trigger>
+                                {#snippet child({ props })}
+                                    <Button
+                                        variant="ghost"
+                                        title="Edit Quote"
+                                        size="icon"
+                                        class="h-8 w-8 text-blue-500"
+                                        {...props}
+                                    >
+                                        <Edit class="h-4 w-4" />
+                                        <span class="sr-only">Edit Quote</span>
+                                    </Button>
+                                {/snippet}
+                            </Popover.Trigger>
+                            <Popover.Content class="w-80">
+                                <div class="grid gap-4">
+                                    <div class="space-y-2">
+                                        <Label for="editQuote">Edit Quote</Label
+                                        >
+                                        <Textarea
+                                            id="editQuote"
+                                            bind:value={editQuoteText}
+                                            placeholder="Enter new quote text..."
+                                            class="min-h-[100px]"
+                                        />
+                                    </div>
+                                    <div class="flex justify-start gap-2">
+                                        <Button
+                                            type="submit"
+                                            size="sm"
+                                            disabled={!editQuoteText}
+                                            onclick={updateQuote}
+                                        >
+                                            Save
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onclick={() =>
+                                                (isEditPopoverOpen = false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Popover.Content>
+                        </Popover.Root>
+                    </div>
+                </div>
+
                 <Textarea
                     bind:value={currentPrompt}
                     disabled={$isLoading}
