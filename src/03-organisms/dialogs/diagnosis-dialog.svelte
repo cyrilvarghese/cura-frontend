@@ -97,14 +97,10 @@
 </script>
 
 <Dialog.Root bind:open>
-    <Dialog.Content class="sm:max-w-[800px]" onkeydown={handleKeyDown}>
+    <Dialog.Content class="sm:max-w-[800px] " onkeydown={handleKeyDown}>
         <Dialog.Header>
             <Dialog.Title>Submit Initial Diagnosis</Dialog.Title>
             <Dialog.Description>
-                <p class="font-semibold">
-                    This is your initial diagnosis for Case #123, which you can
-                    change later.
-                </p>
                 <p>
                     Please select your primary diagnosis and mark others as
                     differential or ruled out.
@@ -112,14 +108,15 @@
             </Dialog.Description>
         </Dialog.Header>
 
-        <div class="grid gap-4 py-4">
-            <div class="space-y-2">
-                <p class="text-sm text-muted-foreground">
-                    Use the dropdown to mark a diagnosis as primary,
-                    differential, or ruled out.
-                </p>
-                <DiagnosisList bind:diagnoses />
-            </div>
+        <div class="space-y-2">
+            <p class="text-sm text-muted-foreground">
+                Use the dropdown to mark a diagnosis as primary, differential,
+                or ruled out.
+            </p>
+            <DiagnosisList
+                bind:diagnoses
+                class="max-h-[80vh] overflow-y-auto"
+            />
         </div>
 
         <Dialog.Footer>
