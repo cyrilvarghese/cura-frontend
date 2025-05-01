@@ -57,14 +57,14 @@
             try {
                 isSubmitting = true;
                 const response = await preTreatmentStore.evaluatePreTreatment(
-                    newInvestigation.name.split(","),
+                    newInvestigation.name.split(",").map((item) => item.trim()),
                 );
                 feedbackResults = { ...feedbackResults, ...response.feedback };
 
                 console.log(feedbackResults);
                 investigations = [
                     ...investigations,
-                    { name: newInvestigation.name.trim() },
+                    { name: newInvestigation.name.trim().toUpperCase() },
                 ];
             } catch (error) {
                 console.error("Error evaluating investigation:", error);
