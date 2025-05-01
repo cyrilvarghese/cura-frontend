@@ -4,6 +4,12 @@
     import { Edit, MoreVertical, Pencil, PlusCircle } from "lucide-svelte";
 
     export let historyContext: HistoryContextResponse;
+
+    function hasAssociatedSymptoms(symptoms: any): boolean {
+        if (!symptoms) return false;
+        if (Array.isArray(symptoms)) return symptoms.length > 0;
+        return Object.keys(symptoms).length > 0;
+    }
 </script>
 
 <div class="space-y-8 max-w-4xl mx-auto">
@@ -132,7 +138,7 @@
     </div>
 
     <!-- Symptoms and Findings -->
-    {#if Array.isArray(historyContext.content.case_summary_history.associated_symptoms) ? historyContext.content.case_summary_history.associated_symptoms.length > 0 : Object.keys(historyContext.content.case_summary_history.associated_symptoms).length > 0}
+    {#if hasAssociatedSymptoms(historyContext.content.case_summary_history.associated_symptoms)}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Associated Symptoms -->
             <div

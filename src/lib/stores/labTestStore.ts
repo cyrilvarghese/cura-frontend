@@ -54,7 +54,8 @@ function createLabStore() {
                     interpretation: testData.interpretation,
                     timestamp: new Date(),
                     status: 'completed' as const,
-                    comments: []
+                    comments: [],
+                    isVerified: false
                 };
             }
             // If we have generated data, use it
@@ -66,7 +67,8 @@ function createLabStore() {
                     interpretation: generatedData.interpretation,
                     timestamp: new Date(),
                     status: generatedData.status || 'completed' as const,
-                    comments: generatedData.comments || []
+                    comments: generatedData.comments || [],
+                    isVerified: generatedData.isVerified || false
                 };
             }
             // No data available

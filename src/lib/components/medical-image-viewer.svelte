@@ -209,7 +209,7 @@
                 >
                     <img
                         src={getFullImageUrl(imageUrl)}
-                        alt={`${altText} ${index + 1}`}
+                        alt="test"
                         class="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.05]"
                         onerror={() => handleImageError(index)}
                     />
@@ -224,9 +224,9 @@
                         {caption}
                     </p>
                 {/if} -->
-                <p class="text-sm font-semibold text-muted-foreground">
+                <!-- <p class="text-sm font-semibold text-muted-foreground">
                     {altText}
-                </p>
+                </p> -->
             </div>
         {/if}
         <!-- Add uploader for additional images -->
@@ -263,7 +263,7 @@
     <Dialog.Content class="max-w-4xl">
         <Dialog.Header>
             {#if altText}
-                <Dialog.Title>{altText}</Dialog.Title>
+                <!-- <Dialog.Title>{altText}</Dialog.Title> -->
                 <Dialog.Description
                     >{#if subtitle}
                         <p class="text-sm text-muted-foreground">
@@ -278,8 +278,8 @@
             class="relative w-full overflow-auto h-fit max-h-[calc(90vh-150px)] rounded-lg"
         >
             <img
+                alt="test"
                 src={getFullImageUrl(currentImageUrl)}
-                alt={`${altText} ${selectedImageIndex + 1}`}
                 class="w-full h-auto object-contain"
             />
         </div>

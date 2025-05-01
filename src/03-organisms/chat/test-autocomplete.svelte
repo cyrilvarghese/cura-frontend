@@ -64,18 +64,36 @@
             labTestsArray.length === 0 &&
             physicalExamsArray.length === 0
         ) {
+            debugger;
+            // Convert all lab tests to uppercase and deduplicate
+            const labTestsUppercase = labTests.map((test) =>
+                test.toUpperCase(),
+            );
+            const caseLabTestsUppercase = Object.keys(
+                $caseDataStore.labTestReports,
+            ).map((test) => test.toUpperCase());
+
+            // Combine and deduplicate using Set
             labTestsArray = [
-                ...new Set([
-                    ...labTests,
-                    ...Object.keys($caseDataStore.labTestReports),
-                ]),
+                ...new Set([...labTestsUppercase, ...caseLabTestsUppercase]),
             ];
+
+            // Same for physical exams - convert to uppercase and deduplicate
+            const physicalExamsUppercase = physicalExams.map((exam) =>
+                exam.toUpperCase(),
+            );
+            const casePhysicalExamsUppercase = Object.keys(
+                $caseDataStore.physicalExamReports,
+            ).map((exam) => exam.toUpperCase());
+
+            // Combine and deduplicate
             physicalExamsArray = [
                 ...new Set([
-                    ...physicalExams,
-                    ...Object.keys($caseDataStore.physicalExamReports),
+                    ...physicalExamsUppercase,
+                    ...casePhysicalExamsUppercase,
                 ]),
             ];
+
             console.log("Case Data Updated:", $caseDataStore);
         }
     });

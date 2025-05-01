@@ -26,6 +26,7 @@
     import mixpanel from "mixpanel-browser";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import OSCEPopup from "../../components/OSCEPopup.svelte";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -226,6 +227,8 @@
         { label: `Case ${id}` },
     ]}
 >
+    <LoadingOverlay isVisible={$isLoading} message="Loading case data..." />
+
     <div class="flex gap-4 w-full h-full">
         <div class="w-[100%] h-full flex flex-col">
             <!-- Title Section with Action Buttons -->
