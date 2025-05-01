@@ -7,6 +7,7 @@
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { evaluationStore } from "$lib/stores/evaluationStore";
     import { clinicalFindingsStore } from "$lib/stores/clinicalFindingsStore";
+    import { relevantFindingsStore } from "$lib/stores/relevantFindingsStore";
     import { toast } from "svelte-sonner";
     import { get } from "svelte/store";
     import EvaluationFeedback from "../../02-molecules/evaluation-feedback.svelte";
@@ -126,8 +127,12 @@
                 throw new Error("No case ID found");
             }
             isSubmitting = true;
-            // Record the findings using our new store
+
+            // Record the findings using our clinical findings store
             await clinicalFindingsStore.recordFindings(caseId, relevantPoints);
+
+            // Store the findings in our new relevantFindingsStore
+            relevantFindingsStore.setFindings(relevantPoints);
 
             // Send the message as before
             const messageContent = relevantPoints.join("\n");

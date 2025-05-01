@@ -15,7 +15,10 @@
 
     let textValue = $state("");
     let isLoading = $state(false);
-    const { caseId } = $props<{ caseId: string }>();
+    const { caseId, currentStep } = $props<{
+        caseId: string;
+        currentStep: string;
+    }>();
     let textareaRef = $state<null | HTMLTextAreaElement>(null);
     async function handleSend() {
         if (textValue.trim() && !isLoading) {
@@ -140,8 +143,8 @@
             </Tooltip.Root>
             <p class="text-gray-500 pt-2">|</p>
         </Tooltip.Provider> -->
-        <TestAutocomplete {caseId} />
-        <p class="text-gray-500 pt-2">|</p>
+
+        <TestAutocomplete {caseId} {currentStep} />
     </div>
     <Button
         class="absolute right-2 top-1/2 -translate-y-1/2"

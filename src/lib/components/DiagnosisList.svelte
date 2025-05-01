@@ -4,6 +4,7 @@
     import { Label } from "$lib/components/ui/label";
     import { Textarea } from "$lib/components/ui/textarea";
     import { caseDataStore } from "$lib/stores/casePlayerStore";
+    import { relevantFindingsStore } from "$lib/stores/relevantFindingsStore";
 
     // Subscribe to caseDataStore changes using $ syntax
     $effect(() => {
@@ -49,6 +50,13 @@
 
     function updateDiagnosisStatus(id: string, newStatus: DiagnosisStatus) {
         if (newStatus === "primary") {
+            // Get relevant findings from the store
+            const relevantFindings = relevantFindingsStore.getFindings();
+            const findingsText =
+                relevantFindings.length > 0
+                    ? "Relevant findings:\n" + relevantFindings.join("\n- ")
+                    : "";
+
             diagnoses = diagnoses.map((d: Diagnosis) => ({
                 ...d,
                 status:
@@ -59,7 +67,11 @@
                           : d.status,
                 isPrimary: d.id === id,
                 isIrrelevant: false,
-                justification: d.id === id ? d.justification : undefined,
+                // Set the justification to include relevant findings when marked as primary
+                justification:
+                    d.id === id
+                        ? findingsText || d.justification || ""
+                        : undefined,
             }));
         } else {
             diagnoses = diagnoses.map((d: Diagnosis) => ({

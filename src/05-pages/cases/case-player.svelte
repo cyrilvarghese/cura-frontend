@@ -108,6 +108,14 @@
         console.log("Relevant info submitted");
         relevantInfoDialogOpen = false;
         currentStep = "diagnosis";
+        const labTestTrigger = document.getElementById(
+            "lab-test-autocomplete-container",
+        );
+        labTestTrigger?.classList.remove("hidden");
+        const testAutocompleteDivider = document.getElementById(
+            "test-autocomplete-divider",
+        );
+        testAutocompleteDivider?.classList.remove("hidden");
     }
 
     function handleDiagnosisSubmit() {
@@ -298,7 +306,7 @@
             </ScrollArea>
 
             <div class=" pl-0 pt-6 border-t">
-                <ChatInput caseId={id} />
+                <ChatInput caseId={id} {currentStep} />
                 <!-- <TestAutocomplete /> -->
             </div>
         </div>

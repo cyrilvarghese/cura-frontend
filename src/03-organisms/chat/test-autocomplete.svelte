@@ -5,6 +5,8 @@
     import { tick } from "svelte";
     import * as Command from "$lib/components/ui/command/index.js";
     import * as Popover from "$lib/components/ui/popover/index.js";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
+    import { buttonVariants } from "$lib/components/ui/button/index.js";
     import { cn } from "$lib/utils";
     import { onMount } from "svelte";
     import type {
@@ -19,14 +21,16 @@
     import { examinationStore } from "$lib/stores/examinationStore";
     import { sendMessage } from "$lib/stores/apiStore";
     import { caseDataStore } from "$lib/stores/casePlayerStore";
+    import CircleAlert from "lucide-svelte/icons/circle-alert";
 
     // Import all test data
     import physicalExams from "$lib/data/physical_exam.json";
     import labTests from "$lib/data/lab_test.json";
     import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
 
-    const { caseId } = $props<{
+    const { caseId, currentStep } = $props<{
         caseId?: string;
+        currentStep?: string;
     }>();
 
     // State for lab tests autocomplete
@@ -118,6 +122,9 @@
         if (triggerRefLabTests) {
             triggerRefLabTests.focus();
         }
+
+        // Log the current step value
+        console.log("Current Step:", currentStep);
     });
 
     // Handle lab test selection
@@ -304,9 +311,30 @@
             valuePhysicalExams = ""; // Reset after ordering
         }
     }
+
+    // Add state for alert dialog
+    let showAlertDialog = $state(false);
+    let alertDialogMessage = $state("");
 </script>
 
-<div class="relative space-y-4">
+<div class="relative space-y-4" id="test-autocomplete-container">
+    <!-- Alert Dialog Component -->
+    <AlertDialog.Root bind:open={showAlertDialog}>
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title
+                    >Submit Relevant Clinical Findings First</AlertDialog.Title
+                >
+                <AlertDialog.Description>
+                    {alertDialogMessage}
+                </AlertDialog.Description>
+            </AlertDialog.Header>
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel>Ok</AlertDialog.Cancel>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
+
     <!-- Autocompletes in the same row -->
     <div class="flex gap-4">
         <!-- Physical Exams Autocomplete -->
@@ -370,7 +398,24 @@
         <!-- Lab Tests Autocomplete -->
         <div class="flex-1">
             <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
-            <Popover.Root bind:open={openLabTests}>
+            <Popover.Root
+                bind:open={openLabTests}
+                onOpenChange={(open) => {
+                    if (currentStep === "relevant-info") {
+                        if (open) {
+                            console.log(
+                                "Lab Tests Popover opened, Current Step:",
+                                currentStep,
+                            );
+                            // Show alert dialog instead
+                            alertDialogMessage =
+                                "You'll need to submit relevant clinical findings before ordering tests!";
+                            showAlertDialog = true;
+                            openLabTests = false; // Prevent popover from opening
+                        }
+                    }
+                }}
+            >
                 <Popover.Trigger bind:ref={triggerRefLabTests}>
                     {#snippet child({ props })}
                         <Button
