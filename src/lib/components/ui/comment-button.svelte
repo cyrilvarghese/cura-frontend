@@ -66,7 +66,7 @@
 <div class="relative">
     <Popover.Root bind:open={isPopoverOpen}>
         <Popover.Trigger>
-            {#snippet child({ props })}
+            {#snippet child({ props }: { props: any })}
                 <Button
                     variant="ghost"
                     title="Report Errors"
