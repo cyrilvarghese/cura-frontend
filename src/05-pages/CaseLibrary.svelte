@@ -72,7 +72,7 @@
     <Tabs.Root
         value={activeTab}
         class="mb-6"
-        onValueChange={(value) => (activeTab = value)}
+        onValueChange={(value: string) => (activeTab = value)}
     >
         {#if user?.role === "admin"}
             <Tabs.List class="mb-4">

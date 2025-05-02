@@ -23,6 +23,8 @@
 	import CaseEditPage from "../../05-pages/cases/case-edit.svelte";
 	import mixpanel from "mixpanel-browser";
 	import StudentDashboardPage from "../../05-pages/StudentDashboardPage.svelte";
+	import StudentPerformance from "../../05-pages/StudentPerformance.svelte";
+	import ClassPerformance from "../../05-pages/ClassPerformance.svelte";
 
 	// Get the current URL for Router
 	export let url = "";
@@ -81,9 +83,9 @@
 						<Route path="/curriculum/new-case">
 							<CaseAssessment />
 						</Route>
-						<Route path="/class">
+						<!-- <Route path="/class">
 							<ClassPage />
-						</Route>
+						</Route> -->
 						<Route path="/osce">
 							<OSCEPage />
 						</Route>
@@ -104,6 +106,12 @@
 						</Route>
 						<Route path="/viva-questions">
 							<VivaQuestionsPage />
+						</Route>
+						<Route path="/student-performance">
+							<StudentPerformance />
+						</Route>
+						<Route path="/class">
+							<ClassPerformance />
 						</Route>
 					</main>
 				</Sidebar.Inset>

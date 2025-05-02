@@ -20,6 +20,8 @@
 		ClipboardCheck,
 		LayoutDashboard,
 		Home,
+		BarChart2,
+		School,
 	} from "lucide-svelte";
 	import NavMain from "./nav-main.svelte";
 	import NavSecondary from "./nav-secondary.svelte";
@@ -91,6 +93,13 @@
 				icon: ClipboardCheck,
 				role: ["admin"],
 			},
+			{
+				title: "My Performance",
+				url: "/student-performance",
+				icon: BarChart2,
+				role: ["student", "admin"],
+			},
+
 			{
 				title: "Class",
 				url: "/class",

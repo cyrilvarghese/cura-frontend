@@ -35,10 +35,10 @@ export interface FormattedPersonaResponse {
 export interface Message {
     id: string;
     sender: string;
-    content: string | TestResult | ExaminationResult | FeedbackResponse;
+    content: string | TestResult | ExaminationResult | FeedbackResponse | FeedbackState;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-steps';
     imageUrl?: string;
     title?: string;
 }
