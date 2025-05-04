@@ -212,41 +212,43 @@
         }
     }
 
-    // Add this function to check and update the end screen state
+    // Modify this function to not automatically show the end screen
     function checkAndUpdateEndScreen() {
+        // Only prepare the score data but don't automatically show end screen
         if (questionsAnswered === caseData.osce_questions.length) {
-            setTimeout(() => {
-                showEndScreen = true;
+            // Create score data object
+            const scoreData = {
+                case_id: caseData.case_id,
+                overallPerformance: {
+                    totalPointsEarned: totalScore,
+                    totalPossiblePoints: caseData.osce_questions.length,
+                    overallPercentage: totalPercentage,
+                },
+                performanceByQuestionType: {
+                    multipleChoicePercentage: mcqPercentage,
+                    writtenResponsePercentage: writtenPercentage,
+                    imageBasedPercentage: imagePercentage,
+                },
+            };
 
-                // Create score data object
-                const scoreData = {
-                    case_id: caseData.case_id,
-                    overallPerformance: {
-                        totalPointsEarned: totalScore,
-                        totalPossiblePoints: caseData.osce_questions.length,
-                        overallPercentage: totalPercentage,
-                    },
-                    performanceByQuestionType: {
-                        multipleChoicePercentage: mcqPercentage,
-                        writtenResponsePercentage: writtenPercentage,
-                        imageBasedPercentage: imagePercentage,
-                    },
-                };
+            // Log to console
+            console.log("OSCE Score Summary:", scoreData);
 
-                // Log to console
-                console.log("OSCE Score Summary:", scoreData);
-
-                // Send to server
-                osceFeedbackStore
-                    .recordOsceFeedback(scoreData)
-                    .then((response) =>
-                        console.log("Score recorded successfully:", response),
-                    )
-                    .catch((error) =>
-                        console.error("Failed to record score:", error),
-                    );
-            }, 0);
+            // Send to server
+            osceFeedbackStore
+                .recordOsceFeedback(scoreData)
+                .then((response) =>
+                    console.log("Score recorded successfully:", response),
+                )
+                .catch((error) =>
+                    console.error("Failed to record score:", error),
+                );
         }
+    }
+
+    // Add new function to manually show end screen
+    function showEndScreenManually() {
+        showEndScreen = true;
     }
 
     async function submitAnswer() {
@@ -503,7 +505,7 @@
                                 <div
                                     class="h-full bg-blue-500 rounded-full"
                                     style="width: {totalPercentage}%"
-                                />
+                                ></div>
                             </div>
                         </div>
 
@@ -537,7 +539,7 @@
                                         <div
                                             class="h-full bg-blue-500 rounded-full"
                                             style="width: {mcqPercentage}%"
-                                        />
+                                        ></div>
                                     </div>
                                 </div>
                             {/if}
@@ -570,7 +572,7 @@
                                         <div
                                             class="h-full bg-blue-500 rounded-full"
                                             style="width: {writtenPercentage}%"
-                                        />
+                                        ></div>
                                     </div>
                                 </div>
                             {/if}
@@ -603,7 +605,7 @@
                                         <div
                                             class="h-full bg-blue-500 rounded-full"
                                             style="width: {imagePercentage}%"
-                                        />
+                                        ></div>
                                     </div>
                                 </div>
                             {/if}
@@ -943,6 +945,17 @@
                                             Submit Answer
                                         {/if}
                                     </Button>
+
+                                    <!-- Add End Test button after all questions are answered -->
+                                    {#if questionsAnswered === caseData.osce_questions.length && !showEndScreen}
+                                        <Button
+                                            variant="outline"
+                                            onclick={showEndScreenManually}
+                                            class="ml-2 bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200"
+                                        >
+                                            View Results
+                                        </Button>
+                                    {/if}
                                 </div>
                             </div>
                         </div>
