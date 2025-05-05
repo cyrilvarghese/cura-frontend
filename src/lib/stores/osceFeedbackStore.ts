@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { OSCEFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse, type OSCEScoreRecord } from '$lib/services/osceFeedbackService';
+import { OSCEFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse, type OSCEScoreRecord, type PerformanceComparisonData } from '$lib/services/osceFeedbackService';
 import { currentCaseId } from './casePlayerStore';
 import { get } from 'svelte/store';
 
@@ -10,10 +10,12 @@ function createOSCEFeedbackStore() {
         feedback: OSCEFeedbackResponse | null;
         isLoading: boolean;
         error: string | null;
+        comparisonData: PerformanceComparisonData | null;
     }>({
         feedback: null,
         isLoading: false,
-        error: null
+        error: null,
+        comparisonData: null
     });
 
     return {
@@ -69,11 +71,49 @@ function createOSCEFeedbackStore() {
             }
         },
 
+        getPerformanceComparison: async (caseId: string) => {
+            console.log(`osceFeedbackStore: Starting getPerformanceComparison for case ID: ${caseId}`);
+
+            update(state => {
+                console.log('osceFeedbackStore: Setting isLoading to true');
+                return { ...state, isLoading: true, error: null };
+            });
+
+            try {
+                console.log('osceFeedbackStore: Calling service method');
+                const comparisonData = await osceFeedbackService.getPerformanceComparison(caseId);
+
+                console.log('osceFeedbackStore: Received data, updating store');
+                update(state => {
+                    console.log('osceFeedbackStore: Setting comparisonData and isLoading=false');
+                    return {
+                        ...state,
+                        comparisonData,
+                        isLoading: false
+                    };
+                });
+
+                console.log('osceFeedbackStore: Returning data to caller');
+                return comparisonData;
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Failed to fetch performance comparison';
+                console.error(`osceFeedbackStore: Error: ${errorMessage}`);
+
+                update(state => ({
+                    ...state,
+                    error: errorMessage,
+                    isLoading: false
+                }));
+                throw error;
+            }
+        },
+
         reset: () => {
             set({
                 feedback: null,
                 isLoading: false,
-                error: null
+                error: null,
+                comparisonData: null
             });
         }
     };

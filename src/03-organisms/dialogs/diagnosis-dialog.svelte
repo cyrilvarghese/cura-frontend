@@ -102,18 +102,23 @@
             <Dialog.Title>Submit Initial Diagnosis</Dialog.Title>
             <Dialog.Description>
                 <p>
-                    Please select your primary diagnosis and mark others as
-                    differential or ruled out.
+                    Use the dropdown to mark a diagnosis as primary,
+                    differential, or ruled out.
                 </p>
             </Dialog.Description>
         </Dialog.Header>
 
         <div class="space-y-2">
-            <p class="text-sm text-muted-foreground">
-                Use the dropdown to mark a diagnosis as primary, differential,
-                or ruled out.
-            </p>
-            <DiagnosisList bind:diagnoses />
+            <div class="relative">
+                <div
+                    class="max-h-[400px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+                >
+                    <DiagnosisList bind:diagnoses />
+                </div>
+                <div
+                    class="pointer-events-none absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-gray-700/20 to-transparent"
+                ></div>
+            </div>
         </div>
 
         <Dialog.Footer>

@@ -315,6 +315,7 @@
     // Add state for alert dialog
     let showAlertDialog = $state(false);
     let alertDialogMessage = $state("");
+    let alertDialogTitle = $state("");
 </script>
 
 <div class="relative space-y-4" id="test-autocomplete-container">
@@ -322,9 +323,7 @@
     <AlertDialog.Root bind:open={showAlertDialog}>
         <AlertDialog.Content>
             <AlertDialog.Header>
-                <AlertDialog.Title
-                    >Submit Relevant Clinical Findings First</AlertDialog.Title
-                >
+                <AlertDialog.Title>{alertDialogTitle}</AlertDialog.Title>
                 <AlertDialog.Description>
                     {alertDialogMessage}
                 </AlertDialog.Description>
@@ -408,8 +407,24 @@
                                 currentStep,
                             );
                             // Show alert dialog instead
+                            alertDialogTitle =
+                                "Submit Postive Clinical Findings First";
                             alertDialogMessage =
                                 "You'll need to submit relevant clinical findings before ordering tests!";
+                            showAlertDialog = true;
+                            openLabTests = false; // Prevent popover from opening
+                        }
+                    }
+                    if (currentStep === "diagnosis") {
+                        if (open) {
+                            console.log(
+                                "Lab Tests Popover opened, Current Step:",
+                                currentStep,
+                            );
+                            // Show alert dialog instead
+                            alertDialogTitle = "Submit Initial Diagnosis First";
+                            alertDialogMessage =
+                                "You'll need to submit an initial diagnosis before ordering tests!";
                             showAlertDialog = true;
                             openLabTests = false; // Prevent popover from opening
                         }

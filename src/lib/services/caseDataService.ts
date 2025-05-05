@@ -65,6 +65,7 @@ export class CaseDataService {
             physicalExamReports: data.content.physical_exam,
             labTestReports: data.content.lab_test,
             coverMessage: data.content.case_cover,
+            diagnosisContext: data.content.diagnosis_context,
         };
     }
 

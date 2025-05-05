@@ -61,6 +61,30 @@ export interface OSCEScoreRecord {
     };
 }
 
+export interface PerformanceComparisonData {
+    student_id: string;
+    case_id: string;
+    primary_diagnosis: string;
+    student_history: number;
+    student_physicals: number;
+    student_tests: number;
+    student_diagnosis: number;
+    student_reasoning: number;
+    student_differentials: number;
+    avg_history: number;
+    max_history: number;
+    avg_physicals: number;
+    max_physicals: number;
+    avg_tests: number;
+    max_tests: number;
+    avg_diagnosis: number;
+    max_diagnosis: number;
+    avg_reasoning: number;
+    max_reasoning: number;
+    avg_differentials: number;
+    max_differentials: number;
+}
+
 export class OSCEFeedbackService {
     private baseUrl = API_BASE_URL;
 
@@ -115,6 +139,36 @@ export class OSCEFeedbackService {
             return response.json();
         } catch (error) {
             console.error('Error recording OSCE score:', error);
+            throw error;
+        }
+    }
+
+    async getPerformanceComparison(caseId: string): Promise<PerformanceComparisonData> {
+        try {
+            console.log(`OSCEFeedbackService: Fetching performance comparison for case ID: ${caseId}`);
+            const url = `${this.baseUrl}/student-performance/comparison/${caseId}`;
+            console.log(`OSCEFeedbackService: API URL: ${url}`);
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            console.log(`OSCEFeedbackService: API response status: ${response.status}`);
+
+            if (!response.ok) {
+                handleApiResponse(response);
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.detail || 'Failed to fetch performance comparison data');
+            }
+
+            const data = await response.json();
+            console.log('OSCEFeedbackService: Comparison data received:', data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching performance comparison data:', error);
             throw error;
         }
     }

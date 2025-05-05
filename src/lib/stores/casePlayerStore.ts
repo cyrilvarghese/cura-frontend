@@ -2,6 +2,8 @@ import { writable } from 'svelte/store';
 import { CaseDataService, type CaseListItem } from '$lib/services/caseDataService';
 import type { DiagnosticTestName, ExaminationName } from '$lib/types/index';
 import { API_BASE_URL } from '$lib/config/api';
+import type { DiagnosisContextResponse } from '$lib/services/diagnosisContextService';
+import type { a } from 'node_modules/vite/dist/node/types.d-aGj9QkWt';
 // Current case ID store
 export const currentCaseId = writable<string | null>(null);
 
@@ -18,6 +20,7 @@ export interface CaseData {
         interpretation: string;
     }>;
     coverMessage: any;
+    diagnosisContext: any;
 }
 
 const caseDataService = new CaseDataService();

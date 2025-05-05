@@ -10,6 +10,17 @@
         if (Array.isArray(symptoms)) return symptoms.length > 0;
         return Object.keys(symptoms).length > 0;
     }
+
+    function hasPertinentData(data: any[]): boolean {
+        return data && Array.isArray(data) && data.length > 0;
+    }
+    function hasDemographicsData(demographics: any): boolean {
+        return (
+            demographics &&
+            (demographics.risk_factors !== undefined ||
+                demographics.age !== undefined)
+        );
+    }
 </script>
 
 <div class="space-y-8 max-w-4xl mx-auto">
@@ -49,7 +60,7 @@
         </div>
     {/if}
 
-    {#if historyContext.content.case_summary_history.demographics_risk && (historyContext.content.case_summary_history.demographics_risk.risk_factors !== undefined || historyContext.content.case_summary_history.demographics_risk.age !== undefined)}
+    {#if hasDemographicsData(historyContext.content.case_summary_history.demographics_risk)}
         <!-- Demographics & Risk Factors -->
         <div
             class="bg-white dark:bg-gray-800 p-5 rounded-sm shadow-md border-l-2 border-purple-200"
@@ -161,7 +172,7 @@
                                 >
                             </li>
                         {/each}
-                    {:else}
+                    {:else if historyContext.content.case_summary_history.associated_symptoms}
                         {#each Object.entries(historyContext.content.case_summary_history.associated_symptoms) as [key, value]}
                             <li class="flex items-start">
                                 <span
@@ -180,7 +191,7 @@
             </div>
 
             <!-- Pertinent Positives -->
-            {#if historyContext.content.case_summary_history.pertinent_positives && historyContext.content.case_summary_history.pertinent_positives.length > 0}
+            {#if hasPertinentData(historyContext.content.case_summary_history.pertinent_positives)}
                 <div
                     class="bg-white dark:bg-gray-800 p-5 rounded-sm shadow-md border-l-2 border-red-200"
                 >
@@ -206,7 +217,7 @@
         </div>
     {/if}
     <!-- Pertinent Negatives -->
-    {#if historyContext.content.case_summary_history.pertinent_negatives_from_history.length > 0}
+    {#if historyContext.content.case_summary_history.pertinent_negatives_from_history && historyContext.content.case_summary_history.pertinent_negatives_from_history.length > 0}
         <div
             class="bg-white dark:bg-gray-800 p-5 rounded-sm shadow-md border-l-2 border-indigo-200"
         >

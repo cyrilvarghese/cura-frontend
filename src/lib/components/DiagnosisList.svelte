@@ -8,12 +8,14 @@
 
     // Subscribe to caseDataStore changes using $ syntax
     $effect(() => {
-        if ($caseDataStore?.coverMessage?.differentials) {
+        debugger;
+        console.log("caseDataStore", $caseDataStore);
+        if ($caseDataStore?.diagnosisContext?.keyDifferentials) {
             // Create array of diagnoses from differentials and randomize their order
-            diagnoses = $caseDataStore.coverMessage.differentials
-                .map((diagnosis: string, index: number) => ({
+            diagnoses = $caseDataStore.diagnosisContext.keyDifferentials
+                .map((diagnosis: any, index: number) => ({
                     id: index.toString(),
-                    text: diagnosis,
+                    text: diagnosis.name,
                     isPrimary: false,
                     isIrrelevant: false,
                     status: "differential",
@@ -97,10 +99,10 @@
     }
 </script>
 
-<div class="space-y-4 max-h-[400px] overflow-y-auto p-4">
+<div class="space-y-2 max-h-[400px] overflow-y-auto p-4">
     {#if diagnoses && diagnoses.length > 0}
         {#each diagnoses as diagnosis}
-            <div class="flex flex-col space-y-2 py-2 border-b">
+            <div class="flex flex-col space-y-2 py-2 pb-4 border-b">
                 <div class="flex items-center space-x-3">
                     <div class="flex-1 flex items-center justify-between gap-4">
                         <Label
