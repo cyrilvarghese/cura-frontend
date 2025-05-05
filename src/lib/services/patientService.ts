@@ -14,7 +14,7 @@ export class PatientApiService {
         currentCaseId.subscribe(value => caseId = value)();
 
         const response = await fetch(
-            `${this.baseUrl}/patient/ask-gemini?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${caseId ? `&case_id=${caseId}` : ''}`,
+            `${this.baseUrl}/patient/ask?student_query=${encodeURIComponent(query)}${currentThreadId ? `&thread_id=${currentThreadId}` : ''}${caseId ? `&case_id=${caseId}` : ''}`,
             {
                 method: 'GET',
                 headers: {
