@@ -128,7 +128,7 @@
                                             {/if}
 
                                             <h3
-                                                class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
+                                                class="font-semibold capitalize text-lg group-hover:text-blue-600 transition-colors"
                                             >
                                                 {caseItem.title ||
                                                     "Untitled Case"}

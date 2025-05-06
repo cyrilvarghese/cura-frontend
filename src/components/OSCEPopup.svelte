@@ -27,7 +27,7 @@
         ArrowLeft,
     } from "lucide-svelte";
     import { Link } from "svelte-routing";
-
+    import { currentDepartment } from "$lib/stores/teamStore";
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
     // Current question being displayed to the user
@@ -249,6 +249,7 @@
                     writtenResponsePercentage: writtenPercentage,
                     imageBasedPercentage: imagePercentage,
                 },
+                department: $currentDepartment?.name,
             };
 
             // Log to console

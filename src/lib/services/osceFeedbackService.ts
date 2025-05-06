@@ -49,6 +49,7 @@ export interface OSCEFeedbackResponse {
 
 export interface OSCEScoreRecord {
     case_id: string;
+    department: string;
     overallPerformance: {
         totalPointsEarned: number;
         totalPossiblePoints: number;
