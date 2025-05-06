@@ -104,6 +104,7 @@
 				title: "Class",
 				url: "/class",
 				icon: GraduationCap,
+				role: ["admin"],
 			},
 			{
 				title: "OSCE/OSPE",

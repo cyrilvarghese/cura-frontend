@@ -10,18 +10,38 @@
     $effect(() => {
         debugger;
         console.log("caseDataStore", $caseDataStore);
-        if ($caseDataStore?.diagnosisContext?.keyDifferentials) {
-            // Create array of diagnoses from differentials and randomize their order
-            diagnoses = $caseDataStore.diagnosisContext.keyDifferentials
-                .map((diagnosis: any, index: number) => ({
-                    id: index.toString(),
-                    text: diagnosis.name,
+        if ($caseDataStore?.diagnosisContext) {
+            let diagnosisList = [];
+
+            // Add key differentials
+            if ($caseDataStore.diagnosisContext.keyDifferentials) {
+                diagnosisList =
+                    $caseDataStore.diagnosisContext.keyDifferentials.map(
+                        (diagnosis: any, index: number) => ({
+                            id: index.toString(),
+                            text: diagnosis.name,
+                            isPrimary: false,
+                            isIrrelevant: false,
+                            status: "differential",
+                            justification: undefined,
+                        }),
+                    );
+            }
+
+            // Add primary diagnosis if it exists
+            if ($caseDataStore.diagnosisContext.primaryDiagnosis) {
+                diagnosisList.push({
+                    id: diagnosisList.length.toString(),
+                    text: $caseDataStore.diagnosisContext.primaryDiagnosis,
                     isPrimary: false,
                     isIrrelevant: false,
                     status: "differential",
                     justification: undefined,
-                }))
-                .sort(() => Math.random() - 0.5); // Randomize the order
+                });
+            }
+
+            // Randomize the order of all diagnoses
+            diagnoses = diagnosisList.sort(() => Math.random() - 0.5);
         }
     });
 
