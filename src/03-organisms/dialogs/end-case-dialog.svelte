@@ -22,10 +22,10 @@
 <Dialog.Root bind:open>
     <Dialog.Content class="sm:max-w-[425px]" onkeydown={handleKeyDown}>
         <Dialog.Header>
-            <Dialog.Title>End Case</Dialog.Title>
+            <Dialog.Title>End Case And Proceed To OSCE</Dialog.Title>
             <Dialog.Description>
-                Are you sure you want to end this case? This action cannot be
-                undone.
+                You'll be given a short MCQ to cover topics related to the
+                disease.
             </Dialog.Description>
         </Dialog.Header>
 
@@ -34,7 +34,7 @@
                 >Cancel</Button
             >
             <Button
-                variant="destructive"
+                variant="default"
                 onclick={onSubmit}
                 disabled={isLoading}
                 class="gap-2"
@@ -43,7 +43,7 @@
                     <LoaderCircle class="h-4 w-4 animate-spin" />
                     Generating OSCE...
                 {:else}
-                    End Case
+                    Take me to the OSCE
                 {/if}
             </Button>
         </div>

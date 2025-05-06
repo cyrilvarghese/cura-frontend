@@ -1181,14 +1181,6 @@
                                 </Button>
 
                                 <!-- Debug information during development -->
-                                {#if import.meta.env.DEV}
-                                    <div
-                                        class="text-xs text-left text-gray-500 mt-1 p-1 bg-gray-100 rounded"
-                                    >
-                                        Debug: showComparisonView = {showComparisonView},
-                                        hasData = {comparisonData !== null}
-                                    </div>
-                                {/if}
 
                                 <div class="flex space-x-2">
                                     <Button

@@ -46,7 +46,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("end-case"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -176,6 +176,8 @@
             label: "Submit Positive Clinical Findings",
             icon: InfoIcon,
             action: () => (relevantInfoDialogOpen = true),
+            className:
+                "bg-blue-600 text-white hover:bg-blue-700 hover:text-white",
             variant: "outline" as const,
             id: "relevant-info",
         },
@@ -184,6 +186,8 @@
             icon: Stethoscope,
             action: () => (diagnosisDialogOpen = true),
             variant: "outline" as const,
+            className:
+                "bg-blue-600 text-white hover:bg-blue-700 hover:text-white",
             id: "diagnosis",
         },
         "final-diagnosis": {
@@ -191,6 +195,8 @@
             icon: CheckCircle2,
             action: () => (finalDiagnosisDialogOpen = true),
             variant: "outline" as const,
+            className:
+                "bg-blue-600 text-white hover:bg-blue-700 hover:text-white",
             id: "final-diagnosis",
         },
         "pre-treatment": {
@@ -198,6 +204,8 @@
             icon: Stethoscope,
             action: () => (investigationDialogOpen = true),
             variant: "outline" as const,
+            className:
+                "bg-blue-600 text-white hover:bg-blue-700 hover:text-white",
             id: "pre-treatment",
         },
         "treatment-protocol": {
@@ -205,6 +213,8 @@
             icon: Pill,
             action: () => (treatmentProtocolDialogOpen = true),
             variant: "outline" as const,
+            className:
+                "bg-blue-600 text-white hover:bg-blue-700 hover:text-white",
             id: "treatment-protocol",
         },
         "end-case": {
@@ -263,7 +273,7 @@
                         <Button
                             id={button.id}
                             variant={button.variant || "outline"}
-                            class="gap-2"
+                            class={button.className}
                             onclick={button.action}
                         >
                             {button.label}
