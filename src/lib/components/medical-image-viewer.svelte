@@ -183,7 +183,7 @@
     <!-- Image Gallery with Delete All button -->
     <div class="space-y-4">
         <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium">Uploaded Images</h3>
+            <h3 class="text-sm font-medium">Images for {testName}</h3>
             {#if user?.role === "admin"}
                 <button
                     class="text-xs text-destructive hover:underline flex items-center gap-1"

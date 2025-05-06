@@ -9,7 +9,7 @@
     
     const {
         imageUrls = [],
-        altText = "Uploaded image",
+        altText = "Uploaded image for test",
         caseId,
         testName,
         testType,   
