@@ -55,6 +55,7 @@
                 (d) => d.status === "differential",
             );
 
+            debugger;
             const messageContent = `Primary Diagnosis: ${primaryDiagnosis.text}\nJustification: ${primaryDiagnosis.justification}\nDifferential Diagnoses: ${differentialDiagnoses.map((d) => d.text).join(", ")}`;
 
             await sendMessage(

@@ -60,6 +60,7 @@
                 <p
                     class="pt-2 pb-2 text-md font-normal {justificationTextColor} leading-relaxed"
                 >
+                    {@debug diagnosis}
                     {diagnosis.primaryDiagnosis.justification}
                 </p>
             </div>

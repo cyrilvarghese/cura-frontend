@@ -46,7 +46,9 @@
             const diagnosisMatch = content.match(
                 /(Primary|Final) Diagnosis: (.*?)\n/,
             );
-            const justificationMatch = content.match(/Justification: (.*?)\n/);
+            const justificationMatch = content.match(
+                /Justification: ([\s\S]*?)(?=\nDifferential Diagnoses:|$)/,
+            );
             const differentialMatch = content.match(
                 /Differential Diagnoses: (.*?)$/,
             );
