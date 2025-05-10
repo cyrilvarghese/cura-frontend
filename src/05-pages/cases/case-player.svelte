@@ -54,7 +54,7 @@
     function scrollToLatest() {
         requestAnimationFrame(() => {
             const lastMessage = document.querySelector(
-                "#messages-container > div:last-child",
+                "#messages-container #scroll-target",
             );
             if (lastMessage) {
                 lastMessage.scrollIntoView({
@@ -347,6 +347,7 @@
                         {/each}
                     {/if}
                     <TestAutocomplete caseId={id} {currentStep} />
+                    <div class="pl-0 pt-6 h-10" id="scroll-target"></div>
                 </div>
             </ScrollArea>
 
