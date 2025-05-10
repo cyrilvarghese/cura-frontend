@@ -27,6 +27,7 @@
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import OSCEPopup from "../../components/OSCEPopup.svelte";
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
+    import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -231,10 +232,43 @@
         osceData = state.osceData;
     });
 
+    // Handle general page unload (reload/tab close)
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+        // Show a confirmation dialog when navigating away
+        event.preventDefault();
+        event.returnValue =
+            "Are you sure you want to leave? Your progress may not be saved.";
+        return event.returnValue;
+    }
+
+    // Handle back button specifically
+    function handlePopState(event: PopStateEvent) {
+        const confirmMessage =
+            "Are you sure you want to go back? Your progress may not be saved.";
+        if (confirm(confirmMessage)) {
+            // User confirmed, allow navigation
+            // You might want to do cleanup here
+        } else {
+            // User cancelled, prevent navigation by pushing another state
+            history.pushState(null, "", window.location.href);
+        }
+    }
+
+    // Set up the event listeners
+    $effect(() => {
+        // Add state to the history so we can detect back navigation
+        history.pushState(null, "", window.location.href);
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+        window.addEventListener("popstate", handlePopState);
+    });
+
     // Add this to your onDestroy cleanup
     onDestroy(() => {
         unsubscribe(); // existing unsubscribe
         unsubscribeOsceData(); // new unsubscribe for osceData
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+        window.removeEventListener("popstate", handlePopState);
     });
 </script>
 
@@ -290,7 +324,7 @@
             {/if}
 
             <!-- Chat Messages -->
-            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-300px)]">
+            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-300px)] relative">
                 <div id="messages-container" class="messages space-y-4">
                     {#if $isLoading}
                         <div
@@ -313,6 +347,7 @@
                         {/each}
                     {/if}
                 </div>
+                <TestAutocomplete {id} {currentStep} />
             </ScrollArea>
 
             <div class=" pl-0 pt-6 border-t">

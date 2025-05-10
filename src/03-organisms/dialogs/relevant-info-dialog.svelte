@@ -263,20 +263,12 @@
                 <ArrowLeft class="h-4 w-4" />
                 Back to conversation
             </Button>
-            <Button onclick={handleContinue} disabled={isEvaluating}>
-                <!-- {#if evaluationResponse}
-                    <Button
-                        disabled={isEvaluating || relevantPoints.length === 0}
-                        onclick={handleContinue}
-                    >
-                        Submit Current Findings
-                    </Button>
-                {:else if isEvaluating}
-                    <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                {:else}
-                    Submit
-                {/if} -->
+            <Button
+                onclick={handleContinue}
+                disabled={isEvaluating ||
+                    relevantPoints.length === 0 ||
+                    isSubmitting}
+            >
                 {#if isSubmitting}
                     <Loader2 class="mr-2 h-4 w-4 animate-spin" />
                     Submitting...

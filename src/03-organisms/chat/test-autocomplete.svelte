@@ -33,30 +33,61 @@
         currentStep?: string;
     }>();
 
+    // Define initialValue object containing all default state values
+    const initialValue = {
+        // Lab tests state
+        openLabTests: false,
+        valueLabTests: "",
+        labTestsArray: [],
+
+        // Physical exams state
+        openPhysicalExams: false,
+        valuePhysicalExams: "",
+        physicalExamsArray: [],
+
+        // Shared state
+        validationResult: null,
+        isValidating: false,
+        isOrdering: false,
+
+        // Alert dialog state
+        showAlertDialog: false,
+        alertDialogMessage: "",
+        alertDialogTitle: "",
+    };
+
     // State for lab tests autocomplete
-    let openLabTests = $state(false);
-    let valueLabTests = $state("");
+    let openLabTests = $state(initialValue.openLabTests);
+    let valueLabTests = $state(initialValue.valueLabTests);
     let triggerRefLabTests = $state<HTMLButtonElement>(null!);
+    let labTestsArray = $state<string[]>(initialValue.labTestsArray);
 
     // State for physical exams autocomplete
-    let openPhysicalExams = $state(false);
-    let valuePhysicalExams = $state("");
+    let openPhysicalExams = $state(initialValue.openPhysicalExams);
+    let valuePhysicalExams = $state(initialValue.valuePhysicalExams);
     let triggerRefPhysicalExams = $state<HTMLButtonElement>(null!);
+    let physicalExamsArray = $state<string[]>(initialValue.physicalExamsArray);
 
     // Shared state
-    let validationResult = $state<TestValidationResponse | null>(null);
-    let isValidating = $state(false);
-    let isOrdering = $state(false);
+    let validationResult = $state<TestValidationResponse | null>(
+        initialValue.validationResult,
+    );
+    let isValidating = $state(initialValue.isValidating);
+    let isOrdering = $state(initialValue.isOrdering);
+
+    // Alert dialog state
+    let showAlertDialog = $state(initialValue.showAlertDialog);
+    let alertDialogMessage = $state(initialValue.alertDialogMessage);
+    let alertDialogTitle = $state(initialValue.alertDialogTitle);
 
     // Derived values
     const selectedValueLabTests = $derived(
-        valueLabTests ? valueLabTests : "Order Lab Test...",
+        valueLabTests ? valueLabTests : "Order Lab Tests",
     );
     const selectedValuePhysicalExams = $derived(
-        valuePhysicalExams ? valuePhysicalExams : "Order Physical Exam...",
+        valuePhysicalExams ? valuePhysicalExams : "Conduct Physical Exams",
     );
-    let labTestsArray = $state<string[]>([]);
-    let physicalExamsArray = $state<string[]>([]);
+
     // Get and monitor case data changes
     const initialCaseData = $caseDataStore;
     console.log("Initial Case Data:", initialCaseData);
@@ -118,7 +149,35 @@
         });
     }
 
+    // Function to reset component state
+    function resetComponentState() {
+        // Reset lab tests state
+        openLabTests = initialValue.openLabTests;
+        valueLabTests = initialValue.valueLabTests;
+        labTestsArray = initialValue.labTestsArray;
+
+        // Reset physical exams state
+        openPhysicalExams = initialValue.openPhysicalExams;
+        valuePhysicalExams = initialValue.valuePhysicalExams;
+        physicalExamsArray = initialValue.physicalExamsArray;
+
+        // Reset shared state
+        validationResult = initialValue.validationResult;
+        isValidating = initialValue.isValidating;
+        isOrdering = initialValue.isOrdering;
+
+        // Reset alert dialog state
+        showAlertDialog = initialValue.showAlertDialog;
+        alertDialogMessage = initialValue.alertDialogMessage;
+        alertDialogTitle = initialValue.alertDialogTitle;
+
+        console.log("Component state has been reset");
+    }
+
     onMount(() => {
+        // Reset component state when mounted
+        resetComponentState();
+
         if (triggerRefLabTests) {
             triggerRefLabTests.focus();
         }
@@ -311,14 +370,12 @@
             valuePhysicalExams = ""; // Reset after ordering
         }
     }
-
-    // Add state for alert dialog
-    let showAlertDialog = $state(false);
-    let alertDialogMessage = $state("");
-    let alertDialogTitle = $state("");
 </script>
 
-<div class="relative space-y-4" id="test-autocomplete-container">
+<div
+    class=" space-y-4 absolute bottom-4 right-4 w-[500px]"
+    id="test-autocomplete-container"
+>
     <!-- Alert Dialog Component -->
     <AlertDialog.Root bind:open={showAlertDialog}>
         <AlertDialog.Content>
@@ -335,9 +392,9 @@
     </AlertDialog.Root>
 
     <!-- Autocompletes in the same row -->
-    <div class="flex gap-4">
+    <div class="flex gap-4 justify-end">
         <!-- Physical Exams Autocomplete -->
-        <div class="flex-1">
+        <div>
             <!-- <h3 class="text-sm font-medium mb-2">Physical Exams</h3> -->
             <Popover.Root bind:open={openPhysicalExams}>
                 <Popover.Trigger bind:ref={triggerRefPhysicalExams}>
@@ -345,16 +402,17 @@
                         <Button
                             variant="ghost"
                             class={cn(
-                                "w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none hover:bg-transparent hover:no-underline ring-offset-0",
+                                "w-full justify-between focus-visible:ring-0 bg-blue-100 cursor-pointer focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none hover:bg-blue-200 hover:no-underline ring-offset-0",
                                 openPhysicalExams && "text-blue-500",
                             )}
                             {...props}
-                            role="combobox"
                             aria-expanded={openPhysicalExams}
                         >
-                            <p class="hover:text-blue-600 flex items-center">
+                            <p
+                                class="hover:underline text-blue-600 flex items-center"
+                            >
                                 <ScanEye class="h-5 w-5 mr-2" />
-                                <span class="">
+                                <span class=" truncate text-left">
                                     {selectedValuePhysicalExams}
                                 </span>
                             </p>
@@ -395,7 +453,7 @@
         </div>
         <p class="text-gray-500 pt-2">|</p>
         <!-- Lab Tests Autocomplete -->
-        <div class="flex-1">
+        <div>
             <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
             <Popover.Root
                 bind:open={openLabTests}
@@ -436,16 +494,17 @@
                         <Button
                             variant="ghost"
                             class={cn(
-                                "w-full justify-between focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none hover:bg-transparent hover:no-underline ring-offset-0",
+                                "w-full bg-blue-100 justify-between cursor-pointer hover:bg-blue-200 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:ring-transparent focus-visible:ring-offset-transparent focus-visible:ring-offset-background shadow-none ring-offset-0",
                                 openLabTests && "text-blue-500",
                             )}
                             {...props}
-                            role="combobox"
                             aria-expanded={openLabTests}
                         >
-                            <p class="hover:text-blue-600 flex items-center">
+                            <p
+                                class="hover:underline text-blue-600 flex items-center"
+                            >
                                 <TestTubeDiagonal class="h-5 w-5 mr-2" />
-                                <span class="w-[100px] truncate">
+                                <span class="truncate text-left">
                                     {selectedValueLabTests}
                                 </span>
                             </p>

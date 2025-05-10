@@ -113,48 +113,27 @@
     });
 </script>
 
-<div class="relative flex-1">
-    <Textarea
-        bind:ref={textareaRef}
-        bind:value={textValue}
-        class="flex-1 pl-[440px] pt-8 pr-12  focus-visible:ring-black/20"
-        placeholder="Type your message... (Ctrl+Enter to send)"
-        disabled={isLoading}
-        onkeydown={handleKeyDown}
-    />
-    <div class="absolute left-3 top-1/2 -translate-y-1/2 flex gap-2">
-        <!-- <Tooltip.Provider>
-            <Tooltip.Root>
-                <Tooltip.Trigger>
-                    <PhysicalExamDropdown onExamination={handlePhysicalExam} />
-                </Tooltip.Trigger>
-                <Tooltip.Content>
-                    <p>Perform Physical Examination</p>
-                </Tooltip.Content>
-            </Tooltip.Root>
-            <p class="text-gray-500 pt-2">|</p>
-            <Tooltip.Root>
-                <Tooltip.Trigger>
-                    <LabTestsDropdown onOrderTest={handleLabTest} />
-                </Tooltip.Trigger>
-                <Tooltip.Content>
-                    <p>Order Lab Tests</p>
-                </Tooltip.Content>
-            </Tooltip.Root>
-            <p class="text-gray-500 pt-2">|</p>
-        </Tooltip.Provider> -->
+<div class="flex flex-row flex-1">
+    <div class="flex flex-row relative flex-1 w-full">
+        <Textarea
+            bind:ref={textareaRef}
+            bind:value={textValue}
+            class="flex-1 pt-8 pr-12  focus-visible:ring-black/20"
+            placeholder="Type your message... (Ctrl+Enter to send)"
+            disabled={isLoading}
+            onkeydown={handleKeyDown}
+        />
 
-        <TestAutocomplete {caseId} {currentStep} />
+        <Button
+            class="absolute right-4 top-1/2 -translate-y-1/2"
+            onclick={handleSend}
+            disabled={isLoading}
+        >
+            {#if isLoading}
+                Sending...
+            {:else}
+                Send
+            {/if}
+        </Button>
     </div>
-    <Button
-        class="absolute right-2 top-1/2 -translate-y-1/2"
-        onclick={handleSend}
-        disabled={isLoading}
-    >
-        {#if isLoading}
-            Sending...
-        {:else}
-            Send
-        {/if}
-    </Button>
 </div>

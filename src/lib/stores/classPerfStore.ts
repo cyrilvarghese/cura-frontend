@@ -1,7 +1,14 @@
 import { writable, derived } from 'svelte/store';
 import { teachingService, type CaseSessionData } from '$lib/services/classPerfDataService';
 import { currentDepartment } from '$lib/stores/teamStore';
-
+import { authStore } from '$lib/stores/authStore';
+let user: any | null;
+authStore.subscribe((state) => {
+    user = state.user;
+    if (user) {
+        console.log("Current user role:", user.role);
+    }
+});
 interface TeachingState {
     sessionData: CaseSessionData[] | null;
     isLoading: boolean;
@@ -19,7 +26,7 @@ function createTeachingStore() {
 
     // Create a derived store that automatically updates when the department changes
     const departmentSubscription = currentDepartment.subscribe(department => {
-        if (department) {
+        if (department && user?.role === "admin") {
             getTeachingSessions(department.name.toLowerCase());
         }
     });
