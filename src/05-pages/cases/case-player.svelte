@@ -346,13 +346,12 @@
                             </div>
                         {/each}
                     {/if}
+                    <TestAutocomplete caseId={id} {currentStep} />
                 </div>
-                <TestAutocomplete {id} {currentStep} />
             </ScrollArea>
 
             <div class=" pl-0 pt-6 border-t">
                 <ChatInput caseId={id} {currentStep} />
-                <!-- <TestAutocomplete /> -->
             </div>
         </div>
         <!-- 
