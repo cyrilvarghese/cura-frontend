@@ -69,7 +69,7 @@
     });
 </script>
 
-<div class="flex-col w-full p-6 h-full">
+<div class="flex-col w-full pt-6 h-full">
     <h2 class="text-lg font-semibold pb-8 border-b border-gray-200">
         Patient File
     </h2>

@@ -28,6 +28,7 @@
     import OSCEPopup from "../../components/OSCEPopup.svelte";
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
+    import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -355,11 +356,10 @@
                 <ChatInput caseId={id} {currentStep} />
             </div>
         </div>
-        <!-- 
+
         <div class="bg-muted/10 rounded-xl w-[30%] h-full">
             <CaseSidebar />
         </div>
-        -->
     </div>
 
     <RelevantInfoDialog

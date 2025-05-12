@@ -82,10 +82,10 @@
 
     // Derived values
     const selectedValueLabTests = $derived(
-        valueLabTests ? valueLabTests : "Order Lab Tests",
+        valueLabTests ? valueLabTests : "Lab Tests",
     );
     const selectedValuePhysicalExams = $derived(
-        valuePhysicalExams ? valuePhysicalExams : "Conduct Physical Exams",
+        valuePhysicalExams ? valuePhysicalExams : "Physical Exams",
     );
 
     // Get and monitor case data changes
@@ -373,7 +373,7 @@
 </script>
 
 <div
-    class=" space-y-4 absolute bottom-4 right-4 w-[500px]"
+    class=" space-y-4 absolute top-0 right-4 w-[500px]"
     id="test-autocomplete-container"
 >
     <!-- Alert Dialog Component -->
@@ -451,7 +451,7 @@
                 </Popover.Content>
             </Popover.Root>
         </div>
-        <p class="text-gray-500 pt-2">|</p>
+        <!-- <p class="text-gray-500 pt-2">|</p> -->
         <!-- Lab Tests Autocomplete -->
         <div>
             <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->

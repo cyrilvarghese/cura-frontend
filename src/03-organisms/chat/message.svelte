@@ -212,12 +212,12 @@
         >
             {#if message.type === "image"}
                 <div
-                    class="bg-card w-[260px] rounded-lg overflow-hidden shadow-sm border"
+                    class="bg-card w-[400px] rounded-lg overflow-hidden flex justify-start items-start flex-row shadow-sm border"
                 >
                     <img
                         src={message.imageUrl}
                         alt={message.title}
-                        class="w-full h-64 object-contain"
+                        class=" h-32 object-contain"
                     />
                     <div class="p-4">
                         <h3 class="font-medium text-md mb-1">
