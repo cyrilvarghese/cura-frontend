@@ -10,10 +10,11 @@
 	}: {
 		teams: {
 			name: string;
+			id: string;
 			// The `any` should be `Component` after lucide-svelte updates types
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			logo: any;
-			plan: string;
+			value: string;
 		}[];
 	} = $props();
 

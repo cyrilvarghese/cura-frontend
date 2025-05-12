@@ -54,17 +54,20 @@
 			{
 				name: "Dermatology",
 				logo: Feather,
-				plan: "Enterprise",
+				id: "1",
+				value: "dermantology",
 			},
 			{
 				name: "Internal Medicine",
 				logo: Stethoscope,
-				plan: "Startup",
+				id: "2",
+				value: "internal-medicine",
 			},
 			{
 				name: "Microbiology",
 				logo: Microscope,
-				plan: "Free",
+				id: "3",
+				value: "microbiology",
 			},
 		],
 		navMain: [

@@ -73,6 +73,7 @@
             const results = await uploadDocuments(
                 validFiles,
                 $currentDepartment.name,
+                $currentDepartment.id,
             );
 
             if (results && results.length > 0) {

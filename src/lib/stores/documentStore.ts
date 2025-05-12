@@ -21,12 +21,13 @@ export const documentStore = writable<DocumentState>(initialState);
 
 export async function uploadDocuments(
     files: Array<{ file: File; title: string; description: string }>,
-    departmentName: string
+    departmentName: string,
+    departmentId: string
 ) {
     documentStore.update(state => ({ ...state, isUploading: true, error: null }));
 
     try {
-        const responses = await documentService.uploadDocuments(files, departmentName);
+        const responses = await documentService.uploadDocuments(files, departmentName, departmentId);
 
         documentStore.update(state => {
             const departmentDocs = state.documents[departmentName] || [];

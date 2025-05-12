@@ -20,13 +20,15 @@ export class DocumentService {
 
     async uploadDocuments(
         files: Array<{ file: File; title: string; description: string }>,
-        departmentName: string
+        departmentName: string,
+        departmentId: string
     ): Promise<DocumentUploadResponse[]> {
         try {
             const formData = new FormData();
-
+            debugger;
             // Add department name
             formData.append('department_name', departmentName);
+            formData.append('department_id', departmentId);
 
             // Add files, titles, and descriptions as separate arrays
             files.forEach((fileData, index) => {

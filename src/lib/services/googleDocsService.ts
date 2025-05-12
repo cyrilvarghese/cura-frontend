@@ -2,7 +2,7 @@ import { API_BASE_URL } from '$lib/config/api';
 import { toast } from 'svelte-sonner';
 import { navigate } from 'svelte-routing';
 import { authStore } from '$lib/stores/authStore';
-
+import { currentDepartment } from '$lib/stores/teamStore';
 export interface GoogleDoc {
     id: string;
     name: string;
@@ -24,10 +24,10 @@ export class GoogleDocsService {
         this.baseUrl = API_BASE_URL;
     }
 
-    async getAllDocs(): Promise<GoogleDoc[]> {
+    async getAllDocs(departmentId: string): Promise<GoogleDoc[]> {
         const toastId = toast.loading('Fetching Google docs...');
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs`);
+            const response = await fetch(`${this.baseUrl}/google-docs?department_id=${departmentId}`);
             if (!response.ok) {
                 if (response.status === 504) {
                     toast.error('Google Docs API is down', {
@@ -35,7 +35,7 @@ export class GoogleDocsService {
                         description: 'Retrying...'
                     });
                     setTimeout(async () => {
-                        await this.getAllDocs();
+                        await this.getAllDocs(departmentId);
                     }, 1000);
                     toast.dismiss();
                 }

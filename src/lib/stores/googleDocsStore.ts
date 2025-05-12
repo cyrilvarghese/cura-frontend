@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import type { GoogleDoc } from '$lib/services/googleDocsService';
 import { GoogleDocsService } from '$lib/services/googleDocsService';
-
+import { currentDepartment } from '$lib/stores/teamStore';
 const googleDocsService = new GoogleDocsService();
 
 function createGoogleDocsStore() {
@@ -9,9 +9,9 @@ function createGoogleDocsStore() {
 
     return {
         subscribe,
-        loadDocs: async () => {
+        loadDocs: async (departmentId: string) => {
             try {
-                const docs = await googleDocsService.getAllDocs();
+                const docs = await googleDocsService.getAllDocs(departmentId);
                 set(docs);
             } catch (error) {
                 console.error('Error loading docs:', error);

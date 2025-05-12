@@ -2,8 +2,9 @@ import { writable } from 'svelte/store';
 
 export type Department = {
     name: string;
+    id: string;
     logo: any; // TODO: Update this type when lucide-svelte updates types
-    plan: string;
+    value: string;
 };
 
 const storedDepartment = localStorage.getItem('currentDepartment');

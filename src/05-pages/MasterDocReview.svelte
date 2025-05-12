@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { googleDocsStore } from "$lib/stores/googleDocsStore";
     import PageLayout from "../04-templates/page-layout.svelte";
     import mixpanel from "mixpanel-browser";
@@ -23,6 +23,8 @@
     import * as Tooltip from "$lib/components/ui/tooltip/index.js";
     import { Checkbox } from "$lib/components/ui/checkbox/index.js";
     import { Label } from "$lib/components/ui/label/index.js";
+    import { currentDepartment } from "$lib/stores/teamStore";
+    import { get } from "svelte/store";
     // Direct state declarations without import
     let searchQuery = $state("");
     let isLoading = $state(true);
@@ -32,7 +34,7 @@
     let isApproving = $state(false);
     let isUploading = $state(false);
     let showPendingOnly = $state(false);
-
+    let departmentId = $state("");
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
             CASE_REVIEW_PENDING: "Document Review Pending",
@@ -58,8 +60,19 @@
 
     let caseReviews = $derived(transformApiResponse($googleDocsStore));
 
+    const departmentUnsubscribe = currentDepartment.subscribe(async (dept) => {
+        if (dept) {
+            departmentId = dept.id;
+        }
+        await googleDocsStore.loadDocs(departmentId);
+    });
+    onDestroy(() => {
+        departmentUnsubscribe();
+    });
+
     onMount(async () => {
-        await googleDocsStore.loadDocs();
+        debugger;
+        await googleDocsStore.loadDocs(departmentId);
         isLoading = false;
     });
 
@@ -196,7 +209,7 @@
             <DocumentUploadButton
                 topicName="Master Document"
                 onSuccess={() => {
-                    googleDocsStore.loadDocs();
+                    googleDocsStore.loadDocs($currentDepartment.id);
                 }}
             />
         </div>
