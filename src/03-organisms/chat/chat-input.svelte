@@ -12,6 +12,7 @@
     import PhysicalExamDropdown from "../physical-exam/PhysicalExamDropdown.svelte";
     import { onMount } from "svelte";
     import TestAutocomplete from "./test-autocomplete.svelte";
+    import SendIcon from "lucide-svelte/icons/send";
 
     let textValue = $state("");
     let isLoading = $state(false);
@@ -118,21 +119,27 @@
         <Textarea
             bind:ref={textareaRef}
             bind:value={textValue}
-            class="flex-1 pt-8 pr-12  focus-visible:ring-black/20"
-            placeholder="Type your message... (Ctrl+Enter to send)"
+            class="flex-1 min-h-4 pt-6 focus-visible:ring-black/20 border-radius-none"
+            placeholder="Type your message... ( Enter to send)"
             disabled={isLoading}
             onkeydown={handleKeyDown}
         />
 
         <Button
-            class="absolute right-4 top-1/2 -translate-y-1/2"
+            class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 w-10 h-10 bg-muted hover:bg-muted/80 flex items-center justify-center"
             onclick={handleSend}
-            disabled={isLoading}
+            disabled={isLoading || !textValue.trim()}
         >
             {#if isLoading}
-                Sending...
+                <div
+                    class="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent"
+                ></div>
             {:else}
-                Send
+                <SendIcon
+                    class="h-5 w-5 {textValue.trim()
+                        ? 'text-primary'
+                        : 'text-muted-foreground'}"
+                />
             {/if}
         </Button>
     </div>

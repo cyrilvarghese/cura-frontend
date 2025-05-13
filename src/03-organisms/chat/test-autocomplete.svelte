@@ -8,7 +8,7 @@
     import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
     import { cn } from "$lib/utils";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import type {
         DiagnosticTestName,
         ExaminationName,
@@ -184,7 +184,65 @@
 
         // Log the current step value
         console.log("Current Step:", currentStep);
+
+        // Add keyboard event listener
+        document.addEventListener("keydown", handleKeydown);
     });
+
+    onDestroy(() => {
+        // Remove keyboard event listener when component is destroyed
+        document.removeEventListener("keydown", handleKeydown);
+    });
+
+    // Handle keyboard shortcuts
+    function handleKeydown(event: KeyboardEvent) {
+        // Ctrl+P for Physical Exams
+        if (event.ctrlKey && event.key === "p") {
+            event.preventDefault();
+            openPhysicalExams = true;
+            tick().then(() => {
+                const input = document.querySelector(
+                    '[placeholder="SEARCH FOR A PHYSICAL EXAM..."]',
+                ) as HTMLInputElement;
+                if (input) input.focus();
+            });
+        }
+
+        // Ctrl+L for Lab Tests
+        if (event.ctrlKey && event.key === "l") {
+            event.preventDefault();
+
+            // Don't open if in a step that doesn't allow it
+            if (
+                currentStep === "relevant-info" ||
+                currentStep === "diagnosis"
+            ) {
+                // Show alert dialog instead
+                const title =
+                    currentStep === "relevant-info"
+                        ? "Submit Postive Clinical Findings First"
+                        : "Submit Initial Diagnosis First";
+
+                const message =
+                    currentStep === "relevant-info"
+                        ? "You'll need to submit relevant clinical findings before ordering tests!"
+                        : "You'll need to submit an initial diagnosis before ordering tests!";
+
+                alertDialogTitle = title;
+                alertDialogMessage = message;
+                showAlertDialog = true;
+                return;
+            }
+
+            openLabTests = true;
+            tick().then(() => {
+                const input = document.querySelector(
+                    '[placeholder="SEARCH FOR A LAB TEST..."]',
+                ) as HTMLInputElement;
+                if (input) input.focus();
+            });
+        }
+    }
 
     // Handle lab test selection
     async function handleSelectLabTest(testName: string) {
@@ -372,10 +430,7 @@
     }
 </script>
 
-<div
-    class=" space-y-4 absolute top-0 right-4 w-[500px]"
-    id="test-autocomplete-container"
->
+<div class=" space-y-4 w-[500px]" id="test-autocomplete-container">
     <!-- Alert Dialog Component -->
     <AlertDialog.Root bind:open={showAlertDialog}>
         <AlertDialog.Content>
@@ -416,6 +471,9 @@
                                     {selectedValuePhysicalExams}
                                 </span>
                             </p>
+                            <span class="text-xs text-blue-400 ml-1"
+                                >(Ctrl+P)</span
+                            >
                         </Button>
                     {/snippet}
                 </Popover.Trigger>
@@ -508,6 +566,9 @@
                                     {selectedValueLabTests}
                                 </span>
                             </p>
+                            <span class="text-xs text-blue-400 ml-1"
+                                >(Ctrl+L)</span
+                            >
                         </Button>
                     {/snippet}
                 </Popover.Trigger>

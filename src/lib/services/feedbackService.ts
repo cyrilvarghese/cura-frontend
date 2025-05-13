@@ -159,7 +159,7 @@ export class FeedbackService {
     async getFeedback(studentMessageHistory: StudentMessage[], caseId: string): Promise<FeedbackResponse> {
         // Return different mock data based on caseId
 
-        // return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
+        return Promise.resolve(mockFeedback2 as unknown as FeedbackResponse);
         try {
             const url = caseId
                 ? `${this.baseUrl}/get-feedback?case_id=${encodeURIComponent(caseId)}`
@@ -187,7 +187,7 @@ export class FeedbackService {
 
     async generateFinalOsce(caseId: string): Promise<OsceGenerationResponse> {
         // Return mock data instead of making an API call
-        // return Promise.resolve(mockOsce2 as unknown as OsceGenerationResponse);
+        return Promise.resolve(mockOsce2 as unknown as OsceGenerationResponse);
 
         try {
             const response = await fetch(`${this.baseUrl}/osce/generate`, {

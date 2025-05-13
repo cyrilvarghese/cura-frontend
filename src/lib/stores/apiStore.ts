@@ -3,10 +3,12 @@ import { writable, get } from 'svelte/store';
 import { patientApi } from '$lib/services/patientService';
 import { caseDataStore } from '$lib/stores/casePlayerStore';
 import { API_BASE_URL } from '$lib/config/api';
-
+import { historyMatchApi } from '$lib/services/historyMatchService';
 import type { CaseData } from './casePlayerStore';
 import type { HistoryAnalysisResponse, HistoryDomainResponse } from '$lib/services/feedbackService';
 import type { FeedbackButtonsState } from '$lib/types/feedback';
+import { refreshHistoryMatchData } from './historyMatchStore';
+
 interface ApiState {
     messages: Message[];
     error: string | null;
@@ -227,6 +229,9 @@ export async function sendMessage(
                                 timestamp: new Date(response.timestamp)
                             })
                     }));
+
+                    // Update the history match store with the response
+                    await refreshHistoryMatchData();
                 } catch (error) {
                     // Handle any API errors and update error state
                     apiStore.update(state => ({

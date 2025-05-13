@@ -29,6 +29,7 @@
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
+    import ConversationStarters from "../../components/ConversationStarters.svelte";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -48,7 +49,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("relevant-info"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -129,7 +130,7 @@
     function handleFinalDiagnosisSubmit() {
         console.log("Final diagnosis submitted");
         finalDiagnosisDialogOpen = false;
-        currentStep = "pre-treatment";
+        currentStep = "treatment-protocol";
     }
 
     async function handleEndCase() {
@@ -248,7 +249,12 @@
             "Are you sure you want to go back? Your progress may not be saved.";
         if (confirm(confirmMessage)) {
             // User confirmed, allow navigation
-            // You might want to do cleanup here
+            // Remove event listeners to prevent loops
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("popstate", handlePopState);
+
+            // Navigate back
+            window.history.back();
         } else {
             // User cancelled, prevent navigation by pushing another state
             history.pushState(null, "", window.location.href);
@@ -271,6 +277,15 @@
         window.removeEventListener("beforeunload", handleBeforeUnload);
         window.removeEventListener("popstate", handlePopState);
     });
+
+    function handleNextStep() {
+        // Call the appropriate action based on current step
+        const currentButton =
+            stepButtons[currentStep as keyof typeof stepButtons];
+        if (currentButton) {
+            currentButton.action();
+        }
+    }
 </script>
 
 <PageLayout
@@ -299,7 +314,9 @@
                     </p>
                 </div>
                 <div class="flex gap-2">
-                    {@debug currentStep}
+                    <TestAutocomplete caseId={id} {currentStep} />
+
+                    <!-- {@debug currentStep}
                     {#if stepButtons[currentStep as keyof typeof stepButtons]}
                         {@const button =
                             stepButtons[
@@ -314,7 +331,7 @@
                             {button.label}
                             <button.icon class="h-4 w-4" />
                         </Button>
-                    {/if}
+                    {/if} -->
                 </div>
             </div>
 
@@ -325,7 +342,7 @@
             {/if}
 
             <!-- Chat Messages -->
-            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-300px)] relative">
+            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-250px)] relative">
                 <div id="messages-container" class="messages space-y-4">
                     {#if $isLoading}
                         <div
@@ -347,18 +364,21 @@
                             </div>
                         {/each}
                     {/if}
-                    <TestAutocomplete caseId={id} {currentStep} />
+
+                    <!-- component which has tags like converstation starters in a chat -->
+                    <ConversationStarters />
+
                     <div class="pl-0 pt-6 h-10" id="scroll-target"></div>
                 </div>
             </ScrollArea>
 
-            <div class=" pl-0 pt-6 border-t">
+            <div class=" pl-0 pt-2">
                 <ChatInput caseId={id} {currentStep} />
             </div>
         </div>
 
-        <div class="bg-muted/10 rounded-xl w-[30%] h-full">
-            <CaseSidebar />
+        <div class="bg-muted/10 rounded-xl w-[40%] h-full">
+            <CaseSidebar {currentStep} onNextClick={handleNextStep} />
         </div>
     </div>
 
