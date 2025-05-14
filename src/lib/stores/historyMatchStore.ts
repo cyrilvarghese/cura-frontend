@@ -1,6 +1,6 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import type { DomainStats, HistoryMatchResponse, UnmatchedQuestion } from '$lib/types';
-import { fetchUnmatchedQuestions } from '$lib/services/historyMatchService';
+import { fetchUnmatchedQuestions, fetchMatchedQuestions } from '$lib/services/historyMatchService';
 import { API_BASE_URL } from '$lib/config/api';
 
 // Define initial state
@@ -9,8 +9,8 @@ const initialState: Partial<HistoryMatchResponse> = {
     domain_stats: {},
     metadata: {
         total_expected_questions: 0,
-        total_student_questions: 0,
-        total_unmatched_questions: 0,
+        total_newly_covered_questions: 0,
+        total_remaining_questions: 0,
         processing_time_seconds: 0,
         model_version: ''
     }
@@ -34,7 +34,35 @@ export const unmatchedQuestionsStore = derived(
 // Function to refresh the history match data
 export async function refreshHistoryMatchData() {
     try {
-        const data = await fetchUnmatchedQuestions();
+        // Pass the current unmatched questions from the store to the API
+        const currentState = get(historyMatchStore);
+        const data = await fetchUnmatchedQuestions(currentState.unmatched_questions as UnmatchedQuestion[]);
+
+        // Compare domain stats and keep higher values from the current state
+        if (currentState.domain_stats && data.domain_stats) {
+            const mergedDomainStats = { ...data.domain_stats };
+
+            Object.entries(currentState.domain_stats as Record<string, DomainStats>).forEach(([domain, oldStats]) => {
+                if (mergedDomainStats[domain]) {
+                    // For each metric, keep the higher value (completed, percent_complete)
+                    if (oldStats.completed > mergedDomainStats[domain].completed) {
+                        mergedDomainStats[domain].completed = oldStats.completed;
+                    }
+
+                    if (oldStats.percent_complete > mergedDomainStats[domain].percent_complete) {
+                        mergedDomainStats[domain].percent_complete = oldStats.percent_complete;
+                    }
+
+                    // Recalculate remaining based on total and completed
+                    mergedDomainStats[domain].remaining =
+                        mergedDomainStats[domain].total - mergedDomainStats[domain].completed;
+                }
+            });
+
+            // Update the data with merged stats
+            data.domain_stats = mergedDomainStats;
+        }
+
         historyMatchStore.set(data);
         return data;
     } catch (error) {
@@ -43,22 +71,5 @@ export async function refreshHistoryMatchData() {
     }
 }
 
-// Function to refresh the history match data for a specific case and student
-export async function refreshHistoryMatchDataForCase(caseId: string, studentId: string) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/history-match/unmatched-questions?case_id=${caseId}&student_id=${studentId}`);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch history match data: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        historyMatchStore.set(data);
-        return data;
-    } catch (error) {
-        console.error('Error refreshing history match data for case:', error);
-        return null;
-    }
-}
 
 export default historyMatchStore; 

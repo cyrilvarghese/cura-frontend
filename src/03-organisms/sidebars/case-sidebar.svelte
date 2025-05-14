@@ -20,6 +20,7 @@
     import { Button } from "$lib/components/ui/button";
     import { onMount, onDestroy } from "svelte";
     import { ArrowRight, Check, Info, ThumbsUp } from "lucide-svelte";
+    import { Badge } from "$lib/components/ui/badge";
 
     // Add the onNextClick prop
     const { onNextClick = () => {}, currentStep = "diagnosis" } = $props();
@@ -35,7 +36,9 @@
     const initialState = {
         showUnmatchedPopup: false,
         domainStats: {} as Record<string, DomainStat>,
+        allQuestions: [] as UnmatchedQuestion[],
         unmatchedQuestions: [] as UnmatchedQuestion[],
+        coveredQuestions: [] as UnmatchedQuestion[],
         overallProgress: {
             completed: 0,
             total: 0,
@@ -73,8 +76,8 @@
             unmatched_questions: [],
             metadata: {
                 total_expected_questions: 0,
-                total_student_questions: 0,
-                total_unmatched_questions: 0,
+                total_newly_covered_questions: 0,
+                total_remaining_questions: 0,
                 processing_time_seconds: 0,
                 model_version: "",
             },
@@ -86,7 +89,7 @@
         resetState();
 
         // Refresh data on mount
-        // refreshHistoryMatchData();
+        //refreshHistoryMatchData();
 
         // Subscribe to domain stats store
         domainStatsUnsubscribe = domainStatsStore.subscribe((storeValue) => {
@@ -153,6 +156,29 @@
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(" ");
     }
+
+    // Add a function to manually refresh data when needed
+    async function updateHistoryMatch() {
+        await refreshHistoryMatchData();
+    }
+
+    // Function to get domain-specific badge color classes
+    function getDomainBadgeClass(domain: string): string {
+        switch (domain) {
+            case "chief_complaint":
+                return "bg-blue-100 text-blue-800 hover:bg-blue-200";
+            case "associated_symptoms":
+                return "bg-purple-100 text-purple-800 hover:bg-purple-200";
+            case "past_medical_history":
+                return "bg-green-100 text-green-800 hover:bg-green-200";
+            case "medications":
+                return "bg-red-100 text-red-800 hover:bg-red-200";
+            case "social_exposure":
+                return "bg-amber-100 text-amber-800 hover:bg-amber-200";
+            default:
+                return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+        }
+    }
 </script>
 
 <div class="flex-col w-full pt-6 h-full">
@@ -160,7 +186,7 @@
         <h2 class="text-lg font-semibold">History Progress</h2>
 
         <!-- Domain progress bars -->
-        <div class="mt-8 space-y-4">
+        <div class="mt-6 space-y-4">
             {#each Object.entries(domainStats) as [domain, stats]}
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
@@ -201,11 +227,8 @@
                             class="text-xs text-gray-500 flex items-center gap-1"
                         >
                             {#if overallProgress.completed === overallProgress.total}
-                                <span class="text-green-500"
-                                    >Complete <ThumbsUp
-                                        class="h-3 w-3 text-green-500"
-                                    />
-                                </span>
+                                <span class="text-green-500">Complete </span>
+                                <ThumbsUp class="h-3 w-3 text-green-500" />
                             {:else}
                                 {overallProgress.total -
                                     overallProgress.completed}
@@ -300,6 +323,8 @@
                                 "patient_history",
                                 "text",
                             );
+                            // Refresh history match data after sending a question
+                            setTimeout(() => updateHistoryMatch(), 2000);
                         }}
                     >
                         <p
@@ -307,6 +332,9 @@
                         >
                             {getQuestionText(question)}
                         </p>
+                        <Badge class={getDomainBadgeClass(question.domain)}>
+                            {question.domain.replace(/_/g, " ")}
+                        </Badge>
                     </Button>
                 {/each}
             </div>

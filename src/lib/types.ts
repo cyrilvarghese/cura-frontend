@@ -12,8 +12,8 @@ export interface DomainStats {
 
 export interface HistoryMatchMetadata {
     total_expected_questions: number;
-    total_student_questions: number;
-    total_unmatched_questions: number;
+    total_newly_covered_questions: number;
+    total_remaining_questions: number;
     processing_time_seconds: number;
     model_version: string;
 }
@@ -23,6 +23,8 @@ export interface HistoryMatchResponse {
     student_id: string;
     timestamp: string;
     unmatched_questions: UnmatchedQuestion[];
+    covered_questions: UnmatchedQuestion[];
+    all_questions: UnmatchedQuestion[];
     domain_stats: Record<string, DomainStats>;
     metadata: HistoryMatchMetadata;
 }

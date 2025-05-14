@@ -301,7 +301,7 @@
         <div class="w-[100%] h-full flex flex-col">
             <!-- Title Section with Action Buttons -->
             <div
-                class="p-4 px-0 border-b border-gray-300 flex justify-between items-end"
+                class="p-4 pt-2 px-0 border-b border-gray-300 flex justify-between items-end"
             >
                 <div>
                     <h2 class="text-2xl font-semibold text-gray-800">
@@ -342,7 +342,7 @@
             {/if}
 
             <!-- Chat Messages -->
-            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-250px)] relative">
+            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-240px)] relative">
                 <div id="messages-container" class="messages space-y-4">
                     {#if $isLoading}
                         <div
