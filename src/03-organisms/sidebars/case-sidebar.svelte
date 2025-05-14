@@ -288,6 +288,8 @@
                             Submit Pre-Treatment Investigations
                         {:else if currentStep === "treatment-protocol"}
                             Submit Treatment Protocol
+                        {:else if currentStep === "end-case"}
+                            Take The Final OSCE
                         {/if}
                     </Button>
                 </div>

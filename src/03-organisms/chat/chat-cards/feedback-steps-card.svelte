@@ -91,7 +91,7 @@
 
     function handleTreatmentPlanClick() {
         // Find the pre-treatment button by ID and click it
-        const button = document.getElementById("pre-treatment");
+        const button = document.getElementById("treatment-plan");
         if (button) {
             button.click();
         }
@@ -186,14 +186,14 @@
                 {/each}
             </Accordion.Root>
 
-            <Button
+            <!-- <Button
                 variant="default"
                 disabled={!completedStates.diagnosis}
                 onclick={handleTreatmentPlanClick}
             >
                 Ready for Treatment Plan
                 <ArrowRight class="h-4 w-4" />
-            </Button>
+            </Button> -->
         </div>
     </Card.Content>
 </Card.Root>
