@@ -28,6 +28,7 @@
     import TestAutocomplete from "../../03-organisms/chat/test-autocomplete.svelte";
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ConversationStarters from "../../components/ConversationStarters.svelte";
+    import { useSidebar } from "$lib/components/ui/sidebar/index.js";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -69,6 +70,16 @@
             if (caseId !== null) {
                 // Set loading state to true
                 isLoading.set(true);
+
+                // Collapse the sidebar when a new case is loaded
+                try {
+                    const sidebar = useSidebar();
+                    if (sidebar.state === "expanded") {
+                        sidebar.toggle();
+                    }
+                } catch (error) {
+                    console.error("Error collapsing sidebar:", error);
+                }
 
                 try {
                     await fetchCaseData(caseId.toString());

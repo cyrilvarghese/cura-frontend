@@ -252,13 +252,13 @@
                         : ''}"
                 >
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-medium">@{message.sender}</span>
-                        <span
+                        <!-- <span class="font-medium">{message.sender}</span> -->
+                        <!-- <span
                             class="text-xs {isStudent
                                 ? 'text-primary-foreground/70'
                                 : 'text-muted-foreground'}"
                             >{getRelativeTime(message.timestamp)}</span
-                        >
+                        > -->
                     </div>
                     <p class="text-sm">{message.content}</p>
                 </div>
