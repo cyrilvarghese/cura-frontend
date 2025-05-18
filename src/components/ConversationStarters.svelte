@@ -8,6 +8,13 @@
     // Number of conversation starters to show
     const MAX_STARTERS = 5;
 
+    // Define allowed domains for conversation starters
+    const allowedDomains = [
+        "associated_symptoms",
+        "past_medical_history",
+        "chief_complaint",
+    ];
+
     // Get unmatched questions
     let unmatchedQuestions = $derived($unmatchedQuestionsStore || []);
 
@@ -25,9 +32,14 @@
         console.log("unmatchedQuestions", unmatchedQuestions);
         if (!initialized) {
             if (unmatchedQuestions.length > 0) {
+                // Filter questions to only include allowed domains
+                const filteredQuestions = unmatchedQuestions.filter((q) =>
+                    allowedDomains.includes(q.domain),
+                );
+
                 // Group questions by domain
                 const questionsByDomain: { [key: string]: string[] } = {};
-                unmatchedQuestions.forEach((q) => {
+                filteredQuestions.forEach((q) => {
                     const domain = q.domain || "unknown";
                     if (!questionsByDomain[domain]) {
                         questionsByDomain[domain] = [];
@@ -36,7 +48,6 @@
                 });
 
                 // Take one question from each domain, up to MAX_STARTERS
-                debugger;
                 const starters = [...visibleStarters];
                 for (const domain in questionsByDomain) {
                     if (starters.length < MAX_STARTERS) {
@@ -75,7 +86,7 @@
             {#each visibleStarters as starter}
                 <button
                     onclick={() => handleStarterClick(starter)}
-                    class="w-[150px] px-3 py-1.5 bg-muted/40 hover:bg-muted/80 hover:bg-primary-foreground text-sm rounded-full
+                    class="w-[150px] px-3 py-1.5 bg-muted hover:bg-muted/80 hover:bg-primary-foreground text-sm rounded-full
                           border border-muted-foreground/20 transition-colors text-foreground
                           hover:text-primary hover:border-primary/80 cursor-pointer
                           overflow-hidden whitespace-nowrap"

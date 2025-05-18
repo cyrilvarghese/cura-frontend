@@ -21,7 +21,6 @@
 	import MasterDocReview from "../../05-pages/MasterDocReview.svelte";
 	import { Toaster } from "svelte-sonner";
 	import CaseEditPage from "../../05-pages/cases/case-edit.svelte";
-	import mixpanel from "mixpanel-browser";
 	import StudentDashboardPage from "../../05-pages/StudentDashboardPage.svelte";
 	import StudentPerformance from "../../05-pages/StudentPerformance.svelte";
 	import ClassPerformance from "../../05-pages/ClassPerformance.svelte";
@@ -34,11 +33,6 @@
 	$: if (!$isAuthenticated) {
 		navigate("/login", { replace: true });
 	}
-	mixpanel.init("d9cb0f2d5c9b4205ebf8939b60e2395c", {
-		debug: true,
-		track_pageview: true,
-		persistence: "localStorage",
-	});
 </script>
 
 <Toaster position="top-center" />

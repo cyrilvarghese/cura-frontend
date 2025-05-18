@@ -4,7 +4,6 @@
     import Message from "../../03-organisms/chat/message.svelte";
     import { apiStore } from "$lib/stores/apiStore";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
-    import { Button } from "$lib/components/ui/button";
     import InfoIcon from "lucide-svelte/icons/info";
     import Stethoscope from "lucide-svelte/icons/stethoscope";
     import CheckCircle2 from "lucide-svelte/icons/check-circle-2";
@@ -23,7 +22,6 @@
     import InvestigationDialog from "../../03-organisms/dialogs/pre-treatment-dialog.svelte";
     import TreatmentProtocolDialog from "../../03-organisms/dialogs/treatment-protocol-dialog.svelte";
     import { Pill } from "lucide-svelte";
-    import mixpanel from "mixpanel-browser";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import OSCEPopup from "../../components/OSCEPopup.svelte";
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
@@ -91,11 +89,6 @@
     $effect(() => {
         console.log("Setting current case id to", id);
         currentCaseId.set(id);
-        mixpanel.track("start case", {
-            "case ID": id,
-            "current step": currentStep,
-            "start time": new Date().toISOString(),
-        });
     });
     $effect(() => {
         if (messages?.length) {
@@ -141,11 +134,6 @@
             const response = await feedbackStore.generateFinalOsce(id);
             console.log("OSCE generated", response);
 
-            mixpanel.track("end case", {
-                "case ID": id,
-                "current step": currentStep,
-                "end time": new Date().toISOString(),
-            });
             endCaseDialogOpen = false;
 
             // Call triggerOSCE here to show the OSCE popup

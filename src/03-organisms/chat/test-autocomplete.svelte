@@ -129,6 +129,10 @@
                 ]),
             ];
 
+            // Sort the two arrays alphabetically
+            labTestsArray.sort();
+            physicalExamsArray.sort();
+
             console.log("Case Data Updated:", $caseDataStore);
         }
     });

@@ -143,7 +143,7 @@
             try {
                 const success = await googleDocsStore.deleteDoc(docId, title);
                 if (success) {
-                    await googleDocsStore.loadDocs();
+                    await googleDocsStore.loadDocs(departmentId);
                 }
             } finally {
                 isDeleting = false;
@@ -156,7 +156,7 @@
         try {
             const success = await googleDocsStore.approveCase(docId);
             if (success) {
-                await googleDocsStore.loadDocs();
+                await googleDocsStore.loadDocs(departmentId);
             }
         } finally {
             isApproving = false;
@@ -316,15 +316,6 @@
                                                             // Track the click event
                                                             console.log(
                                                                 `Document clicked: ${review.title}`,
-                                                            );
-                                                            mixpanel.track(
-                                                                "Document Link Clicked",
-                                                                {
-                                                                    "doc ID":
-                                                                        review.docId,
-                                                                    "doc title":
-                                                                        review.title,
-                                                                },
                                                             );
                                                         }}
                                                     >
