@@ -29,6 +29,9 @@
     import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ConversationStarters from "../../components/ConversationStarters.svelte";
     import { useSidebar } from "$lib/components/ui/sidebar/index.js";
+    import Maximize2 from "lucide-svelte/icons/maximize-2";
+    import Minimize2 from "lucide-svelte/icons/minimize-2";
+    import { Button } from "$lib/components/ui/button";
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -51,6 +54,40 @@
     let currentStep = $state("diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
+
+    // Add fullscreen state
+    let isFullscreen = $state(false);
+
+    // Add state for chat window height
+
+    // Function to calculate chat window height
+    function calculateChatWindowHeight() {
+        if (isFullscreen) {
+            const vh = window.innerHeight;
+            console.log("vh", vh);
+            const chatWindow = document.getElementById("chat-window");
+            if (chatWindow) {
+                chatWindow.style.height = `${vh - 200}px`;
+            }
+        } else {
+            const chatWindow = document.getElementById("chat-window");
+            if (chatWindow) {
+                chatWindow.style.height = "calc(100vh - 240px)";
+            }
+        }
+    }
+
+    // Initial calculation and resize listener
+    $effect(() => {
+        // // Calculate on initial load
+        calculateChatWindowHeight();
+        // // Add resize event listener
+        window.addEventListener("resize", calculateChatWindowHeight);
+        // Clean up listener on component destroy
+        return () => {
+            window.removeEventListener("resize", calculateChatWindowHeight);
+        };
+    });
 
     function scrollToLatest() {
         requestAnimationFrame(() => {
@@ -285,6 +322,51 @@
             currentButton.action();
         }
     }
+
+    // Function to toggle fullscreen
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement
+                .requestFullscreen()
+                .then(() => {
+                    isFullscreen = true;
+                })
+                .catch((err) => {
+                    console.error(
+                        `Error attempting to enable fullscreen: ${err.message}`,
+                    );
+                });
+        } else {
+            if (document.exitFullscreen) {
+                document
+                    .exitFullscreen()
+                    .then(() => {
+                        isFullscreen = false;
+                    })
+                    .catch((err) => {
+                        console.error(
+                            `Error attempting to exit fullscreen: ${err.message}`,
+                        );
+                    });
+            }
+        }
+    }
+
+    // Listen for fullscreen change events from browser
+    $effect(() => {
+        const handleFullscreenChange = () => {
+            isFullscreen = !!document.fullscreenElement;
+        };
+
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+        return () => {
+            document.removeEventListener(
+                "fullscreenchange",
+                handleFullscreenChange,
+            );
+        };
+    });
 </script>
 
 <PageLayout
@@ -293,6 +375,7 @@
         { label: "Case Library", href: "/case-library" },
         { label: `Case ${id}` },
     ]}
+    hideNav={isFullscreen}
 >
     <LoadingOverlay isVisible={$isLoading} message="Loading case data..." />
 
@@ -302,16 +385,26 @@
             <div
                 class="p-4 pt-2 px-0 border-b border-gray-300 flex justify-between items-end"
             >
-                <div>
-                    <h2 class="text-2xl font-semibold text-gray-800">
+                <div class="flex items-star flex-row gap-2">
+                    <h2 class="text-2xl font-semibold text-gray-800 pt-2.5">
                         Patient Consultation
                     </h2>
-                    <p class="text-sm text-gray-500 capitalize">
-                        {#if $apiStore.messages.length > 0}
-                            {$apiStore.messages[0].title}
+                    <Button
+                        variant="ghost"
+                        onclick={toggleFullscreen}
+                        aria-label={isFullscreen
+                            ? "Exit fullscreen"
+                            : "Enter fullscreen"}
+                        class="text-blue-600 bg-blue-600/10"
+                    >
+                        {#if isFullscreen}
+                            <Minimize2 class="h-5 w-5" /> Minimize
+                        {:else}
+                            <Maximize2 class="h-5 w-5" /> Maximize
                         {/if}
-                    </p>
+                    </Button>
                 </div>
+
                 <div class="flex gap-2">
                     <TestAutocomplete caseId={id} {currentStep} />
 
@@ -341,7 +434,10 @@
             {/if}
 
             <!-- Chat Messages -->
-            <ScrollArea class="p-4 bg-muted/50 h-[calc(100vh-240px)] relative">
+            <ScrollArea
+                id="chat-window"
+                class="p-4 bg-muted/50 relative h-[calc(100vh-240px)]"
+            >
                 <div id="messages-container" class="messages space-y-4">
                     {#if $isLoading}
                         <div

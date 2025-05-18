@@ -2,7 +2,6 @@
     import { onMount, onDestroy } from "svelte";
     import { googleDocsStore } from "$lib/stores/googleDocsStore";
     import PageLayout from "../04-templates/page-layout.svelte";
-    import mixpanel from "mixpanel-browser";
     import {
         ClipboardCheck,
         Search,
