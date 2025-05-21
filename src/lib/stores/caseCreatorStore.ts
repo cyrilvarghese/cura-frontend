@@ -229,7 +229,10 @@ export async function generateDifferentialDiagnosis(selectedDocumentName: string
         caseStore.update(state => ({
             ...state,
             diagnosisContext: response,
-            differentialDiagnosis: response.content.keyDifferentials.map(diff => diff.name),
+            differentialDiagnosis: [
+                ...(response.content.keyCorrectDifferentials?.map(diff => diff.name) || []),
+                ...(response.content.keyIncorrectDifferentials?.map(diff => diff.name) || [])
+            ],
             generating: false,
             isGeneratingDifferential: false,
             caseId: response.case_id.toString(),
@@ -251,6 +254,7 @@ export async function loadExistingCase(id: string) {
         caseStore.update(state => ({ ...state, loading: true }));
         const caseData = await getCaseDataService().getCaseById(id);
         console.log(caseData);
+        debugger;
         caseStore.update((state) => ({
             ...state,
             caseId: id,
@@ -271,7 +275,12 @@ export async function loadExistingCase(id: string) {
             },
             googleDocLink: caseData.googleDocLink || null,
             doc_has_changed: caseData.doc_has_changed || false,
-            differentialDiagnosis: caseData.diagnosisContext?.content.keyDifferentials.map(diff => diff.name) || caseData.differentialDiagnosis,
+            differentialDiagnosis: [
+                ...(caseData.diagnosisContext?.content.keyCorrectDifferentials?.map(diff => diff.name) || []),
+                ...(caseData.diagnosisContext?.content.keyIncorrectDifferentials?.map(diff => diff.name) || []),
+                ...((!caseData.diagnosisContext?.content.keyCorrectDifferentials && !caseData.diagnosisContext?.content.keyIncorrectDifferentials) ?
+                    (caseData.differentialDiagnosis || []) : [])
+            ],
             selectedDocumentName: caseData.selectedDocumentName,
         }));
     } catch (error) {

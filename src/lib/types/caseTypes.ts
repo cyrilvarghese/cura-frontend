@@ -30,7 +30,7 @@ export interface CaseStoreState {
     diagnosisContext: DiagnosisContextResponse | null;
     historyContext: any | null; // Adjust to use proper type
     treatmentContext: any | null; // Adjust to use proper type
-    clinicalFindingsContext: ClinicalFindingsContextResponse | null;
+    clinicalFindingsContext: any | null;
     uploadedFile: File | null;
     uploadedFileName: string | null;
     isGeneratingPersona: boolean;

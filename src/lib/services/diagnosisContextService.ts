@@ -27,7 +27,8 @@ export interface DiagnosisContextResponse {
         keyEvidence: string[];
         essentialPhysicalExams: PhysicalExam[];
         keyDiagnosticTests: DiagnosticTest[];
-        keyDifferentials: DiagnosisDifferential[];
+        keyCorrectDifferentials: DiagnosisDifferential[];
+        keyIncorrectDifferentials: DiagnosisDifferential[];
     };
     case_id: string | number;
     file_path?: string;
