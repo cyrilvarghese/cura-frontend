@@ -1,0 +1,146 @@
+{
+    "educationalCapsules": {
+        "primaryDxCapsule": {
+            "dx": "Bacterial Vaginosis (BV)",
+            "overview": "Bacterial Vaginosis (BV) is the most common cause of abnormal vaginal discharge in women of reproductive age. It represents a complex change in the vaginal flora, characterized by a decrease in hydrogen peroxide-producing Lactobacillus species and an overgrowth of predominantly anaerobic bacteria.",
+            "pathoPoints": [
+                "Shift in vaginal microbiome from Lactobacillus-dominant to a polymicrobial flora including Gardnerella vaginalis, Prevotella species, Atopobium vaginae, Mobiluncus species, and other anaerobes.",
+                "Formation of a polymicrobial biofilm on the vaginal epithelium.",
+                "Production of amines by anaerobic bacteria, leading to the characteristic 'fishy' odor and elevated vaginal pH."
+            ],
+            "etiologyRiskFactors": [
+                "New or multiple sexual partners.",
+                "Douching.",
+                "Lack of condom use.",
+                "Cigarette smoking.",
+                "Race/ethnicity (more common in Black and Hispanic women)."
+            ],
+            "clinicalFeatures": [
+                "Thin, homogenous, grayish-white vaginal discharge, often coating the vaginal walls.",
+                "Unpleasant 'fishy' vaginal odor, particularly noticeable after sexual intercourse or during menses.",
+                "Vaginal pH >4.5.",
+                "Presence of clue cells on saline microscopy (\u226520% of epithelial cells).",
+                "Positive Whiff test (amine odor with 10% KOH).",
+                "Often asymptomatic in up to 50% of women; itching or irritation are usually mild if present."
+            ],
+            "complications": [
+                "Increased risk of acquiring STIs, including HIV, HSV-2, gonorrhea, and chlamydia.",
+                "Adverse pregnancy outcomes (preterm birth, low birth weight, postpartum endometritis).",
+                "Post-operative infections after gynecologic surgery.",
+                "Increased risk of Pelvic Inflammatory Disease (PID)."
+            ],
+            "diagModalities": [
+                "Amsel's criteria (requires 3 of 4: characteristic discharge, pH >4.5, positive Whiff test, clue cells on microscopy).",
+                "Saline wet mount microscopy for clue cells, WBCs (typically few), and assessment of lactobacilli (reduced/absent).",
+                "Vaginal pH testing.",
+                "Whiff test (amine test).",
+                "Gram stain with Nugent scoring (gold standard in research, less common in routine clinical practice)."
+            ]
+        },
+        "differentialDxCapsulesToEmbed": [
+            {
+                "differentialDxName": "Vulvovaginal Candidiasis (VVC)",
+                "overview": "Vulvovaginal Candidiasis, commonly known as a yeast infection, is an infection of the vulva and vagina primarily caused by Candida species, most often Candida albicans. It is characterized by vulvar itching and abnormal discharge.",
+                "pathoPoints": [
+                    "Overgrowth of Candida species, which are normally present in small numbers in the vaginal flora.",
+                    "Conversion of yeast to hyphal forms, which are more invasive and associated with symptoms.",
+                    "Host inflammatory response contributing to symptoms like itching and erythema."
+                ],
+                "etiologyRiskFactors": [
+                    "Antibiotic use (disrupts normal flora).",
+                    "Increased estrogen levels (pregnancy, oral contraceptives, estrogen therapy).",
+                    "Diabetes mellitus (especially poorly controlled).",
+                    "Immunosuppression (e.g., HIV, corticosteroid use).",
+                    "Use of spermicides, douching (less common than for BV), tight-fitting synthetic clothing."
+                ],
+                "clinicalFeatures": [
+                    "Vulvar pruritus (itching) - often the predominant and most bothersome symptom.",
+                    "Thick, white, curdy 'cottage cheese-like' vaginal discharge (can also be thin and watery).",
+                    "Vulvar burning, soreness, and irritation.",
+                    "Dyspareunia (painful intercourse) and external dysuria (pain on urination due to urine passing over inflamed vulva).",
+                    "Erythema and edema of the vulva and vagina; sometimes satellite lesions or excoriations."
+                ],
+                "complications": [
+                    "Recurrent VVC (RVVC) - four or more symptomatic episodes per year, significantly impacting quality of life.",
+                    "Excoriations and secondary bacterial infection from scratching.",
+                    "Severe vulvovaginitis with extensive erythema and edema."
+                ],
+                "diagModalities": [
+                    "Clinical symptoms and signs.",
+                    "Normal vaginal pH (\u22644.5).",
+                    "Saline and 10% KOH wet mount microscopy to identify yeast buds, hyphae, or pseudohyphae.",
+                    "Vaginal culture for Candida species if microscopy is negative but suspicion remains, for speciation in recurrent cases, or if non-albicans Candida is suspected."
+                ]
+            },
+            {
+                "differentialDxName": "Trichomonas vaginalis (Trichomoniasis)",
+                "overview": "Trichomoniasis is a common sexually transmitted infection (STI) caused by the motile protozoan parasite Trichomonas vaginalis. It can infect the vagina, urethra, and paraurethral glands in women, and the urethra and under the foreskin in men.",
+                "pathoPoints": [
+                    "Adherence of T. vaginalis to vaginal and urethral epithelial cells via adhesins.",
+                    "Release of cytotoxic substances, proteinases, and enzymes causing host cell damage and inflammation.",
+                    "Evasion of host immune responses, allowing for persistent infection if untreated."
+                ],
+                "etiologyRiskFactors": [
+                    "Sexual contact with an infected partner (vaginal, anal, or oral sex, though vaginal is most common for transmission).",
+                    "Multiple sexual partners or a new sexual partner.",
+                    "History of other STIs.",
+                    "Not using condoms consistently and correctly."
+                ],
+                "clinicalFeatures": [
+                    "Can be asymptomatic in up to 50% of women and even more in men.",
+                    "In women: frothy, malodorous (often musty or fishy), yellow-green to gray vaginal discharge; discharge can be copious.",
+                    "Vulvovaginal irritation, pruritus, and soreness.",
+                    "Dysuria (painful urination), urinary frequency.",
+                    "Dyspareunia (painful intercourse).",
+                    "Postcoital bleeding (less common).",
+                    "Erythema and edema of vulva and vagina; 'strawberry cervix' (colpitis macularis - punctate cervical hemorrhages) visible on speculum exam in a minority of cases (about 2-10%)."
+                ],
+                "complications": [
+                    "Increased risk of HIV acquisition and transmission.",
+                    "Adverse pregnancy outcomes (preterm delivery, premature rupture of membranes, low birth weight).",
+                    "Pelvic Inflammatory Disease (PID) when co-infection with other pathogens occurs.",
+                    "Increased susceptibility to other STIs."
+                ],
+                "diagModalities": [
+                    "Saline wet mount microscopy to identify motile, flagellated trichomonads (sensitivity is operator-dependent, ~60-70%).",
+                    "Nucleic Acid Amplification Tests (NAATs) - highly sensitive and specific (>95%), the preferred method for diagnosis from vaginal, endocervical, or urine specimens.",
+                    "Rapid antigen tests and culture (less commonly used due to lower sensitivity or longer turnaround time compared to NAATs).",
+                    "Vaginal pH is typically elevated (>4.5)."
+                ]
+            },
+            {
+                "differentialDxName": "Aerobic Vaginitis",
+                "overview": "Aerobic Vaginitis (AV) is an inflammatory condition of the vagina, distinct from BV, characterized by a disruption of the normal lactobacillary flora and overgrowth of aerobic enteric commensals (e.g., Escherichia coli, Streptococcus agalactiae (Group B Strep), Staphylococcus aureus, Enterococcus faecalis). It involves a significant host inflammatory response.",
+                "pathoPoints": [
+                    "Marked decrease or absence of lactobacilli, leading to an increase in vaginal pH.",
+                    "Overgrowth of aerobic or facultative anaerobic bacteria, often of enteric origin.",
+                    "Significant host inflammatory response resulting in epithelial damage, increased white blood cells (WBCs), and often parabasal cells (indicating epithelial immaturity/atrophy)."
+                ],
+                "etiologyRiskFactors": [
+                    "Exact etiology is not fully understood; likely multifactorial.",
+                    "Possible factors: hormonal changes (particularly hypoestrogenism, e.g., postmenopausal women, though can occur in reproductive-age women), poor hygiene practices, frequent antibiotic use, intestinal flora contamination.",
+                    "It is not considered a sexually transmitted infection, but sexual practices that alter vaginal pH or flora might contribute."
+                ],
+                "clinicalFeatures": [
+                    "Vaginal soreness, burning, and irritation – often more prominent than in BV.",
+                    "Dyspareunia (painful intercourse).",
+                    "Yellowish or greenish, homogenous, often sticky or purulent vaginal discharge; may be malodorous (but typically not 'fishy' like BV).",
+                    "Vulvovaginal erythema, edema, and sometimes petechiae, erosions, or ulcerations.",
+                    "Vaginal pH is usually markedly elevated (often >6.0)."
+                ],
+                "complications": [
+                    "Chronic vaginal discomfort and pain, significantly impacting quality of life.",
+                    "Adverse pregnancy outcomes (e.g., preterm birth, chorioamnionitis, postpartum endometritis).",
+                    "Increased susceptibility to other vaginal infections or STIs.",
+                    "Can be associated with desquamative inflammatory vaginitis in severe forms."
+                ],
+                "diagModalities": [
+                    "Phase-contrast microscopy of fresh vaginal fluid is key: assessing lactobacillary grade (LBG I-III), number of leukocytes, proportion of toxic leukocytes, and type of background flora (AV score).",
+                    "Vaginal pH measurement (markedly elevated).",
+                    "Gram stain can also be used to assess flora and inflammation.",
+                    "Culture for specific aerobic pathogens (e.g., Group B Strep) can identify predominant organisms but diagnosis is primarily microscopic based on the overall pattern of inflammation and flora disruption."
+                ]
+            }
+        ]
+    }
+}

@@ -4,6 +4,8 @@ import mockFeedback from "$lib/data/mock-feedback.json";
 import mockFeedback2 from "$lib/data/mock-feedback2.json";
 import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockOsce2 from "$lib/data/mock-osce2.json";
+import type { PrimaryDiagnosisFeedback } from "./primaryDiagnosisFeedbackService";
+import type { DifferentialDiagnosisFeedback } from "./differentialDiagnosisService";
 
 interface OsceQuestion {
     station_title: string;
@@ -301,6 +303,56 @@ export class FeedbackService {
             throw error;
         }
     }
+
+    async getPrimaryDiagnosisFeedback(caseId: string): Promise<PrimaryDiagnosisFeedback> {
+        try {
+            const response = await fetch(`${this.baseUrl}/feedback/primary-diagnosis`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // You can add query parameters if needed
+                // For example: ?case_id=${encodeURIComponent(caseId)}
+            });
+
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to get primary diagnosis feedback');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting primary diagnosis feedback:', error);
+            throw error;
+        }
+    }
+
+    async getDifferentialDiagnosisFeedback(caseId: string): Promise<DifferentialDiagnosisFeedback> {
+        try {
+            const response = await fetch(`${this.baseUrl}/feedback/v2/differential-diagnosis`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // You can add query parameters if needed
+                // For example: ?case_id=${encodeURIComponent(caseId)}
+            });
+
+            await handleApiResponse(response);
+
+            if (!response.ok) {
+                throw new Error('Failed to get differential diagnosis feedback');
+            }
+
+            // Extract the differentialDxAnalysis from inside feedback_result
+            const data = await response.json();
+            return { differentialDxAnalysis: data.feedback_result.differentialDxAnalysis };
+        } catch (error) {
+            console.error('Error getting differential diagnosis feedback:', error);
+            throw error;
+        }
+    }
 }
 
 export const feedbackService = new FeedbackService();
@@ -309,5 +361,7 @@ export type {
     OsceQuestion,
     HistoryFeedbackResponse,
     AETCOMFeedbackResponse,
-    DiagnosisFeedbackResponse
+    DiagnosisFeedbackResponse,
+    PrimaryDiagnosisFeedback,
+    DifferentialDiagnosisFeedback
 }; 

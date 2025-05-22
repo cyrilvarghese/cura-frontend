@@ -22,14 +22,17 @@ export interface DiagnosisDifferential {
 
 export interface DiagnosisContextResponse {
     id?: string;
-    content: {
-        primaryDiagnosis: string;
-        keyEvidence: string[];
-        essentialPhysicalExams: PhysicalExam[];
-        keyDiagnosticTests: DiagnosticTest[];
-        keyCorrectDifferentials: DiagnosisDifferential[];
-        keyIncorrectDifferentials: DiagnosisDifferential[];
-    };
+
+    physical_exam: any;
+    lab_test: any;
+    case_cover: any;
+    primaryDiagnosis: string;
+    keyEvidence: string[];
+    essentialPhysicalExams: PhysicalExam[];
+    keyDiagnosticTests: DiagnosticTest[];
+    plausibleDifferentials: DiagnosisDifferential[];
+    ruledOutDifferentials: DiagnosisDifferential[];
+
     case_id: string | number;
     file_path?: string;
     timestamp?: string;

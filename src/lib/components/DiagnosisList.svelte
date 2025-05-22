@@ -11,21 +11,25 @@
         debugger;
         console.log("caseDataStore", $caseDataStore);
         if ($caseDataStore?.diagnosisContext) {
-            let diagnosisList = [];
+            let diagnosisList: Diagnosis[] = [];
 
             // Add key differentials
-            if ($caseDataStore.diagnosisContext.keyDifferentials) {
-                diagnosisList =
-                    $caseDataStore.diagnosisContext.keyDifferentials.map(
-                        (diagnosis: any, index: number) => ({
-                            id: index.toString(),
-                            text: diagnosis.name,
-                            isPrimary: false,
-                            isIrrelevant: false,
-                            status: "differential",
-                            justification: undefined,
-                        }),
-                    );
+            let keyDifferentials =
+                $caseDataStore.diagnosisContext.plausibleDifferentials.concat(
+                    $caseDataStore.diagnosisContext.ruledOutDifferentials,
+                );
+
+            if (keyDifferentials) {
+                diagnosisList = keyDifferentials.map(
+                    (diagnosis: any, index: number) => ({
+                        id: index.toString(),
+                        text: diagnosis.name,
+                        isPrimary: false,
+                        isIrrelevant: false,
+                        status: "differential",
+                        justification: undefined,
+                    }),
+                );
             }
 
             // Add primary diagnosis if it exists

@@ -20,7 +20,7 @@ export interface CaseData {
         interpretation: string;
     }>;
     coverMessage: any;
-    diagnosisContext: any;
+    diagnosisContext: DiagnosisContextResponse;
 }
 
 const caseDataService = new CaseDataService();

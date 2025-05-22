@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { feedbackService } from '$lib/services/feedbackService';
 import type { FeedbackResponse, StudentMessage } from '$lib/types/index';
-import type { OsceGenerationResponse, HistoryFeedbackResponse, AETCOMFeedbackResponse, DiagnosisFeedbackResponse } from '$lib/services/feedbackService';
+import type { OsceGenerationResponse, HistoryFeedbackResponse, AETCOMFeedbackResponse, DiagnosisFeedbackResponse, PrimaryDiagnosisFeedback } from '$lib/services/feedbackService';
 import { currentCaseId } from "$lib/stores/casePlayerStore";
 
 interface FeedbackState {
@@ -15,9 +15,11 @@ interface FeedbackState {
     historyFeedback: null | HistoryFeedbackResponse;
     AETCOMFeedback: null | AETCOMFeedbackResponse;
     diagnosisFeedback: null | DiagnosisFeedbackResponse;
+    primaryDiagnosisFeedback: null | PrimaryDiagnosisFeedback;
     historyFeedbackLoading: boolean;
     AETCOMFeedbackLoading: boolean;
     diagnosisFeedbackLoading: boolean;
+    primaryDiagnosisFeedbackLoading: boolean;
 }
 
 const initialState: FeedbackState = {
@@ -31,9 +33,11 @@ const initialState: FeedbackState = {
     historyFeedback: null,
     AETCOMFeedback: null,
     diagnosisFeedback: null,
+    primaryDiagnosisFeedback: null,
     historyFeedbackLoading: false,
     AETCOMFeedbackLoading: false,
-    diagnosisFeedbackLoading: false
+    diagnosisFeedbackLoading: false,
+    primaryDiagnosisFeedbackLoading: false
 };
 
 function createFeedbackStore() {
@@ -165,6 +169,33 @@ function createFeedbackStore() {
         }
     }
 
+    async function getPrimaryDiagnosisFeedback(caseId?: string) {
+        update(state => ({ ...state, primaryDiagnosisFeedbackLoading: true, error: null }));
+
+        try {
+            // Use provided caseId or get it from the store
+            const activeCaseId = caseId || get(currentCaseId) || '';
+
+            const response = await feedbackService.getPrimaryDiagnosisFeedback(activeCaseId);
+
+            update(state => ({
+                ...state,
+                primaryDiagnosisFeedback: response,
+                primaryDiagnosisFeedbackLoading: false
+            }));
+
+            return response;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to get primary diagnosis feedback';
+            update(state => ({
+                ...state,
+                error: errorMessage,
+                primaryDiagnosisFeedbackLoading: false
+            }));
+            throw error;
+        }
+    }
+
     return {
         subscribe,
         getFeedback,
@@ -172,6 +203,7 @@ function createFeedbackStore() {
         getHistoryFeedback,
         getDiagnosisFeedback,
         getAETCOMFeedback,
+        getPrimaryDiagnosisFeedback,
         reset
     };
 }

@@ -1,0 +1,142 @@
+{
+    "primaryDxFeedback": {
+        "studentStated": {
+            "dx": "Bacterial Vaginosis",
+            "isCorrect": true
+        },
+        "scores": {
+            "accuracyScore": 5,
+            "accuracyExplanation": "Excellent! Your diagnosis of Bacterial Vaginosis is correct, and your stated reasoning effectively captured key diagnostic criteria such as the characteristic discharge, odor, and related test findings like elevated pH and clue cells.",
+            "evidenceGatheringScore": 4,
+            "evidenceGatheringExplanation": {
+                "overallSummary": "Good targeted evidence gathering for BV; aim to include all baseline exams for completeness.",
+                "historyStrengths": [
+                    "Elicited characteristic discharge and fishy odor.",
+                    "Noted douching history (risk factor)."
+                ],
+                "examStrengths": [
+                    "Performed essential Speculum Examination.",
+                    "Conducted key office tests: Vaginal pH and Whiff test."
+                ],
+                "testStrengths": [
+                    "Ordered Saline wet mount (for clue cells).",
+                    "Ordered KOH prep (to rule out VVC)."
+                ],
+                "areasForImprovement_Exams": [
+                    "Include Bimanual pelvic exam to rule out PID.",
+                    "Perform an Abdominal exam for completeness."
+                ],
+                "areasForImprovement_Tests": [],
+                "irrelevantActionsNoted": []
+            }
+        },
+        "correctPrimary": {
+            "dx": "Bacterial Vaginosis (BV)",
+            "allSupportingEvidence": {
+                "history": [
+                    {
+                        "desc": "Thin, homogenous, grayish-white vaginal discharge.",
+                        "alignsWithKeyEvidence": "Thin, homogenous, grayish-white vaginal discharge.",
+                        "studentDidIdentify": true
+                    },
+                    {
+                        "desc": "Strong, unpleasant \"fishy\" odor, often worse after sexual intercourse.",
+                        "alignsWithKeyEvidence": "Strong, unpleasant \"fishy\" odor, often worse after sexual intercourse or menses.",
+                        "studentDidIdentify": false
+                    },
+                    {
+                        "desc": "Patient sometimes douches.",
+                        "alignsWithKeyEvidence": "(Risk factor, not direct evidence but supports context)",
+                        "studentDidIdentify": true
+                    },
+                    {
+                        "desc": "No itching or burning.",
+                        "alignsWithKeyEvidence": "(Supports BV by making alternatives like VVC less likely)",
+                        "studentDidIdentify": true
+                    }
+                ],
+                "exams": [
+                    {
+                        "name": "Speculum examination of vagina and cervix",
+                        "expectedFindingSupportingDx": "Vaginal walls coated with a thin, homogenous, grayish-white discharge. Cervix appears normal.",
+                        "alignsWithKeyEvidence": "Thin, homogenous, grayish-white vaginal discharge.",
+                        "studentDidPerform": true,
+                        "studentDidIdentifyFinding": true
+                    },
+                    {
+                        "name": "Vaginal pH test (performed during/after speculum exam)",
+                        "expectedFindingSupportingDx": "pH > 4.5",
+                        "alignsWithKeyEvidence": "Vaginal pH >4.5",
+                        "studentDidPerform": true,
+                        "studentDidIdentifyFinding": true
+                    },
+                    {
+                        "name": "Whiff test (Amine test with 10% KOH) (performed during/after speculum exam)",
+                        "expectedFindingSupportingDx": "Positive (fishy odor)",
+                        "alignsWithKeyEvidence": "Positive Whiff test (amine odor with 10% KOH).",
+                        "studentDidPerform": true,
+                        "studentDidIdentifyFinding": true
+                    }
+                ],
+                "tests": [
+                    {
+                        "name": "Saline wet mount microscopy",
+                        "expectedResultSupportingDx": "Presence of clue cells (\u226520% of epithelial cells), few WBCs, reduced lactobacilli.",
+                        "alignsWithKeyEvidence": "Presence of clue cells (\u226520% of epithelial cells) on saline wet mount microscopy.",
+                        "studentDidOrder": true,
+                        "studentDidIdentifyResult": true
+                    },
+                    {
+                        "name": "KOH wet mount microscopy",
+                        "expectedResultSupportingDx": "Absence of yeast/pseudohyphae (helps rule out VVC).",
+                        "alignsWithKeyEvidence": "(Supports BV by ruling out VVC)",
+                        "studentDidOrder": false,
+                        "studentDidIdentifyResult": false
+                    },
+                    {
+                        "name": "Gram stain of vaginal smear (for Nugent scoring)",
+                        "expectedResultSupportingDx": "Nugent score consistent with BV (e.g., 7-10).",
+                        "alignsWithKeyEvidence": "(Confirmatory, though Amsel's often used clinically)",
+                        "studentDidOrder": true,
+                        "studentDidIdentifyResult": false
+                    }
+                ]
+            }
+        },
+        "missedCrucialEvidence": {
+            "missedExams": [
+                {
+                    "name": "General appearance and vital signs",
+                    "relevance": "Assess overall health status and rule out systemic illness.",
+                    "educationalTip": "Always good practice to start with vitals and a general assessment for completeness."
+                },
+                {
+                    "name": "Abdominal examination",
+                    "relevance": "To rule out tenderness/masses that might suggest an upper genital tract infection or other pathology.",
+                    "educationalTip": "Helps ensure no signs of complicated infection like PID are present."
+                },
+                {
+                    "name": "Bimanual pelvic examination",
+                    "relevance": "To assess for uterine or adnexal tenderness, or cervical motion tenderness, which would point away from uncomplicated BV and towards PID or other conditions.",
+                    "educationalTip": "Essential for ruling out upper genital tract involvement and assessing for tenderness."
+                },
+                {
+                    "name": "Inspection of external genitalia",
+                    "relevance": "For erythema, lesions, edema, which might suggest co-infection or an alternative diagnosis.",
+                    "educationalTip": "A careful inspection of the vulva can provide clues to other conditions or co-infections."
+                },
+                {
+                    "name": "Inguinal lymph node palpation",
+                    "relevance": "To check for lymphadenopathy which could indicate a broader infectious or inflammatory process.",
+                    "educationalTip": null
+                },
+                {
+                    "name": "Visual inspection of perineal skin",
+                    "relevance": "To look for any associated skin changes or lesions.",
+                    "educationalTip": null
+                }
+            ],
+            "missedLabs": []
+        }
+    }
+}

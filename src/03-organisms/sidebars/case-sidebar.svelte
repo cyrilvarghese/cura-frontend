@@ -273,7 +273,7 @@
                 </div>
             {/if}
             <!-- Next button - appears when progress is ≥ 80% -->
-            {#if showNextButton}
+            {#if true}
                 <div class="mt-6 flex justify-start">
                     <Button
                         onclick={handleNextClick}

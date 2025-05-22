@@ -5,7 +5,14 @@
     import { Button } from "$lib/components/ui/button";
     import ClipboardCheck from "lucide-svelte/icons/clipboard-check";
     import Loader2 from "lucide-svelte/icons/loader-2";
-    import { ArrowRight, CheckCircle, ChevronDown } from "lucide-svelte";
+    import {
+        ArrowRight,
+        CheckCircle,
+        ChevronDown,
+        ListTree,
+        BookOpen,
+        Clipboard,
+    } from "lucide-svelte";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import { toast } from "svelte-sonner";
     import { tweened } from "svelte/motion";
@@ -19,6 +26,11 @@
     import HistoryFeedbackContent from "./history-feedback-content.svelte";
     import AETCOMFeedbackContent from "./aetcom-feedback-content.svelte";
     import DiagnosisFeedbackContent from "./diagnosis-feedback-content.svelte";
+
+    // Import the three diagnosis feedback cards
+    import PrimaryDiagnosisCard from "$lib/components/PrimaryDiagnosisCard.svelte";
+    import DifferentialDiagnosisCard from "$lib/components/DifferentialDiagnosisCard.svelte";
+    import EducationalResourcesCard from "$lib/components/EducationalResourcesCard.svelte";
 
     let feedback = $state({
         history: {} as HistoryFeedbackResponse | null,
@@ -40,6 +52,9 @@
 
     let selectedStep = $state<"history" | "aetcom" | "diagnosis" | null>(null);
     let openAccordion = $state<string[]>([]);
+
+    // Diagnosis sub-sections accordions state
+    let diagnosisSubAccordions = $state<string[]>([]);
 
     // Double the delay between accordion transitions for a more gradual experience
     const transitionDelay = 800; // milliseconds
@@ -77,6 +92,8 @@
             // Add diagnosis to open accordions
             setTimeout(() => {
                 openAccordion = [...openAccordion, "diagnosis"];
+                // Open the first diagnosis sub-section by default
+                diagnosisSubAccordions = ["primary-dx"];
             }, transitionDelay);
         } catch (error) {
             console.error("Error loading feedback:", error);
@@ -170,9 +187,91 @@
                                         feedback={feedback.aetcom}
                                     />
                                 {:else if step === "diagnosis" && feedback.diagnosis?.feedback_result}
-                                    <DiagnosisFeedbackContent
-                                        feedback={feedback.diagnosis}
-                                    />
+                                    <!-- Diagnosis Feedback with nested accordions -->
+                                    <div class="space-y-4">
+                                        <Accordion.Root
+                                            class="space-y-2"
+                                            type="multiple"
+                                            value={diagnosisSubAccordions}
+                                        >
+                                            <!-- Primary Diagnosis Card -->
+                                            <Accordion.Item value="primary-dx">
+                                                <Accordion.Trigger
+                                                    class="flex w-full items-center justify-between rounded-lg border border-blue-200 p-3 hover:bg-blue-50/30 bg-blue-50/10 text-blue-800"
+                                                >
+                                                    <div
+                                                        class="flex items-center gap-2"
+                                                    >
+                                                        <Clipboard
+                                                            class="h-4 w-4"
+                                                        />
+                                                        <span
+                                                            class="font-medium"
+                                                            >Primary Diagnosis</span
+                                                        >
+                                                    </div>
+                                                </Accordion.Trigger>
+                                                <Accordion.Content
+                                                    class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden transition-all duration-300 ease-out pt-2"
+                                                >
+                                                    <PrimaryDiagnosisCard />
+                                                </Accordion.Content>
+                                            </Accordion.Item>
+
+                                            <!-- Differential Diagnosis Card -->
+                                            <Accordion.Item value="diff-dx">
+                                                <Accordion.Trigger
+                                                    class="flex w-full items-center justify-between rounded-lg border border-purple-200 p-3 hover:bg-purple-50/30 bg-purple-50/10 text-purple-800"
+                                                >
+                                                    <div
+                                                        class="flex items-center gap-2"
+                                                    >
+                                                        <ListTree
+                                                            class="h-4 w-4"
+                                                        />
+                                                        <span
+                                                            class="font-medium"
+                                                            >Differential
+                                                            Diagnosis</span
+                                                        >
+                                                    </div>
+                                                </Accordion.Trigger>
+                                                <Accordion.Content
+                                                    class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden transition-all duration-300 ease-out pt-2"
+                                                >
+                                                    <DifferentialDiagnosisCard
+                                                    />
+                                                </Accordion.Content>
+                                            </Accordion.Item>
+
+                                            <!-- Educational Resources Card -->
+                                            <Accordion.Item
+                                                value="edu-resources"
+                                            >
+                                                <Accordion.Trigger
+                                                    class="flex w-full items-center justify-between rounded-lg border border-green-200 p-3 hover:bg-green-50/30 bg-green-50/10 text-green-800"
+                                                >
+                                                    <div
+                                                        class="flex items-center gap-2"
+                                                    >
+                                                        <BookOpen
+                                                            class="h-4 w-4"
+                                                        />
+                                                        <span
+                                                            class="font-medium"
+                                                            >Educational
+                                                            Resources</span
+                                                        >
+                                                    </div>
+                                                </Accordion.Trigger>
+                                                <Accordion.Content
+                                                    class="data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up overflow-hidden transition-all duration-300 ease-out pt-2"
+                                                >
+                                                    <EducationalResourcesCard />
+                                                </Accordion.Content>
+                                            </Accordion.Item>
+                                        </Accordion.Root>
+                                    </div>
                                 {:else}
                                     <p class="text-sm">
                                         {feedback[
