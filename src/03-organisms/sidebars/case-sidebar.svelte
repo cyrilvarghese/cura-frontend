@@ -278,6 +278,7 @@
                     <Button
                         onclick={handleNextClick}
                         variant="default"
+                        id="next-button"
                         class="flex items-center justify-center gap-2"
                     >
                         {#if currentStep === "diagnosis"}

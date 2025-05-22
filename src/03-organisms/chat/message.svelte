@@ -16,7 +16,8 @@
     import FeedbackCard from "./chat-cards/feedback-card.svelte";
     import PreTreatmentCard from "./chat-cards/pre-treatment-card.svelte";
     import TreatmentProtocolCard from "./chat-cards/treatment-protocol-card.svelte";
-    import FeedbackStepsCard from "./chat-cards/feedback-steps-card.svelte";
+    import FeedbackStepsCard from "./chat-cards/feedback-diagnosis-card.svelte";
+    import FeedbackProtocolCard from "./chat-cards/feedback-treatment-protocol-card.svelte";
     import { onMount, onDestroy } from "svelte";
     const { message } = $props<{ message: Message }>();
 
@@ -139,6 +140,7 @@
         "pre-treatment": () => PreTreatmentCard,
         "treatment-protocol": () => TreatmentProtocolCard,
         "feedback-steps": () => FeedbackStepsCard,
+        "feedback-protocol": () => FeedbackProtocolCard,
     } as const;
 
     function getComponentProps(msg: Message) {
@@ -187,6 +189,10 @@
                     aetcomFeedback: msg.content.aetcomFeedback,
                     diagnosisFeedback: msg.content.diagnosisFeedback,
                 };
+            case "feedback-protocol":
+                return {
+                    feedback: msg.content,
+                };
             default:
                 return {};
         }
@@ -208,7 +214,10 @@
         {/if}
 
         <div
-            class={message.type === "feedback-steps" ? "w-full" : "max-w-[80%]"}
+            class={message.type === "feedback-steps" ||
+            message.type === "feedback-protocol"
+                ? "w-full"
+                : "max-w-[80%]"}
         >
             {#if message.type === "image"}
                 <div

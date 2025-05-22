@@ -74,6 +74,16 @@
                         </div>
                     {/if}
 
+                    <!-- Indications -->
+                    {#if medication.feedback.details.indication}
+                        <div class="bg-green-50 p-3 rounded-md">
+                            <h4 class="font-medium text-sm mb-1">Indication</h4>
+                            <p class="text-sm">
+                                {medication.feedback.details.indication}
+                            </p>
+                        </div>
+                    {/if}
+
                     <!-- Mechanism -->
                     <div class="bg-gray-50 p-3 rounded-md">
                         <h4 class="font-medium text-sm mb-1">
@@ -99,6 +109,32 @@
                         <div class="p-2 bg-yellow-50 rounded-md text-sm">
                             <span class="font-medium">Memory tip:</span>
                             {medication.feedback.details.mechanism.memory_tip}
+                        </div>
+                    {/if}
+
+                    <!-- Adverse Effects -->
+                    {#if medication.feedback.details.adverse_effects}
+                        <div class="bg-red-50 p-3 rounded-md">
+                            <h4 class="font-medium text-sm mb-1">
+                                Adverse Effects
+                            </h4>
+                            <p class="text-sm flex items-start">
+                                <span class="mr-2 text-base">⚠️</span>
+                                {medication.feedback.details.adverse_effects}
+                            </p>
+                        </div>
+                    {/if}
+
+                    <!-- Contraindications -->
+                    {#if medication.feedback.details.contraindications}
+                        <div class="bg-red-50 p-3 rounded-md">
+                            <h4 class="font-medium text-sm mb-1">
+                                Contraindications
+                            </h4>
+                            <p class="text-sm flex items-start">
+                                <span class="mr-2 text-base">🚫</span>
+                                {medication.feedback.details.contraindications}
+                            </p>
                         </div>
                     {/if}
 

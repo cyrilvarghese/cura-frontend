@@ -160,11 +160,11 @@ export async function sendMessage(
     content: string | TestResult | ExaminationResult | FeedbackResponse | HistoryAnalysisResponse | HistoryDomainResponse | FeedbackButtonsState,
     role: 'student' | 'assistant' | 'patient',
     step: string,
-    type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'pre-treatment' | 'treatment-protocol' | 'feedback-buttons' | 'feedback' | 'feedback-steps' = 'text'
+    type: 'text' | 'image' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'pre-treatment' | 'treatment-protocol' | 'feedback-buttons' | 'feedback' | 'feedback-steps' | 'feedback-protocol' = 'text'
 ): Promise<string> {
     const messageId = crypto.randomUUID();
 
-    let messageContent = type === 'feedback-steps'
+    let messageContent = type === 'feedback-steps' || type === 'feedback-protocol'
         ? content
         : typeof content === 'object' && content !== null
             ? ('testName' in content

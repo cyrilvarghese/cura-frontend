@@ -38,7 +38,7 @@ export interface Message {
     content: string | TestResult | ExaminationResult | FeedbackResponse | FeedbackState;
     step: string;
     timestamp: Date;
-    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-steps';
+    type?: 'text' | 'image' | 'loading' | 'test-result' | 'examination' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-steps' | 'feedback-protocol';
     imageUrl?: string;
     title?: string;
 }
@@ -47,7 +47,7 @@ export type StudentMessage = {
     content: string;
     step: string;
     timestamp: Date;
-    type?: 'examination' | 'test-result' | 'text' | 'image' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-buttons' | 'feedback-steps';
+    type?: 'examination' | 'test-result' | 'text' | 'image' | 'diagnosis' | 'relevant-info' | 'final-diagnosis' | 'feedback' | 'treatment-protocol' | 'pre-treatment' | 'feedback-buttons' | 'feedback-steps' | 'feedback-protocol';
 };
 
 export interface ExaminationResult {

@@ -84,9 +84,7 @@
             loadingStates.diagnosis = true;
 
             // Diagnosis feedback
-            const diagnosisFeedback =
-                await feedbackStore.getDiagnosisFeedback();
-            feedback.diagnosis = diagnosisFeedback;
+
             loadingStates.diagnosis = false;
             completedStates.diagnosis = true;
             // Add diagnosis to open accordions
@@ -108,7 +106,7 @@
 
     function handleTreatmentPlanClick() {
         // Find the pre-treatment button by ID and click it
-        const button = document.getElementById("treatment-plan");
+        const button = document.getElementById("next-button");
         if (button) {
             button.click();
         }
@@ -186,7 +184,7 @@
                                     <AETCOMFeedbackContent
                                         feedback={feedback.aetcom}
                                     />
-                                {:else if step === "diagnosis" && feedback.diagnosis?.feedback_result}
+                                {:else if step === "diagnosis"}
                                     <!-- Diagnosis Feedback with nested accordions -->
                                     <div class="space-y-4">
                                         <Accordion.Root
@@ -285,14 +283,14 @@
                 {/each}
             </Accordion.Root>
 
-            <!-- <Button
+            <Button
                 variant="default"
                 disabled={!completedStates.diagnosis}
                 onclick={handleTreatmentPlanClick}
             >
                 Ready for Treatment Plan
                 <ArrowRight class="h-4 w-4" />
-            </Button> -->
+            </Button>
         </div>
     </Card.Content>
 </Card.Root>

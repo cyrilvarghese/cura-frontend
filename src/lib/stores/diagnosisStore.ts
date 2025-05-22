@@ -11,6 +11,7 @@ function createDiagnosisStore() {
         recordDiagnosis: async (caseId: string, diagnoses: Diagnosis[]) => {
             try {
                 const primaryDiagnosis = diagnoses.find(d => d.status === 'primary');
+
                 if (!primaryDiagnosis || !primaryDiagnosis.justification) {
                     throw new Error('Primary diagnosis with justification is required');
                 }
@@ -19,10 +20,15 @@ function createDiagnosisStore() {
                     .filter(d => d.status === 'differential')
                     .map(d => d.text);
 
+                const incorrectDifferentials = diagnoses
+                    .filter(d => d.status === 'ruled-out')
+                    .map(d => d.text);
+
                 const response = await diagnosisService.recordDiagnosis({
                     case_id: caseId,
                     primary_diagnosis: primaryDiagnosis.text,
                     reason: primaryDiagnosis.justification,
+                    incorrect_differentials: incorrectDifferentials,
                     differentials
                 });
 

@@ -1160,7 +1160,7 @@
                             <!-- After the fun fact section -->
                             <div class="mt-4 flex flex-col space-y-3">
                                 <!-- See what others scored button -->
-                                <Button
+                                <!-- <Button
                                     variant="outline"
                                     class="w-full bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200"
                                     onclick={(e) => {
@@ -1179,7 +1179,7 @@
                                         <BarChart class="mr-2 h-4 w-4" />
                                         See how you compare to others
                                     {/if}
-                                </Button>
+                                </Button> -->
 
                                 <!-- Debug information during development -->
 

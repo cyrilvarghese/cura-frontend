@@ -6,6 +6,7 @@
     import { sendMessage } from "$lib/stores/apiStore";
     import { Checkbox } from "$lib/components/ui/checkbox";
     import { treatmentProtocolStore } from "$lib/stores/treatmentProtocolStore";
+    import { treatmentFeedbackStore } from "$lib/stores/treatmentFeedbackStore";
     import MedicationItem from "../../02-molecules/medication-item.svelte";
     import type { TreatmentFeedback } from "$lib/services/treatmentProtocolService";
 
@@ -134,6 +135,7 @@
             const response =
                 await treatmentProtocolStore.recordTreatmentPlan(treatmentPlan);
 
+            // Send the treatment protocol message
             await sendMessage(
                 JSON.stringify(
                     {
@@ -146,6 +148,21 @@
                 "student",
                 "treatment-protocol",
                 "treatment-protocol",
+            );
+
+            // Get treatment protocol feedback from our new store
+            const feedbackResponse =
+                await treatmentFeedbackStore.getTreatmentFeedback(
+                    treatmentPlan,
+                );
+
+            // Send the feedback message to display our new component
+            debugger;
+            await sendMessage(
+                feedbackResponse,
+                "assistant",
+                "treatment-feedback",
+                "feedback-protocol",
             );
 
             onSubmit();
