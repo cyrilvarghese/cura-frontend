@@ -14,18 +14,20 @@ export interface PrimaryDiagnosisFeedback {
             allSupportingEvidence: {
                 history: Array<{
                     desc: string;
-                    alignsWithKeyEvidence: string;
+                    alignsWithKeyEvidence: string | null;
                     studentDidIdentify: boolean;
                 }>;
                 exams: Array<{
                     name: string;
                     expectedFindingSupportingDx: string;
+                    alignsWithKeyEvidence: string;
                     studentDidPerform: boolean;
                     studentDidIdentifyFinding: boolean;
                 }>;
                 tests: Array<{
                     name: string;
                     expectedResultSupportingDx: string;
+                    alignsWithKeyEvidence: string | null;
                     studentDidOrder: boolean;
                     studentDidIdentifyResult: boolean;
                 }>;
@@ -54,8 +56,16 @@ export interface PrimaryDiagnosisFeedback {
             missedLabs: Array<{
                 testName: string;
                 relevance: string;
+                educationalTip: string | null;
             }>;
         };
+        idealDiagnosticTimeline: Array<{
+            stepNumber: number;
+            type: string;
+            actionDescription: string;
+            rationaleTags: string[];
+            detailedRationale: string;
+        }>;
     };
 }
 

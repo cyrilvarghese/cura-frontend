@@ -5,6 +5,7 @@ export interface DiagnosisRequest {
     case_id: string;
     primary_diagnosis: string;
     reason: string;
+    incorrect_differentials: string[];
     differentials: string[];
 }
 

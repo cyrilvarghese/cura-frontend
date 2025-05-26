@@ -36,6 +36,10 @@ export interface DrugDetails {
     teaching_tagline: string;
     why_in_this_case: string;
     dose_adjustment?: string;
+    indication?: string;
+    contraindications?: string;
+    adverse_effects?: string;
+    contraindicated_drugs?: string[];
 }
 
 export interface TreatmentFeedback {

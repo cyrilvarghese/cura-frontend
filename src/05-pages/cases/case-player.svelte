@@ -51,7 +51,7 @@
     let showOSCE = $state(false);
 
     // Single state to track current step
-    let currentStep = $state("treatment-protocol"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
+    let currentStep = $state("final-diagnosis"); // Possible values: 'relevant-info', 'diagnosis', 'final-diagnosis', 'end-case'
 
     let isEndCaseLoading = $state(false);
 
@@ -461,8 +461,9 @@
                     {/if}
 
                     <!-- component which has tags like converstation starters in a chat -->
-                    <ConversationStarters />
-
+                    {#if currentStep !== "treatment-protocol" && currentStep !== "end-case"}
+                        <ConversationStarters />
+                    {/if}
                     <div class="pl-0 pt-6 h-10" id="scroll-target"></div>
                 </div>
             </ScrollArea>
@@ -472,9 +473,14 @@
             </div>
         </div>
 
-        <div class="bg-muted/10 rounded-xl w-[40%] h-full">
-            <CaseSidebar {currentStep} onNextClick={handleNextStep} />
-        </div>
+        {#if currentStep !== "treatment-protocol" && currentStep !== "end-case"}
+            <div
+                class="bg-muted/10 rounded-xl w-[40%] h-full"
+                id="case-sidebar-container"
+            >
+                <CaseSidebar {currentStep} onNextClick={handleNextStep} />
+            </div>
+        {/if}
     </div>
 
     <RelevantInfoDialog

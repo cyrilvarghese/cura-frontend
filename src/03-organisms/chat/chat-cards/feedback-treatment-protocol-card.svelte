@@ -18,6 +18,7 @@
     import { fade, slide } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
     import type { TreatmentProtocolFeedback } from "$lib/services/treatmentFeedbackService";
+    import DrugDetailsPopover from "../../../03-molecules/drug-details-popover.svelte";
 
     // Accept the feedback as a prop
     const { feedback } = $props<{ feedback: TreatmentProtocolFeedback }>();
@@ -166,10 +167,9 @@
                                                 <Pill
                                                     class="h-4 w-4 text-blue-700"
                                                 />
-                                                <span
-                                                    class="font-medium text-blue-800"
-                                                    >{drug.drug_name}</span
-                                                >
+                                                <DrugDetailsPopover
+                                                    drugName={drug.drug_name}
+                                                />
                                             </div>
                                             <p
                                                 class="text-sm text-blue-700 ml-6"
@@ -264,10 +264,9 @@
                                                     <Pill
                                                         class="h-4 w-4 text-green-700"
                                                     />
-                                                    <span
-                                                        class="font-medium text-green-800"
-                                                        >{drug.drug_name}</span
-                                                    >
+                                                    <DrugDetailsPopover
+                                                        drugName={drug.drug_name}
+                                                    />
                                                     <span
                                                         class="text-xs text-green-700"
                                                         >({drug.details_brief})</span

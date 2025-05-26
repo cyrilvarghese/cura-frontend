@@ -15,7 +15,9 @@
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { onMount } from "svelte";
     import { primaryDiagnosisStore } from "$lib/stores/primaryDiagnosisFeedbackStore";
-
+    import MissedExamsDialog from "$lib/../03-organisms/dialogs/MissedExamsDialog.svelte";
+    import MissedLabsDialog from "$lib/../03-organisms/dialogs/MissedLabsDialog.svelte";
+    import DiagnosticTimeline from "./DiagnosticTimeline.svelte";
     // Optional props
     const { caseId = undefined } = $props();
 
@@ -86,26 +88,27 @@
                 </p>
             </div>
 
-            <!-- Scores Section -->
-            <div>
+            <!-- Performance Scores as a grid of cards -->
+            <div class="mb-8">
                 <h4 class="font-medium mb-3">Performance Scores</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex flex-wrap gap-[60px] justify-start">
+                    <!-- Accuracy Card -->
                     <div
-                        class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                        class="w-80 bg-blue-50 border border-blue-100 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                     >
                         <div
-                            class="bg-blue-50 px-4 py-3 border-b border-blue-100"
+                            class="px-4 py-3 border-b border-blue-100 flex justify-between items-center"
                         >
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-blue-800"
-                                    >Accuracy</span
-                                >
-                                <span class="font-bold text-blue-800"
-                                    >{primaryDiagnosisFeedback.primaryDxFeedback
-                                        .scores.accuracyScore}/5</span
-                                >
-                            </div>
-                            <div class="flex mt-1">
+                            <span class="font-medium text-blue-800"
+                                >Accuracy</span
+                            >
+                            <span class="font-bold text-blue-800">
+                                {primaryDiagnosisFeedback.primaryDxFeedback
+                                    .scores.accuracyScore}/5
+                            </span>
+                        </div>
+                        <div class="px-4 py-3">
+                            <div class="flex mb-2">
                                 {#each Array(5) as _, i}
                                     <span class="text-blue-500">
                                         {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.accuracyScore}
@@ -118,8 +121,6 @@
                                     </span>
                                 {/each}
                             </div>
-                        </div>
-                        <div class="p-4">
                             <p class="text-sm text-gray-700">
                                 {primaryDiagnosisFeedback.primaryDxFeedback
                                     .scores.accuracyExplanation}
@@ -127,22 +128,23 @@
                         </div>
                     </div>
 
+                    <!-- Evidence Gathering Card -->
                     <div
-                        class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                        class="w-80 bg-red-50 border border-red-100 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                     >
                         <div
-                            class="bg-red-50 px-4 py-3 border-b border-red-100"
+                            class="px-4 py-3 border-b border-red-100 flex justify-between items-center"
                         >
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-red-800"
-                                    >Evidence Gathering</span
-                                >
-                                <span class="font-bold text-red-800"
-                                    >{primaryDiagnosisFeedback.primaryDxFeedback
-                                        .scores.evidenceGatheringScore}/5</span
-                                >
-                            </div>
-                            <div class="flex mt-1">
+                            <span class="font-medium text-red-800"
+                                >Evidence Gathering</span
+                            >
+                            <span class="font-bold text-red-800">
+                                {primaryDiagnosisFeedback.primaryDxFeedback
+                                    .scores.evidenceGatheringScore}/5
+                            </span>
+                        </div>
+                        <div class="px-4 py-3">
+                            <div class="flex mb-2">
                                 {#each Array(5) as _, i}
                                     <span class="text-red-500">
                                         {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScore}
@@ -155,116 +157,44 @@
                                     </span>
                                 {/each}
                             </div>
-                        </div>
-                        <div class="p-4">
-                            <div class="space-y-3">
+                            <div class="space-y-2">
                                 <p class="text-sm text-gray-700 font-medium">
                                     {primaryDiagnosisFeedback.primaryDxFeedback
                                         .scores.evidenceGatheringExplanation
                                         .overallSummary}
                                 </p>
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.historyStrengths.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-blue-700 font-medium"
-                                        >
-                                            History Strengths:
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-700 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.historyStrengths as strength}
-                                                <li>{strength}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.examStrengths.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-blue-700 font-medium"
-                                        >
-                                            Exam Strengths:
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-700 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.examStrengths as strength}
-                                                <li>{strength}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.testStrengths.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-blue-700 font-medium"
-                                        >
-                                            Test Strengths:
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-700 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.testStrengths as strength}
-                                                <li>{strength}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-red-700 font-medium"
-                                        >
-                                            Areas for Improvement (Exams):
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-700 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams as area}
-                                                <li>{area}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-red-700 font-medium"
-                                        >
-                                            Areas for Improvement (Tests):
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-700 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests as area}
-                                                <li>{area}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
-
-                                {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.irrelevantActionsNoted.length > 0}
-                                    <div>
-                                        <p
-                                            class="text-sm text-gray-500 font-medium"
-                                        >
-                                            Irrelevant Actions Noted:
-                                        </p>
-                                        <ul
-                                            class="mt-1 pl-4 text-sm text-gray-500 list-disc"
-                                        >
-                                            {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.irrelevantActionsNoted as action}
-                                                <li>{action}</li>
-                                            {/each}
-                                        </ul>
-                                    </div>
-                                {/if}
+                                <!-- {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams.length > 0}
+                                        <div>
+                                            <p
+                                                class="text-sm text-red-700 font-medium"
+                                            >
+                                                Areas for Improvement (Exams):
+                                            </p>
+                                            <ul
+                                                class="mt-1 pl-4 text-sm text-gray-700 list-disc"
+                                            >
+                                                {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams as area}
+                                                    <li>{area}</li>
+                                                {/each}
+                                            </ul>
+                                        </div>
+                                    {/if}
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests.length > 0}
+                                        <div>
+                                            <p
+                                                class="text-sm text-red-700 font-medium"
+                                            >
+                                                Areas for Improvement (Tests):
+                                            </p>
+                                            <ul
+                                                class="mt-1 pl-4 text-sm text-gray-700 list-disc"
+                                            >
+                                                {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests as area}
+                                                    <li>{area}</li>
+                                                {/each}
+                                            </ul>
+                                        </div>
+                                    {/if} -->
                             </div>
                         </div>
                     </div>
@@ -274,270 +204,193 @@
             <!-- Supporting Evidence -->
             <div class="space-y-4">
                 <h4 class="font-medium mb-1">Supporting Evidence</h4>
-
-                <!-- History Evidence -->
-                <div>
-                    <h5
-                        class="text-sm font-medium mb-2 flex items-center gap-1 text-blue-700"
-                    >
-                        <FileText class="w-4 h-4" />
-                        Patient History
-                    </h5>
+                <div class="flex flex-wrap gap-[60px] justify-start">
+                    <!-- History Evidence Card -->
                     <div
-                        class="bg-blue-50/50 p-4 rounded-md border border-blue-100"
+                        class="w-80 bg-blue-50/50 p-0 rounded-md border flex flex-col items-start border-blue-100 shadow-sm"
                     >
-                        <ul class="space-y-3">
-                            {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.history as item}
-                                <li class="flex gap-2">
-                                    <div class="mt-0.5">
-                                        {#if item.studentDidIdentify}
-                                            <div
-                                                class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <CheckCircle class="w-4 h-4" />
-                                            </div>
-                                        {:else}
-                                            <div
-                                                class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <AlertCircle class="w-4 h-4" />
-                                            </div>
-                                        {/if}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium">
-                                            {item.desc}
-                                        </p>
-                                        <p class="text-xs text-gray-600 mt-0.5">
-                                            {item.alignsWithKeyEvidence}
-                                        </p>
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Physical Exams Evidence -->
-                <div>
-                    <h5
-                        class="text-sm font-medium mb-2 flex items-center gap-1 text-blue-700"
-                    >
-                        <Stethoscope class="w-4 h-4" />
-                        Physical Examinations
-                    </h5>
-                    <div
-                        class="bg-gray-50 p-4 rounded-md border border-gray-200"
-                    >
-                        <ul class="space-y-3">
-                            {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.exams as item}
-                                <li class="flex gap-2">
-                                    <div class="mt-0.5">
-                                        {#if item.studentDidPerform}
-                                            <div
-                                                class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <CheckCircle class="w-4 h-4" />
-                                            </div>
-                                        {:else}
-                                            <div
-                                                class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <AlertCircle class="w-4 h-4" />
-                                            </div>
-                                        {/if}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium">
-                                            {item.name}
-                                        </p>
-                                        <p class="text-xs text-gray-600 mt-0.5">
-                                            Finding: {item.expectedFindingSupportingDx}
-                                        </p>
-                                        {#if item.studentDidPerform && !item.studentDidIdentifyFinding}
-                                            <p
-                                                class="text-xs text-red-700 mt-0.5 italic"
-                                            >
-                                                You performed this exam but
-                                                didn't identify the key finding.
+                        <div
+                            class="px-4 py-3 w-full border-b border-gray-200 flex items-center gap-1 text-blue-700 font-medium"
+                        >
+                            <FileText class="w-4 h-4" />
+                            Patient History
+                        </div>
+                        <div class="p-4">
+                            <ul class="space-y-3">
+                                {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.history as item}
+                                    <li class="flex gap-2">
+                                        <div class="mt-0.5">
+                                            {#if item.studentDidIdentify}
+                                                <div
+                                                    class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <CheckCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {:else}
+                                                <div
+                                                    class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <AlertCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {/if}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">
+                                                {item.desc}
                                             </p>
-                                        {/if}
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Lab Tests Evidence -->
-                <div>
-                    <h5
-                        class="text-sm font-medium mb-2 flex items-center gap-1 text-blue-700"
-                    >
-                        <ClipboardList class="w-4 h-4" />
-                        Laboratory Tests
-                    </h5>
-                    <div
-                        class="bg-gray-50 p-4 rounded-md border border-gray-200"
-                    >
-                        <ul class="space-y-3">
-                            {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.tests as item}
-                                <li class="flex gap-2">
-                                    <div class="mt-0.5">
-                                        {#if item.studentDidOrder}
-                                            <div
-                                                class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <CheckCircle class="w-4 h-4" />
-                                            </div>
-                                        {:else}
-                                            <div
-                                                class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
-                                            >
-                                                <AlertCircle class="w-4 h-4" />
-                                            </div>
-                                        {/if}
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium">
-                                            {item.name}
-                                        </p>
-                                        <p class="text-xs text-gray-600 mt-0.5">
-                                            Expected Result: {item.expectedResultSupportingDx}
-                                        </p>
-                                        {#if item.studentDidOrder && !item.studentDidIdentifyResult}
                                             <p
-                                                class="text-xs text-red-700 mt-0.5 italic"
+                                                class="text-xs text-gray-600 mt-0.5"
                                             >
-                                                You ordered this test but didn't
-                                                interpret the result correctly.
+                                                {item.alignsWithKeyEvidence}
                                             </p>
-                                        {/if}
-                                    </div>
-                                </li>
-                            {/each}
-                        </ul>
+                                        </div>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Physical Exams Evidence Card -->
+                    <div
+                        class="w-80 bg-gray-50 p-0 rounded-md border border-gray-200 shadow-sm"
+                    >
+                        <div
+                            class="px-4 py-3 border-b border-gray-200 flex items-center gap-1 text-blue-700 font-medium"
+                        >
+                            <Stethoscope class="w-4 h-4" />
+                            Physical Examinations
+                        </div>
+                        <div class="p-4">
+                            <ul class="space-y-3">
+                                {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.exams as item}
+                                    <li class="flex gap-2">
+                                        <div class="mt-0.5">
+                                            {#if item.studentDidPerform}
+                                                <div
+                                                    class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <CheckCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {:else}
+                                                <div
+                                                    class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <AlertCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {/if}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">
+                                                {item.name}
+                                            </p>
+                                            <p
+                                                class="text-xs text-gray-600 mt-0.5"
+                                            >
+                                                Finding: {item.expectedFindingSupportingDx}
+                                            </p>
+                                            {#if item.studentDidPerform && !item.studentDidIdentifyFinding}
+                                                <p
+                                                    class="text-xs text-red-700 mt-0.5 italic"
+                                                >
+                                                    You performed this exam but
+                                                    didn't identify the key
+                                                    finding.
+                                                </p>
+                                            {/if}
+                                        </div>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Lab Tests Evidence Card -->
+                    <div
+                        class="w-80 bg-gray-50 p-0 rounded-md border border-gray-200 shadow-sm"
+                    >
+                        <div
+                            class="px-4 py-3 border-b border-gray-200 flex items-center gap-1 text-blue-700 font-medium"
+                        >
+                            <ClipboardList class="w-4 h-4" />
+                            Laboratory Tests
+                        </div>
+                        <div class="p-4">
+                            <ul class="space-y-3">
+                                {#each primaryDiagnosisFeedback.primaryDxFeedback.correctPrimary.allSupportingEvidence.tests as item}
+                                    <li class="flex gap-2">
+                                        <div class="mt-0.5">
+                                            {#if item.studentDidOrder}
+                                                <div
+                                                    class="w-5 h-5 bg-green-100 text-green-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <CheckCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {:else}
+                                                <div
+                                                    class="w-5 h-5 bg-red-100 text-red-700 rounded-full flex items-center justify-center"
+                                                >
+                                                    <AlertCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                </div>
+                                            {/if}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">
+                                                {item.name}
+                                            </p>
+                                            <p
+                                                class="text-xs text-gray-600 mt-0.5"
+                                            >
+                                                Expected Result: {item.expectedResultSupportingDx}
+                                            </p>
+                                            {#if item.studentDidOrder && !item.studentDidIdentifyResult}
+                                                <p
+                                                    class="text-xs text-red-700 mt-0.5 italic"
+                                                >
+                                                    You ordered this test but
+                                                    didn't interpret the result
+                                                    correctly.
+                                                </p>
+                                            {/if}
+                                        </div>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <!-- Missed Exams -->
             {#if primaryDiagnosisFeedback.primaryDxFeedback.missedCrucialEvidence.missedExams.length > 0}
-                <div>
-                    <Accordion.Root type="single">
-                        <Accordion.Item
-                            value="missed-exams"
-                            class="border-none"
-                        >
-                            <Accordion.Trigger
-                                class="py-3 bg-amber-50 justify-start px-4 text-amber-800 font-medium text-base flex items-center gap-2 rounded-t-md"
-                            >
-                                <AlertCircle class="w-5 h-5" />
-                                Missed Physical Exams ({primaryDiagnosisFeedback
-                                    .primaryDxFeedback.missedCrucialEvidence
-                                    .missedExams.length})
-                            </Accordion.Trigger>
-                            <Accordion.Content
-                                class="border-x border-b border-amber-200 rounded-b-md p-4"
-                            >
-                                <ul class="space-y-4">
-                                    {#each primaryDiagnosisFeedback.primaryDxFeedback.missedCrucialEvidence.missedExams as item}
-                                        <li
-                                            class="border-l-4 border-amber-400 pl-4 py-2"
-                                        >
-                                            <div
-                                                class="flex items-center gap-2 mb-2"
-                                            >
-                                                <span
-                                                    class="font-semibold text-base"
-                                                    >{item.name}</span
-                                                >
-                                                <Badge
-                                                    variant="outline"
-                                                    class="border-amber-300 text-amber-800"
-                                                    >Key exam</Badge
-                                                >
-                                            </div>
-                                            <p
-                                                class="text-gray-700 text-sm mb-2"
-                                            >
-                                                <span
-                                                    class="font-medium text-amber-700"
-                                                    >Relevance:</span
-                                                >
-                                                {item.relevance}
-                                            </p>
-                                            {#if item.educationalTip}
-                                                <p
-                                                    class="text-blue-700 text-sm italic"
-                                                >
-                                                    <span class="font-medium"
-                                                        >Tip:</span
-                                                    >
-                                                    {item.educationalTip}
-                                                </p>
-                                            {/if}
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </Accordion.Content>
-                        </Accordion.Item>
-                    </Accordion.Root>
-                </div>
+                <MissedExamsDialog
+                    missedExams={primaryDiagnosisFeedback.primaryDxFeedback
+                        .missedCrucialEvidence.missedExams}
+                />
             {/if}
 
             <!-- Missed Labs -->
             {#if primaryDiagnosisFeedback.primaryDxFeedback.missedCrucialEvidence.missedLabs && primaryDiagnosisFeedback.primaryDxFeedback.missedCrucialEvidence.missedLabs.length > 0}
-                <div>
-                    <Accordion.Root type="single">
-                        <Accordion.Item value="missed-labs" class="border-none">
-                            <Accordion.Trigger
-                                class="py-3 bg-amber-50 justify-start px-4 text-amber-800 font-medium text-base flex items-center gap-2 rounded-t-md"
-                            >
-                                <AlertCircle class="w-5 h-5" />
-                                Missed Lab Tests ({primaryDiagnosisFeedback
-                                    .primaryDxFeedback.missedCrucialEvidence
-                                    .missedLabs.length})
-                            </Accordion.Trigger>
-                            <Accordion.Content
-                                class="border-x border-b border-amber-200 rounded-b-md p-4"
-                            >
-                                <ul class="space-y-4">
-                                    {#each primaryDiagnosisFeedback.primaryDxFeedback.missedCrucialEvidence.missedLabs as item}
-                                        <li
-                                            class="border-l-4 border-amber-400 pl-4 py-2"
-                                        >
-                                            <div
-                                                class="flex items-center gap-2 mb-2"
-                                            >
-                                                <span
-                                                    class="font-semibold text-base"
-                                                    >{item.testName}</span
-                                                >
-                                                <Badge
-                                                    variant="outline"
-                                                    class="border-amber-300 text-amber-800"
-                                                    >Key test</Badge
-                                                >
-                                            </div>
-                                            {#if item.relevance}
-                                                <p
-                                                    class="text-gray-700 text-sm mb-2"
-                                                >
-                                                    <span
-                                                        class="font-medium text-amber-700"
-                                                        >Relevance:</span
-                                                    >
-                                                    {item.relevance}
-                                                </p>
-                                            {/if}
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </Accordion.Content>
-                        </Accordion.Item>
-                    </Accordion.Root>
-                </div>
+                <MissedLabsDialog
+                    missedLabs={primaryDiagnosisFeedback.primaryDxFeedback
+                        .missedCrucialEvidence.missedLabs}
+                />
+            {/if}
+
+            <!-- Diagnostic Timeline -->
+            {@debug primaryDiagnosisFeedback}
+            {#if primaryDiagnosisFeedback?.primaryDxFeedback?.idealDiagnosticTimeline}
+                <DiagnosticTimeline {primaryDiagnosisFeedback} />
             {/if}
         </div>
     {:else}

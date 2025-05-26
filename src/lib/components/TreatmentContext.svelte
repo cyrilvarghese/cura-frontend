@@ -239,140 +239,94 @@
                 </h3>
             </div>
             <div class="p-5">
-                <!-- First Line -->
-                <div class="mb-10">
-                    <h4
-                        class="text-lg font-medium mb-3 text-gray-700 dark:text-gray-300 flex items-center gap-2"
-                    >
-                        <PlusSquare class="h-5 w-5" />
-                        First Line
-                    </h4>
-                    <div class="space-y-3">
-                        {#each treatmentContext.content.treatment_plan.first_line as treatment}
-                            <div
-                                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border border-gray-500 dark:border-gray-500 dark:border-l-4 overflow-hidden hover:shadow-md transition-shadow"
-                            >
-                                <div class="p-4">
-                                    <div
-                                        class="flex flex-row items-center justify-between"
-                                    >
+                {#each Object.entries(treatmentContext.content.treatment_plan) as [planType, treatments]}
+                    <div class="mb-10">
+                        <h4
+                            class="text-lg font-medium mb-3 flex items-center gap-2"
+                            class:text-red-600={planType === "contraindicated"}
+                            class:dark:text-red-400={planType ===
+                                "contraindicated"}
+                            class:text-gray-700={planType !== "contraindicated"}
+                            class:dark:text-gray-300={planType !==
+                                "contraindicated"}
+                        >
+                            {#if planType === "first_line"}
+                                <PlusSquare class="h-5 w-5" />
+                                First Line
+                            {:else if planType === "second_line"}
+                                <Flame class="h-5 w-5" />
+                                Second Line
+                            {:else if planType === "escalation"}
+                                <Flame class="h-5 w-5" />
+                                Escalation Therapy
+                            {:else if planType === "contraindicated"}
+                                <Ban class="h-5 w-5" />
+                                Contraindicated
+                            {:else}
+                                <Pill class="h-5 w-5" />
+                                {planType
+                                    .replace(/_/g, " ")
+                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                            {/if}
+                        </h4>
+                        <div class="space-y-3">
+                            {#each treatments as treatment}
+                                <div
+                                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border overflow-hidden hover:shadow-md transition-shadow"
+                                    class:border-red-400={planType ===
+                                        "contraindicated"}
+                                    class:dark:border-red-500={planType ===
+                                        "contraindicated"}
+                                    class:border-gray-500={planType !==
+                                        "contraindicated"}
+                                    class:dark:border-gray-500={planType !==
+                                        "contraindicated"}
+                                >
+                                    <div class="p-4">
                                         <div
-                                            class="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-semibold text-lg"
+                                            class="flex flex-row items-center justify-between"
                                         >
-                                            <Link
-                                                class="h-5 w-5 text-gray-700"
-                                            />
-                                            {treatment.drug_name}
-                                        </div>
-                                        <div
-                                            class="text-gray-600 dark:text-gray-300"
-                                        >
-                                            {treatment.details}
-                                        </div>
-                                    </div>
-                                    {#if treatment.rationale}
-                                        <div class="mt-2 text-sm text-gray-500">
-                                            <span class="font-medium"
-                                                >Rationale:</span
+                                            <div
+                                                class="flex items-center gap-2 font-semibold text-lg"
+                                                class:text-red-700={planType ===
+                                                    "contraindicated"}
+                                                class:dark:text-red-300={planType ===
+                                                    "contraindicated"}
+                                                class:text-gray-700={planType !==
+                                                    "contraindicated"}
+                                                class:dark:text-gray-300={planType !==
+                                                    "contraindicated"}
                                             >
-                                            {treatment.rationale}
-                                        </div>
-                                    {/if}
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-
-                <!-- Escalation -->
-                <div class="mb-10">
-                    <h4
-                        class="text-lg font-medium mb-3 text-gray-700 dark:text-gray-300 flex items-center gap-2"
-                    >
-                        <Flame class="h-5 w-5" />
-                        Escalation Therapy
-                    </h4>
-                    <div class="space-y-3">
-                        {#each treatmentContext.content.treatment_plan.escalation as treatment}
-                            <div
-                                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border border-gray-500 dark:border-gray-500 dark:border-l-4 overflow-hidden hover:shadow-md transition-shadow"
-                            >
-                                <div class="p-4">
-                                    <div
-                                        class="flex flex-row items-center justify-between"
-                                    >
-                                        <div
-                                            class="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-semibold text-lg"
-                                        >
-                                            <Link
-                                                class="h-5 w-5 text-gray-500"
-                                            />
-                                            {treatment.drug_name}
-                                        </div>
-                                        <div
-                                            class="text-gray-600 dark:text-gray-300"
-                                        >
-                                            {treatment.details}
-                                        </div>
-                                    </div>
-                                    {#if treatment.rationale}
-                                        <div class="mt-2 text-sm text-gray-500">
-                                            <span class="font-medium"
-                                                >Rationale:</span
+                                                <Link
+                                                    class="h-5 w-5 {planType ===
+                                                    'contraindicated'
+                                                        ? 'text-red-500'
+                                                        : 'text-gray-500'}"
+                                                />
+                                                {treatment.drug_name}
+                                            </div>
+                                            <div
+                                                class="text-gray-600 dark:text-gray-300"
                                             >
-                                            {treatment.rationale}
+                                                {treatment.details}
+                                            </div>
                                         </div>
-                                    {/if}
-                                </div>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-
-                <!-- Contraindicated -->
-                <div class="mb-10">
-                    <h4
-                        class="text-lg font-medium mb-3 text-red-600 dark:text-red-400 flex items-center gap-2"
-                    >
-                        <Ban class="h-5 w-5" />
-                        Contraindicated
-                    </h4>
-                    <div class="space-y-3">
-                        {#each treatmentContext.content.treatment_plan.contraindicated as treatment}
-                            <div
-                                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border border-red-400 dark:border-red-500 dark:border-l-4 overflow-hidden hover:shadow-md transition-shadow"
-                            >
-                                <div class="p-4">
-                                    <div
-                                        class="flex flex-row items-center justify-between"
-                                    >
-                                        <div
-                                            class="flex items-center gap-2 text-red-700 dark:text-red-300 font-semibold text-lg"
-                                        >
-                                            <Link
-                                                class="h-5 w-5 text-red-500"
-                                            />
-                                            {treatment.drug_name}
-                                        </div>
-                                        <div
-                                            class="text-gray-600 dark:text-gray-300"
-                                        >
-                                            {treatment.details}
-                                        </div>
-                                    </div>
-                                    {#if treatment.rationale}
-                                        <div class="mt-2 text-sm text-gray-500">
-                                            <span class="font-medium"
-                                                >Rationale:</span
+                                        {#if treatment.rationale}
+                                            <div
+                                                class="mt-2 text-sm text-gray-500"
                                             >
-                                            {treatment.rationale}
-                                        </div>
-                                    {/if}
+                                                <span class="font-medium"
+                                                    >Rationale:</span
+                                                >
+                                                {treatment.rationale}
+                                            </div>
+                                        {/if}
+                                    </div>
                                 </div>
-                            </div>
-                        {/each}
+                            {/each}
+                        </div>
                     </div>
-                </div>
+                {/each}
             </div>
         </div>
     </div>

@@ -83,7 +83,7 @@
                 <h2
                     class="text-xl font-semibold text-gray-800 text-center md:text-left"
                 >
-                    Overall Assessment
+                    Overall History Assessment
                 </h2>
                 <p class="text-gray-700 max-w-2xl text-center md:text-left">
                     {feedback.analysis_result.summary_feedback.score_reason}
@@ -141,7 +141,7 @@
     </div>
 
     <!-- Questions Asked Evaluation -->
-    {#if feedback.analysis_result.student_question_evaluation && feedback.analysis_result.student_question_evaluation.length > 0}
+    <!-- {#if feedback.analysis_result.student_question_evaluation && feedback.analysis_result.student_question_evaluation.length > 0}
         <div
             class="bg-white p-5 rounded-lg shadow-sm border-l-2 border-blue-200"
         >
@@ -182,7 +182,7 @@
                 {/each}
             </ul>
         </div>
-    {/if}
+    {/if} -->
 
     <!-- Critical Missed Areas -->
     <div class="space-y-4">
@@ -191,36 +191,24 @@
             Critical Missed Areas
         </h3>
 
-        <div class="grid grid-cols-1 gap-4">
+        <div class="flex flex-wrap gap-4">
             {#each feedback.analysis_result.critical_missed_areas as item, i}
                 <div
                     in:fade={{ delay: 100 * i, duration: 400 }}
-                    class="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    class="w-80 bg-red-50 border border-red-100 rounded-lg shadow-sm hover:shadow-md transition-shadow flex flex-col"
                 >
-                    <div class="bg-red-50 px-4 py-3 border-b border-red-100">
+                    <div class="px-4 py-3 border-b border-red-100">
                         <h4 class="font-medium text-red-800 capitalize">
                             {item.domain.replace(/_/g, " ")}
                         </h4>
                     </div>
-                    <div class="p-4 space-y-3">
-                        <div>
-                            <span class="text-sm font-medium text-gray-500"
-                                >Why it's important:</span
-                            >
-                            <p class="text-gray-700">
-                                {item.importance_reason}
-                            </p>
-                        </div>
-                        <div
-                            class="bg-blue-50 p-3 rounded-md border border-blue-100"
-                        >
-                            <span class="text-sm font-medium text-blue-700"
-                                >Example question you could have asked:</span
-                            >
-                            <p class="text-gray-700 italic mt-1">
-                                "{item.example_missed_question}"
-                            </p>
-                        </div>
+                    <div class="p-4 bg-white flex-1 flex flex-col">
+                        <span class="text-sm font-medium text-blue-700 mb-1">
+                            Example
+                        </span>
+                        <p class="text-gray-700 italic">
+                            "{item.example_missed_question}"
+                        </p>
                     </div>
                 </div>
             {/each}

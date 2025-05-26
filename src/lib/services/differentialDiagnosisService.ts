@@ -4,26 +4,29 @@ import mockDifferentialDxAnalysis from "$lib/data/feedback-p2.json";
 
 export interface DifferentialDiagnosisFeedback {
     differentialDxAnalysis: {
-        differentialListScore: number;
+        differentialListScore: string;
         differentialListExplanation: string;
         detailedAnalysis: Array<{
-            dx: string;
-            studentDidConsider: boolean;
-            isPlausibleDifferential_InContext: boolean;
-            reasoningDetail: {
-                summaryWhyNotPrimaryOrRuledOut_ForThisCase: string;
-                reasonRuledOutFromContext?: string;
-                differentiatingHistoryFromContext: Array<{
-                    desc: string;
-                    comparisonNote: string;
-                }>;
-                differentiatingLabsFromContext: Array<{
-                    testName: string;
-                    findingForThisDDx: string;
-                    comparisonNote: string;
-                }>;
-                educationalTip?: string;
-            }
+            type: "PrimaryDiagnosis" | "PlausibleDifferential" | "RuledOutDifferential";
+            dxName: string;
+            supportingFeatures_ThisCase?: {
+                history: string[];
+                exam: string[];
+                lab: string[];
+            };
+            studentDidConsiderAsPlausible?: boolean;
+            studentDidMarkAsIncorrect?: boolean | null;
+            differentiatingFeatures_General?: {
+                history: string[];
+                exam: string[];
+                lab: string[];
+            };
+            caseSpecificDifferentiation?: {
+                quickDifferentiatingTags_ThisCase: string[];
+                detailedExplanation_ThisCase: string;
+                educationalTip: string | null;
+            };
+            educationalTip?: string | null;
         }>;
     };
 }

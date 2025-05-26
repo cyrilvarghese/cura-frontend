@@ -26,7 +26,7 @@
     // Import all test data
     import physicalExams from "$lib/data/physical_exam.json";
     import labTests from "$lib/data/lab_test.json";
-    import { ScanEye, TestTubeDiagonal } from "lucide-svelte";
+    import { Stethoscope, FlaskConical } from "lucide-svelte";
 
     const { caseId, currentStep } = $props<{
         caseId?: string;
@@ -470,7 +470,7 @@
                             <p
                                 class="hover:underline text-blue-600 flex items-center"
                             >
-                                <ScanEye class="h-5 w-5 mr-2" />
+                                <Stethoscope class="h-5 w-5 mr-2" />
                                 <span class=" truncate text-left">
                                     {selectedValuePhysicalExams}
                                 </span>
@@ -519,7 +519,7 @@
             <!-- <h3 class="text-sm font-medium mb-2">Lab Tests</h3> -->
             <Popover.Root
                 bind:open={openLabTests}
-                onOpenChange={(open) => {
+                onOpenChange={(open: boolean) => {
                     if (currentStep === "relevant-info") {
                         if (open) {
                             console.log(
@@ -565,7 +565,7 @@
                             <p
                                 class="hover:underline text-blue-600 flex items-center"
                             >
-                                <TestTubeDiagonal class="h-5 w-5 mr-2" />
+                                <FlaskConical class="h-5 w-5 mr-2" />
                                 <span class="truncate text-left">
                                     {selectedValueLabTests}
                                 </span>

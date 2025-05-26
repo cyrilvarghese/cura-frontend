@@ -7,8 +7,15 @@
         Star as StarFilled,
         StarIcon,
         Loader2,
+        CheckCircle,
+        XCircle,
+        Target,
+        User,
+        Stethoscope,
+        FlaskConical,
     } from "lucide-svelte";
     import * as Accordion from "$lib/components/ui/accordion/index.js";
+    import * as Popover from "$lib/components/ui/popover/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { onMount } from "svelte";
     import { differentialDiagnosisFeedbackStore } from "$lib/stores/differentialDiagnosisFeedbackStore";
@@ -24,6 +31,26 @@
     const isLoading = $derived($differentialDiagnosisFeedbackStore.isLoading);
     const error = $derived($differentialDiagnosisFeedbackStore.error);
 
+    // Derived data for different diagnosis types
+    const primaryDiagnosis = $derived(
+        differentialDxAnalysis?.detailedAnalysis.find(
+            (dx) => dx.type === "PrimaryDiagnosis",
+        ),
+    );
+    const plausibleDifferentials = $derived(
+        differentialDxAnalysis?.detailedAnalysis.filter(
+            (dx) => dx.type === "PlausibleDifferential",
+        ) || [],
+    );
+    const ruledOutDifferentials = $derived(
+        differentialDxAnalysis?.detailedAnalysis.filter(
+            (dx) => dx.type === "RuledOutDifferential",
+        ) || [],
+    );
+
+    // State for tracking open popovers
+    let openPopover: string | null = $state(null);
+
     onMount(async () => {
         try {
             await differentialDiagnosisFeedbackStore.getDifferentialDiagnosisFeedback(
@@ -36,6 +63,10 @@
             );
         }
     });
+
+    function splitBySemicolon(text: string) {
+        return text.split(";").join(";\n");
+    }
 </script>
 
 <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-200">
@@ -74,7 +105,7 @@
                         <div class="flex">
                             {#each Array(5) as _, i}
                                 <span class="text-yellow-400">
-                                    {#if i < differentialDxAnalysis.differentialListScore}
+                                    {#if i < parseInt(differentialDxAnalysis.differentialListScore)}
                                         <StarFilled
                                             class="w-5 h-5 fill-current"
                                         />
@@ -91,311 +122,401 @@
                 </p>
             </div>
 
-            <!-- Plausible Diagnoses that were Considered -->
-            <div>
-                <h4 class="font-medium mb-3">
-                    Plausible Diagnoses (Considered)
-                </h4>
-                <div class="space-y-3">
-                    {#each differentialDxAnalysis.detailedAnalysis as diagnosis}
-                        {#if diagnosis.studentDidConsider && diagnosis.isPlausibleDifferential_InContext}
-                            <Accordion.Root type="single" collapsible>
-                                <Accordion.Item
-                                    value={diagnosis.dx}
-                                    class="border border-gray-100 rounded-lg overflow-hidden"
+            <!-- Primary Diagnosis -->
+            {#if primaryDiagnosis}
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div class="flex items-center gap-2 mb-3">
+                        <Target class="w-5 h-5 text-green-600" />
+                        <h4 class="font-semibold text-green-800">
+                            {primaryDiagnosis.dxName}
+                        </h4>
+                        <Badge
+                            class="bg-green-100 text-green-800 border-green-300"
+                        >
+                            Primary Diagnosis
+                        </Badge>
+                    </div>
+
+                    {#if primaryDiagnosis.supportingFeatures_ThisCase}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                            <div>
+                                <h5
+                                    class="font-medium text-sm text-green-700 mb-2"
                                 >
-                                    <Accordion.Trigger
-                                        class="p-3 bg-blue-50 text-blue-800 flex items-center justify-between text-left"
-                                    >
-                                        <div class="flex items-center gap-2">
-                                            <span class="font-medium"
-                                                >{diagnosis.dx}</span
-                                            >
-                                            <Badge
-                                                class="bg-blue-100 text-blue-800 border-blue-200"
-                                                >Plausible</Badge
-                                            >
-                                        </div>
-                                    </Accordion.Trigger>
-                                    <Accordion.Content class="p-4 bg-white">
-                                        <div class="space-y-3">
-                                            <div>
-                                                <h5 class="font-medium text-sm">
-                                                    Analysis:
-                                                </h5>
-                                                <p
-                                                    class="text-sm text-gray-700 mt-1"
-                                                >
-                                                    {diagnosis.reasoningDetail
-                                                        .summaryWhyNotPrimaryOrRuledOut_ForThisCase}
-                                                </p>
-                                            </div>
-
-                                            {#if diagnosis.reasoningDetail.differentiatingHistoryFromContext.length > 0}
-                                                <div>
-                                                    <h5
-                                                        class="font-medium text-sm"
-                                                    >
-                                                        Key History Differences:
-                                                    </h5>
-                                                    <ul class="mt-1 space-y-2">
-                                                        {#each diagnosis.reasoningDetail.differentiatingHistoryFromContext as item}
-                                                            <li
-                                                                class="text-xs border-l-2 border-blue-200 pl-3 py-1"
-                                                            >
-                                                                <p
-                                                                    class="font-medium"
-                                                                >
-                                                                    {item.desc}
-                                                                </p>
-                                                                <p
-                                                                    class="text-gray-600 mt-0.5"
-                                                                >
-                                                                    {item.comparisonNote}
-                                                                </p>
-                                                            </li>
-                                                        {/each}
-                                                    </ul>
-                                                </div>
-                                            {/if}
-
-                                            {#if diagnosis.reasoningDetail.differentiatingLabsFromContext.length > 0}
-                                                <div>
-                                                    <h5
-                                                        class="font-medium text-sm"
-                                                    >
-                                                        Key Lab Differences:
-                                                    </h5>
-                                                    <ul class="mt-1 space-y-2">
-                                                        {#each diagnosis.reasoningDetail.differentiatingLabsFromContext as item}
-                                                            <li
-                                                                class="text-xs border-l-2 border-green-200 pl-3 py-1"
-                                                            >
-                                                                <p
-                                                                    class="font-medium"
-                                                                >
-                                                                    {item.testName}:
-                                                                    {item.findingForThisDDx}
-                                                                </p>
-                                                                <p
-                                                                    class="text-gray-600 mt-0.5"
-                                                                >
-                                                                    {item.comparisonNote}
-                                                                </p>
-                                                            </li>
-                                                        {/each}
-                                                    </ul>
-                                                </div>
-                                            {/if}
-
-                                            {#if diagnosis.reasoningDetail.educationalTip}
-                                                <div
-                                                    class="bg-blue-50 p-3 rounded-md mt-2"
-                                                >
-                                                    <div class="flex gap-2">
-                                                        <Info
-                                                            class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0"
-                                                        />
-                                                        <div>
-                                                            <span
-                                                                class="text-xs font-medium text-blue-700 uppercase tracking-wide block mb-1"
-                                                                >Learning Point</span
-                                                            >
-                                                            <p
-                                                                class="text-xs text-blue-800"
-                                                            >
-                                                                {diagnosis
-                                                                    .reasoningDetail
-                                                                    .educationalTip}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {/if}
-                                        </div>
-                                    </Accordion.Content>
-                                </Accordion.Item>
-                            </Accordion.Root>
-                        {/if}
-                    {/each}
-                </div>
-            </div>
-
-            <!-- Plausible Diagnoses that were NOT Considered -->
-            {#if differentialDxAnalysis.detailedAnalysis.some((dx) => !dx.studentDidConsider && dx.isPlausibleDifferential_InContext)}
-                <div>
-                    <h4 class="font-medium mb-3">
-                        Plausible Diagnoses (Missed)
-                    </h4>
-                    <div class="space-y-3">
-                        {#each differentialDxAnalysis.detailedAnalysis as diagnosis}
-                            {#if !diagnosis.studentDidConsider && diagnosis.isPlausibleDifferential_InContext}
-                                <Accordion.Root type="single" collapsible>
-                                    <Accordion.Item
-                                        value={diagnosis.dx}
-                                        class="border border-gray-100 rounded-lg overflow-hidden"
-                                    >
-                                        <Accordion.Trigger
-                                            class="p-3 bg-amber-50 text-amber-800 flex items-center justify-between text-left"
+                                    History
+                                </h5>
+                                <ul class="space-y-1">
+                                    {#each primaryDiagnosis.supportingFeatures_ThisCase.history as item}
+                                        <li
+                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
                                         >
-                                            <div
-                                                class="flex items-center gap-2"
+                                            {item}
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                            <div>
+                                <h5
+                                    class="font-medium text-sm text-green-700 mb-2"
+                                >
+                                    Exam
+                                </h5>
+                                <ul class="space-y-1">
+                                    {#each primaryDiagnosis.supportingFeatures_ThisCase.exam as item}
+                                        <li
+                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
+                                        >
+                                            {item}
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                            <div>
+                                <h5
+                                    class="font-medium text-sm text-green-700 mb-2"
+                                >
+                                    Lab
+                                </h5>
+                                <ul class="space-y-1">
+                                    {#each primaryDiagnosis.supportingFeatures_ThisCase.lab as item}
+                                        <li
+                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
+                                        >
+                                            {item}
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+            {/if}
+
+            <!-- Plausible Differentials Table -->
+            {#if plausibleDifferentials.length > 0}
+                <div class="mt-8">
+                    <h4
+                        class="font-medium text-amber-700 mb-3 mt-12 flex items-center gap-2"
+                    >
+                        <AlertCircle class="w-4 h-4" />
+                        Typical Features of Plausible Differentials (should consider)
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table
+                            class="w-full border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                            <thead class="bg-amber-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        Diagnosis
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        Student Considered
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        <div class="flex items-center gap-1">
+                                            <User class="w-4 h-4" />
+                                            History
+                                        </div>
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        <div class="flex items-center gap-1">
+                                            <Stethoscope class="w-4 h-4" />
+                                            Exam
+                                        </div>
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        <div class="flex items-center gap-1">
+                                            <FlaskConical class="w-4 h-4" />
+                                            Lab
+                                        </div>
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-amber-800 border-b"
+                                    >
+                                        Why Not This?
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                {#each plausibleDifferentials as diagnosis, i}
+                                    <tr
+                                        class={i % 2 === 0
+                                            ? "bg-white"
+                                            : "bg-amber-25"}
+                                    >
+                                        <td class="px-4 py-3 border-b">
+                                            <span class="font-medium text-sm"
+                                                >{diagnosis.dxName}</span
                                             >
-                                                <span class="font-medium"
-                                                    >{diagnosis.dx}</span
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.studentDidConsiderAsPlausible}
+                                                <div
+                                                    class="flex items-center gap-1 text-green-600"
                                                 >
-                                                <Badge
-                                                    class="bg-amber-100 text-amber-800 border-amber-200"
-                                                    >Missed</Badge
-                                                >
-                                            </div>
-                                        </Accordion.Trigger>
-                                        <Accordion.Content class="p-4 bg-white">
-                                            <div class="space-y-3">
-                                                <div>
-                                                    <h5
-                                                        class="font-medium text-sm"
+                                                    <CheckCircle
+                                                        class="w-4 h-4"
+                                                    />
+                                                    <span class="text-xs"
+                                                        >Yes</span
                                                     >
-                                                        Analysis:
-                                                    </h5>
-                                                    <p
-                                                        class="text-sm text-gray-700 mt-1"
-                                                    >
-                                                        {diagnosis
-                                                            .reasoningDetail
-                                                            .summaryWhyNotPrimaryOrRuledOut_ForThisCase}
-                                                    </p>
                                                 </div>
-
-                                                {#if diagnosis.reasoningDetail.differentiatingHistoryFromContext && diagnosis.reasoningDetail.differentiatingHistoryFromContext.length > 0}
-                                                    <div>
-                                                        <h5
-                                                            class="font-medium text-sm"
-                                                        >
-                                                            Key History
-                                                            Differences:
-                                                        </h5>
-                                                        <ul
-                                                            class="mt-1 space-y-2"
-                                                        >
-                                                            {#each diagnosis.reasoningDetail.differentiatingHistoryFromContext as item}
-                                                                <li
-                                                                    class="text-xs border-l-2 border-amber-200 pl-3 py-1"
-                                                                >
-                                                                    <p
-                                                                        class="font-medium"
-                                                                    >
-                                                                        {item.desc}
-                                                                    </p>
-                                                                    <p
-                                                                        class="text-gray-600 mt-0.5"
-                                                                    >
-                                                                        {item.comparisonNote}
-                                                                    </p>
-                                                                </li>
-                                                            {/each}
-                                                        </ul>
-                                                    </div>
-                                                {/if}
-
-                                                {#if diagnosis.reasoningDetail.differentiatingLabsFromContext && diagnosis.reasoningDetail.differentiatingLabsFromContext.length > 0}
-                                                    <div>
-                                                        <h5
-                                                            class="font-medium text-sm"
-                                                        >
-                                                            Key Lab Differences:
-                                                        </h5>
-                                                        <ul
-                                                            class="mt-1 space-y-2"
-                                                        >
-                                                            {#each diagnosis.reasoningDetail.differentiatingLabsFromContext as item}
-                                                                <li
-                                                                    class="text-xs border-l-2 border-amber-200 pl-3 py-1"
-                                                                >
-                                                                    <p
-                                                                        class="font-medium"
-                                                                    >
-                                                                        {item.testName}:
-                                                                        {item.findingForThisDDx}
-                                                                    </p>
-                                                                    <p
-                                                                        class="text-gray-600 mt-0.5"
-                                                                    >
-                                                                        {item.comparisonNote}
-                                                                    </p>
-                                                                </li>
-                                                            {/each}
-                                                        </ul>
-                                                    </div>
-                                                {/if}
-
-                                                {#if diagnosis.reasoningDetail.educationalTip}
-                                                    <div
-                                                        class="bg-blue-50 p-3 rounded-md mt-2"
+                                            {:else}
+                                                <div
+                                                    class="flex items-center gap-1 text-red-600"
+                                                >
+                                                    <XCircle class="w-4 h-4" />
+                                                    <span class="text-xs"
+                                                        >No</span
                                                     >
-                                                        <div class="flex gap-2">
-                                                            <Info
-                                                                class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0"
-                                                            />
-                                                            <div>
-                                                                <span
-                                                                    class="text-xs font-medium text-blue-700 uppercase tracking-wide block mb-1"
-                                                                    >Learning
-                                                                    Point</span
+                                                </div>
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.differentiatingFeatures_General?.history}
+                                                <ul class="space-y-1">
+                                                    {#each diagnosis.differentiatingFeatures_General.history as item}
+                                                        <li
+                                                            class="text-xs bg-amber-50 p-1 rounded border-l-2 border-amber-300"
+                                                        >
+                                                            {item}
+                                                        </li>
+                                                    {/each}
+                                                </ul>
+                                            {:else}
+                                                <span
+                                                    class="text-xs text-gray-400"
+                                                    >-</span
+                                                >
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.differentiatingFeatures_General?.exam}
+                                                <ul class="space-y-1">
+                                                    {#each diagnosis.differentiatingFeatures_General.exam as item}
+                                                        <li
+                                                            class="text-xs bg-amber-50 p-1 rounded border-l-2 border-amber-300"
+                                                        >
+                                                            {item}
+                                                        </li>
+                                                    {/each}
+                                                </ul>
+                                            {:else}
+                                                <span
+                                                    class="text-xs text-gray-400"
+                                                    >-</span
+                                                >
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.differentiatingFeatures_General?.lab}
+                                                <ul class="space-y-1">
+                                                    {#each diagnosis.differentiatingFeatures_General.lab as item}
+                                                        <li
+                                                            class="text-xs bg-amber-50 p-1 rounded border-l-2 border-amber-300 whitespace-pre-line"
+                                                        >
+                                                            {splitBySemicolon(
+                                                                item,
+                                                            )}
+                                                        </li>
+                                                    {/each}
+                                                </ul>
+                                            {:else}
+                                                <span
+                                                    class="text-xs text-gray-400"
+                                                    >-</span
+                                                >
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.caseSpecificDifferentiation?.quickDifferentiatingTags_ThisCase}
+                                                <div
+                                                    class="flex flex-wrap gap-1"
+                                                >
+                                                    {#each diagnosis.caseSpecificDifferentiation.quickDifferentiatingTags_ThisCase as tag}
+                                                        <Popover.Root>
+                                                            <Popover.Trigger>
+                                                                <Badge
+                                                                    class="bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs cursor-pointer"
                                                                 >
-                                                                <p
-                                                                    class="text-xs text-blue-800"
+                                                                    {tag}
+                                                                </Badge>
+                                                            </Popover.Trigger>
+                                                            <Popover.Content
+                                                                class="w-80 p-4"
+                                                            >
+                                                                <div
+                                                                    class="space-y-3"
                                                                 >
-                                                                    {diagnosis
-                                                                        .reasoningDetail
-                                                                        .educationalTip}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                {/if}
-                                            </div>
-                                        </Accordion.Content>
-                                    </Accordion.Item>
-                                </Accordion.Root>
-                            {/if}
-                        {/each}
+                                                                    <h5
+                                                                        class="font-medium text-sm"
+                                                                    >
+                                                                        Case
+                                                                        Explanation
+                                                                    </h5>
+                                                                    <p
+                                                                        class="text-xs text-gray-700"
+                                                                    >
+                                                                        {diagnosis
+                                                                            .caseSpecificDifferentiation
+                                                                            ?.detailedExplanation_ThisCase ||
+                                                                            "No explanation provided"}
+                                                                    </p>
+                                                                    {#if diagnosis.caseSpecificDifferentiation?.educationalTip}
+                                                                        <div
+                                                                            class="p-2 bg-blue-50 rounded text-xs"
+                                                                        >
+                                                                            <span
+                                                                                class="text-blue-800"
+                                                                                >{diagnosis
+                                                                                    .caseSpecificDifferentiation
+                                                                                    .educationalTip}</span
+                                                                            >
+                                                                        </div>
+                                                                    {/if}
+                                                                </div>
+                                                            </Popover.Content>
+                                                        </Popover.Root>
+                                                    {/each}
+                                                </div>
+                                            {:else}
+                                                <span
+                                                    class="text-xs text-gray-400"
+                                                    >-</span
+                                                >
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             {/if}
 
-            <!-- Correctly Ruled Out Diagnoses -->
-            {#if differentialDxAnalysis.detailedAnalysis.some((dx) => !dx.isPlausibleDifferential_InContext)}
+            <!-- Ruled Out Differentials Table -->
+            {#if ruledOutDifferentials.length > 0}
                 <div>
-                    <h4 class="font-medium mb-3">Correctly Ruled Out</h4>
-                    <div class="space-y-3">
-                        {#each differentialDxAnalysis.detailedAnalysis as diagnosis}
-                            {#if !diagnosis.isPlausibleDifferential_InContext}
-                                <div
-                                    class="border border-gray-100 rounded-lg overflow-hidden"
-                                >
-                                    <div
-                                        class="p-3 bg-gray-50 flex items-center justify-between"
+                    <h4
+                        class="font-medium text-gray-700 mb-3 mt-12 flex items-center gap-2"
+                    >
+                        <XCircle class="w-4 h-4" />
+                        To be Ruled Out (should not consider)
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table
+                            class="w-full border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-gray-800 border-b"
                                     >
-                                        <span class="font-medium"
-                                            >{diagnosis.dx}</span
-                                        >
-                                        <Badge
-                                            class="bg-gray-100 text-gray-800 border-gray-200"
-                                            >Not Applicable</Badge
-                                        >
-                                    </div>
-                                    <div class="p-3 text-sm text-gray-600">
-                                        <p>
-                                            {diagnosis.reasoningDetail
-                                                .reasonRuledOutFromContext ||
-                                                diagnosis.reasoningDetail
-                                                    .summaryWhyNotPrimaryOrRuledOut_ForThisCase}
-                                        </p>
-                                    </div>
-                                </div>
-                            {/if}
-                        {/each}
+                                        Diagnosis
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-gray-800 border-b"
+                                    >
+                                        Student Marked Incorrect
+                                    </th>
+                                    <th
+                                        class="px-4 py-3 text-left text-sm font-medium text-gray-800 border-b"
+                                    >
+                                        Why Ruled Out ?
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                                {#each ruledOutDifferentials as diagnosis, i}
+                                    <tr
+                                        class={i % 2 === 0
+                                            ? "bg-white"
+                                            : "bg-gray-25"}
+                                    >
+                                        <td class="px-4 py-3 border-b">
+                                            <span class="font-medium text-sm"
+                                                >{diagnosis.dxName}</span
+                                            >
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.studentDidMarkAsIncorrect}
+                                                <span
+                                                    class="inline-flex items-center gap-1 text-green-600 text-xs font-medium"
+                                                >
+                                                    <CheckCircle
+                                                        class="w-4 h-4"
+                                                    /> Yes
+                                                </span>
+                                            {:else}
+                                                <span
+                                                    class="inline-flex items-center gap-1 text-red-600 text-xs font-medium"
+                                                >
+                                                    <XCircle class="w-4 h-4" /> No
+                                                </span>
+                                            {/if}
+                                        </td>
+                                        <td class="px-4 py-3 border-b">
+                                            {#if diagnosis.caseSpecificDifferentiation?.quickDifferentiatingTags_ThisCase}
+                                                <div
+                                                    class="flex flex-wrap gap-1"
+                                                >
+                                                    {#each diagnosis.caseSpecificDifferentiation.quickDifferentiatingTags_ThisCase as tag}
+                                                        <Popover.Root>
+                                                            <Popover.Trigger>
+                                                                <Badge
+                                                                    class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs cursor-pointer"
+                                                                >
+                                                                    {tag}
+                                                                </Badge>
+                                                            </Popover.Trigger>
+                                                            <Popover.Content
+                                                                class="w-80 p-4"
+                                                            >
+                                                                <div
+                                                                    class="space-y-3"
+                                                                >
+                                                                    <h5
+                                                                        class="font-medium text-sm"
+                                                                    >
+                                                                        Why
+                                                                        Ruled
+                                                                        Out
+                                                                    </h5>
+                                                                    <p
+                                                                        class="text-xs text-gray-700"
+                                                                    >
+                                                                        {diagnosis
+                                                                            .caseSpecificDifferentiation
+                                                                            ?.detailedExplanation_ThisCase ||
+                                                                            "No explanation provided"}
+                                                                    </p>
+                                                                </div>
+                                                            </Popover.Content>
+                                                        </Popover.Root>
+                                                    {/each}
+                                                </div>
+                                            {:else}
+                                                <span
+                                                    class="text-xs text-gray-400"
+                                                    >-</span
+                                                >
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             {/if}
