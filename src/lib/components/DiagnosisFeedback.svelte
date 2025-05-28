@@ -1,7 +1,7 @@
 <script>
-    import PrimaryDiagnosisCard from "./PrimaryDiagnosisCard.svelte";
+    import PrimaryDiagnosisCard from "./primary-diagnosis-feedback/PrimaryDiagnosisCard.svelte";
     import DifferentialDiagnosisCard from "./DifferentialDiagnosisCard.svelte";
-    import EducationalResourcesCard from "./EducationalResourcesCard.svelte";
+    import EducationalResourcesCard from "./education-feedback/EducationalResourcesCard.svelte";
 </script>
 
 <section class="pt-4 pb-8">

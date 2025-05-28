@@ -131,7 +131,7 @@
                             {primaryDiagnosis.dxName}
                         </h4>
                         <Badge
-                            class="bg-green-100 text-green-800 border-green-300"
+                            class="bg-green-100 hover:bg-green-400 text-green-800 border-green-300"
                         >
                             Primary Diagnosis
                         </Badge>
@@ -148,7 +148,7 @@
                                 <ul class="space-y-1">
                                     {#each primaryDiagnosis.supportingFeatures_ThisCase.history as item}
                                         <li
-                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
+                                            class="text-sm bg-white p-2 rounded border-l-2 border-green-300"
                                         >
                                             {item}
                                         </li>
@@ -164,7 +164,7 @@
                                 <ul class="space-y-1">
                                     {#each primaryDiagnosis.supportingFeatures_ThisCase.exam as item}
                                         <li
-                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
+                                            class="text-sm bg-white p-2 rounded border-l-2 border-green-300"
                                         >
                                             {item}
                                         </li>
@@ -180,7 +180,7 @@
                                 <ul class="space-y-1">
                                     {#each primaryDiagnosis.supportingFeatures_ThisCase.lab as item}
                                         <li
-                                            class="text-xs bg-white p-2 rounded border-l-2 border-green-300"
+                                            class="text-sm bg-white p-2 rounded border-l-2 border-green-300"
                                         >
                                             {item}
                                         </li>

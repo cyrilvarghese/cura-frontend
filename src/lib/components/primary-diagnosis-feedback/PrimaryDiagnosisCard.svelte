@@ -157,24 +157,143 @@
                                     </span>
                                 {/each}
                             </div>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-700 font-medium">
-                                    {primaryDiagnosisFeedback.primaryDxFeedback
-                                        .scores.evidenceGatheringExplanation
-                                        .overallSummary}
-                                </p>
-                                <!-- {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams.length > 0}
+                            <p class="text-sm text-gray-700">
+                                {primaryDiagnosisFeedback.primaryDxFeedback
+                                    .scores.evidenceGatheringExplanation
+                                    .overallSummary}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Strengths and Weaknesses Card -->
+                    <div
+                        class="w-80 bg-amber-50 border border-amber-100 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                        <div
+                            class="px-4 py-3 border-b border-amber-100 flex justify-between items-center"
+                        >
+                            <span class="font-medium text-amber-800"
+                                >Strengths & Areas for Improvement</span
+                            >
+                            <Info class="w-5 h-5 text-amber-600" />
+                        </div>
+                        <div class="px-4 py-3 space-y-4">
+                            <!-- Strengths Section -->
+                            <div>
+                                <h5
+                                    class="text-sm font-semibold text-green-800 mb-2"
+                                >
+                                    Strengths
+                                </h5>
+                                <div class="space-y-2">
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.historyStrengths.length > 0}
                                         <div>
                                             <p
-                                                class="text-sm text-red-700 font-medium"
+                                                class="text-xs text-green-700 font-medium mb-1"
                                             >
-                                                Areas for Improvement (Exams):
+                                                Patient History:
                                             </p>
                                             <ul
-                                                class="mt-1 pl-4 text-sm text-gray-700 list-disc"
+                                                class="text-xs text-gray-700 space-y-1"
+                                            >
+                                                {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.historyStrengths as strength}
+                                                    <li
+                                                        class="flex items-start gap-1"
+                                                    >
+                                                        <span
+                                                            class="text-green-600 mt-1"
+                                                            >✓</span
+                                                        >
+                                                        <span>{strength}</span>
+                                                    </li>
+                                                {/each}
+                                            </ul>
+                                        </div>
+                                    {/if}
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.examStrengths.length > 0}
+                                        <div>
+                                            <p
+                                                class="text-xs text-green-700 font-medium mb-1"
+                                            >
+                                                Physical Examinations:
+                                            </p>
+                                            <ul
+                                                class="text-xs text-gray-700 space-y-1"
+                                            >
+                                                {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.examStrengths as strength}
+                                                    <li
+                                                        class="flex items-start gap-1"
+                                                    >
+                                                        <span
+                                                            class="text-green-600 mt-1"
+                                                            >✓</span
+                                                        >
+                                                        <span>{strength}</span>
+                                                    </li>
+                                                {/each}
+                                            </ul>
+                                        </div>
+                                    {/if}
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.testStrengths.length > 0}
+                                        <div>
+                                            <p
+                                                class="text-xs text-green-700 font-medium mb-1"
+                                            >
+                                                Laboratory Tests:
+                                            </p>
+                                            <ul
+                                                class="text-xs text-gray-700 space-y-1"
+                                            >
+                                                {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.testStrengths as strength}
+                                                    <li
+                                                        class="flex items-start gap-1"
+                                                    >
+                                                        <span
+                                                            class="text-green-600 mt-1"
+                                                            >✓</span
+                                                        >
+                                                        <span>{strength}</span>
+                                                    </li>
+                                                {/each}
+                                            </ul>
+                                        </div>
+                                    {/if}
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.historyStrengths.length === 0 && primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.examStrengths.length === 0 && primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.testStrengths.length === 0}
+                                        <p class="text-xs text-gray-600 italic">
+                                            No specific strengths identified.
+                                        </p>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <!-- Areas for Improvement Section -->
+                            <div>
+                                <h5
+                                    class="text-sm font-semibold text-amber-800 mb-2"
+                                >
+                                    Areas for Improvement
+                                </h5>
+                                <div class="space-y-2">
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams.length > 0}
+                                        <div>
+                                            <p
+                                                class="text-xs text-amber-700 font-medium mb-1"
+                                            >
+                                                Physical Examinations:
+                                            </p>
+                                            <ul
+                                                class="text-xs text-gray-700 space-y-1"
                                             >
                                                 {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams as area}
-                                                    <li>{area}</li>
+                                                    <li
+                                                        class="flex items-start gap-1"
+                                                    >
+                                                        <span
+                                                            class="text-amber-600 mt-1"
+                                                            >•</span
+                                                        >
+                                                        <span>{area}</span>
+                                                    </li>
                                                 {/each}
                                             </ul>
                                         </div>
@@ -182,19 +301,34 @@
                                     {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests.length > 0}
                                         <div>
                                             <p
-                                                class="text-sm text-red-700 font-medium"
+                                                class="text-xs text-amber-700 font-medium mb-1"
                                             >
-                                                Areas for Improvement (Tests):
+                                                Laboratory Tests:
                                             </p>
                                             <ul
-                                                class="mt-1 pl-4 text-sm text-gray-700 list-disc"
+                                                class="text-xs text-gray-700 space-y-1"
                                             >
                                                 {#each primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests as area}
-                                                    <li>{area}</li>
+                                                    <li
+                                                        class="flex items-start gap-1"
+                                                    >
+                                                        <span
+                                                            class="text-amber-600 mt-1"
+                                                            >•</span
+                                                        >
+                                                        <span>{area}</span>
+                                                    </li>
                                                 {/each}
                                             </ul>
                                         </div>
-                                    {/if} -->
+                                    {/if}
+                                    {#if primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Exams.length === 0 && primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringExplanation.areasForImprovement_Tests.length === 0}
+                                        <p class="text-xs text-gray-600 italic">
+                                            No specific areas for improvement
+                                            identified.
+                                        </p>
+                                    {/if}
+                                </div>
                             </div>
                         </div>
                     </div>

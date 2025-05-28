@@ -367,6 +367,23 @@
             );
         };
     });
+
+    function handleMessageAction(event: CustomEvent) {
+        const { type, payload } = event.detail;
+        console.log("Opening OSCE dialog");
+
+        switch (type) {
+            case "openTreatmentProtocol":
+                treatmentProtocolDialogOpen = true;
+                break;
+            case "openOSCEDialog":
+                handleEndCase();
+                break;
+            // Add more cases as needed
+            default:
+                console.log("Unhandled message action:", type, payload);
+        }
+    }
 </script>
 
 <PageLayout
@@ -378,6 +395,10 @@
     hideNav={isFullscreen}
 >
     <LoadingOverlay isVisible={$isLoading} message="Loading case data..." />
+    <LoadingOverlay
+        isVisible={isEndCaseLoading}
+        message="Generating OSCE Questions..."
+    />
 
     <div class="flex gap-4 w-full h-full">
         <div class="w-[100%] h-full flex flex-col">
@@ -455,7 +476,10 @@
                     {:else}
                         {#each $apiStore.messages as message}
                             <div class="message-wrapper">
-                                <Message {message} />
+                                <Message
+                                    {message}
+                                    on:messageAction={handleMessageAction}
+                                />
                             </div>
                         {/each}
                     {/if}

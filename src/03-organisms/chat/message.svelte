@@ -19,6 +19,7 @@
     import FeedbackStepsCard from "./chat-cards/feedback-diagnosis-card.svelte";
     import FeedbackProtocolCard from "./chat-cards/feedback-treatment-protocol-card.svelte";
     import { onMount, onDestroy } from "svelte";
+    import { createEventDispatcher } from "svelte";
     const { message } = $props<{ message: Message }>();
 
     function getRelativeTime(date: Date): string {
@@ -90,6 +91,8 @@
 
     let relativeTimeString: string;
     let intervalId: ReturnType<typeof setInterval>;
+
+    const dispatch = createEventDispatcher();
 
     onMount(() => {
         // Update immediately
@@ -246,14 +249,14 @@
                     messageTypeComponents[
                         message.type as keyof typeof messageTypeComponents
                     ](message)}
-                {#if MessageComponent}
-                    {#key message.type}
-                        <!-- @ts-ignore  fix the type error -->
-                        <MessageComponent
-                            {...getComponentProps(message) as any}
-                        />
-                    {/key}
-                {/if}
+                {#key message.type}
+                    <!-- @ts-ignore  fix the type error -->
+                    <MessageComponent
+                        {...getComponentProps(message) as any}
+                        on:messageAction={(e) =>
+                            dispatch("messageAction", e.detail)}
+                    />
+                {/key}
             {:else}
                 <div
                     class="bg-card rounded-lg p-4 shadow-sm border {isStudent

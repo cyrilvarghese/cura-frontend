@@ -6,6 +6,8 @@
         FileText,
         Microscope,
         Clock,
+        FlaskConical,
+        ListTree,
     } from "lucide-svelte";
 
     export let primaryDiagnosisFeedback: PrimaryDiagnosisFeedback;
@@ -19,12 +21,13 @@
             case "HistoryTaking - Focused":
                 return ClipboardList;
             case "PhysicalExam":
+            case "PhysicalExam Specific":
                 return Stethoscope;
             case "InitialLabTest":
             case "ConfirmatoryLabTest":
-                return Microscope;
+                return FlaskConical;
             case "DifferentialConsideration":
-                return FileText;
+                return ListTree;
             default:
                 return ClipboardList;
         }
@@ -59,7 +62,7 @@
             class="w-6 h-6 mr-4 text-gray-700 dark:text-white z-10 bg-white rounded-full"
         />
         <h3 class="text-xl font-semibold text-gray-700 dark:text-white m-0">
-            Ideal Diagnostic Timeline
+            Suggested Diagnostic Timeline
         </h3>
     </div>
     {#each primaryDiagnosisFeedback.primaryDxFeedback.idealDiagnosticTimeline as step, i (step.stepNumber)}
@@ -73,8 +76,11 @@
             <!-- Step content -->
             <div class="flex-1 pl-2 pb-6">
                 <div class="flex flex-wrap items-center gap-2 mb-1">
-                    <!-- Rationale tags as the main title, bold -->
-
+                    <!-- Icon for step type -->
+                    {#if getIconForType(step.type)}
+                        {@const Icon = getIconForType(step.type)}
+                        <Icon class="w-4 h-4 text-blue-500" />
+                    {/if}
                     <!-- Step name as a tag/pill -->
                     <span
                         class="px-3 py-1 text-xs rounded-full bg-blue-100 dark:bg-gray-800 text-gray-800 dark:text-white dark:border-gray-700 font-medium cursor-pointer hover:underline"

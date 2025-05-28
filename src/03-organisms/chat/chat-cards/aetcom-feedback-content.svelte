@@ -69,12 +69,12 @@
             {feedback.feedback_result.aetcom_evaluation.communication
                 .performance_level}
         </span>
-        <p class="text-sm text-left">{commFeedback.feedback}</p>
+        <!-- <p class="text-sm text-left">{commFeedback.feedback}</p> -->
         {#if commFeedback.action}
             <div class="mt-2 pl-4 border-l-2 border-blue-200">
-                <p class="text-sm text-blue-700 font-medium mb-1">
+                <!-- <p class="text-sm text-blue-700 font-medium mb-1">
                     Suggested action:
-                </p>
+                </p> -->
                 <p class="text-sm italic text-gray-700">
                     {commFeedback.action}
                 </p>
@@ -102,12 +102,12 @@
             {feedback.feedback_result.aetcom_evaluation
                 .empathy_patient_centeredness.performance_level}
         </span>
-        <p class="text-sm text-left">{empathyFeedback.feedback}</p>
+        <!-- <p class="text-sm text-left">{empathyFeedback.feedback}</p> -->
         {#if empathyFeedback.action}
             <div class="mt-2 pl-4 border-l-2 border-blue-200">
-                <p class="text-sm text-blue-700 font-medium mb-1">
+                <!-- <p class="text-sm text-blue-700 font-medium mb-1">
                     Suggested action:
-                </p>
+                </p> -->
                 <p class="text-sm italic text-gray-700">
                     {empathyFeedback.action}
                 </p>
@@ -134,12 +134,12 @@
             {feedback.feedback_result.aetcom_evaluation.professionalism_ethics
                 .performance_level}
         </span>
-        <p class="text-sm text-left">{profFeedback.feedback}</p>
+        <!-- <p class="text-sm text-left">{profFeedback.feedback}</p> -->
         {#if profFeedback.action}
             <div class="mt-2 pl-4 border-l-2 border-blue-200">
-                <p class="text-sm text-blue-700 font-medium mb-1">
+                <!-- <p class="text-sm text-blue-700 font-medium mb-1">
                     Suggested action:
-                </p>
+                </p> -->
                 <p class="text-sm italic text-gray-700">
                     {profFeedback.action}
                 </p>
@@ -166,12 +166,12 @@
             {feedback.feedback_result.aetcom_evaluation.information_gathering
                 .performance_level}
         </span>
-        <p class="text-sm text-left">{infoFeedback.feedback}</p>
+        <!-- <p class="text-sm text-left">{infoFeedback.feedback}</p> -->
         {#if infoFeedback.action}
             <div class="mt-2 pl-4 border-l-2 border-blue-200">
-                <p class="text-sm text-blue-700 font-medium mb-1">
+                <!-- <p class="text-sm text-blue-700 font-medium mb-1">
                     Suggested action:
-                </p>
+                </p> -->
                 <p class="text-sm italic text-gray-700">
                     {infoFeedback.action}
                 </p>

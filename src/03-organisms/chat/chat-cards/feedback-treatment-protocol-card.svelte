@@ -4,6 +4,7 @@
     import { Badge } from "$lib/components/ui/badge";
     import { Button } from "$lib/components/ui/button";
     import ClipboardCheck from "lucide-svelte/icons/clipboard-check";
+    import { createEventDispatcher } from "svelte";
     import {
         ArrowRight,
         CheckCircle,
@@ -25,6 +26,15 @@
 
     // State for accordion sections
     let openAccordion = $state<string[]>(["evaluation", "implications"]);
+
+    const dispatch = createEventDispatcher();
+
+    function handleEndCaseClick() {
+        dispatch("messageAction", {
+            type: "openOSCEDialog",
+            payload: null,
+        });
+    }
 </script>
 
 <Card.Root class="w-[calc(100%-44px)] border rounded-lg shadow-sm bg-white">
@@ -300,6 +310,11 @@
                     </Accordion.Content>
                 </Accordion.Item>
             </Accordion.Root>
+
+            <Button variant="default" onclick={handleEndCaseClick}>
+                Take the OSCE
+                <ArrowRight class="h-4 w-4" />
+            </Button>
         </div>
     </Card.Content>
 </Card.Root>

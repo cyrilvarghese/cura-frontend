@@ -28,9 +28,11 @@
     import DiagnosisFeedbackContent from "./diagnosis-feedback-content.svelte";
 
     // Import the three diagnosis feedback cards
-    import PrimaryDiagnosisCard from "$lib/components/PrimaryDiagnosisCard.svelte";
+    import PrimaryDiagnosisCard from "$lib/components/primary-diagnosis-feedback/PrimaryDiagnosisCard.svelte";
     import DifferentialDiagnosisCard from "$lib/components/DifferentialDiagnosisCard.svelte";
-    import EducationalResourcesCard from "$lib/components/EducationalResourcesCard.svelte";
+    import EducationalResourcesCard from "$lib/components/education-feedback/EducationalResourcesCard.svelte";
+
+    import { createEventDispatcher } from "svelte";
 
     let feedback = $state({
         history: {} as HistoryFeedbackResponse | null,
@@ -58,6 +60,8 @@
 
     // Double the delay between accordion transitions for a more gradual experience
     const transitionDelay = 800; // milliseconds
+
+    const dispatch = createEventDispatcher();
 
     async function loadFeedback() {
         try {
@@ -105,11 +109,10 @@
     }
 
     function handleTreatmentPlanClick() {
-        // Find the pre-treatment button by ID and click it
-        const button = document.getElementById("next-button");
-        if (button) {
-            button.click();
-        }
+        dispatch("messageAction", {
+            type: "openTreatmentProtocol",
+            payload: null,
+        });
     }
 
     // Start loading feedback when component mounts
