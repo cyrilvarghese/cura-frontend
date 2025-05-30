@@ -1,6 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
-import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockEducationalCapsules from "$lib/data/feedback-p3.json";
 
 export interface EducationalResourcesFeedback {
@@ -39,13 +38,6 @@ export class EducationalResourcesService {
 
         try {
             const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/educational-resources`);
-            await handleApiResponse(response);
-
-            if (!response.ok) {
-                throw new Error('Failed to get educational resources');
-            }
-
-            // Extract the educationalCapsules from inside feedback_result
             const data = await response.json();
             return { educationalCapsules: data.feedback_result.educationalCapsules };
         } catch (error) {

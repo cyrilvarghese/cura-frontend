@@ -1,5 +1,5 @@
-import type { ApiResponse } from '$lib/types';
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface ImageSearchResponse {
     images: Array<{
@@ -13,22 +13,15 @@ export class ImageSearchService {
     private baseUrl = API_BASE_URL;
 
     async searchMedicalImages(query: string): Promise<ImageSearchResponse> {
-        const response = await fetch(
-            `${this.baseUrl}/image-search/search_medical_images?query=${encodeURIComponent(query)}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }
+        const response = await makeAuthenticatedRequest(
+            `${this.baseUrl}/image-search/search_medical_images?query=${encodeURIComponent(query)}`
         );
 
         if (!response.ok) {
             throw new Error('Failed to search medical images');
         }
 
-        const apiResponse: ApiResponse = await response.json();
-        return apiResponse as ImageSearchResponse;
+        return await response.json();
     }
 }
 

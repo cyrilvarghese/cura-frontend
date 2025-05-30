@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockStudentData from "$lib/data/mock-student.json";
 
@@ -23,6 +24,11 @@ export interface StudentPerformanceData {
     [key: string]: string | number; // Index signature
 }
 
+export interface PerformanceRequest {
+    case_id: string;
+    performance_data: any;
+}
+
 export class StudentPerformanceService {
     private baseUrl = API_BASE_URL;
 
@@ -35,23 +41,36 @@ export class StudentPerformanceService {
         // return Promise.resolve(mockStudentData as StudentPerformanceData[]);
 
         try {
-            const response = await fetch(`${this.baseUrl}/student-performance/comparison`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            await handleApiResponse(response);
-
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
-            }
-            debugger;
-            const data = await response.json();
-            return data as StudentPerformanceData[];
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/student-performance/comparison`);
+            return response.json();
         } catch (error) {
             console.error('Failed to fetch student performance data:', error);
+            throw error;
+        }
+    }
+
+    async getPerformance(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/performance`);
+        return response.json();
+    }
+
+    async updatePerformance(caseId: string, performanceData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/performance`, {
+            method: 'PUT',
+            body: performanceData
+        });
+        return response.json();
+    }
+
+    async submitPerformance(request: PerformanceRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/submit-performance`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error submitting performance:', error);
             throw error;
         }
     }

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface TreatmentProtocolRequest {
     case_id: string;
@@ -91,17 +92,14 @@ export class TreatmentProtocolService {
         isPrimary: boolean
     ): Promise<TreatmentProtocolResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/treatment_protocol_gemini`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/feedback/treatment_protocol_gemini`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     drug_line: `${drugName} ${dosage}`,
                     student_reasoning: indication,
                     first_line: isPrimary
-                })
+                }
             });
 
             if (!response.ok) {
@@ -120,16 +118,12 @@ export class TreatmentProtocolService {
         treatmentPlan: string[]
     ): Promise<TreatmentPlanResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/treatment-plan`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment-plan`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     treatment_plan: treatmentPlan
-                })
+                }
             });
 
             if (!response.ok) {

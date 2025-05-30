@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface PreTreatmentRequest {
     case_id: number;
@@ -46,16 +47,13 @@ export class PreTreatmentService {
 
     async evaluatePreTreatment(input: string[], caseId: string): Promise<PreTreatmentResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/pre_treatment_gemini`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/feedback/pre_treatment_gemini`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     student_inputs_pre_treatment: input,
                     student_inputs_monitoring: []
-                })
+                }
             });
 
             if (!response.ok) {
@@ -71,16 +69,13 @@ export class PreTreatmentService {
 
     async evaluateMonitoring(monitoringInputs: string[], caseId: string): Promise<MonitoringResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/monitoring_gemini`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/feedback/monitoring_gemini`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     student_inputs_pre_treatment: [],
                     student_inputs_monitoring: monitoringInputs
-                })
+                }
             });
 
             if (!response.ok) {

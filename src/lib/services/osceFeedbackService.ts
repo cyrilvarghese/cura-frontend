@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { handleApiResponse } from '$lib/utils/auth-handler';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface OSCEQuestion {
     station_title: string;
@@ -86,8 +87,55 @@ export interface PerformanceComparisonData {
     max_differentials: number;
 }
 
-export class OSCEFeedbackService {
+export interface OsceFeedbackRequest {
+    case_id: string;
+    feedback_data: any;
+}
+
+export class OsceFeedbackService {
     private baseUrl = API_BASE_URL;
+
+    async getOsceFeedback(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/osce-feedback`);
+        return response.json();
+    }
+
+    async updateOsceFeedback(caseId: string, feedbackData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/osce-feedback`, {
+            method: 'PUT',
+            body: feedbackData
+        });
+        return response.json();
+    }
+
+    async submitOsceFeedback(request: OsceFeedbackRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/submit-osce-feedback`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error submitting OSCE feedback:', error);
+            throw error;
+        }
+    }
+
+    async createOsceFeedback(fileName: string, caseId: string): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/osce-feedback/create`, {
+                method: 'POST',
+                body: {
+                    file_name: fileName,
+                    case_id: caseId
+                }
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error creating OSCE feedback:', error);
+            throw error;
+        }
+    }
 
     async submitOSCEResponse(
         caseId: string,
@@ -95,24 +143,14 @@ export class OSCEFeedbackService {
         studentResponse: StudentResponse
     ): Promise<OSCEFeedbackResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/final-osce-feedback`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/final-osce-feedback`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     question: question,
                     student_response: studentResponse
-                })
+                }
             });
-
-            if (!response.ok) {
-                handleApiResponse(response);
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.detail || 'Failed to submit OSCE response');
-            }
-
             return response.json();
         } catch (error) {
             console.error('Error submitting OSCE response:', error);
@@ -122,21 +160,10 @@ export class OSCEFeedbackService {
 
     async recordOsceFeedback(scoreData: OSCEScoreRecord): Promise<any> {
         try {
-            const response = await fetch(`${this.baseUrl}/record-osce-score`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/record-osce-score`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(scoreData)
+                body: scoreData
             });
-
-            if (!response.ok) {
-                handleApiResponse(response);
-
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.detail || 'Failed to record OSCE score');
-            }
-
             return response.json();
         } catch (error) {
             console.error('Error recording OSCE score:', error);
@@ -150,20 +177,8 @@ export class OSCEFeedbackService {
             const url = `${this.baseUrl}/student-performance/comparison/${caseId}`;
             console.log(`OSCEFeedbackService: API URL: ${url}`);
 
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
+            const response = await makeAuthenticatedRequest(url);
             console.log(`OSCEFeedbackService: API response status: ${response.status}`);
-
-            if (!response.ok) {
-                handleApiResponse(response);
-                const errorData = await response.json().catch(() => null);
-                throw new Error(errorData?.detail || 'Failed to fetch performance comparison data');
-            }
 
             const data = await response.json();
             console.log('OSCEFeedbackService: Comparison data received:', data);
@@ -173,4 +188,6 @@ export class OSCEFeedbackService {
             throw error;
         }
     }
-} 
+}
+
+export const osceFeedbackService = new OsceFeedbackService(); 

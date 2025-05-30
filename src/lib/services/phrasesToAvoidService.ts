@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export class PhrasesToAvoidService {
     private baseUrl = API_BASE_URL;
@@ -8,12 +9,9 @@ export class PhrasesToAvoidService {
     }
 
     async addPhraseToAvoid(caseId: string, phrase: string): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/cover_image/${caseId}/add-phrase-to-avoid`, {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cover_image/${caseId}/add-phrase-to-avoid`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ phrase }),
+            body: { phrase }
         });
 
         if (!response.ok) {

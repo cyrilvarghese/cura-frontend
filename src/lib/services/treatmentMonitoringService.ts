@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from '$lib/utils/auth-handler';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface TreatmentMonitoringRequest {
     case_id: string;
@@ -43,17 +43,13 @@ export class TreatmentMonitoringService {
         postTreatmentMonitoring: string[]
     ): Promise<TreatmentMonitoringResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/treatment-monitoring`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment-monitoring`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     pre_treatment_checks: preTreatmentChecks,
                     post_treatment_monitoring: postTreatmentMonitoring
-                })
+                }
             });
 
             if (!response.ok) {
@@ -70,15 +66,10 @@ export class TreatmentMonitoringService {
     // Keep the existing evaluation methods from preTreatmentService
     async evaluatePreTreatment(tests: string[]): Promise<{ feedback: Record<string, TestFeedback> }> {
         try {
-            const response = await fetch(`${this.baseUrl}/evaluate-pre-treatment`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/evaluate-pre-treatment`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ tests }),
+                body: { tests }
             });
-
-            await handleApiResponse(response);
             return response.json();
         } catch (error) {
             console.error('Error evaluating pre-treatment:', error);
@@ -88,15 +79,10 @@ export class TreatmentMonitoringService {
 
     async evaluateMonitoring(monitoring: string[]): Promise<Record<string, TestFeedback>> {
         try {
-            const response = await fetch(`${this.baseUrl}/evaluate-monitoring`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/evaluate-monitoring`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ monitoring }),
+                body: { monitoring }
             });
-
-            await handleApiResponse(response);
             return response.json();
         } catch (error) {
             console.error('Error evaluating monitoring:', error);

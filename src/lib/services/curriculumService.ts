@@ -19,11 +19,7 @@ export class CurriculumService {
         }
 
         try {
-            const response = await fetch(`${this.baseUrl}/curriculum`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch curriculum data');
-            }
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/curriculum`);
             const data = await response.json();
             return data as CurriculumData;
         } catch (error) {

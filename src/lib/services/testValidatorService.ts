@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { DiagnosticTestName } from '$lib/types/index';
 import { toast } from 'svelte-sonner';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface TestValidationRequest {
     case_id: string;
@@ -55,21 +56,18 @@ export class TestValidatorService {
     async validateTest(request: TestValidationRequest): Promise<TestValidationResponse> {
         const toastId = toast.loading('Fetching test results...');
         try {
-            const response = await fetch(`${this.baseUrl}/test-validator/validate`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/test-validator/validate`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
+                body: request
             });
-
-            if (!response.ok) {
-                throw new Error(`Failed to validate test: ${response.statusText}`);
-            }
-            toast.dismiss();
+            toast.dismiss(toastId);
             return await response.json();
         } catch (error) {
             console.error('Error validating test:', error);
+            toast.error('Failed to validate test', {
+                id: toastId,
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
             throw error;
         }
     }

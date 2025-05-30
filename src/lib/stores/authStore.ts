@@ -74,7 +74,7 @@ function createAuthStore() {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            const response = await authService.login({ email, password });
+            const response = await authService.login(email, password);
 
             const newState = {
                 user: response.user,

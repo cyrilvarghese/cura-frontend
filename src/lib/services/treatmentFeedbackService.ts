@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from "$lib/utils/auth-handler";
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 // Define the type for the treatment protocol feedback
 export type TreatmentProtocolFeedback = {
@@ -34,7 +34,6 @@ export type TreatmentProtocolFeedback = {
         critical_adjunctive_therapy_notes: string[];
     };
     key_takeaway_message_on_drug_therapy: string;
-
 };
 
 // Add this interface to match the nested structure
@@ -46,19 +45,10 @@ export class TreatmentFeedbackService {
     private baseUrl = API_BASE_URL;
 
     async getTreatmentFeedback(treatmentPlan: string[]): Promise<TreatmentFeedbackResponse> {
-        // For now, return mock data
-        // return Promise.resolve(this.getMockFeedback(treatmentPlan));
-
-
         try {
-            const response = await fetch(`${this.baseUrl}/treatment-protocol-feedback/final`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment-protocol-feedback/final`, {
+                method: 'GET'
             });
-
-            await handleApiResponse(response);
 
             if (!response.ok) {
                 throw new Error('Failed to get treatment protocol feedback');
@@ -69,7 +59,6 @@ export class TreatmentFeedbackService {
             console.error('Error getting treatment protocol feedback:', error);
             throw error;
         }
-
     }
 
     // Mock data for development

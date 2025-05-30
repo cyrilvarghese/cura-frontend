@@ -15,8 +15,8 @@ export class AssessmentService {
     }
 
     async deleteAssessment(assessmentId: number): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/assessments/${assessmentId}`, {
-            method: 'DELETE',
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/assessments/${assessmentId}`, {
+            method: 'DELETE'
         });
 
         if (!response.ok) {

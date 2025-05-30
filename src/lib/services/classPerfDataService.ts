@@ -1,8 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockTeachingData from "$lib/data/mock-teaching.json";
-import { authStore } from '$lib/stores/authStore';
-import { get } from 'svelte/store';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 // Define interfaces for the API response
 export interface CaseSessionData {
@@ -34,18 +32,10 @@ export class TeachingService {
     async getTeachingSessions(department: string): Promise<CaseSessionData[]> {
         // Temporarily return mock data for development
         // return Promise.resolve(mockTeachingData as TeachingSessionData[]);
-        debugger;
         try {
-            const response = await fetch(`${this.baseUrl}/teaching?department=${encodeURIComponent(department)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${get(authStore).accessToken}`,
-                    "X-Refresh-Token": get(authStore).refreshToken
-                },
-            });
-
-            await handleApiResponse(response);
+            const response = await makeAuthenticatedRequest(
+                `${this.baseUrl}/teaching?department=${encodeURIComponent(department)}`
+            );
 
             if (!response.ok) {
                 throw new Error(`API error: ${response.status}`);

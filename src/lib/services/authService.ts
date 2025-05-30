@@ -62,14 +62,15 @@ export class AuthService {
         }
     }
 
-    async login(username: string, password: string): Promise<AuthResponse> {
+    async login(email: string, password: string): Promise<AuthResponse> {
+        debugger;
         try {
             const response = await fetch(`${this.baseUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ email, password }),
             });
 
             if (!response.ok) {
