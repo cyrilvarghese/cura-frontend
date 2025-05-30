@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockEducationalCapsules from "$lib/data/feedback-p3.json";
 
@@ -24,6 +25,11 @@ export interface EducationalResourcesFeedback {
     };
 }
 
+export interface EducationalResourcesRequest {
+    case_id: string;
+    resources: string[];
+}
+
 export class EducationalResourcesService {
     private baseUrl = API_BASE_URL;
 
@@ -32,15 +38,7 @@ export class EducationalResourcesService {
         // return Promise.resolve(mockEducationalCapsules as EducationalResourcesFeedback);
 
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/v2/educational-resources`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // You can add query parameters if needed
-                // For example: ?case_id=${encodeURIComponent(caseId)}
-            });
-
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/educational-resources`);
             await handleApiResponse(response);
 
             if (!response.ok) {
@@ -52,6 +50,27 @@ export class EducationalResourcesService {
             return { educationalCapsules: data.feedback_result.educationalCapsules };
         } catch (error) {
             console.error('Error getting educational resources:', error);
+            throw error;
+        }
+    }
+
+    async updateEducationalResources(caseId: string, resourcesData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/educational-resources`, {
+            method: 'PUT',
+            body: resourcesData
+        });
+        return response.json();
+    }
+
+    async recordEducationalResources(request: EducationalResourcesRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/record-educational-resources`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error recording educational resources:', error);
             throw error;
         }
     }

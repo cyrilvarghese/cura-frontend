@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from '$lib/utils/auth-handler';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface ClinicalFindingsRequest {
     case_id: string;
@@ -24,17 +24,25 @@ export interface ClinicalFindingsContextResponse {
 export class ClinicalFindingsService {
     private baseUrl = API_BASE_URL;
 
-    async recordFindings(request: ClinicalFindingsRequest): Promise<any> {
-        try {
-            const response = await fetch(`${this.baseUrl}/record-clinical-findings`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
-            });
+    async getClinicalFindings(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/clinical-findings`);
+        return response.json();
+    }
 
-            await handleApiResponse(response);
+    async updateClinicalFindings(caseId: string, findingsData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/clinical-findings`, {
+            method: 'PUT',
+            body: findingsData
+        });
+        return response.json();
+    }
+
+    async recordClinicalFindings(request: ClinicalFindingsRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/record-clinical-findings`, {
+                method: 'POST',
+                body: request
+            });
             return response.json();
         } catch (error) {
             console.error('Error recording clinical findings:', error);
@@ -44,28 +52,22 @@ export class ClinicalFindingsService {
 
     async createClinicalFindingsContext(fileName: string, caseId: string): Promise<ClinicalFindingsContextResponse> {
         try {
-            const response = await fetch(
+            const response = await makeAuthenticatedRequest(
                 `${this.baseUrl}/clinical_findings_context/create`,
                 {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         file_name: fileName,
                         case_id: caseId
-                    })
+                    }
                 }
             );
-
-            if (!response.ok) {
-                throw new Error('Failed to create clinical findings context');
-            }
-
             return await response.json();
         } catch (error) {
             console.error('Error creating clinical findings context:', error);
             throw error;
         }
     }
-} 
+}
+
+export const clinicalFindingsService = new ClinicalFindingsService(); 

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import type { CurriculumData } from '$lib/types/curriculum';
 
 // For development/testing, we'll use this as mock data
@@ -30,4 +31,16 @@ export class CurriculumService {
             throw error;
         }
     }
-} 
+
+    async getTopics(): Promise<any[]> {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/curriculum/topics`);
+        return response.json();
+    }
+
+    async getDocumentsByTopic(topicName: string): Promise<any[]> {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/curriculum/topics/${topicName}/documents`);
+        return response.json();
+    }
+}
+
+export const curriculumService = new CurriculumService(); 

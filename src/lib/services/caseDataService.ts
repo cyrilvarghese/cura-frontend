@@ -1,11 +1,15 @@
 import { API_BASE_URL } from '$lib/config/api';
-import type { CaseStoreState, ClinicalFindingsContextResponse } from '$lib/types/caseTypes';
+import type { CaseStoreState } from '$lib/types/caseTypes';
 import type { CaseData } from '$lib/stores/casePlayerStore';
 import type { FormattedPersonaResponse } from '$lib/types/index';
 import { handleApiResponse } from '$lib/utils/auth-handler';
 import type { HistoryContextResponse } from '$lib/services/historyContextService';
 import type { TreatmentContextResponse } from './treatmentContextService';
 import type { DiagnosisContextResponse } from './diagnosisContextService';
+import type { ClinicalFindingsContextResponse } from './clinicalFindingsService';
+import { authStore } from '$lib/stores/authStore';
+import { get } from 'svelte/store';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface CaseListItem {
     case_id: number;
@@ -58,9 +62,8 @@ export class CaseDataService {
     }
 
     async getCaseData(caseId: string): Promise<CaseData> {
-        const response = await fetch(`${this.baseUrl}/cases/${caseId}`);
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}`);
         const data = await response.json();
-        await handleApiResponse(response);
         return {
             physicalExamReports: data.content.physical_exam,
             labTestReports: data.content.lab_test,
@@ -71,11 +74,7 @@ export class CaseDataService {
 
     async getAllCases(): Promise<CaseListItem[]> {
         try {
-            const response = await fetch(`${this.baseUrl}/cases`);
-            if (!response.ok) {
-                await handleApiResponse(response);
-                throw new Error('Failed to fetch cases');
-            }
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases`);
             const data = await response.json();
             return data as CaseListItem[];
         } catch (error) {
@@ -85,27 +84,16 @@ export class CaseDataService {
     }
 
     async getDocumentsByTopic(topicName: string): Promise<any[]> {
-        const response = await fetch(`${this.baseUrl}/curriculum/topics/${topicName}/documents`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch documents');
-        }
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/curriculum/topics/${topicName}/documents`);
         return response.json();
     }
 
     async publishCase(caseId: string, params: PublishCaseParams): Promise<any> {
-
         try {
-            const response = await fetch(`${this.baseUrl}/cases/${caseId}/publish`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/publish`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(params),
+                body: params
             });
-            if (!response.ok) {
-                throw new Error('Failed to publish case');
-            }
-
             return response.json();
         } catch (error) {
             console.error('Error publishing case:', error);
@@ -114,14 +102,9 @@ export class CaseDataService {
     }
 
     async getCaseById(id: string): Promise<CaseStoreState> {
-        const response = await fetch(`${this.baseUrl}/case-details/${id}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch case data');
-        }
-
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/case-details/${id}`);
         const data: CaseDetailsResponse = await response.json();
 
-        // Transform the API response to match the store structure
         return {
             caseId: data.content.case_cover.case_id.toString(),
             persona: data.content.patient_persona,

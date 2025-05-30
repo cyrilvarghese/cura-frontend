@@ -13,6 +13,8 @@ export interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
+    accessToken: string | null;
+    refreshToken: string | null;
 }
 
 const initialState: AuthState = {
@@ -20,7 +22,9 @@ const initialState: AuthState = {
     token: null,
     isAuthenticated: false,
     isLoading: false,
-    error: null
+    error: null,
+    accessToken: null,
+    refreshToken: null
 };
 
 function createAuthStore() {
@@ -41,7 +45,9 @@ function createAuthStore() {
                 token: response.token,
                 isAuthenticated: true,
                 isLoading: false,
-                error: null
+                error: null,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token
             };
 
 
@@ -75,6 +81,8 @@ function createAuthStore() {
                 token: response.token,
                 isAuthenticated: true,
                 isLoading: false,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token,
                 error: null
             };
 

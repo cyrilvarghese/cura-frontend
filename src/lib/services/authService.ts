@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { toast } from 'svelte-sonner';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 interface SignupData {
     email: string;
@@ -21,6 +22,8 @@ interface AuthResponse {
         username: string;
         role: string;
     };
+    access_token: string;
+    refresh_token: string;
 }
 
 export class AuthService {
@@ -59,14 +62,14 @@ export class AuthService {
         }
     }
 
-    async login(data: LoginData): Promise<AuthResponse> {
+    async login(username: string, password: string): Promise<AuthResponse> {
         try {
             const response = await fetch(`${this.baseUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ username, password }),
             });
 
             if (!response.ok) {
@@ -92,22 +95,32 @@ export class AuthService {
         }
     }
 
+    async refreshToken(refreshToken: string) {
+        const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Token refresh failed');
+        }
+
+        return response.json();
+    }
+
+    async validateToken() {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/auth/validate`);
+        return response.json();
+    }
+
     async logout(): Promise<void> {
         try {
-            const response = await fetch(`${this.baseUrl}/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+            await makeAuthenticatedRequest(`${this.baseUrl}/auth/logout`, {
+                method: 'POST'
             });
-
-            if (!response.ok) {
-                toast.error('Logout failed', {
-                    description: 'Please try again'
-                });
-                throw new Error('Logout failed');
-            }
-
             toast.success('Logged out successfully');
         } catch (error) {
             console.error('Error during logout:', error);
