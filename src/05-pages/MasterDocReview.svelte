@@ -46,15 +46,21 @@
     }
 
     function transformApiResponse(docs: GoogleDoc[]) {
-        return docs.map((doc) => ({
-            title: doc.name,
-            docLink: doc.webViewLink,
-            status: transformStatus(doc.status),
-            submittedDate: doc.modifiedTime,
-            commentCount: doc.commentCount,
-            docId: doc.id,
-            approvedBy: doc.approved_by_username,
-        }));
+        return docs
+            .sort(
+                (a, b) =>
+                    new Date(b.modifiedTime).getTime() -
+                    new Date(a.modifiedTime).getTime(),
+            )
+            .map((doc) => ({
+                title: doc.name,
+                docLink: doc.webViewLink,
+                status: transformStatus(doc.status),
+                submittedDate: doc.modifiedTime,
+                commentCount: doc.commentCount,
+                docId: doc.id,
+                approvedBy: doc.approved_by_username,
+            }));
     }
 
     let caseReviews = $derived(transformApiResponse($googleDocsStore));
