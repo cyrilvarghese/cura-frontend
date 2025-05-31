@@ -6,10 +6,6 @@ export type TreatmentProtocolFeedback = {
     student_diagnosis_acknowledged: string;
     student_drug_plan_evaluation: {
         assumed_patient_scenario_from_context: string;
-        ideal_drugs_for_this_scenario_from_context: Array<{
-            drug_name: string;
-            brief_rationale: string;
-        }>;
         student_prescribed_drugs_summary: string[];
         appropriateness_of_student_choices_for_scenario: boolean;
         feedback_on_drug_choices: string;

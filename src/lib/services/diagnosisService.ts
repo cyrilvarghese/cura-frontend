@@ -35,7 +35,7 @@ export class DiagnosisService {
 
     async recordDiagnosis(request: DiagnosisRequest): Promise<any> {
         try {
-            const response = await makeAuthenticatedRequest(`${this.baseUrl}/record-diagnosis`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/diagnosis/record`, {
                 method: 'POST',
                 body: request
             });

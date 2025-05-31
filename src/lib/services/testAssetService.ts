@@ -31,7 +31,7 @@ export class TestAssetService {
         formData.append('case_id', caseId);
         formData.append('test_name', testName);
         formData.append('test_type', testType);
-
+        debugger;
         const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/upload`,
             {
@@ -63,7 +63,7 @@ export class TestAssetService {
         formData.append('case_id', caseId);
         formData.append('test_name', testName);
         formData.append('test_type', testType);
-
+        debugger;
         const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/upload`,  // Using the same endpoint as single upload
             {

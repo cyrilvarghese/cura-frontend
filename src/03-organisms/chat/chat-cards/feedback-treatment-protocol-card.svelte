@@ -160,36 +160,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Ideal drugs -->
-                            <div class="space-y-2">
-                                <h3 class="text-sm font-medium text-gray-700">
-                                    Ideal Drugs for This Scenario
-                                </h3>
-                                <div class="space-y-2">
-                                    {#each feedback.student_drug_plan_evaluation.ideal_drugs_for_this_scenario_from_context as drug}
-                                        <div
-                                            class="bg-blue-50 p-3 rounded-md border border-blue-200"
-                                        >
-                                            <div
-                                                class="flex items-center gap-2 mb-1"
-                                            >
-                                                <Pill
-                                                    class="h-4 w-4 text-blue-700"
-                                                />
-                                                <DrugDetailsPopover
-                                                    drugName={drug.drug_name}
-                                                />
-                                            </div>
-                                            <p
-                                                class="text-sm text-blue-700 ml-6"
-                                            >
-                                                {drug.brief_rationale}
-                                            </p>
-                                        </div>
-                                    {/each}
-                                </div>
-                            </div>
                         </div>
                     </Accordion.Content>
                 </Accordion.Item>
@@ -292,6 +262,25 @@
                                     </div>
                                 </div>
                             {/each}
+
+                            <!-- Key takeaway message for drug therapy -->
+                            <div class="space-y-3 pt-2">
+                                <h3 class="text-sm font-medium text-gray-700">
+                                    Key Takeaway
+                                </h3>
+                                <div
+                                    class="bg-blue-50 p-3 rounded-md border border-blue-200"
+                                >
+                                    <div class="flex items-start gap-2">
+                                        <Info
+                                            class="h-4 w-4 text-blue-700 mt-0.5 flex-shrink-0"
+                                        />
+                                        <p class="text-sm text-blue-800">
+                                            {feedback.key_takeaway_message_on_drug_therapy}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Critical adjunctive therapy notes -->
                             <div class="space-y-3 pt-2">

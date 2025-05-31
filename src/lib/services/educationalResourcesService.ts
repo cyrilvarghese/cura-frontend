@@ -37,7 +37,7 @@ export class EducationalResourcesService {
         // return Promise.resolve(mockEducationalCapsules as EducationalResourcesFeedback);
 
         try {
-            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/educational-resources`);
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/feedback/v2/educational-resources`);
             const data = await response.json();
             return { educationalCapsules: data.feedback_result.educationalCapsules };
         } catch (error) {
@@ -46,26 +46,6 @@ export class EducationalResourcesService {
         }
     }
 
-    async updateEducationalResources(caseId: string, resourcesData: any) {
-        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/educational-resources`, {
-            method: 'PUT',
-            body: resourcesData
-        });
-        return response.json();
-    }
-
-    async recordEducationalResources(request: EducationalResourcesRequest): Promise<any> {
-        try {
-            const response = await makeAuthenticatedRequest(`${this.baseUrl}/record-educational-resources`, {
-                method: 'POST',
-                body: request
-            });
-            return response.json();
-        } catch (error) {
-            console.error('Error recording educational resources:', error);
-            throw error;
-        }
-    }
 }
 
 export const educationalResourcesService = new EducationalResourcesService(); 

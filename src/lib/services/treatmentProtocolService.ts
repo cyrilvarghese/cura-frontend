@@ -118,7 +118,7 @@ export class TreatmentProtocolService {
         treatmentPlan: string[]
     ): Promise<TreatmentPlanResponse> {
         try {
-            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment-plan`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment-plan/record`, {
                 method: 'POST',
                 body: {
                     case_id: caseId,

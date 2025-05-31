@@ -95,6 +95,7 @@
     }
 
     function handlePaste(event: ClipboardEvent) {
+        debugger;
         const items = event.clipboardData?.items;
         if (!items) return;
 

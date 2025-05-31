@@ -35,11 +35,6 @@
     const isLoading = $derived($educationalResourcesFeedbackStore.isLoading);
     const error = $derived($educationalResourcesFeedbackStore.error);
 
-    function handleSwitchChange(event: CustomEvent<boolean>) {
-        isComparativeView = event.detail;
-        console.log("isComparativeView:", isComparativeView);
-    }
-
     onMount(async () => {
         try {
             await educationalResourcesFeedbackStore.getEducationalResources(
