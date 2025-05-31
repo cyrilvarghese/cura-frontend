@@ -448,11 +448,11 @@
                 </div>
             </div>
 
-            {#if error}
+            <!-- {#if error}
                 <div class="bg-destructive/10 text-destructive p-2 m-2 rounded">
                     {error}
                 </div>
-            {/if}
+            {/if} -->
 
             <!-- Chat Messages -->
             <ScrollArea
