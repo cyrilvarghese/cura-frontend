@@ -23,6 +23,7 @@
     import { setContext } from "svelte";
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import ConfirmationDialog from "$lib/components/ui/confirmation-dialog.svelte";
+    import { automatedCaseGenerationService } from "$lib/services/automatedCaseGenerationService";
 
     const caseDataService = new CaseDataService();
 
@@ -158,29 +159,63 @@
         uploadState.error = null;
 
         try {
-            uploadState.isGeneratingPersona = true;
-            await handleGeneratePersona();
-            uploadState.isGeneratingPersona = false;
+            await automatedCaseGenerationService.generateAllCaseData(
+                {
+                    documentName: uploadState.selectedDocumentName,
+                    googleDocLink: uploadState.googleDocLink || "",
+                    departmentName: department?.name || "",
+                },
+                (progress) => {
+                    // Update individual loading states based on progress
+                    uploadState.isGeneratingPersona =
+                        progress.step === "Patient Persona" &&
+                        !progress.isComplete;
+                    uploadState.isGeneratingPhysicalExam =
+                        progress.step === "Physical Exam Data" &&
+                        !progress.isComplete;
+                    uploadState.isGeneratingDifferential =
+                        progress.step === "Differential Diagnosis" &&
+                        !progress.isComplete;
+                    uploadState.isGeneratingHistoryContext =
+                        progress.step === "History Summary" &&
+                        !progress.isComplete;
+                    uploadState.isGeneratingTreatmentContext =
+                        progress.step === "Treatment Context" &&
+                        !progress.isComplete;
+                    uploadState.isGeneratingClinicalFindingsContext =
+                        progress.step === "Clinical Findings" &&
+                        !progress.isComplete;
 
-            uploadState.isGeneratingPhysicalExam = true;
-            await handleGenerateCaseData();
-            uploadState.isGeneratingPhysicalExam = false;
+                    // Update current tab based on generation step
+                    switch (progress.step) {
+                        case "Patient Persona":
+                            currentTab = "patient-persona";
+                            break;
+                        case "Physical Exam Data":
+                            currentTab = "physical-exams";
+                            break;
+                        case "Differential Diagnosis":
+                            currentTab = "differential-diagnosis";
+                            break;
+                        case "History Summary":
+                            currentTab = "history-summary";
+                            break;
+                        case "Treatment Context":
+                            currentTab = "treatment-context";
+                            break;
+                        case "Clinical Findings":
+                            currentTab = "clinical-findings-context";
+                            break;
+                        case "Cover Image":
+                            currentTab = "cover-image";
+                            break;
+                    }
 
-            uploadState.isGeneratingDifferential = true;
-            await handleGenerateDifferentialDiagnosis();
-            uploadState.isGeneratingDifferential = false;
-
-            uploadState.isGeneratingHistoryContext = true;
-            await handleGenerateHistorySummary();
-            uploadState.isGeneratingHistoryContext = false;
-
-            uploadState.isGeneratingTreatmentContext = true;
-            await handleTreatmentContext();
-            uploadState.isGeneratingTreatmentContext = false;
-
-            uploadState.isGeneratingClinicalFindingsContext = true;
-            await handleClinicalFindingsContext();
-            uploadState.isGeneratingClinicalFindingsContext = false;
+                    if (progress.error) {
+                        uploadState.error = progress.error;
+                    }
+                },
+            );
         } catch (error) {
             uploadState.error =
                 error instanceof Error ? error.message : "Generation failed";
