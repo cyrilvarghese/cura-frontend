@@ -14,7 +14,6 @@
     } from "$lib/stores/caseCreatorStore";
     import type { CaseStoreState } from "$lib/types/caseTypes";
     import { onDestroy, onMount } from "svelte";
-    import type { DocumentUploadResponse } from "$lib/services/documentService";
     import {
         CaseDataService,
         type PublishCaseParams,

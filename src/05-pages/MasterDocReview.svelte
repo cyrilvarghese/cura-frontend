@@ -24,6 +24,7 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { currentDepartment } from "$lib/stores/teamStore";
     import { get } from "svelte/store";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     // Direct state declarations without import
     let searchQuery = $state("");
     let isLoading = $state(true);
@@ -34,6 +35,9 @@
     let isUploading = $state(false);
     let showPendingOnly = $state(false);
     let departmentId = $state("");
+    let selectedDocIds = $state(new Set<string>());
+    let isBulkApproving = $state(false);
+    let bulkApprovalProgress = $state({ current: 0, total: 0 });
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
             CASE_REVIEW_PENDING: "Document Review Pending",
@@ -168,6 +172,45 @@
         }
     }
 
+    async function handleBulkApprove() {
+        const selectedIds = Array.from(selectedDocIds);
+        if (selectedIds.length === 0) return;
+
+        isBulkApproving = true;
+        bulkApprovalProgress = { current: 0, total: selectedIds.length };
+
+        try {
+            for (let i = 0; i < selectedIds.length; i++) {
+                const docId = selectedIds[i];
+                bulkApprovalProgress = {
+                    current: i,
+                    total: selectedIds.length,
+                };
+
+                // Call the existing approve function but without reloading docs
+                const originalIsApproving = isApproving;
+                isApproving = true;
+                try {
+                    await googleDocsStore.approveCase(docId);
+                } finally {
+                    isApproving = originalIsApproving;
+                }
+
+                // Update progress after successful approval
+                bulkApprovalProgress = {
+                    current: i + 1,
+                    total: selectedIds.length,
+                };
+            }
+
+            // Clear selection and reload docs only once at the end
+            selectedDocIds = new Set();
+            await googleDocsStore.loadDocs(departmentId);
+        } finally {
+            isBulkApproving = false;
+        }
+    }
+
     async function handleGenerateData(
         docId: string,
         fileName: string,
@@ -186,11 +229,35 @@
     async function handleGenerateMCQ(docId: string, title: string) {
         console.log("Generate MCQ clicked:", { docId, title });
     }
+
+    // Add helper functions for checkbox handling
+    function toggleSelectAll() {
+        if (selectedDocIds.size === filteredCases.length) {
+            selectedDocIds = new Set();
+        } else {
+            selectedDocIds = new Set(
+                filteredCases.map((review) => review.docId),
+            );
+        }
+    }
+
+    function toggleSelectDoc(docId: string) {
+        if (selectedDocIds.has(docId)) {
+            // Create new Set without the docId
+            selectedDocIds = new Set(
+                [...selectedDocIds].filter((id) => id !== docId),
+            );
+        } else {
+            // Create new Set with the docId added
+            selectedDocIds = new Set([...selectedDocIds, docId]);
+        }
+    }
 </script>
 
 <PageLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Review" }]}
 >
+    {@debug selectedDocIds}
     <div class="flex items-center justify-between mb-4">
         <div>
             <h1 class="text-2xl font-bold">Master Document Review</h1>
@@ -237,6 +304,62 @@
         </div>
     </div>
 
+    {#if selectedDocIds.size > 0}
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-blue-700 font-medium">
+                        {selectedDocIds.size} document{selectedDocIds.size === 1
+                            ? ""
+                            : "s"} selected
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => (selectedDocIds = new Set())}
+                        class="text-blue-700 border-blue-300 hover:bg-blue-100"
+                    >
+                        Clear selection
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => {
+                            // Handle bulk approve
+                            handleBulkApprove();
+                        }}
+                        class="text-green-700 border-green-300 hover:bg-green-100"
+                        disabled={isBulkApproving}
+                    >
+                        Bulk Approve
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => {
+                            // Handle bulk delete
+                            if (
+                                confirm(
+                                    `Are you sure you want to delete ${selectedDocIds.size} document(s)?`,
+                                )
+                            ) {
+                                console.log(
+                                    "Bulk delete:",
+                                    Array.from(selectedDocIds),
+                                );
+                            }
+                        }}
+                        class="text-red-700 border-red-300 hover:bg-red-100"
+                    >
+                        Bulk Delete
+                    </Button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
     <div class="mt-4">
         <div class="overflow-x-auto">
             {#if isLoading}
@@ -265,6 +388,20 @@
                 <table class="w-full border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b">
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+                            >
+                                <Checkbox
+                                    checked={filteredCases.length > 0 &&
+                                        selectedDocIds.size ===
+                                            filteredCases.length}
+                                    indeterminate={selectedDocIds.size > 0 &&
+                                        selectedDocIds.size <
+                                            filteredCases.length}
+                                    onCheckedChange={toggleSelectAll}
+                                    aria-label="Select all documents"
+                                />
+                            </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
@@ -300,6 +437,18 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         {#each filteredCases as review, index}
                             <tr class="hover:bg-gray-50">
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-12"
+                                >
+                                    <Checkbox
+                                        checked={selectedDocIds.has(
+                                            review.docId,
+                                        )}
+                                        onCheckedChange={() =>
+                                            toggleSelectDoc(review.docId)}
+                                        aria-label={`Select ${review.title}`}
+                                    />
+                                </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
@@ -488,3 +637,8 @@
         </div>
     </div>
 </PageLayout>
+
+<LoadingOverlay
+    isVisible={isBulkApproving}
+    message={`Approving documents: ${bulkApprovalProgress.current} of ${bulkApprovalProgress.total} completed`}
+/>
