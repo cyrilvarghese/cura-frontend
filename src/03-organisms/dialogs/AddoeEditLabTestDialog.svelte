@@ -9,7 +9,7 @@
     import MedicalImageUploader from "$lib/components/medical-image-uploader.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
     import { editExamStore } from "$lib/stores/editExamStore";
-    import type { ExaminationResult, FindingContent } from "$lib/types/index";
+    import type { TestResult, TestResultContent } from "$lib/types/index";
 
     let {
         caseId,
@@ -18,9 +18,9 @@
         editData = undefined,
     } = $props<{
         caseId: string;
-        onSuccess?: (examName: string, examData: any) => void;
+        onSuccess?: (testName: string, testData: any) => void;
         open?: boolean;
-        editData?: ExaminationResult;
+        editData?: TestResult;
     }>();
 
     // Local state to manage dialog open/close
@@ -51,42 +51,42 @@
         }
     });
 
-    // State for add/edit physical exam dialog
-    let examName = $state("");
-    let examPurpose = $state("");
-    let examType = $state<"text" | "mixed">("text");
-    let textFindings = $state("");
+    // State for add/edit lab test dialog
+    let testName = $state("");
+    let testPurpose = $state("");
+    let testType = $state<"text" | "mixed">("text");
+    let textContent = $state("");
     let interpretation = $state("");
     let uploadedImages = $state<{ url: string; id?: string }[]>([]);
     let isUploading = $state(false);
 
     // Subscribe to store state
-    const { isLoading: isAddingExam, error: addExamError } =
+    const { isLoading: isAddingTest, error: addTestError } =
         $derived($editExamStore);
 
     function populateFormWithEditData() {
         if (!editData) return;
 
-        examName = editData.name;
-        examPurpose = editData.purpose || "";
+        testName = editData.testName;
+        testPurpose = editData.purpose || "";
         interpretation = editData.interpretation || "";
 
-        const findings = editData.findings as FindingContent;
+        const results = editData.results as TestResultContent;
 
-        if (findings?.type === "text") {
-            examType = "text";
-            textFindings = findings.content || "";
+        if (results?.type === "text") {
+            testType = "text";
+            textContent = results.content || "";
             uploadedImages = [];
-        } else if (findings?.type === "mixed") {
-            examType = "mixed";
+        } else if (results?.type === "mixed") {
+            testType = "mixed";
             // Extract text content and images from mixed content
-            const textContent = findings.content?.find(
+            const textContentItem = results.content?.find(
                 (item) => item.type === "text",
             );
-            textFindings = textContent?.content || "";
+            textContent = textContentItem?.content || "";
 
             const imageContents =
-                findings.content?.filter((item) => item.type === "image") || [];
+                results.content?.filter((item) => item.type === "image") || [];
             uploadedImages = imageContents.flatMap((item) =>
                 Array.isArray(item.content?.url)
                     ? item.content.url.map((url) => ({ url }))
@@ -96,57 +96,56 @@
             );
         } else {
             // Default to text if type is unclear
-            examType = "text";
-            textFindings = typeof findings === "string" ? findings : "";
+            testType = "text";
+            textContent = typeof results === "string" ? results : "";
             uploadedImages = [];
         }
     }
 
     async function handleSubmit() {
-        if (!examName.trim()) return;
+        if (!testName.trim()) return;
 
-        const finalInterpretation =
-            interpretation.trim() || "Examination completed successfully";
+        const finalInterpretation = interpretation.trim() || "";
 
         try {
             let response;
-            if (examType === "text") {
+            if (testType === "text") {
                 if (isEditMode) {
-                    response = await editExamStore.editTextExam({
+                    response = await editExamStore.editTextLabTest({
                         case_id: caseId,
-                        test_name: examName,
-                        purpose: examPurpose,
-                        text_content: textFindings,
+                        test_name: testName,
+                        purpose: testPurpose,
+                        text_content: textContent,
                         interpretation: finalInterpretation,
                         status: "completed",
                     });
                 } else {
-                    response = await editExamStore.addTextExam({
+                    response = await editExamStore.addTextLabTest({
                         case_id: caseId,
-                        test_name: examName,
-                        purpose: examPurpose,
-                        text_content: textFindings,
+                        test_name: testName,
+                        purpose: testPurpose,
+                        text_content: textContent,
                         interpretation: finalInterpretation,
                         status: "completed",
                     });
                 }
             } else {
                 if (isEditMode) {
-                    response = await editExamStore.editMixedExam({
+                    response = await editExamStore.editMixedLabTest({
                         case_id: caseId,
-                        test_name: examName,
-                        purpose: examPurpose,
-                        text_content: textFindings,
+                        test_name: testName,
+                        purpose: testPurpose,
+                        text_content: textContent,
                         url: uploadedImages.map((img) => img.url),
                         interpretation: finalInterpretation,
                         status: "completed",
                     });
                 } else {
-                    response = await editExamStore.addMixedExam({
+                    response = await editExamStore.addMixedLabTest({
                         case_id: caseId,
-                        test_name: examName,
-                        purpose: examPurpose,
-                        text_content: textFindings,
+                        test_name: testName,
+                        purpose: testPurpose,
+                        text_content: textContent,
                         interpretation: finalInterpretation,
                         status: "completed",
                         url: uploadedImages.map((img) => img.url),
@@ -154,20 +153,20 @@
                 }
             }
 
-            // Call success callback with formatted exam data for UI update
-            const updatedExamData = {
-                purpose: examPurpose,
-                findings:
-                    examType === "text"
-                        ? { type: "text", content: textFindings }
+            // Call success callback with formatted test data for UI update
+            const updatedTestData = {
+                purpose: testPurpose,
+                results:
+                    testType === "text"
+                        ? { type: "text", content: textContent }
                         : {
                               type: "mixed",
                               content: [
-                                  ...(textFindings
+                                  ...(textContent
                                       ? [
                                             {
                                                 type: "text",
-                                                content: textFindings,
+                                                content: textContent,
                                             },
                                         ]
                                       : []),
@@ -175,7 +174,7 @@
                                       type: "image",
                                       content: {
                                           url: [img.url],
-                                          altText: "Examination image",
+                                          altText: "Lab test image",
                                       },
                                   })),
                               ],
@@ -185,23 +184,23 @@
                 comments: editData?.comments || [],
             };
 
-            onSuccess?.(examName, updatedExamData);
+            onSuccess?.(testName, updatedTestData);
 
             resetForm();
             isDialogOpen = false;
         } catch (error) {
             console.error(
-                `Failed to ${isEditMode ? "edit" : "add"} examination:`,
+                `Failed to ${isEditMode ? "edit" : "add"} lab test:`,
                 error,
             );
         }
     }
 
     function resetForm() {
-        examName = "";
-        examPurpose = "";
-        examType = "text";
-        textFindings = "";
+        testName = "";
+        testPurpose = "";
+        testType = "text";
+        textContent = "";
         interpretation = "";
         uploadedImages = [];
     }
@@ -229,53 +228,51 @@
     }
 </script>
 
-<!-- Add/Edit Physical Exam Dialog -->
+<!-- Add/Edit Lab Test Dialog -->
 <Dialog.Root bind:open={isDialogOpen}>
     <Dialog.Content class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <Dialog.Header>
-            <Dialog.Title
-                >{isEditMode ? "Edit" : "Add"} Physical Examination</Dialog.Title
-            >
+            <Dialog.Title>{isEditMode ? "Edit" : "Add"} Lab Test</Dialog.Title>
             <Dialog.Description>
-                {isEditMode ? "Edit the" : "Add a new"} physical examination with
-                text findings or mixed content including images.
+                {isEditMode ? "Edit the" : "Add a new"} lab test with text results
+                or mixed content including images.
             </Dialog.Description>
         </Dialog.Header>
 
         <div class="space-y-4">
-            <!-- Exam Name -->
+            <!-- Test Name -->
             <div class="space-y-2">
-                <Label for="exam-name">Examination Name</Label>
+                <Label for="test-name">Lab Test Name</Label>
                 <Input
-                    id="exam-name"
-                    bind:value={examName}
-                    placeholder="e.g., Skin Examination, Neurological Assessment"
+                    id="test-name"
+                    bind:value={testName}
+                    placeholder="e.g., Blood Work, CBC, Urinalysis"
                     disabled={isEditMode}
                 />
             </div>
 
-            <!-- Exam Purpose and Type Row -->
+            <!-- Test Purpose and Type Row -->
             <div class="flex gap-4">
-                <!-- Exam Purpose -->
+                <!-- Test Purpose -->
                 <div class="flex-1 space-y-2">
-                    <Label for="exam-purpose">Purpose</Label>
+                    <Label for="test-purpose">Purpose</Label>
                     <Input
-                        id="exam-purpose"
-                        bind:value={examPurpose}
-                        placeholder="Purpose of this examination"
+                        id="test-purpose"
+                        bind:value={testPurpose}
+                        placeholder="Purpose of this lab test"
                     />
                 </div>
 
-                <!-- Exam Type Selection -->
+                <!-- Test Type Selection -->
                 <div class="flex-1 space-y-2">
-                    <Label>Examination Type</Label>
-                    <Select.Root type="single" bind:value={examType}>
+                    <Label>Test Type</Label>
+                    <Select.Root type="single" bind:value={testType}>
                         <Select.Trigger class="w-full">
-                            {examType === "text"
+                            {testType === "text"
                                 ? "Text Only"
-                                : examType === "mixed"
+                                : testType === "mixed"
                                   ? "Mixed (Text + Images)"
-                                  : "Select examination type"}
+                                  : "Select test type"}
                         </Select.Trigger>
                         <Select.Content>
                             <Select.Group>
@@ -294,19 +291,19 @@
                 </div>
             </div>
 
-            <!-- Text Findings and Interpretation Row -->
+            <!-- Text Results and Interpretation Row -->
             <div class="flex gap-4">
-                <!-- Text Findings -->
+                <!-- Text Results -->
                 <div class="flex-1 space-y-2">
-                    <Label for="text-findings">
-                        {examType === "mixed"
-                            ? "Text Findings (Optional)"
-                            : "Findings"}
+                    <Label for="text-content">
+                        {testType === "mixed"
+                            ? "Text Results (Optional)"
+                            : "Test Results"}
                     </Label>
                     <Textarea
-                        id="text-findings"
-                        bind:value={textFindings}
-                        placeholder="Enter examination findings..."
+                        id="text-content"
+                        bind:value={textContent}
+                        placeholder="Enter lab test results..."
                         rows="4"
                     />
                 </div>
@@ -317,16 +314,16 @@
                     <Textarea
                         id="interpretation"
                         bind:value={interpretation}
-                        placeholder="Examination completed successfully (default if left empty)"
+                        placeholder="Test interpretation (optional)"
                         rows="4"
                     />
                 </div>
             </div>
 
             <!-- Image Upload for Mixed Type -->
-            {#if examType === "mixed"}
+            {#if testType === "mixed"}
                 <div class="space-y-2">
-                    <Label>Medical Images</Label>
+                    <Label>Lab Test Images</Label>
                     <div class="border rounded-lg p-4">
                         {#if uploadedImages.length > 0}
                             <div class="mb-4">
@@ -334,10 +331,10 @@
                                     imageUrls={uploadedImages.map(
                                         (img) => img.url,
                                     )}
-                                    altText="Examination Images"
+                                    altText="Lab Test Images"
                                     {caseId}
-                                    testName={examName || "New Exam"}
-                                    testType="physical_exam"
+                                    testName={testName || "New Lab Test"}
+                                    testType="lab_test"
                                     onUploadSuccess={handleUploadSuccess}
                                     onUploadError={handleUploadError}
                                 />
@@ -345,8 +342,8 @@
                         {:else}
                             <MedicalImageUploader
                                 {caseId}
-                                testName={examName || "New Exam"}
-                                testType="physical_exam"
+                                testName={testName || "New Lab Test"}
+                                testType="lab_test"
                                 onStart={handleUploadStart}
                                 onSuccess={handleUploadSuccess}
                                 onError={handleUploadError}
@@ -357,11 +354,11 @@
             {/if}
 
             <!-- Error Display -->
-            {#if addExamError}
+            {#if addTestError}
                 <div
                     class="text-sm text-destructive bg-destructive/10 p-3 rounded-md"
                 >
-                    {addExamError}
+                    {addTestError}
                 </div>
             {/if}
         </div>
@@ -378,16 +375,16 @@
             </Button>
             <Button
                 onclick={handleSubmit}
-                disabled={!examName.trim() ||
+                disabled={!testName.trim() ||
                     isUploading ||
-                    isAddingExam ||
-                    (examType === "mixed" && uploadedImages.length === 0)}
+                    isAddingTest ||
+                    (testType === "mixed" && uploadedImages.length === 0)}
             >
-                {isAddingExam
+                {isAddingTest
                     ? `${isEditMode ? "Updating" : "Adding"}...`
                     : isUploading
                       ? "Uploading..."
-                      : `${isEditMode ? "Update" : "Add"} Examination`}
+                      : `${isEditMode ? "Update" : "Add"} Lab Test`}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

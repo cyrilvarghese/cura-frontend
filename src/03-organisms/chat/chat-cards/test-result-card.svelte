@@ -1,7 +1,10 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
     import { Badge } from "$lib/components/ui/badge";
+    import { Button } from "$lib/components/ui/button";
     import TestTube from "lucide-svelte/icons/test-tube";
+    import Edit from "lucide-svelte/icons/edit";
+    import Trash2 from "lucide-svelte/icons/trash-2";
     import { getRelativeTime } from "$lib/utils/time";
     import TestResultsTable from "./test-results-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
@@ -11,13 +14,19 @@
     import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { getContext } from "svelte";
+    import { editExamStore } from "$lib/stores/editExamStore";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
 
     const {
         result,
         caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "",
+        onDelete,
+        onEdit,
     } = $props<{
         result: TestResult;
         caseId?: string;
+        onDelete?: (testName: string) => void;
+        onEdit?: (testName: string, updatedData: any) => void;
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type");
@@ -59,7 +68,38 @@
         }
     }
 
-    const resultContent = renderResult(result.results);
+    const resultContent = $derived(renderResult(result.results));
+
+    let deleteConfirmOpen = $state(false);
+
+    // Handler functions for edit and delete
+    function handleEdit() {
+        console.log("Edit lab test:", result.testName);
+        // Call the callback to notify parent component
+        onEdit?.(result.testName, result);
+    }
+
+    function handleDelete() {
+        deleteConfirmOpen = true;
+    }
+
+    async function confirmDelete() {
+        deleteConfirmOpen = false;
+
+        try {
+            await editExamStore.deleteLabTest({
+                case_id: caseId,
+                test_name: result.testName,
+            });
+
+            // Call the callback to notify parent component
+            onDelete?.(result.testName);
+
+            console.log("Lab test deleted successfully");
+        } catch (error) {
+            console.error("Failed to delete lab test:", error);
+        }
+    }
 </script>
 
 <Card.Root
@@ -80,6 +120,24 @@
                 </Card.Title>
             </div>
             <div class="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onclick={handleEdit}
+                >
+                    <Edit class="h-4 w-4" />
+                </Button>
+
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onclick={handleDelete}
+                >
+                    <Trash2 class="h-4 w-4" />
+                </Button>
+
                 <CommentButton
                     {caseId}
                     testName={result.testName}
@@ -178,3 +236,22 @@
         </p>
     </Card.Footer>
 </Card.Root>
+
+<!-- Delete Confirmation Dialog -->
+<AlertDialog.Root bind:open={deleteConfirmOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete lab test?</AlertDialog.Title>
+            <AlertDialog.Description>
+                Are you sure you want to delete "{result.testName}"? This action
+                cannot be undone.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action class="bg-destructive" onclick={confirmDelete}>
+                Delete
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>

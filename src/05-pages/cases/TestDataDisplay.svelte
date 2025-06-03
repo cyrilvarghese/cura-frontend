@@ -1,39 +1,65 @@
 <script lang="ts">
     import { TestTube, Plus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import ExaminationCard from "../../03-organisms/chat/chat-cards/examination-card.svelte";
     import TestResultCard from "../../03-organisms/chat/chat-cards/test-result-card.svelte";
     import AddorEditPhysicalExamDialog from "../../03-organisms/dialogs/AddorEditPhysicalExamDialog.svelte";
+    import AddoeEditLabTestDialog from "../../03-organisms/dialogs/AddoeEditLabTestDialog.svelte";
     import type { FindingContent, TestResultContent } from "$lib/types/index";
-    import { refreshTestData } from "$lib/stores/caseCreatorStore";
+    import { refreshTestData, caseStore } from "$lib/stores/caseCreatorStore";
 
-    const { testData, caseId } = $props<{
-        testData: {
+    const { caseId } = $props<{
+        caseId: string;
+        testData?: {
             physical_exam: Record<string, any>;
             lab_test: Record<string, any>;
         };
-        caseId: string;
     }>();
+
+    // Subscribe to store for reactive data
+    const storeData = $derived($caseStore);
+
+    // Use store data if available, fallback to props
+    const testData = $derived(
+        storeData.testData || {
+            physical_exam: {},
+            lab_test: {},
+        },
+    );
 
     // State for dialog
     let addExamDialogOpen = $state(false);
     let editExamDialogOpen = $state(false);
     let editExamData = $state<any>(null);
+    let addLabTestDialogOpen = $state(false);
+    let editLabTestDialogOpen = $state(false);
+    let editLabTestData = $state<any>(null);
+
+    // Loading state for data refresh
+    let isRefreshing = $state(false);
+
+    // Helper function to handle refresh with loading state
+    async function handleDataRefresh(action: string) {
+        console.log(`${action} - Refreshing test data for case:`, caseId);
+        isRefreshing = true;
+        try {
+            await refreshTestData(caseId);
+        } finally {
+            isRefreshing = false;
+        }
+    }
 
     // Handle successful exam addition
     function handleExamAdded(examData: any) {
         console.log("New exam added:", examData);
-        console.log("Refreshing test data for case:", caseId);
-        // Refresh the data from API directly
-        refreshTestData(caseId);
+        handleDataRefresh("Exam added");
     }
 
     // Handle exam deletion
     function handleExamDeleted(examName: string) {
         console.log("Exam deleted:", examName);
-        console.log("Refreshing test data for case:", caseId);
-        // Refresh the data from API directly
-        refreshTestData(caseId);
+        handleDataRefresh("Exam deleted");
     }
 
     // Handle exam edit (when implemented)
@@ -46,11 +72,41 @@
     // Handle successful exam update
     function handleExamUpdated(examData: any) {
         console.log("Exam updated:", examData);
-        console.log("Refreshing test data for case:", caseId);
-        // Refresh the data from API directly
-        refreshTestData(caseId);
+        handleDataRefresh("Exam updated");
         editExamDialogOpen = false;
         editExamData = null;
+    }
+
+    // Handle lab test deletion
+    function handleLabTestDeleted(testName: string) {
+        console.log("Lab test deleted:", testName);
+        handleDataRefresh("Lab test deleted");
+    }
+
+    // Handle lab test edit (when implemented)
+    function handleLabTestEdited(testName: string, testData: any) {
+        console.log("Opening edit dialog for lab test:", testName);
+        editLabTestData = testData;
+        editLabTestDialogOpen = true;
+    }
+
+    // Handle lab test addition (placeholder for future implementation)
+    function handleAddLabTest() {
+        addLabTestDialogOpen = true;
+    }
+
+    // Handle successful lab test addition
+    function handleLabTestAdded(testName: string, testData: any) {
+        console.log("New lab test added:", testData);
+        handleDataRefresh("Lab test added");
+    }
+
+    // Handle successful lab test update
+    function handleLabTestUpdated(testName: string, testData: any) {
+        console.log("Lab test updated:", testData);
+        handleDataRefresh("Lab test updated");
+        editLabTestDialogOpen = false;
+        editLabTestData = null;
     }
 
     // Group physical exams by finding type
@@ -190,7 +246,24 @@
     </section>
 
     <section class="space-y-8">
-        <h3 class="text-xl pb-4 pt-6 font-semibold">Lab Tests</h3>
+        <div
+            class="flex items-center justify-start mb-8 border-b pb-4 border-gray-200 dark:border-gray-700"
+        >
+            <h3
+                class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3"
+            >
+                Lab Tests
+            </h3>
+            <Button
+                variant="outline"
+                size="sm"
+                class="gap-2 ml-6 text-amber-600 px-4 py-2"
+                onclick={handleAddLabTest}
+            >
+                <Plus class="h-4 w-4" />
+                Add Lab Test
+            </Button>
+        </div>
 
         <!-- Group lab tests by type -->
         {#each Object.entries(groupedTests) as [type, tests]}
@@ -223,6 +296,8 @@
                                     comments: test.comments,
                                     isVerified: true,
                                 }}
+                                onDelete={handleLabTestDeleted}
+                                onEdit={handleLabTestEdited}
                             />
                         {/each}
                     </div>
@@ -246,3 +321,21 @@
     editData={editExamData}
     onSuccess={handleExamUpdated}
 />
+
+<!-- Add Lab Test Dialog Component -->
+<AddoeEditLabTestDialog
+    {caseId}
+    bind:open={addLabTestDialogOpen}
+    onSuccess={handleLabTestAdded}
+/>
+
+<!-- Edit Lab Test Dialog Component -->
+<AddoeEditLabTestDialog
+    {caseId}
+    bind:open={editLabTestDialogOpen}
+    editData={editLabTestData}
+    onSuccess={handleLabTestUpdated}
+/>
+
+<!-- Loading Overlay for Data Refresh -->
+<LoadingOverlay message="Refreshing data..." isVisible={isRefreshing} />

@@ -47,7 +47,9 @@
         }
     }
 
-    const findingContent = renderFinding(result.findings as FindingContent);
+    const findingContent = $derived(
+        renderFinding(result.findings as FindingContent),
+    );
     let deleteConfirmOpen = $state(false);
 
     // Handler functions for edit and delete

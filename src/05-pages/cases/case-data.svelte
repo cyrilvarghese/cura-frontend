@@ -298,10 +298,7 @@
                             </AlertDescription>
                         </Alert>
                     {:else if uploadState.testData}
-                        <TestDataDisplay
-                            testData={uploadState.testData}
-                            caseId={uploadState.caseId}
-                        />
+                        <TestDataDisplay caseId={uploadState.caseId} />
                     {:else}
                         <div class="text-center text-muted-foreground py-8">
                             <p>Physical exams are not available yet</p>
@@ -520,10 +517,7 @@
             {:else if activeTabContent === "physical-exams"}
                 <!-- Physical Exams Content -->
                 {#if uploadState.testData}
-                    <TestDataDisplay
-                        testData={uploadState.testData}
-                        caseId={uploadState.caseId}
-                    />
+                    <TestDataDisplay caseId={uploadState.caseId} />
                 {/if}
             {:else if activeTabContent === "differential-diagnosis"}
                 <!-- Differential Diagnosis Content -->
