@@ -18,6 +18,7 @@
     import { convertAsteriskToBold } from "$lib/utils/text";
     import { editExamStore } from "$lib/stores/editExamStore";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { authStore, type AuthState } from "$lib/stores/authStore";
 
     const {
         result,
@@ -32,6 +33,13 @@
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
+
+    let user: AuthState["user"] | undefined = $state();
+
+    authStore.subscribe((state) => {
+        user = state.user;
+    });
+
     function renderFinding(finding: FindingContent): string | FindingContent {
         switch (finding.type) {
             case "text":
@@ -108,23 +116,25 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                    onclick={handleEdit}
-                >
-                    <Edit class="h-4 w-4" />
-                </Button>
+                {#if user?.role === "admin"}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        onclick={handleEdit}
+                    >
+                        <Edit class="h-4 w-4" />
+                    </Button>
 
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onclick={handleDelete}
-                >
-                    <Trash2 class="h-4 w-4" />
-                </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onclick={handleDelete}
+                    >
+                        <Trash2 class="h-4 w-4" />
+                    </Button>
+                {/if}
 
                 <CommentButton
                     {caseId}
