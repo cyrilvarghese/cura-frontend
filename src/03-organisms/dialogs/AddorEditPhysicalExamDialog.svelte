@@ -9,19 +9,25 @@
     import MedicalImageUploader from "$lib/components/medical-image-uploader.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
     import { editExamStore } from "$lib/stores/editExamStore";
+    import type { ExaminationResult, FindingContent } from "$lib/types/index";
 
     let {
         caseId,
         onSuccess,
         open = $bindable(),
+        editData = undefined,
     } = $props<{
         caseId: string;
-        onSuccess?: (examData: any) => void;
+        onSuccess?: (examName: string, examData: any) => void;
         open?: boolean;
+        editData?: ExaminationResult;
     }>();
 
     // Local state to manage dialog open/close
     let isDialogOpen = $state(false);
+
+    // Check if we're in edit mode
+    const isEditMode = $derived(!!editData);
 
     // Sync with parent prop
     $effect(() => {
@@ -37,11 +43,15 @@
     // Clear state when dialog opens
     $effect(() => {
         if (isDialogOpen) {
-            resetForm();
+            if (isEditMode) {
+                populateFormWithEditData();
+            } else {
+                resetForm();
+            }
         }
     });
 
-    // State for add physical exam dialog
+    // State for add/edit physical exam dialog
     let examName = $state("");
     let examPurpose = $state("");
     let examType = $state<"text" | "mixed">("text");
@@ -54,7 +64,45 @@
     const { isLoading: isAddingExam, error: addExamError } =
         $derived($editExamStore);
 
-    async function addPhysicalExam() {
+    function populateFormWithEditData() {
+        if (!editData) return;
+
+        examName = editData.name;
+        examPurpose = editData.purpose || "";
+        interpretation = editData.interpretation || "";
+
+        const findings = editData.findings as FindingContent;
+
+        if (findings?.type === "text") {
+            examType = "text";
+            textFindings = findings.content || "";
+            uploadedImages = [];
+        } else if (findings?.type === "mixed") {
+            examType = "mixed";
+            // Extract text content and images from mixed content
+            const textContent = findings.content?.find(
+                (item) => item.type === "text",
+            );
+            textFindings = textContent?.content || "";
+
+            const imageContents =
+                findings.content?.filter((item) => item.type === "image") || [];
+            uploadedImages = imageContents.flatMap((item) =>
+                Array.isArray(item.content?.url)
+                    ? item.content.url.map((url) => ({ url }))
+                    : item.content?.url
+                      ? [{ url: item.content.url }]
+                      : [],
+            );
+        } else {
+            // Default to text if type is unclear
+            examType = "text";
+            textFindings = typeof findings === "string" ? findings : "";
+            uploadedImages = [];
+        }
+    }
+
+    async function handleSubmit() {
         if (!examName.trim()) return;
 
         const finalInterpretation =
@@ -63,28 +111,49 @@
         try {
             let response;
             if (examType === "text") {
-                response = await editExamStore.addTextExam({
-                    case_id: caseId,
-                    test_name: examName,
-                    purpose: examPurpose,
-                    text_content: textFindings,
-                    interpretation: finalInterpretation,
-                    status: "completed",
-                });
+                if (isEditMode) {
+                    // TODO: Implement edit text exam API call when available
+                    console.log("Edit text exam:", {
+                        examName,
+                        examPurpose,
+                        textFindings,
+                        finalInterpretation,
+                    });
+                } else {
+                    response = await editExamStore.addTextExam({
+                        case_id: caseId,
+                        test_name: examName,
+                        purpose: examPurpose,
+                        text_content: textFindings,
+                        interpretation: finalInterpretation,
+                        status: "completed",
+                    });
+                }
             } else {
-                response = await editExamStore.addMixedExam({
-                    case_id: caseId,
-                    test_name: examName,
-                    purpose: examPurpose,
-                    text_content: textFindings,
-                    interpretation: finalInterpretation,
-                    status: "completed",
-                    url: uploadedImages.map((img) => img.url),
-                });
+                if (isEditMode) {
+                    // TODO: Implement edit mixed exam API call when available
+                    console.log("Edit mixed exam:", {
+                        examName,
+                        examPurpose,
+                        textFindings,
+                        finalInterpretation,
+                        images: uploadedImages,
+                    });
+                } else {
+                    response = await editExamStore.addMixedExam({
+                        case_id: caseId,
+                        test_name: examName,
+                        purpose: examPurpose,
+                        text_content: textFindings,
+                        interpretation: finalInterpretation,
+                        status: "completed",
+                        url: uploadedImages.map((img) => img.url),
+                    });
+                }
             }
 
             // Call success callback with formatted exam data for UI update
-            const newExamData = {
+            const updatedExamData = {
                 purpose: examPurpose,
                 findings:
                     examType === "text"
@@ -92,7 +161,14 @@
                         : {
                               type: "mixed",
                               content: [
-                                  { type: "text", content: textFindings },
+                                  ...(textFindings
+                                      ? [
+                                            {
+                                                type: "text",
+                                                content: textFindings,
+                                            },
+                                        ]
+                                      : []),
                                   ...uploadedImages.map((img) => ({
                                       type: "image",
                                       content: {
@@ -104,15 +180,18 @@
                           },
                 status: "completed",
                 interpretation: finalInterpretation,
-                comments: [],
+                comments: editData?.comments || [],
             };
 
-            onSuccess?.(examName, newExamData);
+            onSuccess?.(examName, updatedExamData);
 
             resetForm();
             isDialogOpen = false;
         } catch (error) {
-            console.error("Failed to add examination:", error);
+            console.error(
+                `Failed to ${isEditMode ? "edit" : "add"} examination:`,
+                error,
+            );
         }
     }
 
@@ -148,14 +227,16 @@
     }
 </script>
 
-<!-- Add Physical Exam Dialog -->
+<!-- Add/Edit Physical Exam Dialog -->
 <Dialog.Root bind:open={isDialogOpen}>
     <Dialog.Content class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <Dialog.Header>
-            <Dialog.Title>Add Physical Examination</Dialog.Title>
+            <Dialog.Title
+                >{isEditMode ? "Edit" : "Add"} Physical Examination</Dialog.Title
+            >
             <Dialog.Description>
-                Add a new physical examination with text findings or mixed
-                content including images.
+                {isEditMode ? "Edit the" : "Add a new"} physical examination with
+                text findings or mixed content including images.
             </Dialog.Description>
         </Dialog.Header>
 
@@ -167,6 +248,7 @@
                     id="exam-name"
                     bind:value={examName}
                     placeholder="e.g., Skin Examination, Neurological Assessment"
+                    disabled={isEditMode}
                 />
             </div>
 
@@ -293,17 +375,17 @@
                 Cancel
             </Button>
             <Button
-                onclick={addPhysicalExam}
+                onclick={handleSubmit}
                 disabled={!examName.trim() ||
                     isUploading ||
                     isAddingExam ||
                     (examType === "mixed" && uploadedImages.length === 0)}
             >
                 {isAddingExam
-                    ? "Adding..."
+                    ? `${isEditMode ? "Updating" : "Adding"}...`
                     : isUploading
                       ? "Uploading..."
-                      : "Add Examination"}
+                      : `${isEditMode ? "Update" : "Add"} Examination`}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

@@ -3,7 +3,7 @@
     import { Button } from "$lib/components/ui/button";
     import ExaminationCard from "../../03-organisms/chat/chat-cards/examination-card.svelte";
     import TestResultCard from "../../03-organisms/chat/chat-cards/test-result-card.svelte";
-    import AddPhysicalExamDialog from "../../03-organisms/dialogs/AddorEditPhysicalExamDialog.svelte";
+    import AddorEditPhysicalExamDialog from "../../03-organisms/dialogs/AddorEditPhysicalExamDialog.svelte";
     import type { FindingContent, TestResultContent } from "$lib/types/index";
     import { refreshTestData } from "$lib/stores/caseCreatorStore";
 
@@ -17,6 +17,8 @@
 
     // State for dialog
     let addExamDialogOpen = $state(false);
+    let editExamDialogOpen = $state(false);
+    let editExamData = $state<any>(null);
 
     // Handle successful exam addition
     function handleExamAdded(examData: any) {
@@ -35,11 +37,20 @@
     }
 
     // Handle exam edit (when implemented)
-    function handleExamEdited(examName: string, updatedData: any) {
-        console.log("Exam edited:", examName);
+    function handleExamEdited(examName: string, examData: any) {
+        console.log("Opening edit dialog for exam:", examName);
+        editExamData = examData;
+        editExamDialogOpen = true;
+    }
+
+    // Handle successful exam update
+    function handleExamUpdated(examData: any) {
+        console.log("Exam updated:", examData);
         console.log("Refreshing test data for case:", caseId);
         // Refresh the data from API directly
         refreshTestData(caseId);
+        editExamDialogOpen = false;
+        editExamData = null;
     }
 
     // Group physical exams by finding type
@@ -222,8 +233,16 @@
 </div>
 
 <!-- Add Physical Exam Dialog Component -->
-<AddPhysicalExamDialog
+<AddorEditPhysicalExamDialog
     {caseId}
     bind:open={addExamDialogOpen}
     onSuccess={handleExamAdded}
+/>
+
+<!-- Edit Physical Exam Dialog Component -->
+<AddorEditPhysicalExamDialog
+    {caseId}
+    bind:open={editExamDialogOpen}
+    editData={editExamData}
+    onSuccess={handleExamUpdated}
 />

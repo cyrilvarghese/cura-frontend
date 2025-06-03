@@ -53,8 +53,8 @@
     // Handler functions for edit and delete
     function handleEdit() {
         console.log("Edit examination:", result.name);
-        // TODO: Implement edit functionality
-        // When edit is implemented, call: onEdit?.(result.name, updatedData);
+        // Call the callback to notify parent component
+        onEdit?.(result.name, result);
     }
 
     function handleDelete() {
