@@ -127,7 +127,7 @@
                 </Card.Title>
             </div>
             <div class="flex items-center gap-2">
-                {#if user?.role === "admin"}
+                {#if user?.role === "admin" && caseType === "edit"}
                     <Button
                         variant="ghost"
                         size="sm"
