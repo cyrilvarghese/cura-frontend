@@ -1,7 +1,10 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
     import { Badge } from "$lib/components/ui/badge";
+    import { Button } from "$lib/components/ui/button";
     import ScanEye from "lucide-svelte/icons/scan-eye";
+    import Edit from "lucide-svelte/icons/edit";
+    import Trash2 from "lucide-svelte/icons/trash-2";
     import { getRelativeTime } from "$lib/utils/time";
     import FindingsTable from "./findings-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
@@ -13,13 +16,19 @@
     import { editPhysicalExamTableStore } from "$lib/stores/editTablePEStore";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { convertAsteriskToBold } from "$lib/utils/text";
+    import { editExamStore } from "$lib/stores/editExamStore";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
 
     const {
         result,
         caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "",
+        onDelete,
+        onEdit,
     } = $props<{
         result: ExaminationResult;
         caseId?: string;
+        onDelete?: (examName: string) => void;
+        onEdit?: (examName: string, updatedData: any) => void;
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type"); // new or edit mode
@@ -39,23 +48,82 @@
     }
 
     const findingContent = renderFinding(result.findings as FindingContent);
+    let deleteConfirmOpen = $state(false);
+
+    // Handler functions for edit and delete
+    function handleEdit() {
+        console.log("Edit examination:", result.name);
+        // TODO: Implement edit functionality
+        // When edit is implemented, call: onEdit?.(result.name, updatedData);
+    }
+
+    function handleDelete() {
+        deleteConfirmOpen = true;
+    }
+
+    async function confirmDelete() {
+        deleteConfirmOpen = false;
+
+        try {
+            await editExamStore.deletePhysicalExam({
+                case_id: caseId,
+                test_name: result.name,
+            });
+
+            // Call the callback to notify parent component
+            onDelete?.(result.name);
+
+            console.log("Examination deleted successfully");
+        } catch (error) {
+            console.error("Failed to delete examination:", error);
+        }
+    }
 </script>
 
 <Card.Root
-    class="w-full max-w-2xl border-l-4 border-l-blue-500/50 rounded-none rounded-r-md"
+    class="w-full max-w-2xl border-l-4 {typeof findingContent === 'object' &&
+    findingContent.type === 'mixed'
+        ? 'border-l-red-500/50'
+        : 'border-l-blue-500/50'} rounded-none rounded-r-md p-4 pt-0"
 >
-    <Card.Header>
+    <Card.Header class="pb-4">
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <ScanEye class="h-5 w-5 text-blue-500/70" />
-                <Card.Title class="pr-4 capitalize">
-                    {result.name}
-                    {#if result.isVerified}
-                        <span class="ml-1 text-green-600">✓</span>
-                    {/if}
-                </Card.Title>
+            <div class="flex flex-col gap-2">
+                <Badge
+                    variant="secondary"
+                    class="bg-blue-500/10 text-blue-700 hover:bg-blue-500/20 px-3 py-1 w-fit"
+                >
+                    Physical Exam
+                </Badge>
+                <div class="flex items-center gap-3">
+                    <ScanEye class="h-5 w-5 text-blue-500/70" />
+                    <Card.Title class="pr-4 capitalize text-lg">
+                        {result.name}
+                        {#if result.isVerified}
+                            <span class="ml-2 text-green-600">✓</span>
+                        {/if}
+                    </Card.Title>
+                </div>
             </div>
             <div class="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onclick={handleEdit}
+                >
+                    <Edit class="h-4 w-4" />
+                </Button>
+
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onclick={handleDelete}
+                >
+                    <Trash2 class="h-4 w-4" />
+                </Button>
+
                 <CommentButton
                     {caseId}
                     testName={result.name}
@@ -63,24 +131,21 @@
                     initialCommentCount={result.comments?.length ?? 0}
                     initialComments={result.comments ?? []}
                 />
-
-                <Badge
-                    variant="secondary"
-                    class="bg-blue-500/10 text-blue-700 hover:bg-blue-500/20"
-                >
-                    Physical Exam
-                </Badge>
             </div>
         </div>
         {#if caseType === "edit" || caseType === "new"}
-            <Card.Description class="mt-2">{result.purpose}</Card.Description>
+            <Card.Description class="mt-3 text-sm leading-relaxed"
+                >{result.purpose}</Card.Description
+            >
         {/if}
     </Card.Header>
-    <Card.Content>
-        <div class="space-y-2 bg-blue-50/50 p-3 rounded-md">
+    <Card.Content class="py-4">
+        <div class="space-y-3 p-4 rounded-lg">
             <!-- <h4 class="font-medium leading-none text-blue-700">Findings</h4> -->
             {#if typeof findingContent === "string"}
-                <p class="text-sm text-muted-foreground whitespace-pre-wrap">
+                <p
+                    class="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed"
+                >
                     {@html findingContent}
                 </p>
             {:else if findingContent.type === "table"}
@@ -136,9 +201,28 @@
             {/if}
         </div>
     </Card.Content>
-    <Card.Footer>
+    <Card.Footer class="pt-4">
         <p class="text-sm text-muted-foreground">
             {getRelativeTime(result.timestamp ?? new Date())}
         </p>
     </Card.Footer>
 </Card.Root>
+
+<!-- Delete Confirmation Dialog -->
+<AlertDialog.Root bind:open={deleteConfirmOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete examination?</AlertDialog.Title>
+            <AlertDialog.Description>
+                Are you sure you want to delete "{result.name}"? This action
+                cannot be undone.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action class="bg-destructive" onclick={confirmDelete}>
+                Delete
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>

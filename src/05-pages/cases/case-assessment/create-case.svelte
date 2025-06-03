@@ -576,11 +576,3 @@
     confirmText="Create Data From Scratch"
     onConfirm={executeGenerateCaseData}
 />
-
-<ConfirmationDialog
-    bind:open={generatePhysicalExamConfirmOpen}
-    title="Erase All Data?"
-    description="This will erase all the edits and images uploaded by you. Are you sure you want to continue?"
-    confirmText="Create Data From Scratch"
-    onConfirm={executeGenerateCaseData}
-/>

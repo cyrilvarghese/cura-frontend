@@ -200,7 +200,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {#each imageUrls as imageUrl, index}
                 <div
-                    class="relative overflow-hidden rounded-md cursor-pointer aspect-square"
+                    class="relative w-[100px] h-[100px] overflow-hidden rounded-md cursor-pointer aspect-square"
                     onclick={() => selectImage(index)}
                     onkeydown={(e) => e.key === "Enter" && selectImage(index)}
                     tabindex="0"

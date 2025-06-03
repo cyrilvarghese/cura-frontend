@@ -63,7 +63,10 @@
 </script>
 
 <Card.Root
-    class="w-full max-w-2xl border-l-4 border-l-amber-900/50 rounded-none rounded-r-md"
+    class="w-full max-w-2xl border-l-4 {typeof resultContent === 'object' &&
+    resultContent.type === 'mixed'
+        ? 'border-l-red-500/50'
+        : 'border-l-amber-900/50'} rounded-none rounded-r-md"
 >
     <Card.Header>
         <div class="flex items-center justify-between">

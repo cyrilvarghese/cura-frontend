@@ -72,6 +72,20 @@ export class CaseDataService {
         };
     }
 
+    async getTestData(caseId: string): Promise<{ physical_exam: any; lab_test: any }> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/case-details/test-data/${caseId}`);
+            const data = await response.json();
+            return {
+                physical_exam: data.test_data.physical_exam || {},
+                lab_test: data.test_data.lab_test || {}
+            };
+        } catch (error) {
+            console.error('Error fetching test data:', error);
+            throw error;
+        }
+    }
+
     async getAllCases(): Promise<CaseListItem[]> {
         try {
             const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases`);

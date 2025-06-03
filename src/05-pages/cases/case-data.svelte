@@ -18,6 +18,7 @@
     import TreatmentContext from "$lib/components/TreatmentContext.svelte";
     import ClinicalFindings from "$lib/components/ClinicalFindings.svelte";
     import DiagnosisContext from "$lib/components/DiagnosisContext.svelte";
+
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
         uploadState: CaseStoreState;
