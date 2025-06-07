@@ -24,6 +24,7 @@
     import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import ConfirmationDialog from "$lib/components/ui/confirmation-dialog.svelte";
     import { automatedCaseGenerationService } from "$lib/services/automatedCaseGenerationService";
+    import { navigate } from "svelte-routing";
 
     const caseDataService = new CaseDataService();
 
@@ -384,6 +385,18 @@
     <h1 class="text-3xl font-bold">
         {isEditMode ? "Edit Case" : "Create Case"}
     </h1>
+    {#if isEditMode && caseId}
+        <Button
+            variant="outline"
+            size="sm"
+            onclick={() =>
+                navigate(`/case-library/edit?caseId=${parseInt(caseId!) + 1}`, {
+                    replace: true,
+                })}
+        >
+            Next Case
+        </Button>
+    {/if}
 </div>
 
 <LoadingOverlay isVisible={isLoading} message="Loading case data..." />

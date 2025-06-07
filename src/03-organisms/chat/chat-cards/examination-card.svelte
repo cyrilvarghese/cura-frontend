@@ -5,6 +5,7 @@
     import ScanEye from "lucide-svelte/icons/scan-eye";
     import Edit from "lucide-svelte/icons/edit";
     import Trash2 from "lucide-svelte/icons/trash-2";
+    import Search from "lucide-svelte/icons/search";
     import { getRelativeTime } from "$lib/utils/time";
     import FindingsTable from "./findings-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
@@ -19,6 +20,12 @@
     import { editExamStore } from "$lib/stores/editExamStore";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import { authStore, type AuthState } from "$lib/stores/authStore";
+    import {
+        previewImageSearch,
+        executeImageSearch,
+        imageSearchStore,
+    } from "$lib/stores/imageSearchStore";
+    import ImageSearchModal from "$lib/components/ui/image-search-modal.svelte";
 
     const {
         result,
@@ -59,8 +66,13 @@
         renderFinding(result.findings as FindingContent),
     );
     let deleteConfirmOpen = $state(false);
+    let searchModalOpen = $state(false);
+    let currentSearchQuery = $state<any>(null);
 
-    // Handler functions for edit and delete
+    // Use derived state from the store
+    const searchState = $derived($imageSearchStore);
+
+    // Handler functions for edit, delete, and search
     function handleEdit() {
         console.log("Edit examination:", result.name);
         // Call the callback to notify parent component
@@ -70,6 +82,31 @@
     function handleDelete() {
         deleteConfirmOpen = true;
     }
+
+    async function handleSearch() {
+        console.log("Search examination:", result.name);
+
+        const searchQuery = {
+            case_id: caseId,
+            test_type: "physical_exam" as const,
+            test_name: result.name,
+            max_results: 30,
+            search_depth: "advanced" as const,
+        };
+
+        currentSearchQuery = searchQuery;
+        searchModalOpen = true;
+
+        try {
+            await executeImageSearch(searchQuery);
+        } catch (error) {
+            console.error("Failed to search images:", error);
+        }
+    }
+
+    const handleModalSearch = async (query: any) => {
+        await executeImageSearch(query);
+    };
 
     async function confirmDelete() {
         deleteConfirmOpen = false;
@@ -117,6 +154,18 @@
             </div>
             <div class="flex items-center gap-2">
                 {#if user?.role === "admin" && caseType === "edit"}
+                    {#if typeof findingContent === "object" && findingContent.type === "mixed"}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Search in examination"
+                            onclick={handleSearch}
+                        >
+                            <Search class="h-4 w-4" />
+                        </Button>
+                    {/if}
+
                     <Button
                         variant="ghost"
                         size="sm"
@@ -238,3 +287,14 @@
         </AlertDialog.Footer>
     </AlertDialog.Content>
 </AlertDialog.Root>
+
+<!-- Image Search Modal -->
+{#if currentSearchQuery}
+    <ImageSearchModal
+        bind:open={searchModalOpen}
+        onOpenChange={(open: boolean) => (searchModalOpen = open)}
+        initialQuery={currentSearchQuery}
+        {searchState}
+        onSearch={handleModalSearch}
+    />
+{/if}
