@@ -51,6 +51,8 @@
         caseName: "",
     });
     let currentApprovingCaseName = $state("");
+    let isBulkDeleting = $state(false);
+    let bulkDeleteProgress = $state({ current: 0, total: 0 });
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
             CASE_REVIEW_PENDING: "Document Review Pending",
@@ -357,7 +359,38 @@
         console.log("Generate MCQ clicked:", { docId, title });
     }
 
+    async function handleBulkDelete() {
+        const selectedIds = Array.from(selectedDocIds);
+        if (selectedIds.length === 0) return;
+
+        if (
+            !confirm(
+                `Are you sure you want to delete ${selectedIds.length} document(s)? This action cannot be undone.`,
+            )
+        ) {
+            return;
+        }
+
+        isBulkDeleting = true;
+        bulkDeleteProgress = { current: 0, total: selectedIds.length };
+
+        try {
+            const success = await googleDocsStore.bulkDeleteDocs(selectedIds);
+            if (success) {
+                selectedDocIds = new Set();
+                await googleDocsStore.loadDocs(departmentId);
+            }
+        } finally {
+            isBulkDeleting = false;
+        }
+    }
+
     function getLoadingMessage(): string {
+        // First priority: Are we bulk deleting?
+        if (isBulkDeleting) {
+            return `Deleting ${bulkDeleteProgress.total} documents...`;
+        }
+
         // First priority: Are we generating case data?
         if (isBulkGeneratingCases) {
             const caseName =
@@ -517,20 +550,11 @@
                     <Button
                         variant="outline"
                         size="sm"
-                        onclick={() => {
-                            // Handle bulk delete
-                            if (
-                                confirm(
-                                    `Are you sure you want to delete ${selectedDocIds.size} document(s)?`,
-                                )
-                            ) {
-                                console.log(
-                                    "Bulk delete:",
-                                    Array.from(selectedDocIds),
-                                );
-                            }
-                        }}
+                        onclick={handleBulkDelete}
                         class="text-red-700 border-red-300 hover:bg-red-100"
+                        disabled={isBulkDeleting ||
+                            isBulkApproving ||
+                            isBulkGeneratingCases}
                     >
                         Bulk Delete
                     </Button>
@@ -828,6 +852,6 @@
 </PageLayout>
 
 <LoadingOverlay
-    isVisible={isBulkApproving || isBulkGeneratingCases}
+    isVisible={isBulkApproving || isBulkGeneratingCases || isBulkDeleting}
     message={getLoadingMessage()}
 />

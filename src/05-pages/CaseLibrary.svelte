@@ -5,9 +5,11 @@
     import { fetchCases } from "$lib/stores/casePlayerStore";
     import { API_BASE_URL } from "$lib/config/api";
     import PageLayout from "../04-templates/page-layout.svelte";
+    import CaseItem from "../04-templates/case-item.svelte";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     import { Link } from "svelte-routing";
     import * as Tabs from "$lib/components/ui/tabs";
-    import { FileCheck, Pencil } from "lucide-svelte";
+    import { FileCheck } from "lucide-svelte";
     import type { CaseListItem } from "$lib/services/caseDataService";
     import { authStore } from "$lib/stores/authStore";
     import type { AuthState } from "$lib/stores/authStore";
@@ -15,6 +17,7 @@
     let searchQuery = $state("");
     let activeTab = $state("published");
     let user: AuthState["user"] | undefined = $state();
+    let isLoading = $state(false);
     authStore.subscribe((state) => {
         user = state.user;
         if (user) {
@@ -23,9 +26,25 @@
         }
     });
     onMount(async () => {
-        await fetchCases();
-        cases = $casesListStore || [];
+        isLoading = true;
+        try {
+            await fetchCases();
+            cases = $casesListStore || [];
+        } finally {
+            isLoading = false;
+        }
     });
+
+    // Refresh function to be passed to CaseItem components
+    const handleRefresh = async () => {
+        isLoading = true;
+        try {
+            await fetchCases();
+            cases = $casesListStore || [];
+        } finally {
+            isLoading = false;
+        }
+    };
 
     //filter cases based on department and published status
     let filteredCases = $derived(
@@ -101,48 +120,12 @@
                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                     >
                         {#each filteredCases as caseItem}
-                            <div class="animate-in fade-in duration-500">
-                                <Link
-                                    to={`/case-library/${caseItem.case_id}`}
-                                    class="group"
-                                >
-                                    <div
-                                        class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                                    >
-                                        <div class="relative aspect-square">
-                                            <img
-                                                src={API_BASE_URL +
-                                                    caseItem.image_url ||
-                                                    "/placeholder-image.jpg"}
-                                                alt={caseItem.title}
-                                                class="object-cover absolute inset-0 w-full h-full transition-transform duration-300 hover:scale-[1.05]"
-                                            />
-                                        </div>
-                                        <div class="p-4">
-                                            {#if user?.role === "admin"}
-                                                <span
-                                                    class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
-                                                >
-                                                    {caseItem.case_name}
-                                                </span>
-                                            {/if}
-
-                                            <h3
-                                                class="font-semibold capitalize text-lg group-hover:text-blue-600 transition-colors"
-                                            >
-                                                {caseItem.title ||
-                                                    "Untitled Case"}
-                                            </h3>
-                                            <p
-                                                class="text-gray-600 text-sm mt-1 line-clamp-2"
-                                            >
-                                                {caseItem.quote ||
-                                                    "No description available"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            </div>
+                            <CaseItem
+                                {caseItem}
+                                {user}
+                                isPublished={true}
+                                onRefresh={handleRefresh}
+                            />
                         {/each}
                     </div>
                 {/if}
@@ -168,53 +151,12 @@
                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                     >
                         {#each filteredCases as caseItem}
-                            <div class="animate-in fade-in duration-500">
-                                <div
-                                    class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative"
-                                >
-                                    <Link
-                                        to={`/case-library/${caseItem.case_id}`}
-                                        class="group"
-                                    >
-                                        <div class="relative aspect-square">
-                                            <img
-                                                src={API_BASE_URL +
-                                                    caseItem.image_url ||
-                                                    "/placeholder-image.jpg"}
-                                                alt={caseItem.title}
-                                                class="object-cover absolute inset-0 w-full h-full transition-transform duration-300 hover:scale-[1.05]"
-                                            />
-                                        </div>
-                                        <div class="p-4">
-                                            {#if user?.role === "admin"}
-                                                <span
-                                                    class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 break-words max-w-full"
-                                                >
-                                                    {caseItem.case_name}
-                                                </span>
-                                            {/if}
-                                            <h3
-                                                class="font-semibold text-lg group-hover:text-blue-600 transition-colors"
-                                            >
-                                                {caseItem.title ||
-                                                    "Untitled Case"}
-                                            </h3>
-                                            <p
-                                                class="text-gray-600 text-sm mt-1 line-clamp-2"
-                                            >
-                                                {caseItem.quote ||
-                                                    "No description available"}
-                                            </p>
-                                        </div>
-                                    </Link>
-                                    <Link
-                                        to={`/case-library/edit?caseId=${caseItem.case_id}`}
-                                        class="absolute bottom-2 right-2 p-2 bg-white hover:bg-gray-100 rounded-full transition-colors"
-                                    >
-                                        <Pencil class="w-4 h-4 text-blue-500" />
-                                    </Link>
-                                </div>
-                            </div>
+                            <CaseItem
+                                {caseItem}
+                                {user}
+                                isPublished={false}
+                                onRefresh={handleRefresh}
+                            />
                         {/each}
                     </div>
                 {/if}
@@ -222,6 +164,8 @@
         </div>
     </Tabs.Root>
 </PageLayout>
+
+<LoadingOverlay message="Loading cases..." isVisible={isLoading} />
 
 <style>
 </style>

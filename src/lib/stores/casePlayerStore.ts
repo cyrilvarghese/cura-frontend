@@ -52,3 +52,29 @@ export const fetchCases = async () => {
     }
 };
 
+// Function to unpublish a case
+export const unpublishCase = async (caseId: string) => {
+    try {
+        await caseDataService.unpublishCase(caseId, { published: false });
+        // Refresh the cases list after unpublishing
+        await fetchCases();
+        return true;
+    } catch (error) {
+        console.error('Error unpublishing case:', error);
+        throw error;
+    }
+};
+
+// Function to delete a case
+export const deleteCase = async (caseId: string) => {
+    try {
+        await caseDataService.deleteCase(caseId, { deleted: true });
+        // Refresh the cases list after deleting
+        await fetchCases();
+        return true;
+    } catch (error) {
+        console.error('Error deleting case:', error);
+        throw error;
+    }
+};
+

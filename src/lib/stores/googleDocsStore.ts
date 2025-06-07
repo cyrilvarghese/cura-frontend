@@ -39,6 +39,16 @@ function createGoogleDocsStore() {
                 return false;
             }
         },
+        bulkDeleteDocs: async (docIds: string[]) => {
+            try {
+                await googleDocsService.bulkDeleteDocs(docIds);
+                update(docs => docs.filter(doc => !docIds.includes(doc.id)));
+                return true;
+            } catch (error) {
+                console.error('Error bulk deleting docs:', error);
+                return false;
+            }
+        },
         approveCase: async (docId: string) => {
             try {
                 await googleDocsService.approveCase(docId);

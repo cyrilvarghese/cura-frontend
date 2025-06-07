@@ -26,6 +26,10 @@ export interface PublishCaseParams {
     published: boolean;
 }
 
+export interface DeleteCaseParams {
+    deleted: boolean;
+}
+
 interface CaseDetailsResponse {
     content: {
         case_cover: {
@@ -114,6 +118,31 @@ export class CaseDataService {
             throw error;
         }
     }
+    async unpublishCase(caseId: string, params: PublishCaseParams): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/unpublish`, {
+                method: 'POST',
+                body: params
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error publishing case:', error);
+            throw error;
+        }
+    }
+    async deleteCase(caseId: string, params: DeleteCaseParams): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/delete`, {
+                method: 'POST',
+                body: params
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error deleting case:', error);
+            throw error;
+        }
+    }
+
 
     async getCaseById(id: string): Promise<CaseStoreState> {
         const response = await makeAuthenticatedRequest(`${this.baseUrl}/case-details/${id}`);

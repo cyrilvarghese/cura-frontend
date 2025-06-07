@@ -6,6 +6,7 @@ export interface AuthenticatedRequestOptions {
     method?: string;
     body?: any;
     additionalHeaders?: Record<string, string>;
+
 }
 
 export async function makeAuthenticatedRequest(

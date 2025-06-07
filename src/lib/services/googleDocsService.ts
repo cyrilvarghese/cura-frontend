@@ -108,6 +108,27 @@ export class GoogleDocsService {
         }
     }
 
+    async bulkDeleteDocs(docIds: string[]): Promise<void> {
+        const toastId = toast.loading(`Deleting ${docIds.length} documents...`);
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/bulk/delete`, {
+                method: 'DELETE',
+                body: docIds
+            });
+            toast.success('Documents deleted', {
+                id: toastId,
+                description: `${docIds.length} documents deleted successfully`
+            });
+        } catch (error) {
+            console.error('Error bulk deleting documents:', error);
+            toast.error('Bulk delete failed', {
+                id: toastId,
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
+            throw error;
+        }
+    }
+
     async approveCase(docId: string): Promise<void> {
         const toastId = toast.loading('Approving document...');
         try {
