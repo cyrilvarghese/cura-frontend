@@ -101,16 +101,17 @@
             lastSearchedTestName = result.name;
         }
 
-        // Extract text content from mixed findings
+        // Extract text content from mixed findings or caption from image findings
         let testFinding = "";
-        if (
-            typeof findingContent === "object" &&
-            findingContent.type === "mixed"
-        ) {
-            const textItems = findingContent.content.filter(
-                (item) => item.type === "text",
-            );
-            testFinding = textItems.map((item) => item.content).join(" ");
+        if (typeof findingContent === "object") {
+            if (findingContent.type === "mixed") {
+                const textItems = findingContent.content.filter(
+                    (item) => item.type === "text",
+                );
+                testFinding = textItems.map((item) => item.content).join(" ");
+            } else if (findingContent.type === "image") {
+                testFinding = findingContent.content.caption || "";
+            }
         }
 
         const searchQuery = {
@@ -203,7 +204,7 @@
             </div>
             <div class="flex items-center gap-2">
                 {#if user?.role === "admin" && caseType === "edit"}
-                    {#if typeof findingContent === "object" && findingContent.type === "mixed"}
+                    {#if typeof findingContent === "object" && (findingContent.type === "mixed" || findingContent.type === "image")}
                         <Button
                             variant="ghost"
                             size="sm"
@@ -266,6 +267,18 @@
                     testType="physical_exam"
                 />
             {:else if findingContent.type === "image"}
+                {#if user?.role === "admin"}
+                    <p
+                        class="text-sm text-muted-foreground whitespace-pre-wrap bg-blue-50/50 p-2 rounded border-l-2 border-blue-200 mb-3"
+                    >
+                        <span
+                            class="text-xs font-medium text-blue-600 uppercase tracking-wide"
+                        >
+                            Finding
+                        </span><br />
+                        {findingContent.content.caption}
+                    </p>
+                {/if}
                 <MedicalImageViewer
                     {caseId}
                     testName={result.name}

@@ -105,16 +105,17 @@
     async function handleSearch() {
         console.log("Search lab test:", result.testName);
 
-        // Extract text content from mixed results
+        // Extract text content from mixed results or caption from image results
         let testFinding = "";
-        if (
-            typeof resultContent === "object" &&
-            resultContent.type === "mixed"
-        ) {
-            const textItems = resultContent.content.filter(
-                (item) => item.type === "text",
-            );
-            testFinding = textItems.map((item) => item.content).join(" ");
+        if (typeof resultContent === "object") {
+            if (resultContent.type === "mixed") {
+                const textItems = resultContent.content.filter(
+                    (item) => item.type === "text",
+                );
+                testFinding = textItems.map((item) => item.content).join(" ");
+            } else if (resultContent.type === "image") {
+                testFinding = resultContent.content.caption || "";
+            }
         }
 
         const searchQuery = {
@@ -178,7 +179,7 @@
             </div>
             <div class="flex items-center gap-2">
                 {#if user?.role === "admin" && caseType === "edit"}
-                    {#if typeof resultContent === "object" && resultContent.type === "mixed"}
+                    {#if typeof resultContent === "object" && (resultContent.type === "mixed" || resultContent.type === "image")}
                         <Button
                             variant="ghost"
                             size="sm"
@@ -244,6 +245,18 @@
                     testType="lab_test"
                 />
             {:else if resultContent.type === "image"}
+                {#if user?.role === "admin"}
+                    <p
+                        class="text-sm text-muted-foreground whitespace-pre-wrap bg-amber-50/50 p-2 rounded border-l-2 border-amber-200 mb-3"
+                    >
+                        <span
+                            class="text-xs font-medium text-amber-600 uppercase tracking-wide"
+                        >
+                            Result
+                        </span><br />
+                        {resultContent.content.caption}
+                    </p>
+                {/if}
                 <MedicalImageViewer
                     {caseId}
                     testName={result.testName}
@@ -265,7 +278,8 @@
                                 >
                                     <span
                                         class="text-xs font-medium text-amber-600 uppercase tracking-wide"
-                                        >Admin View - Result Content:</span
+                                    >
+                                        Result</span
                                     ><br />
                                     {item.content}
                                 </p>
