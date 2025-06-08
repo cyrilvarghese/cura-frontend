@@ -21,46 +21,31 @@
         onSearch?: (query: ImageSearchQuery) => Promise<void>;
     }
 
-    let {
-        open = $bindable(),
-        onOpenChange,
-        initialQuery,
-        searchState,
-        onSearch,
-    }: Props = $props();
+    let { open, onOpenChange, initialQuery, searchState, onSearch }: Props =
+        $props();
 
-    let editableQuery = $state(initialQuery.search_query || "");
     let isRetrying = $state(false);
-    let hasInitialized = $state(false);
+    let queryText = $state("");
 
-    // Update editable query when results change (only on first load)
+    // Initialize query text from search query when modal opens
     $effect(() => {
-        if (searchState.results?.generated_query && !hasInitialized) {
-            editableQuery = searchState.results.generated_query;
-            hasInitialized = true;
-        }
-    });
-
-    // Clear state when modal is closed
-    $effect(() => {
-        if (!open) {
-            // Reset local state
-            editableQuery = initialQuery.search_query || "";
-            isRetrying = false;
-            hasInitialized = false;
-            // Clear the search store state
-            clearImageSearch();
+        if (open) {
+            // Set query text from the actual search query or generated query
+            queryText =
+                searchState.results?.generated_query ||
+                initialQuery.search_query ||
+                "";
         }
     });
 
     const handleRetrySearch = async () => {
-        if (!editableQuery.trim()) return;
+        if (!queryText.trim()) return;
 
         isRetrying = true;
         try {
             const retryQuery: ImageSearchQuery = {
                 ...initialQuery,
-                search_query: editableQuery,
+                search_query: queryText,
             };
 
             if (onSearch) {
@@ -73,14 +58,6 @@
         } finally {
             isRetrying = false;
         }
-    };
-
-    const handleImageClick = (imageUrl: string) => {
-        window.open(imageUrl, "_blank");
-    };
-
-    const handleArticleClick = (articleUrl: string) => {
-        window.open(articleUrl, "_blank");
     };
 </script>
 
@@ -122,7 +99,7 @@
                 <label class="text-sm font-medium">Search Query:</label>
                 <div class="flex gap-2">
                     <textarea
-                        bind:value={editableQuery}
+                        bind:value={queryText}
                         placeholder="Enter or edit search query..."
                         class="flex-1 min-h-[80px] px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         disabled={searchState.isLoading || isRetrying}
@@ -131,7 +108,7 @@
                         onclick={handleRetrySearch}
                         disabled={searchState.isLoading ||
                             isRetrying ||
-                            !editableQuery.trim()}
+                            !queryText.trim()}
                         class="self-start"
                         variant="outline"
                     >
@@ -174,9 +151,11 @@
                             class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
                         >
                             {#each searchState.results.images as image, index}
-                                <div
-                                    class="group cursor-pointer"
-                                    onclick={() => handleImageClick(image.url)}
+                                <a
+                                    href={image.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="group cursor-pointer block"
                                 >
                                     <div
                                         class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
@@ -200,7 +179,7 @@
                                     >
                                         {image.description}
                                     </p>
-                                </div>
+                                </a>
                             {/each}
                         </div>
                     </div>
@@ -222,19 +201,18 @@
                                         class="flex justify-between items-start gap-4"
                                     >
                                         <div class="flex-1">
-                                            <button
-                                                onclick={() =>
-                                                    handleArticleClick(
-                                                        article.url,
-                                                    )}
-                                                class="text-left hover:text-blue-600 transition-colors"
+                                            <a
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="text-left hover:text-blue-600 transition-colors block"
                                             >
                                                 <h4
                                                     class="font-medium text-blue-700 hover:underline"
                                                 >
                                                     {article.title}
                                                 </h4>
-                                            </button>
+                                            </a>
                                             <p
                                                 class="mt-2 text-sm text-gray-600 line-clamp-3"
                                             >
@@ -255,13 +233,18 @@
                                             </div>
                                         </div>
                                         <Button
-                                            onclick={() =>
-                                                handleArticleClick(article.url)}
                                             variant="ghost"
                                             size="sm"
                                             class="shrink-0"
+                                            asChild
                                         >
-                                            <ExternalLink class="w-4 h-4" />
+                                            <a
+                                                href={article.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <ExternalLink class="w-4 h-4" />
+                                            </a>
                                         </Button>
                                     </div>
                                 </div>

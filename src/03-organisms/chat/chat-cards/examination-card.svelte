@@ -23,6 +23,7 @@
     import {
         previewImageSearch,
         executeImageSearch,
+        clearImageSearch,
         imageSearchStore,
     } from "$lib/stores/imageSearchStore";
     import ImageSearchModal from "$lib/components/ui/image-search-modal.svelte";
@@ -68,9 +69,10 @@
     let deleteConfirmOpen = $state(false);
     let searchModalOpen = $state(false);
     let currentSearchQuery = $state<any>(null);
+    let lastSearchedTestName = $state<string>("");
 
-    // Use derived state from the store
-    const searchState = $derived($imageSearchStore);
+    // Get search state without reactive derivation to avoid loops
+    let searchState = $state($imageSearchStore);
 
     // Handler functions for edit, delete, and search
     function handleEdit() {
@@ -86,6 +88,19 @@
     async function handleSearch() {
         console.log("Search examination:", result.name);
 
+        // If this is a different test than the last searched one, clear the state
+        if (lastSearchedTestName !== result.name) {
+            clearImageSearch();
+            searchState = {
+                isLoading: false,
+                preview: null,
+                results: null,
+                error: null,
+                query: null,
+            };
+            lastSearchedTestName = result.name;
+        }
+
         const searchQuery = {
             case_id: caseId,
             test_type: "physical_exam" as const,
@@ -97,15 +112,36 @@
         currentSearchQuery = searchQuery;
         searchModalOpen = true;
 
-        try {
-            await executeImageSearch(searchQuery);
-        } catch (error) {
-            console.error("Failed to search images:", error);
+        // Only call API if we don't already have results for this test
+        if (!searchState.results) {
+            // Set loading state immediately when starting search
+            searchState = { ...searchState, isLoading: true };
+
+            try {
+                await executeImageSearch(searchQuery);
+                // Update search state after search completes
+                searchState = $imageSearchStore;
+            } catch (error) {
+                console.error("Failed to search images:", error);
+                // Update search state even on error
+                searchState = $imageSearchStore;
+            }
         }
     }
 
     const handleModalSearch = async (query: any) => {
-        await executeImageSearch(query);
+        // Set loading state for retry search
+        searchState = { ...searchState, isLoading: true };
+
+        try {
+            await executeImageSearch(query);
+            // Update search state after search completes
+            searchState = $imageSearchStore;
+        } catch (error) {
+            console.error("Failed to retry search:", error);
+            // Update search state even on error
+            searchState = $imageSearchStore;
+        }
     };
 
     async function confirmDelete() {
@@ -289,12 +325,10 @@
 </AlertDialog.Root>
 
 <!-- Image Search Modal -->
-{#if currentSearchQuery}
-    <ImageSearchModal
-        bind:open={searchModalOpen}
-        onOpenChange={(open: boolean) => (searchModalOpen = open)}
-        initialQuery={currentSearchQuery}
-        {searchState}
-        onSearch={handleModalSearch}
-    />
-{/if}
+<ImageSearchModal
+    open={searchModalOpen}
+    onOpenChange={(open: boolean) => (searchModalOpen = open)}
+    initialQuery={currentSearchQuery || { search_query: "" }}
+    {searchState}
+    onSearch={handleModalSearch}
+/>

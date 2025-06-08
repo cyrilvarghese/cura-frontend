@@ -8,6 +8,7 @@ export interface ImageSearchQuery {
     max_results?: number;
     search_depth?: 'basic' | 'advanced';
     search_query?: string;
+    single_search?: boolean;
 }
 
 export interface ImageSearchPreview {
@@ -83,6 +84,7 @@ export class ImageSearchService {
     }
 
     async executeSearch(params: ImageSearchQuery): Promise<ImageSearchResult> {
+        debugger;
         try {
             const requestBody = {
                 case_id: params.case_id,
@@ -90,11 +92,12 @@ export class ImageSearchService {
                 test_name: params.test_name,
                 max_results: params.max_results || 30,
                 search_depth: params.search_depth || 'advanced',
-                search_query: params.search_query || ''
+                search_query: params.search_query || '',
+                single_search: params.single_search || false
             };
 
             const response = await makeAuthenticatedRequest(
-                `${this.baseUrl}/intelligent-image-search/search`,
+                `${this.baseUrl}/intelligent-image-search/search-serpapi`,
                 {
                     method: 'POST',
                     body: requestBody
