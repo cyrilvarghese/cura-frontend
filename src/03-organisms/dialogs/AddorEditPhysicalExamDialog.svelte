@@ -378,10 +378,7 @@
             </Button>
             <Button
                 onclick={handleSubmit}
-                disabled={!examName.trim() ||
-                    isUploading ||
-                    isAddingExam ||
-                    (examType === "mixed" && uploadedImages.length === 0)}
+                disabled={!examName.trim() || isUploading || isAddingExam}
             >
                 {isAddingExam
                     ? `${isEditMode ? "Updating" : "Adding"}...`
