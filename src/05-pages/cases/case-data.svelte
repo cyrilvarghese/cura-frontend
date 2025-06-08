@@ -18,6 +18,7 @@
     import TreatmentContext from "$lib/components/TreatmentContext.svelte";
     import ClinicalFindings from "$lib/components/ClinicalFindings.svelte";
     import DiagnosisContext from "$lib/components/DiagnosisContext.svelte";
+    import { refreshTestData } from "$lib/stores/caseCreatorStore";
 
     // Use $props() to declare props in runes mode
     const { uploadState, currentTab } = $props<{
@@ -69,6 +70,21 @@
         activeTabContent = tab;
         isFullscreen = true;
     }
+
+    // Handle fullscreen modal close and refresh data
+    const handleFullscreenChange = async (open: boolean) => {
+        const wasOpen = isFullscreen;
+        isFullscreen = open;
+
+        // If modal was open and is now closed, refresh data
+        if (wasOpen && !open) {
+            console.log(
+                "Fullscreen modal closed - Refreshing test data for case:",
+                uploadState.caseId,
+            );
+            await refreshTestData(uploadState.caseId);
+        }
+    };
 
     let showCoverImageSection = $state(false);
 
@@ -432,7 +448,7 @@
 </Dialog.Root>
 
 <!-- Fullscreen Dialog -->
-<Dialog.Root bind:open={isFullscreen}>
+<Dialog.Root open={isFullscreen} onOpenChange={handleFullscreenChange}>
     <Dialog.Content class="max-w-[95vw] max-h-[95vh] w-full h-full">
         <div class="flex justify-between items-center mb-4">
             <Dialog.Title>

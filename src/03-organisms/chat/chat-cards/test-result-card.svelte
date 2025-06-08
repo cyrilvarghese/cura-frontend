@@ -12,7 +12,10 @@
     import type { TestResult, TestResultContent } from "$lib/types/index";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
-    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
+    import {
+        lastCaseIdStore,
+        refreshTestData,
+    } from "$lib/stores/caseCreatorStore";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { getContext } from "svelte";
     import { editExamStore } from "$lib/stores/editExamStore";
@@ -350,7 +353,7 @@
 <!-- Image Search Modal -->
 {#if currentSearchQuery}
     <ImageSearchModal
-        bind:open={searchModalOpen}
+        open={searchModalOpen}
         onOpenChange={(open: boolean) => (searchModalOpen = open)}
         initialQuery={currentSearchQuery}
         {searchState}
