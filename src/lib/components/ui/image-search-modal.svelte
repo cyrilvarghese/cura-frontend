@@ -38,6 +38,18 @@
         }
     });
 
+    // Clear state when modal closes
+    $effect(() => {
+        if (!open) {
+            // Clear search state
+            clearImageSearch();
+            // Reset local state
+            queryText = "";
+            isRetrying = false;
+            console.log("Image search modal closed - State cleared");
+        }
+    });
+
     const handleRetrySearch = async () => {
         if (!queryText.trim()) return;
 
@@ -326,10 +338,10 @@
 </Dialog.Root>
 
 <!-- Loading Overlay -->
-<LoadingOverlay
+<!-- <LoadingOverlay
     message={isRetrying ? "Retrying search..." : "Searching medical images..."}
     isVisible={searchState.isLoading || isRetrying}
-/>
+/> -->
 
 <style>
     .line-clamp-2 {

@@ -83,7 +83,7 @@
                 uploadState.caseId,
             );
             await refreshTestData(uploadState.caseId);
-            window.location.reload();
+            window.location.reload(); //todo: this is a hack to refresh the page
         }
     };
 
