@@ -20,13 +20,7 @@
     import { editExamStore } from "$lib/stores/editExamStore";
     import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import { authStore, type AuthState } from "$lib/stores/authStore";
-    import {
-        previewImageSearch,
-        executeImageSearch,
-        clearImageSearch,
-        imageSearchStore,
-    } from "$lib/stores/imageSearchStore";
-    import ImageSearchModal from "$lib/components/ui/image-search-modal.svelte";
+    import ImageSearchResultsModal from "$lib/components/ui/image-search-results-modal.svelte";
 
     const {
         result,
@@ -68,11 +62,6 @@
     );
     let deleteConfirmOpen = $state(false);
     let searchModalOpen = $state(false);
-    let currentSearchQuery = $state<any>(null);
-    let lastSearchedTestName = $state<string>("");
-
-    // Get search state without reactive derivation to avoid loops
-    let searchState = $state($imageSearchStore);
 
     // Handler functions for edit, delete, and search
     function handleEdit() {
@@ -85,77 +74,24 @@
         deleteConfirmOpen = true;
     }
 
-    async function handleSearch() {
+    function handleSearch() {
         console.log("Search examination:", result.name);
+        searchModalOpen = true;
+    }
 
-        // If this is a different test than the last searched one, clear the state
-        if (lastSearchedTestName !== result.name) {
-            clearImageSearch();
-            searchState = {
-                isLoading: false,
-                preview: null,
-                results: null,
-                error: null,
-                query: null,
-            };
-            lastSearchedTestName = result.name;
-        }
-
-        // Extract text content from mixed findings or caption from image findings
-        let testFinding = "";
+    // Extract finding string for search
+    const getFindingString = (): string => {
         if (typeof findingContent === "object") {
             if (findingContent.type === "mixed") {
                 const textItems = findingContent.content.filter(
                     (item) => item.type === "text",
                 );
-                testFinding = textItems.map((item) => item.content).join(" ");
+                return textItems.map((item) => item.content).join(" ");
             } else if (findingContent.type === "image") {
-                testFinding = findingContent.content.caption || "";
+                return findingContent.content.caption || "";
             }
         }
-
-        const searchQuery = {
-            case_id: caseId,
-            test_type: "physical_exam" as const,
-            test_name: result.name,
-            max_results: 30,
-            search_depth: "advanced" as const,
-            test_finding: testFinding,
-        };
-
-        currentSearchQuery = searchQuery;
-        searchModalOpen = true;
-
-        // Only call API if we don't already have results for this test
-        if (!searchState.results) {
-            // Set loading state immediately when starting search
-            searchState = { ...searchState, isLoading: true };
-
-            try {
-                await executeImageSearch(searchQuery);
-                // Update search state after search completes
-                searchState = $imageSearchStore;
-            } catch (error) {
-                console.error("Failed to search images:", error);
-                // Update search state even on error
-                searchState = $imageSearchStore;
-            }
-        }
-    }
-
-    const handleModalSearch = async (query: any) => {
-        // Set loading state for retry search
-        searchState = { ...searchState, isLoading: true };
-
-        try {
-            await executeImageSearch(query);
-            // Update search state after search completes
-            searchState = $imageSearchStore;
-        } catch (error) {
-            console.error("Failed to retry search:", error);
-            // Update search state even on error
-            searchState = $imageSearchStore;
-        }
+        return "";
     };
 
     async function confirmDelete() {
@@ -357,11 +293,11 @@
     </AlertDialog.Content>
 </AlertDialog.Root>
 
-<!-- Image Search Modal -->
-<ImageSearchModal
-    open={searchModalOpen}
-    onOpenChange={(open: boolean) => (searchModalOpen = open)}
-    initialQuery={currentSearchQuery || { search_query: "" }}
-    {searchState}
-    onSearch={handleModalSearch}
+<!-- Image Search Results Modal -->
+<ImageSearchResultsModal
+    bind:open={searchModalOpen}
+    {caseId}
+    testName={result.name}
+    testType="physical_exam"
+    findingString={getFindingString()}
 />
