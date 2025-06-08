@@ -390,9 +390,7 @@
             variant="outline"
             size="sm"
             onclick={() =>
-                navigate(`/case-library/edit?caseId=${parseInt(caseId!) + 1}`, {
-                    replace: true,
-                })}
+                (window.location.href = `/case-library/edit?caseId=${parseInt(caseId!) + 1}`)}
         >
             Next Case
         </Button>

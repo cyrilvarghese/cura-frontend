@@ -97,7 +97,7 @@ export class ImageSearchService {
             };
 
             const response = await makeAuthenticatedRequest(
-                `${this.baseUrl}/intelligent-image-search/search-serpapi`,
+                `${this.baseUrl}/intelligent-image-search/search`,
                 {
                     method: 'POST',
                     body: requestBody
