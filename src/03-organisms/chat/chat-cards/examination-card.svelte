@@ -101,12 +101,25 @@
             lastSearchedTestName = result.name;
         }
 
+        // Extract text content from mixed findings
+        let testFinding = "";
+        if (
+            typeof findingContent === "object" &&
+            findingContent.type === "mixed"
+        ) {
+            const textItems = findingContent.content.filter(
+                (item) => item.type === "text",
+            );
+            testFinding = textItems.map((item) => item.content).join(" ");
+        }
+
         const searchQuery = {
             case_id: caseId,
             test_type: "physical_exam" as const,
             test_name: result.name,
             max_results: 30,
             search_depth: "advanced" as const,
+            test_finding: testFinding,
         };
 
         currentSearchQuery = searchQuery;
@@ -268,11 +281,18 @@
                 <div class="space-y-4">
                     {#each findingContent.content as item}
                         {#if item.type === "text"}
-                            <!-- <p
-                                class="text-sm text-muted-foreground whitespace-pre-wrap"
-                            >
-                                {item.content}
-                            </p> -->
+                            {#if user?.role === "admin"}
+                                <p
+                                    class="text-sm text-muted-foreground whitespace-pre-wrap bg-blue-50/50 p-2 rounded border-l-2 border-blue-200"
+                                >
+                                    <span
+                                        class="text-xs font-medium text-blue-600 uppercase tracking-wide"
+                                    >
+                                        Finding
+                                    </span><br />
+                                    {item.content}
+                                </p>
+                            {/if}
                         {:else if item.type === "table"}
                             <FindingsTable
                                 data={item.content}

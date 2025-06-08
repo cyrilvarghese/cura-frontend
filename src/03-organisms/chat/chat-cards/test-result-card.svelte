@@ -105,12 +105,25 @@
     async function handleSearch() {
         console.log("Search lab test:", result.testName);
 
+        // Extract text content from mixed results
+        let testFinding = "";
+        if (
+            typeof resultContent === "object" &&
+            resultContent.type === "mixed"
+        ) {
+            const textItems = resultContent.content.filter(
+                (item) => item.type === "text",
+            );
+            testFinding = textItems.map((item) => item.content).join(" ");
+        }
+
         const searchQuery = {
             case_id: caseId,
             test_type: "lab_test" as const,
             test_name: result.testName,
             max_results: 30,
             search_depth: "advanced" as const,
+            test_finding: testFinding,
         };
 
         currentSearchQuery = searchQuery;
@@ -246,11 +259,17 @@
                 <div class="space-y-4">
                     {#each resultContent.content as item}
                         {#if item.type === "text"}
-                            <p
-                                class="text-sm text-muted-foreground whitespace-pre-wrap"
-                            >
-                                <!-- {item.content} -->
-                            </p>
+                            {#if user?.role === "admin"}
+                                <p
+                                    class="text-sm text-muted-foreground whitespace-pre-wrap bg-amber-50/50 p-2 rounded border-l-2 border-amber-200"
+                                >
+                                    <span
+                                        class="text-xs font-medium text-amber-600 uppercase tracking-wide"
+                                        >Admin View - Result Content:</span
+                                    ><br />
+                                    {item.content}
+                                </p>
+                            {/if}
                         {:else if item.type === "table"}
                             <TestResultsTable
                                 data={item.content}
