@@ -83,6 +83,7 @@
                 uploadState.caseId,
             );
             await refreshTestData(uploadState.caseId);
+            window.location.reload();
         }
     };
 
