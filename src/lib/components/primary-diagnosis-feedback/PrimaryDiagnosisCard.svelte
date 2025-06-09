@@ -10,9 +10,11 @@
         ClipboardList,
         FileText,
         Loader2,
+        RefreshCw,
     } from "lucide-svelte";
     import * as Accordion from "$lib/components/ui/accordion/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
+    import { Button } from "$lib/components/ui/button/index.js";
     import { onMount } from "svelte";
     import { primaryDiagnosisStore } from "$lib/stores/primaryDiagnosisFeedbackStore";
     import MissedExamsDialog from "$lib/../03-organisms/dialogs/MissedExamsDialog.svelte";
@@ -41,6 +43,14 @@
             console.error("Failed to load primary diagnosis feedback:", err);
         }
     });
+
+    async function handleRetry() {
+        try {
+            await primaryDiagnosisStore.getPrimaryDiagnosisFeedback(caseId);
+        } catch (err) {
+            console.error("Failed to retry primary diagnosis feedback:", err);
+        }
+    }
 </script>
 
 <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-200">
@@ -59,10 +69,19 @@
             class="bg-red-50 p-4 rounded-md text-red-800 flex items-start gap-2"
         >
             <AlertCircle class="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div>
+            <div class="flex-1">
                 <p class="font-medium">Error loading feedback</p>
                 <p class="text-sm">{error}</p>
             </div>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={handleRetry}
+                class="ml-2 border-red-200 text-red-700 hover:bg-red-100"
+            >
+                <RefreshCw class="w-4 h-4 mr-2" />
+                Retry
+            </Button>
         </div>
     {:else if primaryDiagnosisFeedback}
         <div class="space-y-6">
@@ -144,25 +163,52 @@
                             <span class="font-medium text-red-800"
                                 >Evidence Gathering</span
                             >
-                            <span class="font-bold text-red-800">
-                                {primaryDiagnosisFeedback.primaryDxFeedback
-                                    .scores.evidenceGatheringScore}/5
-                            </span>
                         </div>
                         <div class="px-4 py-3">
-                            <div class="flex mb-2">
-                                {#each Array(5) as _, i}
-                                    <span class="text-red-500">
-                                        {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScore}
-                                            <StarFilled
-                                                class="w-5 h-5 fill-current"
-                                            />
-                                        {:else}
-                                            <StarIcon class="w-5 h-5" />
-                                        {/if}
-                                    </span>
-                                {/each}
+                            <!-- Lab Tests Stars -->
+                            <div class="mb-3">
+                                <p
+                                    class="text-xs text-red-600 font-medium mb-1"
+                                >
+                                    Laboratory Tests
+                                </p>
+                                <div class="flex">
+                                    {#each Array(5) as _, i}
+                                        <span class="text-red-500">
+                                            {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScoreLabTests}
+                                                <StarFilled
+                                                    class="w-4 h-4 fill-current"
+                                                />
+                                            {:else}
+                                                <StarIcon class="w-4 h-4" />
+                                            {/if}
+                                        </span>
+                                    {/each}
+                                </div>
                             </div>
+
+                            <!-- Physical Exams Stars -->
+                            <div class="mb-3">
+                                <p
+                                    class="text-xs text-red-600 font-medium mb-1"
+                                >
+                                    Physical Examinations
+                                </p>
+                                <div class="flex">
+                                    {#each Array(5) as _, i}
+                                        <span class="text-red-500">
+                                            {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScoreExams}
+                                                <StarFilled
+                                                    class="w-4 h-4 fill-current"
+                                                />
+                                            {:else}
+                                                <StarIcon class="w-4 h-4" />
+                                            {/if}
+                                        </span>
+                                    {/each}
+                                </div>
+                            </div>
+
                             <p class="text-sm text-gray-700">
                                 {primaryDiagnosisFeedback.primaryDxFeedback
                                     .scores.evidenceGatheringExplanation

@@ -35,7 +35,8 @@ export interface PrimaryDiagnosisFeedback {
         scores: {
             accuracyScore: number;
             accuracyExplanation: string;
-            evidenceGatheringScore: number;
+            evidenceGatheringScoreLabTests: number;
+            evidenceGatheringScoreExams: number;
             evidenceGatheringExplanation: {
                 overallSummary: string;
                 historyStrengths: string[];

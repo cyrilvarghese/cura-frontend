@@ -13,10 +13,12 @@
         User,
         Stethoscope,
         FlaskConical,
+        RefreshCw,
     } from "lucide-svelte";
     import * as Accordion from "$lib/components/ui/accordion/index.js";
     import * as Popover from "$lib/components/ui/popover/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
+    import { Button } from "$lib/components/ui/button/index.js";
     import { onMount } from "svelte";
     import { differentialDiagnosisFeedbackStore } from "$lib/stores/differentialDiagnosisFeedbackStore";
 
@@ -64,6 +66,19 @@
         }
     });
 
+    async function handleRetry() {
+        try {
+            await differentialDiagnosisFeedbackStore.getDifferentialDiagnosisFeedback(
+                caseId,
+            );
+        } catch (err) {
+            console.error(
+                "Failed to retry differential diagnosis feedback:",
+                err,
+            );
+        }
+    }
+
     function splitBySemicolon(text: string) {
         return text.split(";").join(";\n");
     }
@@ -87,10 +102,19 @@
             class="bg-red-50 p-4 rounded-md text-red-800 flex items-start gap-2"
         >
             <AlertCircle class="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div>
+            <div class="flex-1">
                 <p class="font-medium">Error loading feedback</p>
                 <p class="text-sm">{error}</p>
             </div>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={handleRetry}
+                class="ml-2 border-red-200 text-red-700 hover:bg-red-100"
+            >
+                <RefreshCw class="w-4 h-4 mr-2" />
+                Retry
+            </Button>
         </div>
     {:else if differentialDxAnalysis}
         <div class="space-y-6">
