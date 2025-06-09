@@ -1,6 +1,8 @@
 <script lang="ts">
     // import CaseSidebar from "../../03-organisms/sidebars/case-sidebar.svelte";
     import ChatInput from "../../03-organisms/chat/chat-input.svelte";
+    import { currentDepartment } from "$lib/stores/teamStore";
+
     import Message from "../../03-organisms/chat/message.svelte";
     import { apiStore } from "$lib/stores/apiStore";
     import { ScrollArea } from "$lib/components/ui/scroll-area";
@@ -15,7 +17,7 @@
     import { studentMessageHistory } from "$lib/stores/apiStore";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { fetchCaseData } from "$lib/stores/casePlayerStore";
-    import { onDestroy } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { writable } from "svelte/store";
     import LoaderCircle from "lucide-svelte/icons/loader-circle";
     import PageLayout from "../../04-templates/page-layout.svelte";
@@ -32,6 +34,8 @@
     import Maximize2 from "lucide-svelte/icons/maximize-2";
     import Minimize2 from "lucide-svelte/icons/minimize-2";
     import { Button } from "$lib/components/ui/button";
+    import mixpanel from "mixpanel-browser";
+
     const { id } = $props(); // current case id
     // Add loading state store
     export const isLoading = writable(false);
@@ -77,12 +81,20 @@
         }
     }
 
+    onMount(() => {
+        mixpanel.track("Start Case", {
+            case_id: id,
+            start_time: new Date().toISOString(),
+            department: $currentDepartment?.name,
+        });
+    });
     // Initial calculation and resize listener
     $effect(() => {
         // // Calculate on initial load
         calculateChatWindowHeight();
         // // Add resize event listener
         window.addEventListener("resize", calculateChatWindowHeight);
+
         // Clean up listener on component destroy
         return () => {
             window.removeEventListener("resize", calculateChatWindowHeight);

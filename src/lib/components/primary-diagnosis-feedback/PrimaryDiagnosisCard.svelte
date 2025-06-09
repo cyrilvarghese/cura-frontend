@@ -18,6 +18,8 @@
     import MissedExamsDialog from "$lib/../03-organisms/dialogs/MissedExamsDialog.svelte";
     import MissedLabsDialog from "$lib/../03-organisms/dialogs/MissedLabsDialog.svelte";
     import DiagnosticTimeline from "./DiagnosticTimeline.svelte";
+    import mixpanel from "mixpanel-browser";
+    import { currentDepartment } from "$lib/stores/teamStore";
     // Optional props
     const { caseId = undefined } = $props();
 
@@ -31,8 +33,12 @@
     onMount(async () => {
         try {
             await primaryDiagnosisStore.getPrimaryDiagnosisFeedback(caseId);
+            mixpanel.track("Final Diagnosis Feedback", {
+                case_id: caseId,
+                department: $currentDepartment?.name,
+            });
         } catch (err) {
-            console.error("Failed to load primary diagdnosis feedback:", err);
+            console.error("Failed to load primary diagnosis feedback:", err);
         }
     });
 </script>

@@ -50,7 +50,20 @@ function createAuthStore() {
                 refreshToken: response.refresh_token
             };
 
+            mixpanel.identify(response.user.id)
 
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'plan': 'Free',
+                'role': response.user.role
+
+            });
+
+            mixpanel.track('Signup', {
+                'email': response.user.email,
+                'role': response.user.role
+            });
 
             set(newState);
 
@@ -91,6 +104,21 @@ function createAuthStore() {
             if (typeof window !== 'undefined') {
                 localStorage.setItem('auth', JSON.stringify(newState));
             }
+
+            mixpanel.identify(response.user.id)
+
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'plan': 'Free',
+                'role': response.user.role
+
+            });
+
+            mixpanel.track('Login', {
+                'email': response.user.email,
+                'role': response.user.role
+            });
 
             return response;
         } catch (error) {
