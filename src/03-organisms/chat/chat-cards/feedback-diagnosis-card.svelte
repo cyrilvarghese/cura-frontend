@@ -343,8 +343,8 @@
                                                         />
                                                         <span
                                                             class="font-medium"
-                                                            >Primary Diagnosis</span
-                                                        >
+                                                            >Final
+                                                        </span>
                                                     </div>
                                                 </Accordion.Trigger>
                                                 <Accordion.Content

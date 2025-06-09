@@ -1,27 +1,42 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import { handleApiResponse } from "$lib/utils/auth-handler";
-import mockStudentData from "$lib/data/mock-student.json";
+import mockStudentPerformanceData from "$lib/data/mock-student-performance.json";
 
 // Define interfaces for the API response
+export interface OSCEScoreSummary {
+    overallPercentage: number;
+    totalPointsEarned: number;
+    totalPossiblePoints: number;
+}
+
 export interface StudentPerformanceData {
+    student_id: string;
+    case_id: string;
     primary_diagnosis: string;
-    student_differential: string;
-    avg_differential: number;
-    max_differential: number;
-    student_history: string;
+    student_history: number;
+    student_physicals: number;
+    student_tests: number;
+    student_diagnosis: number;
+    student_reasoning: number;
+    student_differentials: number;
     avg_history: number;
     max_history: number;
-    student_physical: string;
-    avg_physical: number;
-    max_physical: number;
-    student_lab: string;
-    avg_lab: number;
-    max_lab: number;
-    student_management: string;
-    avg_management: number;
-    max_management: number;
-    [key: string]: string | number; // Index signature
+    avg_physicals: number;
+    max_physicals: number;
+    avg_tests: number;
+    max_tests: number;
+    avg_diagnosis: number;
+    max_diagnosis: number;
+    avg_reasoning: number;
+    max_reasoning: number;
+    avg_differentials: number;
+    max_differentials: number;
+    osce_score_summary: OSCEScoreSummary;
+    student_osce_percentage: number | null;
+    avg_osce_percentage: number | null;
+    max_osce_percentage: number | null;
+    [key: string]: string | number | OSCEScoreSummary | null; // Index signature
 }
 
 export interface PerformanceRequest {
@@ -31,18 +46,34 @@ export interface PerformanceRequest {
 
 export class StudentPerformanceService {
     private baseUrl = API_BASE_URL;
+    private useMockData = true; // Toggle this to switch between mock and API data
 
     /**
-     * Fetches student performance comparison data from the API
+     * Toggle between mock data and API data
+     */
+    setUseMockData(useMock: boolean) {
+        this.useMockData = useMock;
+    }
+
+    /**
+     * Fetches student performance comparison data from the API or mock data
      * @returns Promise with student performance data
      */
     async getPerformanceComparison(): Promise<StudentPerformanceData[]> {
-        // Temporarily return mock data
-        // return Promise.resolve(mockStudentData as StudentPerformanceData[]);
+        if (this.useMockData) {
+            // Return mock data with a slight delay to simulate API call
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve(mockStudentPerformanceData as StudentPerformanceData[]);
+                }, 300);
+            });
+        }
 
         try {
             const response = await makeAuthenticatedRequest(`${this.baseUrl}/student-performance/comparison`);
-            return response.json();
+            const data = await response.json();
+            // Wrap single object in array to maintain existing component logic
+            return Array.isArray(data) ? data : [data];
         } catch (error) {
             console.error('Failed to fetch student performance data:', error);
             throw error;
