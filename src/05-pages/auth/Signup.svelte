@@ -48,7 +48,7 @@
           <h1
             class="text-3xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           >
-            Case Chat
+            CaseChat
           </h1>
         </div>
       </div>

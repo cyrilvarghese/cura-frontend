@@ -60,7 +60,7 @@ export class PatientApiService {
             queryParams.append('case_id', caseId);
         }
 
-        const response = await makeAuthenticatedRequest(`${this.baseUrl}/patient/ask?${queryParams}`);
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/patient/ask-gemini?${queryParams}`);
         const apiResponse: ApiResponse = await response.json();
         const patientResponse: PatientResponse = JSON.parse(apiResponse.response);
 
