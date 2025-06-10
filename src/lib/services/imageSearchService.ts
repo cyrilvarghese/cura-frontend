@@ -95,7 +95,7 @@ export class ImageSearchService {
                 max_results: params.max_results || 30,
                 search_depth: params.search_depth || 'advanced',
                 search_query: params.search_query || '',
-                single_search: params.single_search || false,
+                single_search: params.single_search || true,
                 test_finding: params.test_finding || '',
                 serp_key: params.serp_key || ''
             };
