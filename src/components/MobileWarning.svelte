@@ -7,11 +7,11 @@
 >
     <div class="max-w-md mx-auto text-center">
         <!-- Logo -->
-        <div class="mb-8">
+        <div class=" p-6">
             <img
                 src={logoTextDark}
                 alt="Case Chat Logo"
-                class="h-40 mx-auto drop-shadow-lg"
+                class="h-40 mx-auto drop-shadow-lg object-contain"
             />
         </div>
 
