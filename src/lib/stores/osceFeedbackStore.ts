@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
-import { OSCEFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse, type OSCEScoreRecord, type PerformanceComparisonData } from '$lib/services/osceFeedbackService';
+import { OsceFeedbackService, type OSCEFeedbackResponse, type OSCEQuestion, type StudentResponse, type OSCEScoreRecord, type PerformanceComparisonData } from '$lib/services/osceFeedbackService';
 import { currentCaseId } from './casePlayerStore';
 import { get } from 'svelte/store';
 
-const osceFeedbackService = new OSCEFeedbackService();
+const osceFeedbackService = new OsceFeedbackService();
 
 function createOSCEFeedbackStore() {
     const { subscribe, set, update } = writable<{

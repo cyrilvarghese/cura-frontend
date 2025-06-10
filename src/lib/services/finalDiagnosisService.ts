@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from '$lib/utils/auth-handler';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface FinalDiagnosisRequest {
     case_id: string;
@@ -17,15 +17,10 @@ export class FinalDiagnosisService {
 
     async recordFinalDiagnosis(request: FinalDiagnosisRequest): Promise<any> {
         try {
-            const response = await fetch(`${this.baseUrl}/final-diagnosis`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/final-diagnosis/record`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
+                body: request
             });
-
-            await handleApiResponse(response);
             return response.json();
         } catch (error) {
             console.error('Error recording final diagnosis:', error);

@@ -3,6 +3,8 @@ import { toast } from 'svelte-sonner';
 import { navigate } from 'svelte-routing';
 import { authStore } from '$lib/stores/authStore';
 import { currentDepartment } from '$lib/stores/teamStore';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
+
 export interface GoogleDoc {
     id: string;
     name: string;
@@ -17,6 +19,11 @@ export interface GoogleDoc {
     google_doc_id: string;
 }
 
+export interface GoogleDocRequest {
+    case_id: string;
+    doc_id: string;
+}
+
 export class GoogleDocsService {
     private baseUrl = API_BASE_URL;
 
@@ -27,29 +34,25 @@ export class GoogleDocsService {
     async getAllDocs(departmentId: string): Promise<GoogleDoc[]> {
         const toastId = toast.loading('Fetching Google docs...');
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs?department_id=${departmentId}`);
-            if (!response.ok) {
-                if (response.status === 504) {
-                    toast.error('Google Docs API is down', {
-                        id: toastId,
-                        description: 'Retrying...'
-                    });
-                    setTimeout(async () => {
-                        await this.getAllDocs(departmentId);
-                    }, 1000);
-                    toast.dismiss();
-                }
-                else {
-                    toast.error('Failed to fetch Google docs', {
-                        id: toastId,
-                        description: 'Please try again later'
-                    });
-                    throw new Error('Failed to fetch Google docs');
-                }
-            }
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs?department_id=${departmentId}`);
             const data = await response.json();
+            toast.dismiss(toastId);
             return data as GoogleDoc[];
         } catch (error) {
+            if (error instanceof Response && error.status === 504) {
+                toast.error('Google Docs API is down', {
+                    id: toastId,
+                    description: 'Retrying...'
+                });
+                setTimeout(async () => {
+                    await this.getAllDocs(departmentId);
+                }, 1000);
+            } else {
+                toast.error('Failed to fetch Google docs', {
+                    id: toastId,
+                    description: 'Please try again later'
+                });
+            }
             console.error('Error fetching Google docs:', error);
             throw error;
         }
@@ -57,18 +60,10 @@ export class GoogleDocsService {
 
     async updateDocStatus(docId: string, status: string): Promise<GoogleDoc> {
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs/${docId}/status`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/${docId}/status`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status }),
+                body: { status }
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to update doc status');
-            }
-
             return response.json();
         } catch (error) {
             console.error('Error updating doc status:', error);
@@ -79,13 +74,7 @@ export class GoogleDocsService {
     async refreshCommentCount(docId: string): Promise<number> {
         const toastId = toast.loading('Refreshing comments...');
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs/${docId}/comments`);
-            if (!response.ok) {
-                toast.error('Failed to refresh comments', {
-                    id: toastId,
-                });
-                throw new Error('Failed to fetch comments');
-            }
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/${docId}/comments`);
             const comments = await response.json();
             toast.success('Comments refreshed', { id: toastId });
             return Array.isArray(comments) ? comments.length : 0;
@@ -102,23 +91,13 @@ export class GoogleDocsService {
     async deleteDoc(docId: string, docName: string): Promise<void> {
         const toastId = toast.loading('Deleting document...');
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs/${docId}`, {
-                method: 'DELETE',
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/${docId}`, {
+                method: 'DELETE'
             });
-
-            if (!response.ok) {
-                toast.error('Delete failed', {
-                    id: toastId,
-                    description: 'Failed to delete document'
-                });
-                throw new Error('Failed to delete document');
-            }
-
             toast.success('Document deleted', {
                 id: toastId,
-                description: `${docName}  deleted successfully`
+                description: `${docName} deleted successfully`
             });
-
         } catch (error) {
             console.error('Error deleting document:', error);
             toast.error('Delete failed', {
@@ -129,36 +108,35 @@ export class GoogleDocsService {
         }
     }
 
+    async bulkDeleteDocs(docIds: string[]): Promise<void> {
+        const toastId = toast.loading(`Deleting ${docIds.length} documents...`);
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/bulk/delete`, {
+                method: 'DELETE',
+                body: docIds
+            });
+            toast.success('Documents deleted', {
+                id: toastId,
+                description: `${docIds.length} documents deleted successfully`
+            });
+        } catch (error) {
+            console.error('Error bulk deleting documents:', error);
+            toast.error('Bulk delete failed', {
+                id: toastId,
+                description: error instanceof Error ? error.message : 'Please try again later'
+            });
+            throw error;
+        }
+    }
+
     async approveCase(docId: string): Promise<void> {
         const toastId = toast.loading('Approving document...');
         try {
-            const response = await fetch(`${this.baseUrl}/google-docs/${docId}/approve`);
-
-            if (!response.ok) {
-                if (response.status === 401) {
-
-                    toast.error('You are not logged in', {
-                        id: toastId,
-                        description: 'Redirecting to login page...'
-                    });
-                    authStore.logout();
-                    toast.dismiss();
-                }
-                else {
-                    toast.error('Approval failed', {
-                        id: toastId,
-                        description: 'Failed to approve document'
-                    });
-                    throw new Error('Failed to approve document');
-                }
-            }
-            else {
-                toast.success('Case approved', {
-                    id: toastId,
-                    description: 'Document has been approved successfully'
-                });
-            }
-
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs/${docId}/approve`);
+            toast.success('Case approved', {
+                id: toastId,
+                description: 'Document has been approved successfully'
+            });
         } catch (error) {
             if (error instanceof Response && error.status === 401) {
                 toast.dismiss();
@@ -184,26 +162,18 @@ export class GoogleDocsService {
             formData.append('file', file);
             formData.append('title', title);
 
-            const response = await fetch(`${this.baseUrl}/google-docs`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/google-docs`, {
                 method: 'POST',
-                body: formData,
+                body: formData
             });
 
-            if (!response.ok) {
-                if (response.status === 400) {
-                    const errorData = await response.json();
-                    toast.error('Upload failed', {
-                        id: toastId,
-                        description: errorData.detail || 'A document with this title already exists'
-                    });
-                    throw new Error(errorData.detail);
-                }
-
+            if (response.status === 400) {
+                const errorData = await response.json();
                 toast.error('Upload failed', {
                     id: toastId,
-                    description: 'Failed to upload document'
+                    description: errorData.detail || 'A document with this title already exists'
                 });
-                throw new Error('Failed to upload document');
+                throw new Error(errorData.detail);
             }
 
             toast.success('Document uploaded', {
@@ -223,4 +193,32 @@ export class GoogleDocsService {
             throw error;
         }
     }
-} 
+
+    async getGoogleDoc(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/google-doc`);
+        return response.json();
+    }
+
+    async updateGoogleDoc(caseId: string, docData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/google-doc`, {
+            method: 'PUT',
+            body: docData
+        });
+        return response.json();
+    }
+
+    async linkGoogleDoc(request: GoogleDocRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/link-google-doc`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error linking Google Doc:', error);
+            throw error;
+        }
+    }
+}
+
+export const googleDocsService = new GoogleDocsService(); 

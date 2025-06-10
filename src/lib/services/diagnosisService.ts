@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from '$lib/utils/auth-handler';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface DiagnosisRequest {
     case_id: string;
@@ -20,21 +20,31 @@ export interface Diagnosis {
 export class DiagnosisService {
     private baseUrl = API_BASE_URL;
 
+    async getDiagnosis(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/diagnosis`);
+        return response.json();
+    }
+
+    async updateDiagnosis(caseId: string, diagnosisData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/diagnosis`, {
+            method: 'PUT',
+            body: diagnosisData
+        });
+        return response.json();
+    }
+
     async recordDiagnosis(request: DiagnosisRequest): Promise<any> {
         try {
-            const response = await fetch(`${this.baseUrl}/record-diagnosis`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/diagnosis/record`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
+                body: request
             });
-
-            await handleApiResponse(response);
             return response.json();
         } catch (error) {
             console.error('Error recording diagnosis:', error);
             throw error;
         }
     }
-} 
+}
+
+export const diagnosisService = new DiagnosisService(); 

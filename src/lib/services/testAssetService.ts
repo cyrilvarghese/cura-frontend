@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface UploadTestAssetResponse {
     message: string;
@@ -30,8 +31,8 @@ export class TestAssetService {
         formData.append('case_id', caseId);
         formData.append('test_name', testName);
         formData.append('test_type', testType);
-
-        const response = await fetch(
+        debugger;
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/upload`,
             {
                 method: 'POST',
@@ -62,8 +63,8 @@ export class TestAssetService {
         formData.append('case_id', caseId);
         formData.append('test_name', testName);
         formData.append('test_type', testType);
-
-        const response = await fetch(
+        debugger;
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/upload`,  // Using the same endpoint as single upload
             {
                 method: 'POST',
@@ -81,14 +82,11 @@ export class TestAssetService {
     async uploadTestAssetFromUrl(
         request: UploadTestAssetFromUrlRequest
     ): Promise<UploadTestAssetResponse> {
-        const response = await fetch(
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/upload-from-url`,
             {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request)
+                body: request
             }
         );
 
@@ -105,13 +103,10 @@ export class TestAssetService {
         testName: string
     ): Promise<{ success: boolean; message: string }> {
         const encodedTestName = encodeURIComponent(testName);
-        const response = await fetch(
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/test-image/delete/${caseId}/${testType}/${encodedTestName}`,
             {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+                method: 'DELETE'
             }
         );
 

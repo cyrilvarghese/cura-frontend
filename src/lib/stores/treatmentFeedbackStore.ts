@@ -1,6 +1,8 @@
 import { writable, get } from 'svelte/store';
 import { treatmentFeedbackService, type TreatmentProtocolFeedback } from '$lib/services/treatmentFeedbackService';
 import { currentCaseId } from "$lib/stores/casePlayerStore";
+import mixpanel from 'mixpanel-browser';
+import { currentDepartment } from "$lib/stores/teamStore";
 
 interface TreatmentFeedbackState {
     treatmentFeedback: TreatmentProtocolFeedback | null;
@@ -30,6 +32,9 @@ function createTreatmentFeedbackStore() {
             }));
 
             return response.feedback_result;
+
+
+
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to get treatment feedback';
             update(state => ({

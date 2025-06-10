@@ -14,7 +14,7 @@
     async function handleFileUpload(event: Event) {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
-
+        debugger;
         if (!$currentDepartment) {
             toast.error("Please select a department first", {
                 style: "background: white; color: rgb(220 38 38);",

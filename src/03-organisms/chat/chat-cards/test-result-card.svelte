@@ -1,26 +1,52 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
     import { Badge } from "$lib/components/ui/badge";
+    import { Button } from "$lib/components/ui/button";
     import TestTube from "lucide-svelte/icons/test-tube";
+    import Edit from "lucide-svelte/icons/edit";
+    import Trash2 from "lucide-svelte/icons/trash-2";
+    import Search from "lucide-svelte/icons/search";
     import { getRelativeTime } from "$lib/utils/time";
     import TestResultsTable from "./test-results-table.svelte";
     import MedicalImageViewer from "$lib/components/medical-image-viewer.svelte";
     import type { TestResult, TestResultContent } from "$lib/types/index";
     import { currentCaseId } from "$lib/stores/casePlayerStore";
     import { get } from "svelte/store";
-    import { lastCaseIdStore } from "$lib/stores/caseCreatorStore";
+    import {
+        lastCaseIdStore,
+        refreshTestData,
+    } from "$lib/stores/caseCreatorStore";
     import CommentButton from "$lib/components/ui/comment-button.svelte";
     import { getContext } from "svelte";
+    import { editExamStore } from "$lib/stores/editExamStore";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
+    import { authStore, type AuthState } from "$lib/stores/authStore";
+    import {
+        previewImageSearch,
+        executeImageSearch,
+        imageSearchStore,
+    } from "$lib/stores/imageSearchStore";
+    import ImageSearchModal from "$lib/components/ui/image-search-modal.svelte";
 
     const {
         result,
         caseId = get(currentCaseId) ?? get(lastCaseIdStore) ?? "",
+        onDelete,
+        onEdit,
     } = $props<{
         result: TestResult;
         caseId?: string;
+        onDelete?: (testName: string) => void;
+        onEdit?: (testName: string, updatedData: any) => void;
     }>();
 
     const caseType = getContext<"new" | "edit">("case-type");
+
+    let user: AuthState["user"] | undefined = $state();
+
+    authStore.subscribe((state) => {
+        user = state.user;
+    });
 
     const statusColors = {
         completed: "bg-green-500/10 text-green-700 hover:bg-green-500/20",
@@ -59,11 +85,89 @@
         }
     }
 
-    const resultContent = renderResult(result.results);
+    const resultContent = $derived(renderResult(result.results));
+
+    let deleteConfirmOpen = $state(false);
+    let searchModalOpen = $state(false);
+    let currentSearchQuery = $state<any>(null);
+
+    // Use derived state from the store
+    const searchState = $derived($imageSearchStore);
+
+    // Handler functions for edit and delete
+    function handleEdit() {
+        console.log("Edit lab test:", result.testName);
+        // Call the callback to notify parent component
+        onEdit?.(result.testName, result);
+    }
+
+    function handleDelete() {
+        deleteConfirmOpen = true;
+    }
+
+    async function handleSearch() {
+        console.log("Search lab test:", result.testName);
+
+        // Extract text content from mixed results or caption from image results
+        let testFinding = "";
+        if (typeof resultContent === "object") {
+            if (resultContent.type === "mixed") {
+                const textItems = resultContent.content.filter(
+                    (item) => item.type === "text",
+                );
+                testFinding = textItems.map((item) => item.content).join(" ");
+            } else if (resultContent.type === "image") {
+                testFinding = resultContent.content.caption || "";
+            }
+        }
+
+        const searchQuery = {
+            case_id: caseId,
+            test_type: "lab_test" as const,
+            test_name: result.testName,
+            max_results: 30,
+            search_depth: "advanced" as const,
+            test_finding: testFinding,
+        };
+
+        currentSearchQuery = searchQuery;
+        searchModalOpen = true;
+
+        try {
+            await executeImageSearch(searchQuery);
+        } catch (error) {
+            console.error("Failed to search images:", error);
+        }
+    }
+
+    const handleModalSearch = async (query: any) => {
+        await executeImageSearch(query);
+    };
+
+    async function confirmDelete() {
+        deleteConfirmOpen = false;
+
+        try {
+            await editExamStore.deleteLabTest({
+                case_id: caseId,
+                test_name: result.testName,
+            });
+
+            // Call the callback to notify parent component
+            onDelete?.(result.testName);
+
+            console.log("Lab test deleted successfully");
+        } catch (error) {
+            console.error("Failed to delete lab test:", error);
+        }
+    }
 </script>
 
 <Card.Root
-    class="w-full max-w-2xl border-l-4 border-l-amber-900/50 rounded-none rounded-r-md"
+    class="w-full max-w-2xl border-l-4 {typeof resultContent === 'object' &&
+    resultContent.type === 'mixed'
+        ? 'border-l-red-500/50'
+        : 'border-l-amber-900/50'} rounded-none rounded-r-md"
 >
     <Card.Header>
         <div class="flex items-center justify-between">
@@ -77,6 +181,38 @@
                 </Card.Title>
             </div>
             <div class="flex items-center gap-2">
+                {#if user?.role === "admin" && caseType === "edit"}
+                    {#if typeof resultContent === "object" && (resultContent.type === "mixed" || resultContent.type === "image")}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            class="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                            title="Search in lab test"
+                            onclick={handleSearch}
+                        >
+                            <Search class="h-4 w-4" />
+                        </Button>
+                    {/if}
+
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        onclick={handleEdit}
+                    >
+                        <Edit class="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onclick={handleDelete}
+                    >
+                        <Trash2 class="h-4 w-4" />
+                    </Button>
+                {/if}
+
                 <CommentButton
                     {caseId}
                     testName={result.testName}
@@ -112,6 +248,18 @@
                     testType="lab_test"
                 />
             {:else if resultContent.type === "image"}
+                {#if user?.role === "admin"}
+                    <p
+                        class="text-sm text-muted-foreground whitespace-pre-wrap bg-amber-50/50 p-2 rounded border-l-2 border-amber-200 mb-3"
+                    >
+                        <span
+                            class="text-xs font-medium text-amber-600 uppercase tracking-wide"
+                        >
+                            Result
+                        </span><br />
+                        {resultContent.content.caption}
+                    </p>
+                {/if}
                 <MedicalImageViewer
                     {caseId}
                     testName={result.testName}
@@ -127,11 +275,18 @@
                 <div class="space-y-4">
                     {#each resultContent.content as item}
                         {#if item.type === "text"}
-                            <p
-                                class="text-sm text-muted-foreground whitespace-pre-wrap"
-                            >
-                                <!-- {item.content} -->
-                            </p>
+                            {#if user?.role === "admin"}
+                                <p
+                                    class="text-sm text-muted-foreground whitespace-pre-wrap bg-amber-50/50 p-2 rounded border-l-2 border-amber-200"
+                                >
+                                    <span
+                                        class="text-xs font-medium text-amber-600 uppercase tracking-wide"
+                                    >
+                                        Result</span
+                                    ><br />
+                                    {item.content}
+                                </p>
+                            {/if}
                         {:else if item.type === "table"}
                             <TestResultsTable
                                 data={item.content}
@@ -175,3 +330,33 @@
         </p>
     </Card.Footer>
 </Card.Root>
+
+<!-- Delete Confirmation Dialog -->
+<AlertDialog.Root bind:open={deleteConfirmOpen}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete lab test?</AlertDialog.Title>
+            <AlertDialog.Description>
+                Are you sure you want to delete "{result.testName}"? This action
+                cannot be undone.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action class="bg-destructive" onclick={confirmDelete}>
+                Delete
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>
+
+<!-- Image Search Modal -->
+{#if currentSearchQuery}
+    <ImageSearchModal
+        open={searchModalOpen}
+        onOpenChange={(open: boolean) => (searchModalOpen = open)}
+        initialQuery={currentSearchQuery}
+        {searchState}
+        onSearch={handleModalSearch}
+    />
+{/if}

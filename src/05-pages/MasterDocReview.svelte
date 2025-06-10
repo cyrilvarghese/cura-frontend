@@ -24,6 +24,11 @@
     import { Label } from "$lib/components/ui/label/index.js";
     import { currentDepartment } from "$lib/stores/teamStore";
     import { get } from "svelte/store";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
+    import {
+        automatedCaseGenerationService,
+        type CaseGenerationProgress,
+    } from "$lib/services/automatedCaseGenerationService";
     // Direct state declarations without import
     let searchQuery = $state("");
     let isLoading = $state(true);
@@ -34,6 +39,20 @@
     let isUploading = $state(false);
     let showPendingOnly = $state(false);
     let departmentId = $state("");
+    let selectedDocIds = $state(new Set<string>());
+    let isBulkApproving = $state(false);
+    let bulkApprovalProgress = $state({ current: 0, total: 0 });
+    let isBulkGeneratingCases = $state(false);
+    let caseGenerationProgress = $state<CaseGenerationProgress>({
+        step: "",
+        current: 0,
+        total: 0,
+        isComplete: false,
+        caseName: "",
+    });
+    let currentApprovingCaseName = $state("");
+    let isBulkDeleting = $state(false);
+    let bulkDeleteProgress = $state({ current: 0, total: 0 });
     function transformStatus(status: string) {
         const statusMap: { [key: string]: string } = {
             CASE_REVIEW_PENDING: "Document Review Pending",
@@ -168,6 +187,159 @@
         }
     }
 
+    async function handleApproveAndGenerateCase(
+        docId: string,
+        title: string,
+        docLink: string,
+    ) {
+        isApproving = true;
+        currentApprovingCaseName = title;
+
+        try {
+            // First approve the case
+            const success = await googleDocsStore.approveCase(docId);
+            if (!success) {
+                throw new Error("Failed to approve case");
+            }
+
+            // Now start case generation
+            isBulkGeneratingCases = true;
+
+            // Initialize progress with case name
+            caseGenerationProgress = {
+                step: "Starting...",
+                current: 0,
+                total: 7,
+                isComplete: false,
+                caseName: title,
+            };
+
+            // Then automatically generate case data
+            await automatedCaseGenerationService.generateAllCaseData(
+                {
+                    documentName: title,
+                    googleDocLink: docLink,
+                    departmentName: $currentDepartment?.name || "",
+                },
+                (progress) => {
+                    caseGenerationProgress = progress;
+                },
+            );
+
+            // Reload docs after everything is complete
+            await googleDocsStore.loadDocs(departmentId);
+        } catch (error) {
+            console.error("Error in approve and generate:", error);
+            // Still reload docs even if generation failed
+            await googleDocsStore.loadDocs(departmentId);
+        } finally {
+            isApproving = false;
+            isBulkGeneratingCases = false;
+            currentApprovingCaseName = "";
+        }
+    }
+
+    async function handleBulkApprove() {
+        const selectedIds = Array.from(selectedDocIds);
+        if (selectedIds.length === 0) return;
+
+        isBulkApproving = true;
+        bulkApprovalProgress = { current: 0, total: selectedIds.length };
+
+        try {
+            for (let i = 0; i < selectedIds.length; i++) {
+                const docId = selectedIds[i];
+                bulkApprovalProgress = {
+                    current: i,
+                    total: selectedIds.length,
+                };
+
+                // Call the existing approve function but without reloading docs
+                const originalIsApproving = isApproving;
+                isApproving = true;
+                try {
+                    await googleDocsStore.approveCase(docId);
+                } finally {
+                    isApproving = originalIsApproving;
+                }
+
+                // Update progress after successful approval
+                bulkApprovalProgress = {
+                    current: i + 1,
+                    total: selectedIds.length,
+                };
+            }
+
+            // Clear selection and reload docs only once at the end
+            selectedDocIds = new Set();
+            await googleDocsStore.loadDocs(departmentId);
+        } finally {
+            isBulkApproving = false;
+        }
+    }
+
+    async function handleBulkApproveAndGenerate() {
+        const selectedIds = Array.from(selectedDocIds);
+        if (selectedIds.length === 0) return;
+
+        isBulkApproving = true;
+        isBulkGeneratingCases = true;
+        bulkApprovalProgress = { current: 0, total: selectedIds.length };
+
+        try {
+            for (let i = 0; i < selectedIds.length; i++) {
+                const docId = selectedIds[i];
+                const review = filteredCases.find((r) => r.docId === docId);
+                if (!review) continue;
+
+                bulkApprovalProgress = {
+                    current: i,
+                    total: selectedIds.length,
+                };
+
+                // Set current case being approved
+                currentApprovingCaseName = review.title;
+
+                // Approve the case
+                await googleDocsStore.approveCase(docId);
+                debugger;
+
+                // Initialize progress before starting generation
+                caseGenerationProgress = {
+                    step: "Starting...",
+                    current: 0,
+                    total: 7,
+                    isComplete: false,
+                    caseName: review.title,
+                };
+
+                // Generate case data automatically
+                await automatedCaseGenerationService.generateAllCaseData(
+                    {
+                        documentName: review.title,
+                        googleDocLink: review.docLink,
+                        departmentName: $currentDepartment?.name || "",
+                    },
+                    (progress) => {
+                        caseGenerationProgress = progress;
+                    },
+                );
+
+                bulkApprovalProgress = {
+                    current: i + 1,
+                    total: selectedIds.length,
+                };
+            }
+
+            selectedDocIds = new Set();
+            await googleDocsStore.loadDocs(departmentId);
+        } finally {
+            isBulkApproving = false;
+            isBulkGeneratingCases = false;
+            currentApprovingCaseName = "";
+        }
+    }
+
     async function handleGenerateData(
         docId: string,
         fileName: string,
@@ -186,11 +358,106 @@
     async function handleGenerateMCQ(docId: string, title: string) {
         console.log("Generate MCQ clicked:", { docId, title });
     }
+
+    async function handleBulkDelete() {
+        const selectedIds = Array.from(selectedDocIds);
+        if (selectedIds.length === 0) return;
+
+        if (
+            !confirm(
+                `Are you sure you want to delete ${selectedIds.length} document(s)? This action cannot be undone.`,
+            )
+        ) {
+            return;
+        }
+
+        isBulkDeleting = true;
+        bulkDeleteProgress = { current: 0, total: selectedIds.length };
+
+        try {
+            const success = await googleDocsStore.bulkDeleteDocs(selectedIds);
+            if (success) {
+                selectedDocIds = new Set();
+                await googleDocsStore.loadDocs(departmentId);
+            }
+        } finally {
+            isBulkDeleting = false;
+        }
+    }
+
+    function getLoadingMessage(): string {
+        // First priority: Are we bulk deleting?
+        if (isBulkDeleting) {
+            return `Deleting ${bulkDeleteProgress.total} documents...`;
+        }
+
+        // First priority: Are we generating case data?
+        if (isBulkGeneratingCases) {
+            const caseName =
+                caseGenerationProgress.caseName ||
+                currentApprovingCaseName ||
+                "Unknown Case";
+            const step = caseGenerationProgress.step || "Initializing";
+            const current = caseGenerationProgress.current || 0;
+            const total = caseGenerationProgress.total || 7;
+
+            // If we're also doing bulk approval, show which case in the batch
+            if (isBulkApproving) {
+                const batchProgress = `Case ${bulkApprovalProgress.current + 1} of ${bulkApprovalProgress.total}`;
+                return `Generating case data for "${caseName}": ${step} (${current}/${total}) - ${batchProgress}`;
+            }
+
+            return `Generating case data for "${caseName}": ${step} (${current}/${total})`;
+        }
+
+        // Second priority: Are we approving a specific case?
+        if (isApproving && currentApprovingCaseName) {
+            // If we're doing bulk approval, show which case in the batch
+            if (isBulkApproving) {
+                const batchProgress = `Case ${bulkApprovalProgress.current + 1} of ${bulkApprovalProgress.total}`;
+                return `Approving "${currentApprovingCaseName}" - ${batchProgress}`;
+            }
+
+            return `Approving "${currentApprovingCaseName}"...`;
+        }
+
+        // Third priority: Are we doing bulk approval only?
+        if (isBulkApproving) {
+            return `Approving documents: ${bulkApprovalProgress.current} of ${bulkApprovalProgress.total} completed`;
+        }
+
+        // Fallback
+        return "Processing...";
+    }
+
+    // Add helper functions for checkbox handling
+    function toggleSelectAll() {
+        if (selectedDocIds.size === filteredCases.length) {
+            selectedDocIds = new Set();
+        } else {
+            selectedDocIds = new Set(
+                filteredCases.map((review) => review.docId),
+            );
+        }
+    }
+
+    function toggleSelectDoc(docId: string) {
+        if (selectedDocIds.has(docId)) {
+            // Create new Set without the docId
+            selectedDocIds = new Set(
+                [...selectedDocIds].filter((id) => id !== docId),
+            );
+        } else {
+            // Create new Set with the docId added
+            selectedDocIds = new Set([...selectedDocIds, docId]);
+        }
+    }
 </script>
 
 <PageLayout
     breadcrumbs={[{ label: "Home", href: "/" }, { label: "Case Review" }]}
 >
+    {@debug selectedDocIds}
     <div class="flex items-center justify-between mb-4">
         <div>
             <h1 class="text-2xl font-bold">Master Document Review</h1>
@@ -237,6 +504,65 @@
         </div>
     </div>
 
+    {#if selectedDocIds.size > 0}
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-blue-700 font-medium">
+                        {selectedDocIds.size} document{selectedDocIds.size === 1
+                            ? ""
+                            : "s"} selected
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => (selectedDocIds = new Set())}
+                        class="text-blue-700 border-blue-300 hover:bg-blue-100"
+                    >
+                        Clear selection
+                    </Button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => {
+                            // Handle bulk approve
+                            handleBulkApprove();
+                        }}
+                        class="text-green-700 border-green-300 hover:bg-green-100"
+                        disabled={isBulkApproving}
+                    >
+                        Bulk Approve Only
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => {
+                            // Handle bulk approve and generate
+                            handleBulkApproveAndGenerate();
+                        }}
+                        class="text-blue-700 border-blue-300 hover:bg-blue-100"
+                        disabled={isBulkApproving || isBulkGeneratingCases}
+                    >
+                        Approve & Generate Cases
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={handleBulkDelete}
+                        class="text-red-700 border-red-300 hover:bg-red-100"
+                        disabled={isBulkDeleting ||
+                            isBulkApproving ||
+                            isBulkGeneratingCases}
+                    >
+                        Bulk Delete
+                    </Button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
     <div class="mt-4">
         <div class="overflow-x-auto">
             {#if isLoading}
@@ -265,6 +591,20 @@
                 <table class="w-full border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b">
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12"
+                            >
+                                <Checkbox
+                                    checked={filteredCases.length > 0 &&
+                                        selectedDocIds.size ===
+                                            filteredCases.length}
+                                    indeterminate={selectedDocIds.size > 0 &&
+                                        selectedDocIds.size <
+                                            filteredCases.length}
+                                    onCheckedChange={toggleSelectAll}
+                                    aria-label="Select all documents"
+                                />
+                            </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
@@ -300,6 +640,18 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         {#each filteredCases as review, index}
                             <tr class="hover:bg-gray-50">
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-12"
+                                >
+                                    <Checkbox
+                                        checked={selectedDocIds.has(
+                                            review.docId,
+                                        )}
+                                        onCheckedChange={() =>
+                                            toggleSelectDoc(review.docId)}
+                                        aria-label={`Select ${review.title}`}
+                                    />
+                                </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
@@ -426,7 +778,17 @@
                                                             review.docId,
                                                         )}
                                                 >
-                                                    Approve
+                                                    Approve Only
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onclick={() =>
+                                                        handleApproveAndGenerateCase(
+                                                            review.docId,
+                                                            review.title,
+                                                            review.docLink,
+                                                        )}
+                                                >
+                                                    Approve & Generate Case
                                                 </DropdownMenuItem>
                                             {:else if review.status === "Document Review Complete"}
                                                 <DropdownMenuItem
@@ -488,3 +850,8 @@
         </div>
     </div>
 </PageLayout>
+
+<LoadingOverlay
+    isVisible={isBulkApproving || isBulkGeneratingCases || isBulkDeleting}
+    message={getLoadingMessage()}
+/>

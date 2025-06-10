@@ -9,6 +9,9 @@
     import { treatmentFeedbackStore } from "$lib/stores/treatmentFeedbackStore";
     import MedicationItem from "../../02-molecules/medication-item.svelte";
     import type { TreatmentFeedback } from "$lib/services/treatmentProtocolService";
+    import mixpanel from "mixpanel-browser";
+    import { currentCaseId } from "$lib/stores/casePlayerStore";
+    import { currentDepartment } from "$lib/stores/teamStore";
 
     let { open = $bindable(), onSubmit } = $props<{
         open: boolean;
@@ -155,6 +158,10 @@
                 await treatmentFeedbackStore.getTreatmentFeedback(
                     treatmentPlan,
                 );
+            mixpanel.track("Treatment Protocol Feedback", {
+                case_id: $currentCaseId,
+                department: $currentDepartment?.name,
+            });
 
             // Send the feedback message to display our new component
             debugger;

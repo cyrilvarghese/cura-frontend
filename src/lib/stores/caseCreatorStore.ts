@@ -394,3 +394,26 @@ export async function generateClinicalFindingsContext(selectedDocumentName: stri
         }));
     }
 }
+
+// Function to refresh test data only
+export async function refreshTestData(caseId: string) {
+    caseStore.update(state => ({ ...state, loading: true, error: null }));
+
+    try {
+        const testData = await getCaseDataService().getTestData(caseId);
+        caseStore.update(state => ({
+            ...state,
+            testData: {
+                physical_exam: testData.physical_exam,
+                lab_test: testData.lab_test,
+            },
+            loading: false,
+        }));
+    } catch (error) {
+        caseStore.update(state => ({
+            ...state,
+            error: error instanceof Error ? error.message : "Failed to refresh test data",
+            loading: false,
+        }));
+    }
+}

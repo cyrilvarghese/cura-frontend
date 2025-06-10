@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import type { FormattedPersonaResponse } from '$lib/types/index';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export class PatientPersonaService {
     private baseUrl = API_BASE_URL;
@@ -9,11 +10,11 @@ export class PatientPersonaService {
         formData.append('file', file);
         formData.append('case_id', caseId);
 
-        const response = await fetch(
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/patient_persona/create`,
             {
                 method: 'POST',
-                body: formData,
+                body: formData
             }
         );
 
@@ -25,21 +26,16 @@ export class PatientPersonaService {
     }
 
     async createPatientPersonaFromUrl(selectedDocumentName: string, caseId: string | null, department: string, googleDocLink: string | null): Promise<FormattedPersonaResponse> {
-        debugger;
-        console.log(googleDocLink);
-        const response = await fetch(
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/patient_persona/create`,
             {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+                body: {
                     file_name: selectedDocumentName,
                     case_id: caseId,
                     department: department,
                     google_doc_link: googleDocLink
-                })
+                }
             }
         );
 

@@ -1,7 +1,46 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import type { HistoryMatchResponse, UnmatchedQuestion } from '$lib/types';
 import { apiStore } from '$lib/stores/apiStore';
 import type { Message } from '../types/index';
+
+export interface HistoryMatchRequest {
+    case_id: string;
+    history_data: any;
+}
+
+export class HistoryMatchService {
+    private baseUrl = API_BASE_URL;
+
+    async getHistoryMatch(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/history-match`);
+        return response.json();
+    }
+
+    async updateHistoryMatch(caseId: string, historyData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/history-match`, {
+            method: 'PUT',
+            body: historyData
+        });
+        return response.json();
+    }
+
+    async submitHistoryMatch(request: HistoryMatchRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/submit-history-match`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error submitting history match:', error);
+            throw error;
+        }
+    }
+}
+
+export const historyMatchService = new HistoryMatchService();
+
 /**
  * Fetches unmatched questions data from the API
  * @returns Promise with the history match data
@@ -15,24 +54,13 @@ export async function fetchUnmatchedQuestions(
             ? remainingUnmatchedQuestions
             : [];
 
-        const response = await fetch(`${API_BASE_URL}/history-match/unmatched-questions`, {
+        const response = await makeAuthenticatedRequest(`${API_BASE_URL}/history-match/unmatched-questions`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+            body: {
                 remaining_unmatched_questions: questionsToSend
-            })
+            }
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`Error fetching unmatched questions: ${response.status} ${response.statusText}`);
-        }
-
-        const data: HistoryMatchResponse = await response.json();
-        return data;
+        return response.json();
     } catch (error) {
         console.error('Failed to fetch unmatched questions:', error);
         throw error;
@@ -60,24 +88,13 @@ export async function fetchMatchedQuestions(): Promise<HistoryMatchResponse> {
 
         console.log("Current interaction being sent:", currentInteraction);
 
-        const response = await fetch(`${API_BASE_URL}/history-match/match-single-interaction`, {
+        const response = await makeAuthenticatedRequest(`${API_BASE_URL}/history-match/match-single-interaction`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+            body: {
                 current_interaction: currentInteraction
-            })
+            }
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`Error fetching matched questions: ${response.status} ${response.statusText}`);
-        }
-
-        const data: HistoryMatchResponse = await response.json();
-        return data;
+        return response.json();
     } catch (error) {
         console.error('Failed to fetch matched questions:', error);
         throw error;

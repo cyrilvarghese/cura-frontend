@@ -12,6 +12,8 @@
         ListTree,
         BookOpen,
         Clipboard,
+        AlertCircle,
+        RefreshCw,
     } from "lucide-svelte";
     import { feedbackStore } from "$lib/stores/feedbackStore";
     import { toast } from "svelte-sonner";
@@ -52,6 +54,12 @@
         diagnosis: false,
     });
 
+    let errorStates = $state({
+        history: null as string | null,
+        aetcom: null as string | null,
+        diagnosis: null as string | null,
+    });
+
     let selectedStep = $state<"history" | "aetcom" | "diagnosis" | null>(null);
     let openAccordion = $state<string[]>([]);
 
@@ -66,25 +74,48 @@
     async function loadFeedback() {
         try {
             // History feedback
-            const historyFeedback = await feedbackStore.getHistoryFeedback();
-            feedback.history = historyFeedback;
-            loadingStates.history = false;
-            completedStates.history = true;
-            // Add history to open accordions
-            setTimeout(() => {
-                openAccordion = [...openAccordion, "history"];
-            }, transitionDelay);
+            try {
+                const historyFeedback =
+                    await feedbackStore.getHistoryFeedback();
+                feedback.history = historyFeedback;
+                loadingStates.history = false;
+                completedStates.history = true;
+                errorStates.history = null;
+                // Add history to open accordions
+                setTimeout(() => {
+                    openAccordion = [...openAccordion, "history"];
+                }, transitionDelay);
+            } catch (historyError) {
+                loadingStates.history = false;
+                errorStates.history =
+                    historyError instanceof Error
+                        ? historyError.message
+                        : "Failed to load history feedback";
+                console.error("Error loading history feedback:", historyError);
+            }
+
             loadingStates.aetcom = true;
 
             // AETCOM feedback
-            const aetcomFeedback = await feedbackStore.getAETCOMFeedback();
-            feedback.aetcom = aetcomFeedback;
-            loadingStates.aetcom = false;
-            completedStates.aetcom = true;
-            // Add aetcom to open accordions
-            setTimeout(() => {
-                openAccordion = [...openAccordion, "aetcom"];
-            }, transitionDelay);
+            try {
+                const aetcomFeedback = await feedbackStore.getAETCOMFeedback();
+                feedback.aetcom = aetcomFeedback;
+                loadingStates.aetcom = false;
+                completedStates.aetcom = true;
+                errorStates.aetcom = null;
+                // Add aetcom to open accordions
+                setTimeout(() => {
+                    openAccordion = [...openAccordion, "aetcom"];
+                }, transitionDelay);
+            } catch (aetcomError) {
+                loadingStates.aetcom = false;
+                errorStates.aetcom =
+                    aetcomError instanceof Error
+                        ? aetcomError.message
+                        : "Failed to load AETCOM feedback";
+                console.error("Error loading AETCOM feedback:", aetcomError);
+            }
+
             loadingStates.diagnosis = true;
 
             // Diagnosis feedback
@@ -105,6 +136,50 @@
                         ? error.message
                         : "Unknown error occurred",
             });
+        }
+    }
+
+    async function retryHistoryFeedback() {
+        loadingStates.history = true;
+        errorStates.history = null;
+        try {
+            const historyFeedback = await feedbackStore.getHistoryFeedback();
+            feedback.history = historyFeedback;
+            loadingStates.history = false;
+            completedStates.history = true;
+            // Add history to open accordions
+            setTimeout(() => {
+                openAccordion = [...openAccordion, "history"];
+            }, transitionDelay);
+        } catch (error) {
+            loadingStates.history = false;
+            errorStates.history =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to load history feedback";
+            console.error("Error retrying history feedback:", error);
+        }
+    }
+
+    async function retryAetcomFeedback() {
+        loadingStates.aetcom = true;
+        errorStates.aetcom = null;
+        try {
+            const aetcomFeedback = await feedbackStore.getAETCOMFeedback();
+            feedback.aetcom = aetcomFeedback;
+            loadingStates.aetcom = false;
+            completedStates.aetcom = true;
+            // Add aetcom to open accordions
+            setTimeout(() => {
+                openAccordion = [...openAccordion, "aetcom"];
+            }, transitionDelay);
+        } catch (error) {
+            loadingStates.aetcom = false;
+            errorStates.aetcom =
+                error instanceof Error
+                    ? error.message
+                    : "Failed to load AETCOM feedback";
+            console.error("Error retrying AETCOM feedback:", error);
         }
     }
 
@@ -179,14 +254,74 @@
                                 }}
                                 out:slide={{ duration: 600, easing: cubicOut }}
                             >
-                                {#if step === "history" && feedback.history?.analysis_result}
-                                    <HistoryFeedbackContent
-                                        feedback={feedback.history}
-                                    />
-                                {:else if step === "aetcom" && feedback.aetcom?.feedback_result}
-                                    <AETCOMFeedbackContent
-                                        feedback={feedback.aetcom}
-                                    />
+                                {#if step === "history"}
+                                    {#if errorStates.history}
+                                        <div
+                                            class="bg-red-50 p-4 rounded-md text-red-800 flex items-start gap-2"
+                                        >
+                                            <AlertCircle
+                                                class="w-5 h-5 mt-0.5 flex-shrink-0"
+                                            />
+                                            <div class="flex-1">
+                                                <p class="font-medium">
+                                                    Error loading history
+                                                    feedback
+                                                </p>
+                                                <p class="text-sm">
+                                                    {errorStates.history}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onclick={retryHistoryFeedback}
+                                                class="ml-2 border-red-200 text-red-700 hover:bg-red-100"
+                                            >
+                                                <RefreshCw
+                                                    class="w-4 h-4 mr-2"
+                                                />
+                                                Retry
+                                            </Button>
+                                        </div>
+                                    {:else if feedback.history?.analysis_result}
+                                        <HistoryFeedbackContent
+                                            feedback={feedback.history}
+                                        />
+                                    {/if}
+                                {:else if step === "aetcom"}
+                                    {#if errorStates.aetcom}
+                                        <div
+                                            class="bg-red-50 p-4 rounded-md text-red-800 flex items-start gap-2"
+                                        >
+                                            <AlertCircle
+                                                class="w-5 h-5 mt-0.5 flex-shrink-0"
+                                            />
+                                            <div class="flex-1">
+                                                <p class="font-medium">
+                                                    Error loading AETCOM
+                                                    feedback
+                                                </p>
+                                                <p class="text-sm">
+                                                    {errorStates.aetcom}
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onclick={retryAetcomFeedback}
+                                                class="ml-2 border-red-200 text-red-700 hover:bg-red-100"
+                                            >
+                                                <RefreshCw
+                                                    class="w-4 h-4 mr-2"
+                                                />
+                                                Retry
+                                            </Button>
+                                        </div>
+                                    {:else if feedback.aetcom?.feedback_result}
+                                        <AETCOMFeedbackContent
+                                            feedback={feedback.aetcom}
+                                        />
+                                    {/if}
                                 {:else if step === "diagnosis"}
                                     <!-- Diagnosis Feedback with nested accordions -->
                                     <div class="space-y-4">
@@ -208,8 +343,8 @@
                                                         />
                                                         <span
                                                             class="font-medium"
-                                                            >Primary Diagnosis</span
-                                                        >
+                                                            >Final
+                                                        </span>
                                                     </div>
                                                 </Accordion.Trigger>
                                                 <Accordion.Content

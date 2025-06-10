@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface PhysicalExam {
     name: string;
@@ -44,24 +45,16 @@ export class DiagnosisContextService {
 
     async createDiagnosisContext(fileName: string, caseId: string): Promise<DiagnosisContextResponse> {
         try {
-            const response = await fetch(
+            const response = await makeAuthenticatedRequest(
                 `${this.baseUrl}/diagnosis_context/create`,
                 {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         file_name: fileName,
                         case_id: caseId
-                    })
+                    }
                 }
             );
-
-            if (!response.ok) {
-                throw new Error('Failed to create diagnosis context');
-            }
-
             return await response.json();
         } catch (error) {
             console.error('Error creating diagnosis context:', error);

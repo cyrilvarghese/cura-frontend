@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from "$lib/utils/auth-handler";
 import mockTeachingData from "$lib/data/mock-teaching.json";
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 // Define interfaces for the API response
 export interface CaseSessionData {
@@ -32,16 +32,10 @@ export class TeachingService {
     async getTeachingSessions(department: string): Promise<CaseSessionData[]> {
         // Temporarily return mock data for development
         // return Promise.resolve(mockTeachingData as TeachingSessionData[]);
-
         try {
-            const response = await fetch(`${this.baseUrl}/teaching?department=${encodeURIComponent(department)}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            await handleApiResponse(response);
+            const response = await makeAuthenticatedRequest(
+                `${this.baseUrl}/teaching?department=${encodeURIComponent(department)}`
+            );
 
             if (!response.ok) {
                 throw new Error(`API error: ${response.status}`);

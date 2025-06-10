@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '$lib/config/api';
 import { toast } from 'svelte-sonner';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 export interface DocumentUploadResponse {
     id: string;
@@ -37,7 +38,7 @@ export class DocumentService {
                 formData.append('descriptions', fileData.description || '');
             });
 
-            const response = await fetch(
+            const response = await makeAuthenticatedRequest(
                 `${this.baseUrl}/documents/upload`,
                 {
                     method: 'POST',
@@ -85,7 +86,7 @@ export class DocumentService {
             formData.append('title', title);
             formData.append('description', description);
 
-            const response = await fetch(
+            const response = await makeAuthenticatedRequest(
                 `${this.baseUrl}/documents/upload`,
                 {
                     method: 'POST',
@@ -126,7 +127,7 @@ export class DocumentService {
 
     async getDocumentsByDepartment(departmentName: string): Promise<DocumentUploadResponse[]> {
         try {
-            const response = await fetch(
+            const response = await makeAuthenticatedRequest(
                 `${this.baseUrl}/curriculum/${departmentName}/documents`
             );
 

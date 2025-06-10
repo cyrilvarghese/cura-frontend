@@ -1,6 +1,11 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import type { CoverImageResponse } from '$lib/types/index';
 
+export interface ImageGenerationRequest {
+    prompt: string;
+    case_id: string;
+}
 
 export class CoverImageService {
     private baseUrl = API_BASE_URL;
@@ -8,50 +13,55 @@ export class CoverImageService {
     // Create a cover image for a case
 
     async createCoverImage(caseId: string | null): Promise<CoverImageResponse> {
-        debugger;
-        const response = await fetch(
+        const response = await makeAuthenticatedRequest(
             `${this.baseUrl}/cover_image/generate`,
             {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    case_id: caseId,
-
-                })
+                body: {
+                    case_id: caseId
+                }
             }
         );
-
-        if (!response.ok) {
-            throw new Error('Failed to create cover image');
-        }
-
         return await response.json();
     }
 
+    async generateImage(request: ImageGenerationRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/generate-image`, {
+                method: 'POST',
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error generating image:', error);
+            throw error;
+        }
+    }
 
+    async updateCoverImage(caseId: string, imageData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/cover-image`, {
+            method: 'PUT',
+            body: imageData
+        });
+        return response.json();
+    }
 
+    async getCoverImage(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/cover-image`);
+        return response.json();
+    }
 
     async generateWithPrompt(case_id: string, prompt: string, title: string, quote: string): Promise<CoverImageResponse> {
         try {
-            debugger;
-            const response = await fetch(`${this.baseUrl}/cover_image/generate`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/cover_image/generate`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id,
                     prompt,
                     title,
                     quote
-                })
+                }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
 
             const data = await response.json();
             return {
@@ -69,21 +79,13 @@ export class CoverImageService {
 
     async updateQuote(caseId: string, quoteText: string): Promise<CoverImageResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/case_quote/update`, {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/case_quote/update`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+                body: {
                     case_id: caseId,
                     quote_text: quoteText
-
-                })
+                }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
 
             const data = await response.json();
             return {

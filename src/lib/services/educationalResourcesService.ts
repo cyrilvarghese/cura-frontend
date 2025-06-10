@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
-import { handleApiResponse } from "$lib/utils/auth-handler";
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 import mockEducationalCapsules from "$lib/data/feedback-p3.json";
 
 export interface EducationalResourcesFeedback {
@@ -24,6 +24,11 @@ export interface EducationalResourcesFeedback {
     };
 }
 
+export interface EducationalResourcesRequest {
+    case_id: string;
+    resources: string[];
+}
+
 export class EducationalResourcesService {
     private baseUrl = API_BASE_URL;
 
@@ -32,22 +37,7 @@ export class EducationalResourcesService {
         // return Promise.resolve(mockEducationalCapsules as EducationalResourcesFeedback);
 
         try {
-            const response = await fetch(`${this.baseUrl}/feedback/v2/educational-resources`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // You can add query parameters if needed
-                // For example: ?case_id=${encodeURIComponent(caseId)}
-            });
-
-            await handleApiResponse(response);
-
-            if (!response.ok) {
-                throw new Error('Failed to get educational resources');
-            }
-
-            // Extract the educationalCapsules from inside feedback_result
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/feedback/v2/educational-resources`);
             const data = await response.json();
             return { educationalCapsules: data.feedback_result.educationalCapsules };
         } catch (error) {
@@ -55,6 +45,7 @@ export class EducationalResourcesService {
             throw error;
         }
     }
+
 }
 
 export const educationalResourcesService = new EducationalResourcesService(); 

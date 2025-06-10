@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
 
 interface UpdateTableRequest {
     case_id: string;
@@ -48,12 +49,9 @@ export class TestTableService {
     private baseUrl = API_BASE_URL;
 
     async updateTable(params: UpdateTableRequest): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/test-table/update`, {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/test-table/update`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
+            body: params
         });
 
         if (!response.ok) {
@@ -62,12 +60,9 @@ export class TestTableService {
     }
 
     async deleteRow(params: DeleteRowRequest): Promise<void> {
-        const response = await fetch(`${this.baseUrl}/test-table/remove-row`, {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/test-table/remove-row`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
+            body: params
         });
 
         if (!response.ok) {
@@ -76,12 +71,9 @@ export class TestTableService {
     }
 
     async addComment(params: AddCommentRequest): Promise<AddCommentResponse> {
-        const response = await fetch(`${this.baseUrl}/test-comment/add`, {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/test-comment/add`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
+            body: params
         });
 
         if (!response.ok) {
@@ -92,12 +84,9 @@ export class TestTableService {
     }
 
     async removeComment(params: RemoveCommentRequest): Promise<RemoveCommentResponse> {
-        const response = await fetch(`${this.baseUrl}/test-comment/remove`, {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/test-comment/remove`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
+            body: params
         });
 
         if (!response.ok) {

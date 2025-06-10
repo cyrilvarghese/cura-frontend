@@ -1,34 +1,22 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
+
+export interface HistoryContextRequest {
+    case_id: string;
+    history_data: any;
+}
 
 export interface HistoryContextResponse {
     case_id: number;
     content: {
-        case_summary_history: {
+        history_context: {
             chief_complaint: string;
-            history_of_present_illness?: string;
-            demographics_risk: {
-                age: number | null;
-                gender: string;
-                occupation?: string;
-                sexual_orientation?: string;
-                hiv_status?: string;
-                art_status?: string;
-                risk_factors?: string | string[];
-            };
-            history_timeline?: Record<string, string>;
-            associated_symptoms: Record<string, string> | string[] | null;
-            pertinent_positives: string[] | null;
-            pertinent_positives_from_history?: string[];
-            pertinent_negatives_from_history: string[] | null;
-            social_history?: Record<string, string> | string;
-            past_medical_history?: string | null;
-            family_history?: string | null;
-            medications_allergies?: string | null;
+            history_of_present_illness: string;
+            past_medical_history: string;
+            family_history: string;
+            social_history: string;
+            review_of_systems: string;
         };
-        expected_questions_with_domains: Array<{
-            question: string;
-            domain: string;
-        }>;
     };
     file_path: string;
     timestamp: string;
@@ -38,26 +26,46 @@ export interface HistoryContextResponse {
 export class HistoryContextService {
     private baseUrl = API_BASE_URL;
 
-    async createHistoryContext(fileName: string, caseId: string): Promise<HistoryContextResponse> {
-        const response = await fetch(
-            `${this.baseUrl}/history_context/create`,
-            {
+    async getHistoryContext(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/history-context`);
+        return response.json();
+    }
+
+    async updateHistoryContext(caseId: string, historyData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/history-context`, {
+            method: 'PUT',
+            body: historyData
+        });
+        return response.json();
+    }
+
+    async submitHistoryContext(request: HistoryContextRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/submit-history-context`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error submitting history context:', error);
+            throw error;
+        }
+    }
+
+    async createHistoryContext(fileName: string, caseId: string): Promise<HistoryContextResponse> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/history_context/create`, {
+                method: 'POST',
+                body: {
                     file_name: fileName,
                     case_id: caseId
-                })
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to create history context summary');
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error creating history context:', error);
+            throw error;
         }
-
-        return await response.json();
     }
 }
 

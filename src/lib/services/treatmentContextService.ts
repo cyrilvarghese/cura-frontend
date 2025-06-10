@@ -1,73 +1,70 @@
 import { API_BASE_URL } from '$lib/config/api';
+import { makeAuthenticatedRequest } from '$lib/utils/auth-request';
+
+export interface TreatmentContextRequest {
+    case_id: string;
+    treatment_data: any;
+}
 
 export interface TreatmentContextResponse {
-    id?: string;
+    case_id: number;
     content: {
-        patient_summary: {
-            age: number;
-            gender: string;
-            diagnosis: string;
-            critical_factors: string[];
+        treatment_context: {
+            treatment_plan: string;
+            monitoring_plan: string;
+            patient_education: string;
+            follow_up_plan: string;
+            prevention_strategies: string;
         };
-        pre_treatment_investigations: {
-            test_name: string;
-            purpose: string;
-            relevant_drugs: string[];
-        }[];
-        monitoring_during_treatment: {
-            parameter_to_monitor: string;
-            frequency_timing: string;
-            purpose: string;
-            relevant_drugs: string[];
-        }[];
-        treatment_plan: {
-            first_line: {
-                drug_name: string;
-                details: string;
-                rationale: string | null;
-            }[];
-            escalation: {
-                drug_name: string;
-                details: string;
-                rationale: string | null;
-            }[];
-            contraindicated: {
-                drug_name: string;
-                details: string;
-                rationale: string | null;
-            }[];
-        };
-        additional_notes: string[];
     };
-    case_id: string | number;
-    file_path?: string;
-    timestamp?: string;
-    type?: string;
+    file_path: string;
+    timestamp: string;
+    type: string;
 }
 
 export class TreatmentContextService {
     private baseUrl = API_BASE_URL;
 
-    async createTreatmentContext(fileName: string, caseId: string): Promise<TreatmentContextResponse> {
-        const response = await fetch(
-            `${this.baseUrl}/treatment_context/create`,
-            {
+    async getTreatmentContext(caseId: string) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/treatment-context`);
+        return response.json();
+    }
+
+    async updateTreatmentContext(caseId: string, treatmentData: any) {
+        const response = await makeAuthenticatedRequest(`${this.baseUrl}/cases/${caseId}/treatment-context`, {
+            method: 'PUT',
+            body: treatmentData
+        });
+        return response.json();
+    }
+
+    async submitTreatmentContext(request: TreatmentContextRequest): Promise<any> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/submit-treatment-context`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+                body: request
+            });
+            return response.json();
+        } catch (error) {
+            console.error('Error submitting treatment context:', error);
+            throw error;
+        }
+    }
+
+    async createTreatmentContext(fileName: string, caseId: string): Promise<TreatmentContextResponse> {
+        try {
+            const response = await makeAuthenticatedRequest(`${this.baseUrl}/treatment_context/create`, {
+                method: 'POST',
+                body: {
                     file_name: fileName,
                     case_id: caseId
-                })
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('Failed to create treatment context');
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error creating treatment context:', error);
+            throw error;
         }
-
-        return await response.json();
     }
 }
 

@@ -13,6 +13,8 @@ export interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
+    accessToken: string | null;
+    refreshToken: string | null;
 }
 
 const initialState: AuthState = {
@@ -20,7 +22,9 @@ const initialState: AuthState = {
     token: null,
     isAuthenticated: false,
     isLoading: false,
-    error: null
+    error: null,
+    accessToken: null,
+    refreshToken: null
 };
 
 function createAuthStore() {
@@ -41,10 +45,25 @@ function createAuthStore() {
                 token: response.token,
                 isAuthenticated: true,
                 isLoading: false,
-                error: null
+                error: null,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token
             };
 
+            mixpanel.identify(response.user.id)
 
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'plan': 'Free',
+                'role': response.user.role
+
+            });
+
+            mixpanel.track('Signup', {
+                'email': response.user.email,
+                'role': response.user.role
+            });
 
             set(newState);
 
@@ -68,13 +87,15 @@ function createAuthStore() {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            const response = await authService.login({ email, password });
+            const response = await authService.login(email, password);
 
             const newState = {
                 user: response.user,
                 token: response.token,
                 isAuthenticated: true,
                 isLoading: false,
+                accessToken: response.access_token,
+                refreshToken: response.refresh_token,
                 error: null
             };
 
@@ -83,6 +104,21 @@ function createAuthStore() {
             if (typeof window !== 'undefined') {
                 localStorage.setItem('auth', JSON.stringify(newState));
             }
+
+            mixpanel.identify(response.user.id)
+
+            mixpanel.people.set({
+                '$name': response.user.username,
+                '$email': response.user.email,
+                'plan': 'Free',
+                'role': response.user.role
+
+            });
+
+            mixpanel.track('Login', {
+                'email': response.user.email,
+                'role': response.user.role
+            });
 
             return response;
         } catch (error) {

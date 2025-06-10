@@ -28,6 +28,7 @@
     } from "lucide-svelte";
     import { Link } from "svelte-routing";
     import { currentDepartment } from "$lib/stores/teamStore";
+    import mixpanel from "mixpanel-browser";
     const { isOpen = false, onClose = () => {}, caseData } = $props();
 
     // Current question being displayed to the user
@@ -270,6 +271,12 @@
     // Add new function to manually show end screen
     function showEndScreenManually() {
         showEndScreen = true;
+        mixpanel.track("End Case", {
+            case_id: caseData.case_id,
+            end_time: new Date().toISOString(),
+            department: $currentDepartment?.name,
+            score: totalScore,
+        });
     }
 
     async function submitAnswer() {

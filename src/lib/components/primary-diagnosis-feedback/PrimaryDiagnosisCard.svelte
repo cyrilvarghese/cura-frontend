@@ -10,14 +10,18 @@
         ClipboardList,
         FileText,
         Loader2,
+        RefreshCw,
     } from "lucide-svelte";
     import * as Accordion from "$lib/components/ui/accordion/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
+    import { Button } from "$lib/components/ui/button/index.js";
     import { onMount } from "svelte";
     import { primaryDiagnosisStore } from "$lib/stores/primaryDiagnosisFeedbackStore";
     import MissedExamsDialog from "$lib/../03-organisms/dialogs/MissedExamsDialog.svelte";
     import MissedLabsDialog from "$lib/../03-organisms/dialogs/MissedLabsDialog.svelte";
     import DiagnosticTimeline from "./DiagnosticTimeline.svelte";
+    import mixpanel from "mixpanel-browser";
+    import { currentDepartment } from "$lib/stores/teamStore";
     // Optional props
     const { caseId = undefined } = $props();
 
@@ -31,18 +35,25 @@
     onMount(async () => {
         try {
             await primaryDiagnosisStore.getPrimaryDiagnosisFeedback(caseId);
+            mixpanel.track("Final Diagnosis Feedback", {
+                case_id: caseId,
+                department: $currentDepartment?.name,
+            });
         } catch (err) {
-            console.error("Failed to load primary diagdnosis feedback:", err);
+            console.error("Failed to load primary diagnosis feedback:", err);
         }
     });
+
+    async function handleRetry() {
+        try {
+            await primaryDiagnosisStore.getPrimaryDiagnosisFeedback(caseId);
+        } catch (err) {
+            console.error("Failed to retry primary diagnosis feedback:", err);
+        }
+    }
 </script>
 
 <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-200">
-    <h3 class="text-xl font-medium text-blue-800 mb-4 flex items-center gap-2">
-        <CheckCircle class="w-5 h-5" />
-        Primary Diagnosis Feedback
-    </h3>
-
     {#if isLoading}
         <div class="flex justify-center items-center p-8">
             <Loader2 class="w-8 h-8 text-blue-500 animate-spin" />
@@ -53,41 +64,22 @@
             class="bg-red-50 p-4 rounded-md text-red-800 flex items-start gap-2"
         >
             <AlertCircle class="w-5 h-5 mt-0.5 flex-shrink-0" />
-            <div>
+            <div class="flex-1">
                 <p class="font-medium">Error loading feedback</p>
                 <p class="text-sm">{error}</p>
             </div>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={handleRetry}
+                class="ml-2 border-red-200 text-red-700 hover:bg-red-100"
+            >
+                <RefreshCw class="w-4 h-4 mr-2" />
+                Retry
+            </Button>
         </div>
     {:else if primaryDiagnosisFeedback}
         <div class="space-y-6">
-            <!-- Student's Diagnosis Section -->
-            <div class="bg-blue-50/50 p-4 rounded-md">
-                <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-medium">Student's Diagnosis</h4>
-                    {#if primaryDiagnosisFeedback.primaryDxFeedback.studentStated.isCorrect}
-                        <Badge
-                            variant="outline"
-                            class="bg-green-100 text-green-800 border-green-200"
-                            >Correct</Badge
-                        >
-                    {:else}
-                        <Badge
-                            variant="outline"
-                            class="bg-red-100 text-red-800 border-red-200"
-                            >Incorrect</Badge
-                        >
-                    {/if}
-                </div>
-                <p class="text-lg font-semibold">
-                    {primaryDiagnosisFeedback.primaryDxFeedback.studentStated
-                        .dx}
-                </p>
-                <p class="text-sm text-gray-500 mt-1">
-                    Correct Diagnosis: {primaryDiagnosisFeedback
-                        .primaryDxFeedback.correctPrimary.dx}
-                </p>
-            </div>
-
             <!-- Performance Scores as a grid of cards -->
             <div class="mb-8">
                 <h4 class="font-medium mb-3">Performance Scores</h4>
@@ -99,28 +91,58 @@
                         <div
                             class="px-4 py-3 border-b border-blue-100 flex justify-between items-center"
                         >
-                            <span class="font-medium text-blue-800"
-                                >Accuracy</span
-                            >
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-blue-800"
+                                    >Accuracy</span
+                                >
+                                <div class="flex">
+                                    {#each Array(5) as _, i}
+                                        <span class="text-blue-500">
+                                            {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.accuracyScore}
+                                                <StarFilled
+                                                    class="w-4 h-4 fill-current"
+                                                />
+                                            {:else}
+                                                <StarIcon class="w-4 h-4" />
+                                            {/if}
+                                        </span>
+                                    {/each}
+                                </div>
+                            </div>
                             <span class="font-bold text-blue-800">
                                 {primaryDiagnosisFeedback.primaryDxFeedback
                                     .scores.accuracyScore}/5
                             </span>
                         </div>
                         <div class="px-4 py-3">
-                            <div class="flex mb-2">
-                                {#each Array(5) as _, i}
-                                    <span class="text-blue-500">
-                                        {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.accuracyScore}
-                                            <StarFilled
-                                                class="w-5 h-5 fill-current"
-                                            />
-                                        {:else}
-                                            <StarIcon class="w-5 h-5" />
-                                        {/if}
-                                    </span>
-                                {/each}
+                            <!-- Student's Diagnosis with inline Badge -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <p class="text-lg font-semibold text-blue-900">
+                                    {primaryDiagnosisFeedback.primaryDxFeedback
+                                        .studentStated.dx}
+                                </p>
+                                {#if primaryDiagnosisFeedback.primaryDxFeedback.studentStated.isCorrect}
+                                    <Badge
+                                        variant="outline"
+                                        class="bg-green-100 text-green-800 border-green-200"
+                                        >Correct</Badge
+                                    >
+                                {:else}
+                                    <Badge
+                                        variant="outline"
+                                        class="bg-red-100 text-red-800 border-red-200"
+                                        >Incorrect</Badge
+                                    >
+                                {/if}
                             </div>
+                            <!-- Correct diagnosis -->
+                            <p
+                                class="text-sm font-semibold text-green-800 mb-3"
+                            >
+                                Correct: {primaryDiagnosisFeedback
+                                    .primaryDxFeedback.correctPrimary.dx}
+                            </p>
+                            <!-- Explanation -->
                             <p class="text-sm text-gray-700">
                                 {primaryDiagnosisFeedback.primaryDxFeedback
                                     .scores.accuracyExplanation}
@@ -139,24 +161,62 @@
                                 >Evidence Gathering</span
                             >
                             <span class="font-bold text-red-800">
-                                {primaryDiagnosisFeedback.primaryDxFeedback
-                                    .scores.evidenceGatheringScore}/5
+                                {Math.round(
+                                    ((primaryDiagnosisFeedback.primaryDxFeedback
+                                        .scores.evidenceGatheringScoreLabTests +
+                                        primaryDiagnosisFeedback
+                                            .primaryDxFeedback.scores
+                                            .evidenceGatheringScoreExams) /
+                                        2) *
+                                        10,
+                                ) / 10}/5
                             </span>
                         </div>
                         <div class="px-4 py-3">
-                            <div class="flex mb-2">
-                                {#each Array(5) as _, i}
-                                    <span class="text-red-500">
-                                        {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScore}
-                                            <StarFilled
-                                                class="w-5 h-5 fill-current"
-                                            />
-                                        {:else}
-                                            <StarIcon class="w-5 h-5" />
-                                        {/if}
-                                    </span>
-                                {/each}
+                            <!-- Lab Tests Stars -->
+                            <div class="mb-3">
+                                <p
+                                    class="text-xs text-red-600 font-medium mb-1"
+                                >
+                                    Laboratory Tests
+                                </p>
+                                <div class="flex">
+                                    {#each Array(5) as _, i}
+                                        <span class="text-red-500">
+                                            {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScoreLabTests}
+                                                <StarFilled
+                                                    class="w-4 h-4 fill-current"
+                                                />
+                                            {:else}
+                                                <StarIcon class="w-4 h-4" />
+                                            {/if}
+                                        </span>
+                                    {/each}
+                                </div>
                             </div>
+
+                            <!-- Physical Exams Stars -->
+                            <div class="mb-3">
+                                <p
+                                    class="text-xs text-red-600 font-medium mb-1"
+                                >
+                                    Physical Examinations
+                                </p>
+                                <div class="flex">
+                                    {#each Array(5) as _, i}
+                                        <span class="text-red-500">
+                                            {#if i < primaryDiagnosisFeedback.primaryDxFeedback.scores.evidenceGatheringScoreExams}
+                                                <StarFilled
+                                                    class="w-4 h-4 fill-current"
+                                                />
+                                            {:else}
+                                                <StarIcon class="w-4 h-4" />
+                                            {/if}
+                                        </span>
+                                    {/each}
+                                </div>
+                            </div>
+
                             <p class="text-sm text-gray-700">
                                 {primaryDiagnosisFeedback.primaryDxFeedback
                                     .scores.evidenceGatheringExplanation
