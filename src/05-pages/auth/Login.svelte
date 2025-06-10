@@ -50,7 +50,7 @@
 
     <div class="relative z-10 flex flex-col justify-between p-12 w-full">
       <div>
-        <h1 class="text-xl font-bold">Cura | Simulate</h1>
+        <h1 class="text-xl font-bold">Case Chat</h1>
       </div>
 
       <div class="mb-12">
