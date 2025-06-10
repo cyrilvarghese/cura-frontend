@@ -2,6 +2,7 @@
   import { navigate, Link } from "svelte-routing";
   import { authStore } from "$lib/stores/authStore";
   import bg2 from "$lib/assets/bg2.png"; // Import the image
+  import logoNew from "$lib/assets/logo-new.png"; // Import the logo
 
   let username = $state("");
   let email = $state("");
@@ -42,7 +43,10 @@
 
     <div class="relative z-10 flex flex-col justify-between p-12 w-full">
       <div>
-        <h1 class="text-xl font-bold">Case Chat</h1>
+        <div class="flex items-center">
+          <img src={logoNew} alt="Case Chat Logo" class="w-[auto] h-12" />
+          <h1 class="text-xl font-bold">Case Chat</h1>
+        </div>
       </div>
 
       <div class="mb-12">
@@ -117,6 +121,7 @@
             >
             <select
               id="role"
+              disabled
               bind:value={role}
               required
               class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
