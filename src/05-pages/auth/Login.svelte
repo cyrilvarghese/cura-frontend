@@ -53,7 +53,9 @@
       <div>
         <div class="flex items-center">
           <img src={logoNew} alt="Case Chat Logo" class="w-[auto] h-12" />
-          <h1 class="text-xl font-bold">Case Chat</h1>
+          <h1 class="text-xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+            Case Chat
+          </h1>
         </div>
       </div>
 
