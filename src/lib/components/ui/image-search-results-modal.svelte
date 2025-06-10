@@ -67,6 +67,14 @@
             clearImageSearch();
             accumulatedImages = [];
 
+            // Load SerpAPI key from localStorage
+            if (typeof window !== "undefined") {
+                const savedSerpKey = localStorage.getItem("serpApiKey");
+                if (savedSerpKey) {
+                    serpApiKey = savedSerpKey;
+                }
+            }
+
             hasTriggeredSearch = true;
             performSearch();
         } else if (!open && hasTriggeredSearch) {
@@ -74,6 +82,13 @@
             hasTriggeredSearch = false;
             accumulatedImages = [];
             clearImageSearch();
+        }
+    });
+
+    // Effect to save SerpAPI key to localStorage when it changes
+    $effect(() => {
+        if (typeof window !== "undefined" && serpApiKey) {
+            localStorage.setItem("serpApiKey", serpApiKey);
         }
     });
 
