@@ -89,21 +89,20 @@
               bind:value={email}
               required
               class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="name@example.com"
+              placeholder="Your email here"
             />
           </div>
 
           <div>
-            <label for="username" class="block text-sm font-medium mb-2"
-              >Username</label
+            <label for="name" class="block text-sm font-medium mb-2">Name</label
             >
             <input
-              id="username"
+              id="name"
               type="text"
               bind:value={username}
               required
               class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Username here"
+              placeholder="Your name here"
             />
           </div>
 
