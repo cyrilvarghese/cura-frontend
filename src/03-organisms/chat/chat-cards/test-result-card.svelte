@@ -26,7 +26,7 @@
         executeImageSearch,
         imageSearchStore,
     } from "$lib/stores/imageSearchStore";
-    import ImageSearchModal from "$lib/components/ui/image-search-modal.svelte";
+    import ImageSearchResultsModal from "$lib/components/ui/image-search-results-modal.svelte";
 
     const {
         result,
@@ -89,10 +89,6 @@
 
     let deleteConfirmOpen = $state(false);
     let searchModalOpen = $state(false);
-    let currentSearchQuery = $state<any>(null);
-
-    // Use derived state from the store
-    const searchState = $derived($imageSearchStore);
 
     // Handler functions for edit and delete
     function handleEdit() {
@@ -105,44 +101,10 @@
         deleteConfirmOpen = true;
     }
 
-    async function handleSearch() {
+    function handleSearch() {
         console.log("Search lab test:", result.testName);
-
-        // Extract text content from mixed results or caption from image results
-        let testFinding = "";
-        if (typeof resultContent === "object") {
-            if (resultContent.type === "mixed") {
-                const textItems = resultContent.content.filter(
-                    (item) => item.type === "text",
-                );
-                testFinding = textItems.map((item) => item.content).join(" ");
-            } else if (resultContent.type === "image") {
-                testFinding = resultContent.content.caption || "";
-            }
-        }
-
-        const searchQuery = {
-            case_id: caseId,
-            test_type: "lab_test" as const,
-            test_name: result.testName,
-            max_results: 30,
-            search_depth: "advanced" as const,
-            test_finding: testFinding,
-        };
-
-        currentSearchQuery = searchQuery;
         searchModalOpen = true;
-
-        try {
-            await executeImageSearch(searchQuery);
-        } catch (error) {
-            console.error("Failed to search images:", error);
-        }
     }
-
-    const handleModalSearch = async (query: any) => {
-        await executeImageSearch(query);
-    };
 
     async function confirmDelete() {
         deleteConfirmOpen = false;
@@ -351,12 +313,18 @@
 </AlertDialog.Root>
 
 <!-- Image Search Modal -->
-{#if currentSearchQuery}
-    <ImageSearchModal
-        open={searchModalOpen}
-        onOpenChange={(open: boolean) => (searchModalOpen = open)}
-        initialQuery={currentSearchQuery}
-        {searchState}
-        onSearch={handleModalSearch}
-    />
-{/if}
+<ImageSearchResultsModal
+    bind:open={searchModalOpen}
+    {caseId}
+    testName={result.testName}
+    testType="lab_test"
+    findingString={typeof resultContent === "object" &&
+    resultContent.type === "mixed"
+        ? resultContent.content
+              .filter((item) => item.type === "text")
+              .map((item) => item.content)
+              .join(" ")
+        : typeof resultContent === "object" && resultContent.type === "image"
+          ? resultContent.content.caption || ""
+          : ""}
+/>
