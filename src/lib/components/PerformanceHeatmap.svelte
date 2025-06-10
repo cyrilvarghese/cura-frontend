@@ -82,7 +82,7 @@
                     <div class="flex flex-col justify-center pr-4">
                         <div class="text-right">
                             <p class="font-medium text-gray-800 text-sm">
-                                CaseX {caseData.displayIndex}
+                                Case {caseData.displayIndex}
                             </p>
                             <p class="text-xs text-gray-500 mt-1">
                                 {caseData.shortDiagnosis}
