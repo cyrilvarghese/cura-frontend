@@ -11,7 +11,7 @@
             <img
                 src={logoTextDark}
                 alt="Case Chat Logo"
-                class="h-20 mx-auto drop-shadow-lg"
+                class="h-40 mx-auto drop-shadow-lg"
             />
         </div>
 
