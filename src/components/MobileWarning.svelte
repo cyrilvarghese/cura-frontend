@@ -1,5 +1,5 @@
 <script lang="ts">
-    import logoNew from "$lib/assets/logo-new.png";
+    import logoTextDark from "$lib/assets/logo-text-dark.png";
 </script>
 
 <div
@@ -9,9 +9,9 @@
         <!-- Logo -->
         <div class="mb-8">
             <img
-                src={logoNew}
+                src={logoTextDark}
                 alt="Case Chat Logo"
-                class="w-32 h-32 mx-auto drop-shadow-lg"
+                class="h-20 mx-auto drop-shadow-lg"
             />
         </div>
 
