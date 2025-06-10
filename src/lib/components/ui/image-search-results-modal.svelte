@@ -39,6 +39,7 @@
     let editableFindingString = $state("");
     let serpApiKey = $state("");
     let accumulatedImages = $state<any[]>([]);
+    let isHeaderCollapsed = $state(false);
 
     // Subscribe to store updates
     onMount(() => {
@@ -108,89 +109,108 @@
     >
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-            class="max-w-6xl max-h-[90vh] w-full h-full bg-white rounded-lg shadow-xl overflow-hidden flex flex-col m-4"
+            class="max-w-7xl max-h-[95vh] w-full h-full bg-white rounded-lg shadow-xl overflow-hidden flex flex-col m-2"
             role="dialog button"
             aria-modal="true"
             aria-labelledby="modal-title"
             tabindex="-1"
             onkeydown={(e) => e.key === "Escape" && (open = false)}
         >
-            <!-- Header -->
-            <div class="p-6 border-b">
+            <!-- Compact Header -->
+            <div class="border-b {isHeaderCollapsed ? 'p-2' : 'p-4'}">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <Search class="w-5 h-5" />
-                        <h2 id="modal-title" class="text-xl font-semibold">
-                            Medical Image Search Results - {testName}
+                        <Search class="w-4 h-4" />
+                        <h2 id="modal-title" class="text-lg font-semibold">
+                            Medical Images - {testName}
                         </h2>
+                        <button
+                            onclick={() =>
+                                (isHeaderCollapsed = !isHeaderCollapsed)}
+                            class="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                        >
+                            {isHeaderCollapsed ? "Expand" : "Collapse"}
+                        </button>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                    <button
                         onclick={() => (open = false)}
+                        class="p-1 hover:bg-gray-100 rounded transition-colors"
+                        title="Close"
                     >
                         <span class="sr-only">Close</span>
                         ✕
-                    </Button>
-                </div>
-                <!-- Search Query Editor -->
-                <div class="mt-4 space-y-3">
-                    <div class="space-y-2">
-                        <label
-                            class="text-sm font-medium text-gray-700"
-                            for="serp-api-key">SerpAPI Key:</label
-                        >
-                        <input
-                            id="serp-api-key"
-                            bind:value={serpApiKey}
-                            type="password"
-                            placeholder="Enter SerpAPI key..."
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                            disabled={searchState.isLoading}
-                        />
-                    </div>
-                    <div class="space-y-2">
-                        <label
-                            class="text-sm font-medium text-gray-700"
-                            for="search-query">Search Query:</label
-                        >
-                        <div class="flex gap-2">
-                            <input
-                                id="search-query"
-                                bind:value={editableFindingString}
-                                placeholder="Enter or edit search query..."
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                disabled={searchState.isLoading}
-                            />
-                            <Button
-                                onclick={handleRetrySearch}
-                                disabled={searchState.isLoading ||
-                                    !editableFindingString.trim()}
-                                variant="outline"
-                                size="sm"
-                            >
-                                Retry Search
-                            </Button>
-                        </div>
-                    </div>
+                    </button>
                 </div>
 
-                {#if searchState.results}
-                    <div class="mt-4 space-y-2 text-sm text-gray-600">
-                        <p>
-                            <strong>Found:</strong>
-                            {searchState.results.total_images} images
-                        </p>
-                        <p>
-                            <strong>Processing time:</strong>
-                            {searchState.results.response_time}s
-                        </p>
+                {#if !isHeaderCollapsed}
+                    <!-- Compact Search Controls -->
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label
+                                class="text-xs font-medium text-gray-600"
+                                for="serp-api-key">SerpAPI Key:</label
+                            >
+                            <input
+                                id="serp-api-key"
+                                bind:value={serpApiKey}
+                                type="password"
+                                placeholder="Enter SerpAPI key..."
+                                class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                                disabled={searchState.isLoading}
+                            />
+                        </div>
+                        <div class="space-y-1">
+                            <label
+                                class="text-xs font-medium text-gray-600"
+                                for="search-query">Search Query:</label
+                            >
+                            <div class="flex gap-2">
+                                <input
+                                    id="search-query"
+                                    bind:value={editableFindingString}
+                                    placeholder="Enter or edit search query..."
+                                    class="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                                    disabled={searchState.isLoading}
+                                />
+                                <Button
+                                    onclick={handleRetrySearch}
+                                    disabled={searchState.isLoading ||
+                                        !editableFindingString.trim()}
+                                    variant="outline"
+                                    size="sm"
+                                    class="px-2 py-1 text-xs"
+                                >
+                                    Retry
+                                </Button>
+                            </div>
+                        </div>
                     </div>
+
+                    {#if searchState.results}
+                        <div class="mt-2 flex gap-4 text-xs text-gray-600">
+                            <span>
+                                <strong>Found:</strong>
+                                {searchState.results.total_images} images
+                            </span>
+                            <span>
+                                <strong>Time:</strong>
+                                {searchState.results.response_time}s
+                            </span>
+                        </div>
+                    {/if}
+                {:else}
+                    <!-- Collapsed view - just show stats -->
+                    {#if searchState.results}
+                        <div class="mt-1 text-xs text-gray-600">
+                            Found {searchState.results.total_images} images in {searchState
+                                .results.response_time}s
+                        </div>
+                    {/if}
                 {/if}
             </div>
 
-            <!-- Content -->
-            <div class="flex-1 overflow-y-auto p-6">
+            <!-- Content - Maximized for images -->
+            <div class="flex-1 overflow-y-auto p-3">
                 <!-- Loading State -->
                 {#if searchState.isLoading}
                     <div
@@ -218,14 +238,11 @@
                 {/if}
 
                 {#if searchState.results}
-                    <!-- Images Grid -->
+                    <!-- Images Grid - Maximized -->
                     {#if searchState.results.images.length > 0}
-                        <div class="space-y-3">
-                            <h3 class="text-lg font-semibold">
-                                Medical Images ({accumulatedImages.length})
-                            </h3>
+                        <div class="space-y-2">
                             <div
-                                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                                class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"
                             >
                                 {#each accumulatedImages as image, index}
                                     <a
@@ -235,7 +252,7 @@
                                         class="group cursor-pointer block"
                                     >
                                         <div
-                                            class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                                            class="relative aspect-square bg-gray-100 rounded overflow-hidden hover:shadow-lg transition-shadow"
                                         >
                                             <img
                                                 src={image.url}
@@ -247,12 +264,12 @@
                                                 class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center"
                                             >
                                                 <ExternalLink
-                                                    class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                                                 />
                                             </div>
                                         </div>
                                         <p
-                                            class="mt-2 text-xs text-gray-600 line-clamp-2"
+                                            class="mt-1 text-xs text-gray-600 line-clamp-2"
                                         >
                                             {image.description}
                                         </p>
@@ -277,15 +294,6 @@
                         </div>
                     {/if}
                 {/if}
-            </div>
-
-            <!-- Footer -->
-            <div class="p-6 border-t">
-                <div class="flex justify-end">
-                    <Button variant="outline" onclick={() => (open = false)}>
-                        Close
-                    </Button>
-                </div>
             </div>
         </div>
     </div>
