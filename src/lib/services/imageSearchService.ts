@@ -10,6 +10,7 @@ export interface ImageSearchQuery {
     search_query?: string;
     single_search?: boolean;
     test_finding?: string;
+    serp_key?: string;
 }
 
 export interface ImageSearchPreview {
@@ -95,7 +96,8 @@ export class ImageSearchService {
                 search_depth: params.search_depth || 'advanced',
                 search_query: params.search_query || '',
                 single_search: params.single_search || false,
-                test_finding: params.test_finding || ''
+                test_finding: params.test_finding || '',
+                serp_key: params.serp_key || ''
             };
 
             const response = await makeAuthenticatedRequest(

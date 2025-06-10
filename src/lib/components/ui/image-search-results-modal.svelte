@@ -37,6 +37,7 @@
 
     let hasTriggeredSearch = false;
     let editableFindingString = $state("");
+    let serpApiKey = $state("");
     let accumulatedImages = $state<any[]>([]);
 
     // Subscribe to store updates
@@ -84,6 +85,7 @@
             search_depth: "advanced",
             test_finding:
                 customFinding || editableFindingString || findingString,
+            serp_key: serpApiKey,
         };
 
         try {
@@ -133,6 +135,20 @@
                 </div>
                 <!-- Search Query Editor -->
                 <div class="mt-4 space-y-3">
+                    <div class="space-y-2">
+                        <label
+                            class="text-sm font-medium text-gray-700"
+                            for="serp-api-key">SerpAPI Key:</label
+                        >
+                        <input
+                            id="serp-api-key"
+                            bind:value={serpApiKey}
+                            type="password"
+                            placeholder="Enter SerpAPI key..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            disabled={searchState.isLoading}
+                        />
+                    </div>
                     <div class="space-y-2">
                         <label
                             class="text-sm font-medium text-gray-700"
