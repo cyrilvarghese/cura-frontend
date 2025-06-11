@@ -2,7 +2,7 @@
   import { navigate, Link } from "svelte-routing";
   import { authStore } from "$lib/stores/authStore";
   import bg2 from "$lib/assets/bg2.png"; // Import the image
-  import logoNew from "$lib/assets/logo-new.png"; // Import the logo
+  import logoLight from "$lib/assets/logo-light.png"; // Import the logo
 
   let username = $state("");
   let email = $state("");
@@ -44,7 +44,7 @@
     <div class="relative z-10 flex flex-col justify-between p-12 w-full">
       <div>
         <div class="flex items-center">
-          <img src={logoNew} alt="Case Chat Logo" class="w-[auto] h-14" />
+          <img src={logoLight} alt="Case Chat Logo" class="w-[auto] h-14" />
           <h1
             class="text-3xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           >
