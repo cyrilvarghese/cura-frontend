@@ -63,12 +63,12 @@
 				id: "2",
 				value: "internal-medicine",
 			},
-			{
-				name: "Microbiology",
-				logo: Microscope,
-				id: "3",
-				value: "microbiology",
-			},
+			// {
+			// 	name: "Microbiology",
+			// 	logo: Microscope,
+			// 	id: "3",
+			// 	value: "microbiology",
+			// },
 		],
 		navMain: [
 			// {
