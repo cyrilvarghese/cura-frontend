@@ -45,11 +45,11 @@
       <div>
         <div class="flex items-center">
           <img src={logoLight} alt="Case Chat Logo" class="w-[auto] h-14" />
-          <h1
+          <!-- <h1
             class="text-3xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           >
             CaseChat
-          </h1>
+          </h1> -->
         </div>
       </div>
 
