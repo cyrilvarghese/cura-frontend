@@ -60,6 +60,14 @@
           </h1> -->
         </div>
       </div>
+
+      <div class="mb-12">
+        <blockquote class="text-2xl font-medium mb-4">
+          "Finally, medical education that's engaging and practical. The cases
+          feel like real patients I might encounter during rotations"
+        </blockquote>
+        <cite class="block">Ameena Rafath, 4th Year MBBS, GMC Cochin</cite>
+      </div>
     </div>
   </div>
 
