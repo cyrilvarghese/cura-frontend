@@ -7,6 +7,7 @@ interface SignupData {
     password: string;
     username: string;
     role: string;
+    invite_code?: string;
 }
 
 interface LoginData {

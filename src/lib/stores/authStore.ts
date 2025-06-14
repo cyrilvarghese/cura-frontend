@@ -34,11 +34,11 @@ function createAuthStore() {
 
     const { subscribe, update, set } = writable<AuthState>(initialAuthState);
 
-    async function signup(email: string, password: string, username: string, role: string) {
+    async function signup(email: string, password: string, username: string, role: string, inviteCode?: string) {
         update(state => ({ ...state, isLoading: true, error: null }));
 
         try {
-            const response = await authService.signup({ email, password, username, role });
+            const response = await authService.signup({ email, password, username, role, invite_code: inviteCode });
 
             const newState = {
                 user: response.user,

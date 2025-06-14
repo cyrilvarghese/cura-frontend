@@ -10,6 +10,11 @@
   let role = $state("student"); // Default role
   let isLoading = $state(false);
   let error = $state<string | null>(null);
+  let inviteCode = $state("No invite code");
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    inviteCode = params.get("code") || "No invite code";
+  }
 
   async function handleSignup(e: SubmitEvent) {
     e.preventDefault();
@@ -17,7 +22,7 @@
     error = null;
 
     try {
-      await authStore.signup(email, password, username, role);
+      await authStore.signup(email, password, username, role, inviteCode);
       navigate("/", { replace: true });
     } catch (err) {
       error = err instanceof Error ? err.message : "Signup failed";
@@ -133,6 +138,19 @@
               <!-- <option value="teacher">Teacher</option>
               <option value="admin">Admin</option> -->
             </select>
+          </div>
+
+          <div>
+            <label for="inviteCode" class="block text-sm font-medium mb-2"
+              >Invite Code</label
+            >
+            <input
+              id="inviteCode"
+              type="text"
+              value={inviteCode}
+              readonly
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md text-gray-500 cursor-not-allowed"
+            />
           </div>
         </div>
 

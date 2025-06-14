@@ -26,13 +26,21 @@
 	import ClassPerformance from "../../05-pages/ClassPerformance.svelte";
 
 	// Get the current URL for Router
-	export let url = "";
+	const { url = "" } = $props<{ url?: string }>();
 
 	const location = useLocation();
+	const currentPath = $derived($location.pathname);
 
-	$: if (!$isAuthenticated) {
-		navigate("/login", { replace: true });
-	}
+	$effect(() => {
+		if (
+			!$isAuthenticated &&
+			currentPath !== "/login" &&
+			!currentPath.startsWith("/signup")
+		) {
+			console.log("Not authenticated, redirecting to login");
+			navigate("/login", { replace: true });
+		}
+	});
 </script>
 
 <Toaster position="top-center" />
