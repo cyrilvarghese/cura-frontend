@@ -68,7 +68,7 @@
         </div>
         <AlertDialog.Description class="text-gray-600">
           You have been provided early access to CaseChat. Welcome to our
-          exclusive medical education platform!
+          exclusive case base learning platform!
         </AlertDialog.Description>
       </AlertDialog.Header>
       <AlertDialog.Footer>
