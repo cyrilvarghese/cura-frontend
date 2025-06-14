@@ -3,6 +3,7 @@
   import { authStore } from "$lib/stores/authStore";
   import bg2 from "$lib/assets/bg2.png"; // Import the image
   import logoLight from "$lib/assets/logo-light.png"; // Import the logo
+  import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 
   let username = $state("");
   let email = $state("");
@@ -11,9 +12,15 @@
   let isLoading = $state(false);
   let error = $state<string | null>(null);
   let inviteCode = $state("No invite code");
+  let showInviteAlert = $state(false);
+
   if (typeof window !== "undefined") {
     const params = new URLSearchParams(window.location.search);
-    inviteCode = params.get("code") || "No invite code";
+    const code = params.get("code");
+    if (code) {
+      inviteCode = code;
+      showInviteAlert = true;
+    }
   }
 
   async function handleSignup(e: SubmitEvent) {
@@ -31,6 +38,50 @@
     }
   }
 </script>
+
+<!-- Alert Dialog for Invite Code -->
+{#if showInviteAlert && inviteCode !== "No invite code"}
+  <AlertDialog.Root open={showInviteAlert}>
+    <AlertDialog.Content class="max-w-md">
+      <AlertDialog.Header>
+        <div class="flex items-center gap-3 mb-2">
+          <div
+            class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+          >
+            <svg
+              class="w-5 h-5 text-green-600 animate-pulse"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+          </div>
+          <AlertDialog.Title class="text-green-800"
+            >Invite Code Activated!</AlertDialog.Title
+          >
+        </div>
+        <AlertDialog.Description class="text-gray-600">
+          You have been provided early access to CaseChat. Welcome to our
+          exclusive medical education platform!
+        </AlertDialog.Description>
+      </AlertDialog.Header>
+      <AlertDialog.Footer>
+        <AlertDialog.Action
+          class="bg-green-600 hover:bg-green-700 text-white"
+          onclick={() => (showInviteAlert = false)}
+        >
+          Continue
+        </AlertDialog.Action>
+      </AlertDialog.Footer>
+    </AlertDialog.Content>
+  </AlertDialog.Root>
+{/if}
 
 <div class="flex min-h-screen">
   <!-- Left side with image and testimonial -->
