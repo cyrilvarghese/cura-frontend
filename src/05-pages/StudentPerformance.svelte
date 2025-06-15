@@ -30,7 +30,7 @@
 
     // View toggle states
     let isHeatmapView = false;
-    let useMockData = true;
+    let useMockData = false;
 
     // Store unsubscribe function
     const unsubscribe = studentPerformanceStore.subscribe((state) => {
