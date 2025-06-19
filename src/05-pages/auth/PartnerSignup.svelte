@@ -259,8 +259,13 @@
                 <div>
                     <h2 class="text-3xl font-bold">Create an account</h2>
                     <p class="mt-2 text-gray-500">
-                        {partnerData?.text ||
-                            "Enter your email below to create your account"}
+                        You have been given exclusive access to
+                        <span class="font-semibold text-primary">CaseChat</span>
+                        by
+                        <br />
+                        <span class="font-semibold text-primary"
+                            >{partnerData?.name || "Doctors For A Cause"}</span
+                        >
                     </p>
                 </div>
 
