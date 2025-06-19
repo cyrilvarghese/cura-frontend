@@ -20,6 +20,7 @@
     let partnerCode = $state<string | null>(null);
     let partnerData = $state<PartnerData | null>(null);
     let isLoadingPartner = $state(true);
+    let partnerError = $state<string | null>(null);
 
     // Default partner data (fallback)
     const defaultPartnerData: PartnerData = {
@@ -46,13 +47,27 @@
                         showInviteAlert = true;
                     } catch (err) {
                         console.error("Failed to fetch partner data:", err);
-                        // Use default data if API fails
-                        partnerData = { ...defaultPartnerData, code: code };
-                        inviteCode = code;
+                        // Partner code not found - redirect to login
+                        partnerError = "Partner code not found";
+
+                        // Redirect to login after 2 seconds
+                        setTimeout(() => {
+                            navigate("/login", { replace: true });
+                        }, 2000);
+
+                        isLoadingPartner = false;
+                        return;
                     }
                 } else {
-                    // No code provided, use default
-                    partnerData = defaultPartnerData;
+                    // No code provided, redirect to login
+                    partnerError = "Partner code not found";
+
+                    setTimeout(() => {
+                        navigate("/login", { replace: true });
+                    }, 2000);
+
+                    isLoadingPartner = false;
+                    return;
                 }
 
                 isLoadingPartner = false;
@@ -130,6 +145,38 @@
                 class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"
             ></div>
             <p class="text-gray-500">Loading partner information...</p>
+        </div>
+    </div>
+{:else if partnerError}
+    <div class="flex min-h-screen items-center justify-center">
+        <div class="text-center space-y-4">
+            <div
+                class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto"
+            >
+                <svg
+                    class="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">
+                Partner code not found
+            </h2>
+            <p class="text-gray-600">
+                The partner code you provided is invalid or has expired.
+            </p>
+            <p class="text-sm text-gray-500">Redirecting to login...</p>
+            <div
+                class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"
+            ></div>
         </div>
     </div>
 {:else}
