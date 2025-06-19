@@ -9,6 +9,7 @@
     import logoLight from "$lib/assets/logo-light.png";
     import logoDfc from "$lib/assets/logo-dfc.png";
     import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
+    import LoadingOverlay from "$lib/components/ui/loading-overlay.svelte";
     let username = $state("");
     let email = $state("");
     let password = $state("");
@@ -21,6 +22,7 @@
     let partnerData = $state<PartnerData | null>(null);
     let isLoadingPartner = $state(true);
     let partnerError = $state<string | null>(null);
+    let isRedirecting = $state(false);
 
     // Default partner data (fallback)
     const defaultPartnerData: PartnerData = {
@@ -49,24 +51,31 @@
                         console.error("Failed to fetch partner data:", err);
                         // Partner code not found - redirect to login
                         partnerError = "Partner code not found";
+                        isLoadingPartner = false;
 
-                        // Redirect to login after 2 seconds
+                        // Show error for 2 seconds, then redirect
                         setTimeout(() => {
-                            navigate("/login", { replace: true });
+                            isRedirecting = true;
+                            setTimeout(() => {
+                                navigate("/login", { replace: true });
+                            }, 1000);
                         }, 2000);
 
-                        isLoadingPartner = false;
                         return;
                     }
                 } else {
                     // No code provided, redirect to login
                     partnerError = "Partner code not found";
+                    isLoadingPartner = false;
 
+                    // Show error for 2 seconds, then redirect
                     setTimeout(() => {
-                        navigate("/login", { replace: true });
+                        isRedirecting = true;
+                        setTimeout(() => {
+                            navigate("/login", { replace: true });
+                        }, 1000);
                     }, 2000);
 
-                    isLoadingPartner = false;
                     return;
                 }
 
@@ -173,12 +182,14 @@
             <p class="text-gray-600">
                 The partner code you provided is invalid or has expired.
             </p>
-            <p class="text-sm text-gray-500">Redirecting to login...</p>
-            <div
-                class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"
-            ></div>
         </div>
     </div>
+
+    <!-- Loading overlay for redirect -->
+    <LoadingOverlay
+        isVisible={isRedirecting}
+        message="Redirecting to login..."
+    />
 {:else}
     <div class="flex min-h-screen">
         <!-- Left side with partner logo and text -->

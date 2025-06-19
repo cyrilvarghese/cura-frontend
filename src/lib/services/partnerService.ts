@@ -12,13 +12,13 @@ export interface PartnerData {
 const mockPartners: Record<string, PartnerData> = {
     'DFC': {
         logo: logoDfc,
-        text: "Join the Doctors For A Cause medical education initiative",
+        text: "You have been given exclusive access to CaseChat by Doctors For A Cause",
         name: "Doctors For A Cause",
         code: "DFC"
     },
     'dfc': {
         logo: logoDfc,
-        text: "Join the Doctors For A Cause medical education initiative",
+        text: "You have been given exclusive access to CaseChat by Doctors For A Cause",
         name: "Doctors For A Cause",
         code: "dfc"
     }
