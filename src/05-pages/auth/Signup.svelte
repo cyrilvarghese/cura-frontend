@@ -1,7 +1,7 @@
 <script lang="ts">
   import { navigate, Link } from "svelte-routing";
   import { authStore } from "$lib/stores/authStore";
-  import bg2 from "$lib/assets/bg2.png"; // Import the image
+  import bg2 from "$lib/assets/bg4.png"; // Import the image
   import logoLight from "$lib/assets/logo-light.png"; // Import the logo
   import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 
@@ -92,9 +92,7 @@
         alt="Medical molecules"
         class="w-full h-full object-cover opacity-80"
       />
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60"
-      ></div>
+      <div class="absolute inset-0 bg-[#00183C]/70"></div>
     </div>
 
     <div class="relative z-10 flex flex-col justify-between p-12 w-full">
@@ -144,7 +142,7 @@
               type="email"
               bind:value={email}
               required
-              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Your email here"
             />
           </div>
@@ -157,7 +155,7 @@
               type="text"
               bind:value={username}
               required
-              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Your name here"
             />
           </div>
@@ -171,7 +169,7 @@
               type="password"
               bind:value={password}
               required
-              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -183,7 +181,7 @@
               disabled
               bind:value={role}
               required
-              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="student">Student</option>
               <!-- <option value="teacher">Teacher</option>
@@ -207,7 +205,7 @@
 
         <button
           type="submit"
-          class="w-full py-2 px-4 bg-black text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex justify-center"
+          class="w-full py-2 px-4 bg-primary text-primary-foreground font-medium rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex justify-center"
           disabled={isLoading}
         >
           {#if isLoading}

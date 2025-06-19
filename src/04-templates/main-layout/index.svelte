@@ -9,6 +9,7 @@
 	import CaseAssessment from "../../05-pages/cases/case-assessment/create-case-wrapper.svelte";
 	import Login from "../../05-pages/auth/Login.svelte";
 	import Signup from "../../05-pages/auth/Signup.svelte";
+	import PartnerSignup from "../../05-pages/auth/PartnerSignup.svelte";
 	import { isAuthenticated } from "$lib/stores/authStore";
 	import ClassPage from "../../05-pages/ClassPage.svelte";
 	import OSCEPage from "../../05-pages/OSCEPage.svelte";
@@ -126,6 +127,9 @@
 			</Route>
 			<Route path="/signup">
 				<Signup />
+			</Route>
+			<Route path="/partner-signup">
+				<PartnerSignup />
 			</Route>
 			<Route path="*">
 				<Login />
