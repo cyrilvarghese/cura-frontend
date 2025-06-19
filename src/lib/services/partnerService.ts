@@ -6,6 +6,8 @@ export interface PartnerData {
     text: string;
     name: string;
     code: string;
+    quote?: string;
+    quoteAuthor?: string;
 }
 
 // Mock partner data
@@ -14,13 +16,17 @@ const mockPartners: Record<string, PartnerData> = {
         logo: logoDfc,
         text: "You have been given exclusive access to CaseChat by Doctors For A Cause",
         name: "Doctors For A Cause",
-        code: "DFC"
+        code: "DFC",
+        quote: "We believe exceptional medical education is a right, not a privilege. Together, we're building tomorrow's healers.",
+        quoteAuthor: "Doctors For A Cause"
     },
     'dfc': {
         logo: logoDfc,
         text: "You have been given exclusive access to CaseChat by Doctors For A Cause",
         name: "Doctors For A Cause",
-        code: "dfc"
+        code: "dfc",
+        quote: "We believe exceptional medical education is a right, not a privilege. Together, we're building tomorrow's healers.",
+        quoteAuthor: "Doctors For A Cause"
     }
 };
 

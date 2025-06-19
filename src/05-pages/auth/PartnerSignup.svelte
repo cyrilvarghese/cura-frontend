@@ -233,13 +233,13 @@
                     <!-- Partner Text/Quote -->
                     <div class="mt-8">
                         <blockquote class="text-2xl font-medium mb-4">
-                            "Finally, medical education that's engaging and
-                            practical. The cases feel like real patients I might
-                            encounter during rotations"
+                            "{partnerData?.quote ||
+                                `Finally, medical education that's engaging and practical. The cases feel like real patients I might encounter during rotations`}"
                         </blockquote>
-                        <cite class="block"
-                            >Ameena Rafath, 4th Year MBBS, GMC Cochin</cite
-                        >
+                        <cite class="block">
+                            {partnerData?.quoteAuthor ||
+                                "Ameena Rafath, 4th Year MBBS, GMC Cochin"}
+                        </cite>
                     </div>
                 </div>
             </div>
